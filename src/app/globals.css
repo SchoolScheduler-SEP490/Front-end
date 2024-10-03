@@ -5,23 +5,65 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  /* Primary Colors */
+  --primary-light: #e6edf3;
+  --primary-light-hover: #d9e4ed;
+  --primary-light-active: #b0c8da;
+  --primary-normal: #004e88;
+  --primary-normal-hover: #00467a;
+  --primary-normal-active: #003e6d;
+  --primary-dark: #003b66;
+  --primary-dark-hover: #002f52;
+  --primary-dark-active: #00233d;
+  --primary-darker: #001b30;
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
+  /* Secondary Colors */
+  --secondary-light: #e8f0f5;
+  --secondary-light-hover: #dde8f0;
+  --secondary-light-active: #b8cfe1;
+  --secondary-normal: #1a659e;
+  --secondary-normal-hover: #175b8e;
+  --secondary-normal-active: #15517e;
+  --secondary-dark: #144c77;
+  --secondary-dark-hover: #103d5f;
+  --secondary-dark-active: #0c2d47;
+  --secondary-darker: #092337;
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  /* Tertiary Colors (additional secondary) */
+  --tertiary-light: #fff0eb;
+  --tertiary-light-hover: #ffe9e1;
+  --tertiary-light-active: #ffd1c0;
+  --tertiary-normal: #ff6b35;
+  --tertiary-normal-hover: #e66030;
+  --tertiary-normal-active: #cc562a;
+  --tertiary-dark: #bf5028;
+  --tertiary-dark-hover: #994020;
+  --tertiary-dark-active: #733018;
+  --tertiary-darker: #592513;
+
+  /* Font sizes */
+  --font-size-66: 4.125rem;
+  /* 66px */
+  --font-size-52: 3.250rem;
+  /* 52px */
+  --font-size-32: 2.000rem;
+  /* 32px */
+  --font-size-29: 1.812rem;
+  /* 29px */
+  --font-size-26: 1.625rem;
+  /* 26px */
+  --font-size-23: 1.438rem;
+  /* 23px */
+  --font-size-20: 1.250rem;
+  /* 20px */
+  --font-size-18: 1.125rem;
+  /* 18px */
+  --font-size-16: 1.000rem;
+  /* 16px */
+  --font-size-14: 0.875rem;
+  /* 14px */
+  --font-size-13: 0.812rem;
+  /* 13px */
+
 }
