@@ -7,6 +7,9 @@ const config: Config = {
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
 	],
 	theme: {
+		gridTemplateColumns: {
+			'12': 'repeat(12, minmax(0, 1fr))',
+		},
 		extend: {
 			colors: {
 				background: 'var(--background)',
@@ -71,6 +74,9 @@ const config: Config = {
 				bold: '700',
 				extrabold: '800',
 				black: '900',
+			},
+			animation: {
+				normal: '1s linear',
 			},
 		},
 	},
