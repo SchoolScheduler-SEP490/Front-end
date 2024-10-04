@@ -1,36 +1,193 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Introduction
 
-## Getting Started
+-   Add your project logo.
+-   Write a short introduction to the project.
+-   If you are using badges, add them here.
 
-First, run the development server:
+## :ledger: Index
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+-   [About](#beginner-about)
+-   [Usage](#zap-usage)
+    -   [Installation](#electric_plug-installation)
+    -   [Commands](#package-commands)
+-   [Development](#wrench-development)
+    -   [Pre-Requisites](#notebook-pre-requisites)
+    -   [Developmen Environment](#nut_and_bolt-development-environment)
+    -   [File Structure](#file_folder-file-structure)
+    -   [Build](#hammer-build)
+    -   [Deployment](#rocket-deployment)
+-   [Community](#cherry_blossom-community)
+    -   [Contribution](#fire-contribution)
+    -   [Branches](#cactus-branches)
+    -   [Guideline](#exclamation-guideline)
+-   [FAQ](#question-faq)
+-   [Resources](#page_facing_up-resources)
+-   [Gallery](#camera-gallery)
+-   [Credit/Acknowledgment](#star2-creditacknowledgment)
+-   [License](#lock-license)
+
+## :beginner: About
+
+Add a detailed introduction about the project here, everything you want the reader to know.
+
+## :zap: Usage
+
+Write about how to use this project.
+
+### :electric_plug: Installation
+
+-   Steps on how to install this project, to use it.
+-   Be very detailed here, For example, if you have tools which run on different operating systems, write installation steps for all of them.
+
+```
+$ add installations steps if you have to.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### :package: Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-   Commands to start the project.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## :wrench: Development
 
-## Learn More
+If you want other people to contribute to this project, this is the section, make sure you always add this.
 
-To learn more about Next.js, take a look at the following resources:
+### :notebook: Pre-Requisites
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+List all the pre-requisites the system needs to develop this project.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-   A tool
+-   B tool
 
-## Deploy on Vercel
+### :nut_and_bolt: Development Environment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Write about setting up the working environment for your project.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+-   How to download the project...
+-   How to install dependencies...
+
+### :file_folder: File Structure
+
+Add a file structure here with the basic details about files, below is an example.
+
+```
+.
+├── public
+│   ├── animations
+│   │   ├── landing.json
+│   │   └── ...
+│   ├── images
+│   │   ├── icons
+│   │   │   ├── accept.png
+│   │   │   ├── add.png
+│   │   │   └── ...
+│   │   ├── default-avt.png
+│   │   └── ...
+│   └── styles
+        ├── global.css
+│       └── ...
+├── src
+│   ├── app
+│   │   ├── landing
+│   │   │   ├── page.tsx
+│   │   │   └── ...
+│   │   ├── teacher
+│   │   ├── school-manager
+│   │   ├── ...
+│   │   ├── global.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components
+│   │   ├── commons
+│   │   │   ├── button.tsx
+│   │   │   └── ...
+│   │   ├── landing
+│   │   └── ...
+│   ├── context
+│   │   ├── user-slice.ts
+│   │   └── ...
+│   └── libs
+        ├── fonts.ts
+│       └── ...
+├── CNAME
+├── index.html
+├── rate.html
+└── README.md
+```
+
+| No  | File Name | Details     |
+| --- | --------- | ----------- |
+| 1   | index     | Entry point |
+
+### :hammer: Build
+
+Write the build Instruction here.
+
+### :rocket: Deployment
+
+Write the deployment instruction here.
+
+## :cherry_blossom: Community
+
+If it's open-source, talk about the community here, ask social media links and other links.
+
+### :fire: Contribution
+
+Your contributions are always welcome and appreciated. Following are the things you can do to contribute to this project.
+
+1.  **Report a bug** <br>
+    If you think you have encountered a bug, and I should know about it, feel free to report it [here]() and I will take care of it.
+
+2.  **Request a feature** <br>
+    You can also request for a feature [here](), and if it will viable, it will be picked for development.
+
+3.  **Create a pull request** <br>
+    It can't get better then this, your pull request will be appreciated by the community. You can get started by picking up any open issues from [here]() and make a pull request.
+
+> If you are new to open-source, make sure to check read more about it [here](https://www.digitalocean.com/community/tutorial_series/an-introduction-to-open-source) and learn more about creating a pull request [here](https://www.digitalocean.com/community/tutorials/how-to-create-a-pull-request-on-github).
+
+### :cactus: Branches
+
+I use an agile continuous integration methodology, so the version is frequently updated and development is really fast.
+
+1. **`stage`** is the development branch.
+
+2. **`master`** is the production branch.
+
+3. No other permanent branches should be created in the main repository, you can create feature branches but they should get merged with the master.
+
+**Steps to work with feature branch**
+
+1. To start working on a new feature, create a new branch prefixed with `feat` and followed by feature name. (ie. `feat-FEATURE-NAME`)
+2. Once you are done with your changes, you can raise PR.
+
+**Steps to create a pull request**
+
+1. Make a PR to `stage` branch.
+2. Comply with the best practices and guidelines e.g. where the PR concerns visual elements it should have an image showing the effect.
+3. It must pass all continuous integration checks and get positive reviews.
+
+After this, changes will be merged.
+
+### :exclamation: Guideline
+
+coding guidelines or other things you want people to follow should follow.
+
+## :question: FAQ
+
+You can optionally add a FAQ section about the project.
+
+## :page_facing_up: Resources
+
+Add important resources here
+
+## :camera: Gallery
+
+Pictures of your project.
+
+## :star2: Credit/Acknowledgment
+
+Credit the authors here.
+
+## :lock: License
+
+Add a license here, or a link to it.
