@@ -31,10 +31,10 @@ const headerList: IHeaderList[] = [
 
 const Header = () => {
 	return (
-		<div className='flex justify-between items-center w-screen h-16 px-10 gap-8'>
-			<div className='logo'>
+		<nav className='flex justify-between items-center w-screen h-fit px-10 gap-8'>
+			<div className='logo my-8 sm:my-2 md:my-4'>
 				<Link href={headerList[0].url} className='w-fit'>
-					<h2 className='text-primary-normal text-2xl font-bold w-fit tracking-wider'>
+					<h2 className='text-primary-500 text-2xl font-bold w-fit tracking-wider'>
 						Schedulify
 					</h2>
 				</Link>
@@ -46,14 +46,14 @@ const Header = () => {
 						<Link
 							href={item.url}
 							key={`${item.name}${index}`}
-							className='py-1 h-9 hover:border-b-3 hover:border-primary-normal'
+							className='py-1 h-9 hover:border-b-3 hover:border-primary-500'
 						>
 							<h3 className='font-medium tracking-wide'>{item.name}</h3>
 						</Link>
 					))}
 				</div>
 
-				<div className='login-btn w-28 py-1 px-2 border-b-3 border-primary-normal'>
+				<div className='login-btn w-28 py-1 px-2 border-b-3 border-primary-500'>
 					<Link href='/login' title='Đăng nhập'>
 						<h3 className='font-medium tracking-wide text-primary-dark hover:font-bold w-full text-center'>
 							Đăng nhập
@@ -61,7 +61,7 @@ const Header = () => {
 					</Link>
 				</div>
 			</div>
-		</div>
+		</nav>
 	);
 };
 

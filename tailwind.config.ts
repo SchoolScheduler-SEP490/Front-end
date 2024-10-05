@@ -16,16 +16,16 @@ const config: Config = {
 				background: 'var(--background)',
 				foreground: 'var(--foreground)',
 				primary: {
-					light: 'var(--primary-light)',
-					'light-hover': 'var(--primary-light-hover)',
-					'light-active': 'var(--primary-light-active)',
-					normal: 'var(--primary-normal)',
-					'normal-hover': 'var(--primary-normal-hover)',
-					'normal-active': 'var(--primary-normal-active)',
-					dark: 'var(--primary-dark)',
-					'dark-hover': 'var(--primary-dark-hover)',
-					'dark-active': 'var(--primary-dark-active)',
-					darker: 'var(--primary-darker)',
+					'50': 'var(--primary-light)',
+					'100': 'var(--primary-light-hover)',
+					'200': 'var(--primary-light-active)',
+					'300': 'var(--primary-normal)',
+					'400': 'var(--primary-normal-hover)',
+					'500': 'var(--primary-normal-active)',
+					'600': 'var(--primary-dark)',
+					'700': 'var(--primary-dark-hover)',
+					'800': 'var(--primary-dark-active)',
+					'900': 'var(--primary-darker)',
 				},
 				secondary: {
 					light: 'var(--secondary-light)',
@@ -65,17 +65,163 @@ const config: Config = {
 				10: '10px',
 			},
 			fontSize: {
-				'66': 'var(--font-size-66)' /* 66px */,
-				'52': 'var(--font-size-52)' /* 52px */,
-				'32': 'var(--font-size-32)' /* 32px */,
-				'29': 'var(--font-size-29)' /* 29px */,
-				'26': 'var(--font-size-26)' /* 26px */,
-				'23': 'var(--font-size-23)' /* 23px */,
-				'20': 'var(--font-size-20)' /* 20px */,
-				'18': 'var(--font-size-18)' /* 18px */,
-				'16': 'var(--font-size-16)' /* 16px */,
-				'14': 'var(--font-size-14)' /* 14px */,
-				'13': 'var(--font-size-13)' /* 13px */,
+				// Title-variants
+				'title-3xl': [
+					'var(--font-size-66)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-2xl': [
+					'var(--font-size-52)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-1.5xl': [
+					'var(--font-size-32)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-xl': [
+					'var(--font-size-26)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-large': [
+					'var(--font-size-23)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-medium': [
+					'var(--font-size-20)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-small': [
+					'var(--font-size-18)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'medium',
+					},
+				],
+				'title-3xl-strong': [
+					'var(--font-size-66)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'bold',
+					},
+				],
+				'title-2xl-strong': [
+					'var(--font-size-52)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+				'title-1.5xl-strong': [
+					'var(--font-size-32)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+				'title-xl-strong': [
+					'var(--font-size-26)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+				'title-large-strong': [
+					'var(--font-size-23)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+				'title-medium-thin': [
+					'var(--font-size-20)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'regular',
+					},
+				],
+				'title-medium-strong': [
+					'var(--font-size-20)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+				'title-small-strong': [
+					'var(--font-size-18)',
+					{
+						letterSpacing: '3%',
+						fontWeight: 'semibold',
+					},
+				],
+
+				// Body variants
+				'body-xlarge': [
+					'var(--font-size-18)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'regular',
+					},
+				],
+				'body-large': [
+					'var(--font-size-16)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'regular',
+					},
+				],
+				'body-large-strong': [
+					'var(--font-size-16)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'medium',
+					},
+				],
+				'body-medium': [
+					'var(--font-size-14)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'regular',
+					},
+				],
+				'body-medium-strong': [
+					'var(--font-size-14)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'medium',
+					},
+				],
+				'body-small': [
+					'var(--font-size-13)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'regular',
+					},
+				],
+				'small-strong': [
+					'var(--font-size-13)',
+					{
+						letterSpacing: '2%',
+						fontWeight: 'medium',
+					},
+				],
 			},
 			fontWeight: {
 				thin: '100',
@@ -89,7 +235,7 @@ const config: Config = {
 				black: '900',
 			},
 			animation: {
-				normal: '2s linear',
+				normal: '1s linear',
 			},
 		},
 	},
