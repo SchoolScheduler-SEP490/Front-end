@@ -17,7 +17,7 @@ export default function RootLayout({
 	return (
 		<html lang='vi'>
 			<body
-				className={`${inter.className} antialiased container w-screen h-screen`}
+				className={`${inter.className} antialiased container w-screen h-screen animate-normal`}
 			>
 				<Header />
 				{children}

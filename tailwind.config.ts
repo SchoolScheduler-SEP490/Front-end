@@ -5,6 +5,7 @@ const config: Config = {
 		'./src/pages/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
+		'./src/commons/**/*.{js,ts,jsx,tsx,mdx}',
 	],
 	theme: {
 		gridTemplateColumns: {
@@ -51,6 +52,18 @@ const config: Config = {
 					darker: 'var(--tertiary-darker)',
 				},
 			},
+			borderWidth: {
+				1: '1px',
+				2: '2px',
+				3: '3px',
+				4: '4px',
+				5: '5px',
+				6: '6px',
+				7: '7px',
+				8: '8px',
+				9: '9px',
+				10: '10px',
+			},
 			fontSize: {
 				'66': 'var(--font-size-66)' /* 66px */,
 				'52': 'var(--font-size-52)' /* 52px */,
@@ -76,7 +89,7 @@ const config: Config = {
 				black: '900',
 			},
 			animation: {
-				normal: '1s linear',
+				normal: '2s linear',
 			},
 		},
 	},
