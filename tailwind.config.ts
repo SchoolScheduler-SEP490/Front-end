@@ -69,106 +69,107 @@ const config: Config = {
 				'title-3xl': [
 					'var(--font-size-66)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-2xl': [
 					'var(--font-size-52)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-1.5xl': [
 					'var(--font-size-32)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-xl': [
 					'var(--font-size-26)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-large': [
 					'var(--font-size-23)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-medium': [
 					'var(--font-size-20)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
 				'title-small': [
 					'var(--font-size-18)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'medium',
+						letterSpacing: '0.05rem',
+						fontWeight: '400',
 					},
 				],
+
 				'title-3xl-strong': [
 					'var(--font-size-66)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'bold',
+						letterSpacing: '0.05rem',
+						fontWeight: '600',
 					},
 				],
 				'title-2xl-strong': [
 					'var(--font-size-52)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 				'title-1.5xl-strong': [
 					'var(--font-size-32)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 				'title-xl-strong': [
 					'var(--font-size-26)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 				'title-large-strong': [
 					'var(--font-size-23)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 				'title-medium-thin': [
 					'var(--font-size-20)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'regular',
+						letterSpacing: '0.05rem',
+						fontWeight: '300',
 					},
 				],
 				'title-medium-strong': [
 					'var(--font-size-20)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 				'title-small-strong': [
 					'var(--font-size-18)',
 					{
-						letterSpacing: '3%',
-						fontWeight: 'semibold',
+						letterSpacing: '0.05rem',
+						fontWeight: '500',
 					},
 				],
 
@@ -176,50 +177,50 @@ const config: Config = {
 				'body-xlarge': [
 					'var(--font-size-18)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'regular',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'body-large': [
 					'var(--font-size-16)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'regular',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'body-large-strong': [
 					'var(--font-size-16)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'medium',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'body-medium': [
 					'var(--font-size-14)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'regular',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'body-medium-strong': [
 					'var(--font-size-14)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'medium',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'body-small': [
 					'var(--font-size-13)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'regular',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 				'small-strong': [
 					'var(--font-size-13)',
 					{
-						letterSpacing: '2%',
-						fontWeight: 'medium',
+						letterSpacing: '0.025rem',
+						fontWeight: '300',
 					},
 				],
 			},
