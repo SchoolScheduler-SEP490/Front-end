@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import './_styles/globals.css';
+import '@/commons/_styles/globals.css';
 import { inter } from '@/utils/fonts';
 import Header from '@/commons/header';
 import Footer from '@/commons/footer';
