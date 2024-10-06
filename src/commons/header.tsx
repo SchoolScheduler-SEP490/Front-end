@@ -20,7 +20,7 @@ const Header = () => {
 						<Link
 							href={item.url}
 							key={`${item.name}${index}`}
-							className='py-1 h-9 hover:border-b-3 hover:border-primary-500'
+							className='py-1 h-9 hover:border-b-3 hover:border-primary-500 opacity-80'
 						>
 							<h3 className='font-medium tracking-wide'>{item.name}</h3>
 						</Link>
