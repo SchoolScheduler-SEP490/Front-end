@@ -13,7 +13,7 @@ const Footer = (): JSX.Element => {
 				<div className='flex h-fit flex-col justify-start items-center w-96 gap-10'>
 					{/* Logo container */}
 					<div className='flex flex-col justify-between items-start h-fit gap-4'>
-						<Link href={'/'} className='w-fit text-title-xl'>
+						<Link href={'/'} className='w-fit text-title-xl-strong'>
 							Schedulify
 						</Link>
 						<p className='text-justify w-full h-fit text-title-`small opacity-80'>
