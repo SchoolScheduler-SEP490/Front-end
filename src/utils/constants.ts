@@ -1,3 +1,5 @@
+import exp from 'constants';
+
 export interface INavList {
 	name: string;
 	url: string;
@@ -25,3 +27,10 @@ export const NAV_LINKS: INavList[] = [
 		url: '/contact',
 	},
 ];
+
+export default interface ILoginUser {
+	id: string;
+	email: string;
+	name: string;
+	role: string;
+}
