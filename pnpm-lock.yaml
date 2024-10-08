@@ -401,7 +401,7 @@ packages:
 
   '@types/cookie@0.6.0':
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}
-
+    
   '@types/hoist-non-react-statics@3.3.5':
     resolution: {integrity: sha512-SbcrWzkKBw2cdwRTwQAswfpB9g9LJWfjtUeW/jvNwbhC8cpmmNYVePa+ncbUe0rGTQ7G3Ff6mYUN2VMfLVr+Sg==}
 
@@ -1509,7 +1509,7 @@ snapshots:
       tslib: 2.7.0
 
   '@types/cookie@0.6.0': {}
-
+  
   '@types/hoist-non-react-statics@3.3.5':
     dependencies:
       '@types/react': 18.3.11
