@@ -1,8 +1,8 @@
-const formatVNCurrency = (value: number) => {
-	return value.toLocaleString('vi-VN', {
-		style: 'currency',
-		currency: 'VND',
-	});
-};
+// const formatVNCurrency = (value: number) => {
+// 	return value.toLocaleString('vi-VN', {
+// 		style: 'currency',
+// 		currency: 'VND',
+// 	});
+// };
 
-export { formatVNCurrency };
+// export { formatVNCurrency };
