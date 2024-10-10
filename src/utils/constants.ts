@@ -12,15 +12,15 @@ export const NAV_LINKS: INavList[] = [
 	},
 	{
 		name: 'Thời khóa biểu',
-		url: '/about',
+		url: '/timetable',
 	},
 	{
-		name: 'Quản lý trường học',
-		url: '/about',
+		name: 'Trường học',
+		url: '/schools',
 	},
 	{
 		name: 'Cộng đồng',
-		url: '/about',
+		url: '/community',
 	},
 	{
 		name: 'Liên hệ',

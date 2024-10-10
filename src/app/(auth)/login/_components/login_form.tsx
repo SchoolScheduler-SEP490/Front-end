@@ -10,6 +10,7 @@ import { IJWTTokenPayload, ILoginResponse, ILoginUser } from '@/utils/constants'
 import { jwtDecode } from 'jwt-decode';
 import { inter } from '@/utils/fonts';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -32,9 +33,15 @@ interface ILoginForm {
 
 export const LoginForm = () => {
 	const { setSessionToken } = useAppContext();
+	const router = useRouter();
 	const [api, setApi] = useState<string>(process.env.NEXT_PUBLIC_API_URL || 'Unknown');
 
-	const handleRegister = () => {};
+	const handleRegister = () => {
+		router.push('/register');
+	};
+	const handleForgotPassword = () => {
+		router.push('/forgot-password');
+	};
 	const handleLogin = async ({ email, password }: ILoginForm) => {
 		try {
 			const result = await fetch(`${api}/api/users/login`, {
@@ -142,7 +149,10 @@ export const LoginForm = () => {
 					error={formik.touched.password && Boolean(formik.errors.password)}
 					helperText={formik.touched.password && formik.errors.password}
 				/>
-				<h3 className='text-body-small text-right w-full my-2 cursor-pointer'>
+				<h3
+					className='text-body-small text-right w-full my-2 cursor-pointer'
+					onClick={handleForgotPassword}
+				>
 					Quên mật khẩu?
 				</h3>
 				<CustomButton
