@@ -1,3 +1,4 @@
+import { inter } from '@/utils/fonts';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,7 +13,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='en'>
-			<body>{children}</body>
+			<body className={`${inter.className} antialiased w-screen h-screen`}>
+				{children}
+			</body>
 		</html>
 	);
 }

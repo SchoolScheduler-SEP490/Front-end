@@ -1,11 +1,15 @@
 'use client';
+import { styled } from '@mui/material';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
-import { signIn } from 'next-auth/react';
-import { loginSchema } from '../libs/login_schema';
 import Image from 'next/image';
-import { styled } from '@mui/material';
+import { loginSchema } from '../libs/login_schema';
+import { useAppContext } from '@/context/app_provider';
+import { IJWTTokenPayload, ILoginResponse, ILoginUser } from '@/utils/constants';
+import { jwtDecode } from 'jwt-decode';
+import { inter } from '@/utils/fonts';
+import { useState } from 'react';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -15,24 +19,84 @@ const CustomButton = styled(Button)({
 	textTransform: 'uppercase',
 	fontSize: 'var(--font-size-18)',
 	padding: '10px 12px',
-	lineHeight: 1.5,
+	lineHeight: 1.2,
+	verticalAlign: 'center',
 	backgroundColor: 'var(--primary-normal)',
-	fontFamily: ['__Inter_36bd41', '__Inter_Fallback_36bd41'].join(','),
+	fontFamily: [inter].join(','),
 });
 
+interface ILoginForm {
+	email: string;
+	password: string;
+}
+
 export const LoginForm = () => {
+	const { setSessionToken } = useAppContext();
+	const [api, setApi] = useState<string>(process.env.NEXT_PUBLIC_API_URL || 'Unknown');
+
+	const handleRegister = () => {};
+	const handleLogin = async ({ email, password }: ILoginForm) => {
+		try {
+			const result = await fetch(`${api}/api/users/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ email: email, password: password }),
+			}).then(async (response) => {
+				const loginResponse: ILoginResponse = { ...(await response.json()) };
+				let data: ILoginUser | undefined = undefined;
+				if (loginResponse.status === 200) {
+					const decodedToken: IJWTTokenPayload = jwtDecode(
+						loginResponse['jwt-token']
+					);
+					data = {
+						email: decodedToken?.email ?? '',
+						id: decodedToken?.accountId ?? '',
+						role: decodedToken?.role ?? '',
+						jwt: {
+							token: loginResponse['jwt-token'],
+							refreshToken: loginResponse['jwt-refresh-token'],
+							expired: new Date(loginResponse.expired),
+						},
+					};
+				}
+				return data;
+			});
+			console.log(JSON.stringify(result, null, 2));
+			const resultFromNextServer = await fetch('/api/auth', {
+				method: 'POST',
+				body: JSON.stringify(result),
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}).then(async (res) => {
+				const payload = await res.json();
+				const data = {
+					status: res.status,
+					payload,
+				};
+				if (!res.ok) {
+					throw data;
+				}
+				return data;
+			});
+			setSessionToken(resultFromNextServer.payload.jwt.token);
+		} catch (error: any) {
+			console.log('>>>ERROR: ', error);
+		}
+	};
+
 	const formik = useFormik({
 		initialValues: {
 			email: '',
 			password: '',
 		},
 		validationSchema: loginSchema,
-		onSubmit: (formData) => {
-			signIn('credentials', { ...formData, redirect: false });
+		onSubmit: async (formData) => {
+			await handleLogin(formData);
 		},
 	});
-
-	const handleRegister = () => {};
 
 	return (
 		<div className='w-full'>
