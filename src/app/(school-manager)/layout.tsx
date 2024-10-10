@@ -1,12 +1,10 @@
-import type { Metadata } from 'next';
 import '@/commons/styles/globals.css';
 import { inter } from '@/utils/fonts';
-import Header from '@/commons/header';
-import Footer from '@/commons/footer';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
-	title: 'Schedulify | Trang chủ',
+	title: 'Schedulify | Thời khóa biểu',
 };
 
 export default function RootLayout({
@@ -17,9 +15,7 @@ export default function RootLayout({
 	return (
 		<html lang='vi'>
 			<body className={`${inter.className} antialiased w-screen h-screen`}>
-				<Header />
 				{children}
-				<Footer />
 			</body>
 		</html>
 	);

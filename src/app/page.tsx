@@ -1,30 +1,36 @@
 'use client';
 
+import { jwtDecode } from 'jwt-decode';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { IJWTTokenPayload } from './(auth)/_utils/constants';
+import { useEffect } from 'react';
 
 export default function Home(): JSX.Element {
-	redirect('/landing');
-
 	// const cookieStore = cookies();
 	// const sessionToken = cookieStore.get('sessionToken');
-	// const api = process.env.API_URL || '';
-	// const result = await fetch(`${api}/account/me`, {
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		Authorization: `Bearer ${sessionToken?.value}`,
-	// 	},
-	// }).then(async (res) => {
-	// 	const payload = await res.json();
-	// 	const data = {
-	// 		status: res.status,
-	// 		payload,
-	// 	};
-	// 	if (!res.ok) {
-	// 		throw data;
+
+	// useEffect(() => {
+	// 	if (sessionToken && sessionToken?.value.length !== 0) {
+	// 		const data = jwtDecode(sessionToken?.value);
+	// 		const userRole = (data as IJWTTokenPayload).role;
+
+	// 		if (userRole.toLowerCase() === 'admin') {
+	// 			redirect('/dashboard');
+	// 		} else if (
+	// 			userRole.toLowerCase() === 'teacher' ||
+	// 			userRole.toLowerCase() === 'teacher_head'
+	// 		) {
+	// 			redirect('/published-timetable');
+	// 		} else if (userRole.toLowerCase() === 'schoolManager') {
+	// 			redirect('/timetable');
+	// 		}
+	// 	} else {
+	// 		redirect('/landing');
 	// 	}
-	// 	return data;
-	// });
+	// }, []);
+
+	redirect('/landing');
 
 	return <div>{/* Place for redirecting based on user's session */}</div>;
 }

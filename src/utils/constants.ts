@@ -12,15 +12,15 @@ export const NAV_LINKS: INavList[] = [
 	},
 	{
 		name: 'Thời khóa biểu',
-		url: '/about',
+		url: '/timetable',
 	},
 	{
-		name: 'Quản lý trường học',
-		url: '/about',
+		name: 'Trường học',
+		url: '/schools',
 	},
 	{
 		name: 'Cộng đồng',
-		url: '/about',
+		url: '/community',
 	},
 	{
 		name: 'Liên hệ',
@@ -28,7 +28,7 @@ export const NAV_LINKS: INavList[] = [
 	},
 ];
 
-export interface ILoginUser {
+export interface IUser {
 	id: string;
 	email: string;
 	role: string;
@@ -39,23 +39,4 @@ export interface IJWT {
 	token: string;
 	refreshToken: string;
 	expired: Date;
-}
-
-export interface ILoginResponse {
-	status: number;
-	message: string;
-	'jwt-token': string;
-	expired: Date;
-	'jwt-refresh-token': string;
-	'account-id': string;
-}
-
-export interface IJWTTokenPayload {
-	email: string;
-	accountId: string;
-	jti: string;
-	role: string;
-	exp: number;
-	iss: string;
-	aud: string;
 }
