@@ -1,6 +1,8 @@
 export async function POST(request: Request) {
 	const res = await request.json();
+	console.log('>>>Response: ', JSON.stringify(res, null, 2));
 	const sessionToken = res?.jwt?.token ?? undefined;
+
 	if (!sessionToken) {
 		return Response.json(
 			{ message: 'Không nhận được session token' },

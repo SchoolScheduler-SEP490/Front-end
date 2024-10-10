@@ -6,11 +6,16 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { loginSchema } from '../libs/login_schema';
 import { useAppContext } from '@/context/app_provider';
-import { IJWTTokenPayload, ILoginResponse, ILoginUser } from '@/utils/constants';
+import { IUser } from '@/utils/constants';
+import {
+	IJWTTokenPayload,
+	ILoginResponse,
+	ILoginForm,
+} from '@/app/(auth)/_utils/constants';
 import { jwtDecode } from 'jwt-decode';
 import { inter } from '@/utils/fonts';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -25,11 +30,6 @@ const CustomButton = styled(Button)({
 	backgroundColor: 'var(--primary-normal)',
 	fontFamily: [inter].join(','),
 });
-
-interface ILoginForm {
-	email: string;
-	password: string;
-}
 
 export const LoginForm = () => {
 	const { setSessionToken } = useAppContext();
@@ -52,25 +52,24 @@ export const LoginForm = () => {
 				body: JSON.stringify({ email: email, password: password }),
 			}).then(async (response) => {
 				const loginResponse: ILoginResponse = { ...(await response.json()) };
-				let data: ILoginUser | undefined = undefined;
+				let data: IUser | undefined = undefined;
 				if (loginResponse.status === 200) {
 					const decodedToken: IJWTTokenPayload = jwtDecode(
-						loginResponse['jwt-token']
+						loginResponse['jwt-token'] ?? ''
 					);
 					data = {
 						email: decodedToken?.email ?? '',
 						id: decodedToken?.accountId ?? '',
 						role: decodedToken?.role ?? '',
 						jwt: {
-							token: loginResponse['jwt-token'],
-							refreshToken: loginResponse['jwt-refresh-token'],
-							expired: new Date(loginResponse.expired),
+							token: loginResponse['jwt-token'] ?? '',
+							refreshToken: loginResponse['jwt-refresh-token'] ?? '',
+							expired: new Date(loginResponse.expired ?? ''),
 						},
 					};
 				}
 				return data;
 			});
-			console.log(JSON.stringify(result, null, 2));
 			const resultFromNextServer = await fetch('/api/auth', {
 				method: 'POST',
 				body: JSON.stringify(result),
@@ -88,6 +87,7 @@ export const LoginForm = () => {
 				}
 				return data;
 			});
+			router.refresh();
 			setSessionToken(resultFromNextServer.payload.jwt.token);
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
