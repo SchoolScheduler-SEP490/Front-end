@@ -28,9 +28,34 @@ export const NAV_LINKS: INavList[] = [
 	},
 ];
 
-export default interface ILoginUser {
+export interface ILoginUser {
 	id: string;
 	email: string;
-	name: string;
 	role: string;
+	jwt: IJWT;
+}
+
+export interface IJWT {
+	token: string;
+	refreshToken: string;
+	expired: Date;
+}
+
+export interface ILoginResponse {
+	status: number;
+	message: string;
+	'jwt-token': string;
+	expired: Date;
+	'jwt-refresh-token': string;
+	'account-id': string;
+}
+
+export interface IJWTTokenPayload {
+	email: string;
+	accountId: string;
+	jti: string;
+	role: string;
+	exp: number;
+	iss: string;
+	aud: string;
 }

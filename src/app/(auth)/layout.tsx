@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import '@/commons/styles/globals.css';
 import { inter } from '@/utils/fonts';
-import AppProvider from '@/context/app_provider';
-import { cookies } from 'next/headers';
+import Header from '@/commons/header';
+import Footer from '@/commons/footer';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -15,15 +15,12 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const cookieStore = cookies();
-	const sessionToken = cookieStore.get('sessionToken');
-
 	return (
 		<html lang='vi'>
 			<body className={`${inter.className} antialiased w-screen h-screen`}>
-				<AppProvider inititalSessionToken={sessionToken?.value}>
-					{children}
-				</AppProvider>
+				<Header />
+				{children}
+				<Footer />
 			</body>
 		</html>
 	);
