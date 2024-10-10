@@ -35,11 +35,16 @@ export function middleware(request: NextRequest) {
 			if (adminPaths.some((path) => !pathname.startsWith(path)))
 				return NextResponse.redirect(new URL('/dashboard', request.url));
 		}
-		// Teacher and Teacher Department Head routes
-		else if (
-			userRole.toLowerCase() === 'teacher' ||
-			userRole.toLowerCase() === 'teacherheaddepartment'
-		) {
+		// Teacher routes
+		else if (userRole.toLowerCase() === 'teacher') {
+			if (teacherPaths.some((path) => !pathname.startsWith(path)))
+				return NextResponse.redirect(
+					new URL('/published-timetable', request.url)
+				);
+		}
+
+		// Teacher Department Head routes
+		else if (userRole.toLowerCase() === 'teacher') {
 			if (teacherPaths.some((path) => !pathname.startsWith(path)))
 				return NextResponse.redirect(
 					new URL('/published-timetable', request.url)
