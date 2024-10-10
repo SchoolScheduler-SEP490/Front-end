@@ -1,32 +1,71 @@
-import { NextResponse } from 'next/server';
+import { jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { IJWTTokenPayload } from './app/(auth)/_utils/constants';
 
 const publicPaths = ['/landing', '/community', '/contact', '/schools', 'timetable'];
 const authPaths = ['/login', '/register', '/forgot-password'];
-const privatePaths = ['/dashboard'];
+const adminPaths = ['/dashboard'];
+const teacherPaths = ['/published-timetable'];
+const schoolManagerPaths = ['/timetable'];
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 	const sessionToken = request.cookies.get('sessionToken')?.value;
 
-	// Chưa đăng nhập thì không cho vào private paths
-	if (privatePaths.some((path) => pathname.startsWith(path)) && !sessionToken) {
-		return NextResponse.redirect(new URL('/landing', request.url));
-	}
-	// Đăng nhập rồi thì không cho vào login/register nữa
-	if (authPaths.some((path) => pathname.startsWith(path)) && sessionToken) {
-		return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
-	}
+	if (!sessionToken) {
+		if (
+			[...adminPaths, ...teacherPaths, ...schoolManagerPaths].some((path) =>
+				pathname.startsWith(path)
+			)
+		) {
+			return NextResponse.redirect(new URL('/landing', request.url));
+		}
+		// return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
+	} else {
+		if ([...authPaths, ...publicPaths].some((path) => pathname.startsWith(path))) {
+			return NextResponse.redirect(new URL('/', request.url));
+		}
 
-	// Đăng nhập rồi thì không cho vào các trang public nữa
-	if (publicPaths.some((path) => pathname.startsWith(path)) && sessionToken) {
-		return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
+		const data = jwtDecode(sessionToken);
+		const userRole = (data as IJWTTokenPayload).role;
+		// Admin routes
+		if (userRole.toLowerCase() === 'admin') {
+			if (adminPaths.some((path) => !pathname.startsWith(path)))
+				return NextResponse.redirect(new URL('/dashboard', request.url));
+		}
+		// Teacher routes
+		else if (userRole.toLowerCase() === 'teacher') {
+			if (teacherPaths.some((path) => !pathname.startsWith(path)))
+				return NextResponse.redirect(
+					new URL('/published-timetable', request.url)
+				);
+		}
+
+		// Teacher Department Head routes
+		else if (userRole.toLowerCase() === 'teacher') {
+			if (teacherPaths.some((path) => !pathname.startsWith(path)))
+				return NextResponse.redirect(
+					new URL('/published-timetable', request.url)
+				);
+		}
+		// School Manager routes
+		else if (userRole.toLowerCase() === 'schoolmanager') {
+			if (schoolManagerPaths.some((path) => !pathname.startsWith(path)))
+				return NextResponse.redirect(new URL('/timetable', request.url));
+		}
 	}
 	return NextResponse.next();
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-	matcher: Array.from([...privatePaths, ...authPaths, ...publicPaths]),
+	matcher: Array.from([
+		...authPaths,
+		...publicPaths,
+		...adminPaths,
+		...teacherPaths,
+		...schoolManagerPaths,
+	]),
 };
