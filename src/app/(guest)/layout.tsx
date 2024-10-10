@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='vi'>
-			<body className={`w-screen h-screen`}>
+			<body className={`${inter.className} antialiased w-screen h-screen`}>
 				<Header />
 				{children}
 				<Footer />

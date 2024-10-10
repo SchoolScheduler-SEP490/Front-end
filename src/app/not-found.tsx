@@ -10,7 +10,7 @@ export default function NotFound() {
 					{/* <h3 className='text-red-600 !text-title-large !font-bold'>
 						Không thể tìm thấy trang
 					</h3> !*/}
-					<h1>
+					<h1 className='select-none'>
 						<span className='!text-primary-400'>4</span>
 						<span className='!text-primary-400'>0</span>
 						<span className='!text-primary-400'>4</span>
