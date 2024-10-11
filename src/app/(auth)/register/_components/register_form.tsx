@@ -35,6 +35,7 @@ export const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [schoolId, setSchoolId] = useState<number>(1);
 
   const handleLogin = () => {
     router.push("/login");
@@ -52,10 +53,25 @@ export const RegisterForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, phone, password, confirm }),
+        body: JSON.stringify({
+        "school-id": schoolId,
+        email: email,
+        phone: phone,
+        password: password,
+        "confirm-account-password": confirm,
+        }),
       });
 
+      console.log('Request body:', JSON.stringify({
+        "school-id": schoolId,
+        "email": email,
+        "phone": phone,
+        "password": password,
+        "confirm-account-password": confirm,
+      }));
+
       const registerResponse: IRegisterResponse = await response.json();
+      console.log("Register response:", registerResponse);
 
       if (registerResponse.status === 200) {
         router.push("/login");
