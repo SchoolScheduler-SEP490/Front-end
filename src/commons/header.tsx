@@ -22,14 +22,16 @@ const Header = () => {
 							key={`${item.name}${index}`}
 							className='py-1 h-9 hover:border-b-3 hover:border-primary-500 opacity-80'
 						>
-							<h3 className='font-medium tracking-wide'>{item.name}</h3>
+							<h3 className='text-title-small-strong tracking-wide'>
+								{item.name}
+							</h3>
 						</Link>
 					))}
 				</div>
 
-				<div className='login-btn w-28 py-1 px-2 border-b-3 border-primary-600'>
+				<div className='login-btn w-32'>
 					<Link href='/login' title='Đăng nhập'>
-						<h3 className='font-medium tracking-wide text-primary-dark hover:font-semibold hover:text-primary-500 w-full text-center'>
+						<h3 className='text-title-small-strong tracking-wide text-primary-dark py-1 px-2 border-b-3 border-primary-600 hover:font-semibold hover:text-primary-500 hover:bg-primary-50 w-full text-center'>
 							Đăng nhập
 						</h3>
 					</Link>
