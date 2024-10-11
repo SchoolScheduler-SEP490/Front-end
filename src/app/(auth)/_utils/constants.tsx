@@ -20,3 +20,15 @@ export interface IJWTTokenPayload {
 	iss: string;
 	aud: string;
 }
+
+export interface IRegisterForm {
+	email: string;
+	phone: string;
+	password: string;
+	confirm: string;
+}
+
+export interface IRegisterResponse {
+	status: number;
+	message: string;
+}
