@@ -193,7 +193,7 @@ const config: Config = {
 					'var(--font-size-16)',
 					{
 						letterSpacing: '0.025rem',
-						fontWeight: '300',
+						fontWeight: '500',
 					},
 				],
 				'body-medium': [
