@@ -16,6 +16,11 @@
     scrollbar-width: none;
     /* Firefox */
   }
+
+  .text-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
 }
 
 :root {

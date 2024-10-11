@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { IJWTTokenPayload } from './app/(auth)/_utils/constants';
 
-const publicPaths = ['/landing', '/community', '/contact', '/schools', 'timetable'];
+const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedules'];
 const authPaths = ['/login', '/register', '/forgot-password'];
 const adminPaths = ['/dashboard'];
 const teacherPaths = ['/published-timetable'];

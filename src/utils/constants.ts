@@ -12,7 +12,7 @@ export const NAV_LINKS: INavList[] = [
 	},
 	{
 		name: 'Thời khóa biểu',
-		url: '/timetable',
+		url: '/schedules',
 	},
 	{
 		name: 'Trường học',
