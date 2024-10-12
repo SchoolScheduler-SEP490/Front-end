@@ -4,12 +4,15 @@ import ContainedButton from '@/commons/button-contained';
 import { IconButton, Radio, Skeleton, TextField } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ISchool } from '../_utils/constants';
+import useCallAPI from './_hooks/useCallAPI';
 
 export default function Home(): JSX.Element {
+	const { data, isLoading, error } = useCallAPI();
+	const [schoolData, setSchoolData] = useState<ISchool[]>([]);
 	const [currentSection, setCurrentSection] = useState(1);
 	const [constraintSection, setConstraintSection] = useState(1);
-	const [isLoading, setLoading] = useState(true);
 
 	const switchSection = (nextSection: number) => {
 		setCurrentSection(nextSection); // Update to the new section
@@ -19,9 +22,9 @@ export default function Home(): JSX.Element {
 		setConstraintSection(nextSection); // Update to the new section
 	};
 
-	setTimeout(() => {
-		setLoading(false);
-	}, 500);
+	useEffect(() => {
+		setSchoolData(data?.result?.items);
+	}, [data]);
 
 	return (
 		<div className='h-fit w-screen flex flex-col gap-6 pt-[5vh]'>
@@ -239,8 +242,8 @@ export default function Home(): JSX.Element {
 			</section>
 
 			{/* Pros section */}
-			<section className='w-screen h-[45vh] bg-primary-50 px-[10vw] flex flex-row justify-between items-center'>
-				<div className='w-[30%] flex flex-col justify-start items-start gap-2'>
+			<section className='w-screen h-[48vh] bg-primary-50 px-[10vw] pt-[5vh] flex flex-row justify-between items-center'>
+				<div className='w-[20%] h-full flex flex-col justify-start items-start gap-2'>
 					<div className='w-fit h-fit p-3 mb-3 bg-white rounded-[50%] border-1 border-secondary-darker'>
 						<Image
 							src={'/images/icons/book-stack.png'}
@@ -257,7 +260,7 @@ export default function Home(): JSX.Element {
 						giáo viên, phòng học, lớp học,...
 					</p>
 				</div>
-				<div className='w-[30%] flex flex-col justify-start items-start gap-2'>
+				<div className='w-[20%] h-full flex flex-col justify-start items-start gap-2'>
 					<div className='w-fit h-fit p-3 mb-3 bg-white rounded-[50%] border-1 border-secondary-darker overflow-hidden'>
 						<Image
 							className='-translate-y-[2px]'
@@ -275,7 +278,7 @@ export default function Home(): JSX.Element {
 						dựng thời khỏa biểu được rút ngắn nhờ những thuật toán hiện đại.
 					</p>
 				</div>
-				<div className='w-[30%] flex flex-col justify-start items-start gap-2'>
+				<div className='w-[20%] h-full flex flex-col justify-start items-start gap-2'>
 					<div className='w-fit h-fit p-3 mb-3 bg-white rounded-[50%] border-1 border-secondary-darker'>
 						<Image
 							className='translate-y-[2px]'
@@ -292,6 +295,25 @@ export default function Home(): JSX.Element {
 						Được thiết kế theo hướng hiện đại tối giản và phù hợp với nhiều
 						nhóm người dùng khác nhau. Schedulify hứa hẹn sẽ mang đến trải
 						nghiệm tốt nhất cho đối tác của mình.
+					</p>
+				</div>
+				<div className='w-[20%] h-full flex flex-col justify-start items-start gap-2'>
+					<div className='w-fit h-fit p-3 mb-3 bg-white rounded-[50%] border-1 border-secondary-darker'>
+						<Image
+							className='-translate-y-[2px]'
+							src={'/images/icons/support.png'}
+							alt='book-stack'
+							width={30}
+							height={30}
+						/>
+					</div>
+					<h2 className='w-full text-left text-title-small-strong'>
+						Hỗ trợ tích cực
+					</h2>
+					<p className='text-justify opacity-70'>
+						Đội ngũ phát triển Schedulify luôn sẵn lòng hỗ trợ, giải đáp thắc
+						mắc, tích cực ghi nhận góp ý từ người dùng và xử lý yêu cầu nhanh
+						chóng.
 					</p>
 				</div>
 			</section>
@@ -706,91 +728,133 @@ export default function Home(): JSX.Element {
 						<h1 className='text-title-1.5xl'>Đang sử dụng</h1>
 					</div>
 					<div className='w-[70%] h-full flex flex-row justify-start items-start'>
-						<div className='w-[95%] h-full flex flex-row justify-start items-start gap-5'>
-							<div className='w-[30%] h-full bg-primary-50'>
-								{isLoading ? (
-									<Skeleton
-										className='!w-full h-[75%]'
-										variant='rectangular'
-										animation='wave'
-										width={1000}
-										height={400}
-									/>
-								) : (
-									<Image
-										className='w-full h-[75%] object-cover object-center'
-										src='/images/school-example-1.jpg'
-										alt='hero'
-										width={1000}
-										height={400}
-										loading='eager'
-									/>
-								)}
-								<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
-									<h4 className='text-body-medium-strong font-semibold opacity-80'>
-										2020
-									</h4>
-									<h1 className='text-title-small-strong'>
-										Trường THPT chuyên Hà Nội-Amsterdam
-									</h1>
-								</div>
-							</div>
-							<div className='w-[30%] h-full bg-primary-50'>
-								{isLoading ? (
-									<Skeleton
-										className='!w-full h-[75%]'
-										variant='rectangular'
-										animation='wave'
-										width={1000}
-										height={400}
-									/>
-								) : (
-									<Image
-										className='w-full h-[75%] object-cover object-center'
-										src='/images/school-example-2.webp'
-										alt='hero'
-										width={1000}
-										height={400}
-										loading='eager'
-									/>
-								)}
-								<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
-									<h4 className='text-body-medium-strong font-semibold opacity-80'>
-										2010
-									</h4>
-									<h1 className='text-title-small-strong'>
-										Trường THPT Chuyên Lê Hồng Phong
-									</h1>
-								</div>
-							</div>
-							<div className='w-[30%] h-full bg-primary-50'>
-								{isLoading ? (
-									<Skeleton
-										className='!w-full h-[75%]'
-										variant='rectangular'
-										animation='wave'
-										width={1000}
-										height={400}
-									/>
-								) : (
-									<Image
-										className='w-full h-[75%] object-cover object-center'
-										src='/images/school-example-3.jpg'
-										alt='hero'
-										width={1000}
-										height={400}
-										loading='eager'
-									/>
-								)}
-								<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
-									<h4 className='text-body-medium-strong font-semibold opacity-80'>
-										2010
-									</h4>
-									<h1 className='text-title-small-strong'>
-										Trường THPT Chuyên Nguyễn Du
-									</h1>
-								</div>
-							</div>
+						<div className='w-[95%] h-full flex flex-row justify-start items-start gap-5 overflow-hidden'>
+							{schoolData?.length ? (
+								<>
+									{schoolData.map((item, index) => (
+										<div
+											key={index}
+											className='w-[30%] h-full bg-primary-50'
+										>
+											{isLoading ? (
+												<Skeleton
+													className='!w-full h-[60%]'
+													variant='rectangular'
+													animation='wave'
+													width={1000}
+													height={400}
+												/>
+											) : (
+												<Image
+													className='w-full h-[75%] object-cover object-center'
+													src='/images/school-example-demo.jpg'
+													alt='hero'
+													width={1000}
+													height={400}
+													loading='eager'
+												/>
+											)}
+											<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
+												<h4 className='text-body-medium-strong font-semibold opacity-80'>
+													{`${new Date(
+														item['update-date']
+													).getFullYear()}`}
+												</h4>
+												<h1 className='text-title-small-strong'>
+													{item.name}
+												</h1>
+											</div>
+										</div>
+									))}
+								</>
+							) : (
+								<>
+									<div className='w-[30%] h-full bg-primary-50'>
+										{isLoading ? (
+											<Skeleton
+												className='!w-full h-[75%]'
+												variant='rectangular'
+												animation='wave'
+												width={1000}
+												height={400}
+											/>
+										) : (
+											<Image
+												className='w-full h-[75%] object-cover object-center'
+												src='/images/school-example-1.jpg'
+												alt='hero'
+												width={1000}
+												height={400}
+												loading='eager'
+											/>
+										)}
+										<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
+											<h4 className='text-body-medium-strong font-semibold opacity-80'>
+												2020
+											</h4>
+											<h1 className='text-title-small-strong'>
+												Trường THPT chuyên Hà Nội-Amsterdam
+											</h1>
+										</div>
+									</div>
+									<div className='w-[30%] h-full bg-primary-50'>
+										{isLoading ? (
+											<Skeleton
+												className='!w-full h-[75%]'
+												variant='rectangular'
+												animation='wave'
+												width={1000}
+												height={400}
+											/>
+										) : (
+											<Image
+												className='w-full h-[75%] object-cover object-center'
+												src='/images/school-example-2.webp'
+												alt='hero'
+												width={1000}
+												height={400}
+												loading='eager'
+											/>
+										)}
+										<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
+											<h4 className='text-body-medium-strong font-semibold opacity-80'>
+												2010
+											</h4>
+											<h1 className='text-title-small-strong'>
+												Trường THPT Chuyên Lê Hồng Phong
+											</h1>
+										</div>
+									</div>
+									<div className='w-[30%] h-full bg-primary-50'>
+										{isLoading ? (
+											<Skeleton
+												className='!w-full h-[75%]'
+												variant='rectangular'
+												animation='wave'
+												width={1000}
+												height={400}
+											/>
+										) : (
+											<Image
+												className='w-full h-[75%] object-cover object-center'
+												src='/images/school-example-3.jpg'
+												alt='hero'
+												width={1000}
+												height={400}
+												loading='eager'
+											/>
+										)}
+										<div className='w-full h-[25%] px-[5%] flex flex-col justify-center'>
+											<h4 className='text-body-medium-strong font-semibold opacity-80'>
+												2010
+											</h4>
+											<h1 className='text-title-small-strong'>
+												Trường THPT Chuyên Nguyễn Du
+											</h1>
+										</div>
+									</div>
+								</>
+							)}
 						</div>
 						<div className='w-[5%] h-full flex flex-col justify-between items-center'>
 							<h3 className='text-vertical rotate-180 text-title-small'>
@@ -825,7 +889,7 @@ export default function Home(): JSX.Element {
 					<ContainedButton
 						title='Đăng ký'
 						disableRipple
-						styles='w-[30%] py-[2px] bg-primary-50 text-primary-600'
+						styles='!w-[30%] !py-[2px] !bg-primary-50 !text-primary-600'
 						textStyles='text-title-small font-normal tracking-wider normal-case'
 					/>
 				</div>
@@ -861,6 +925,21 @@ export default function Home(): JSX.Element {
 					/>
 				</div>
 			</section>
+
+			{/* BacktoTop button */}
+			<div className='fixed bottom-5 right-5 z-10 bg-white rounded-[50%]'>
+				<div className='w-fit h-fit overflow-visible rounded-[50%] border-1 border-primary-200'>
+					<IconButton>
+						<Image
+							className='aspect-square object-contain rotate-180'
+							src={'/images/icons/download-file.png'}
+							alt='arrow'
+							width={25}
+							height={25}
+						/>
+					</IconButton>
+				</div>
+			</div>
 		</div>
 	);
 }
