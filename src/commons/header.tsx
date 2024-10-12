@@ -2,12 +2,12 @@
 import { INavList, NAV_LINKS } from '@/utils/constants';
 import Link from 'next/link';
 import './styles/header.css';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 const Header = () => {
 	const headerLinks: INavList[] = NAV_LINKS;
 	const router = useRouter();
-	// const currentPath = window.location.pathname;
+	const currentPath = usePathname();
 
 	return (
 		<nav className='flex justify-between items-center w-screen h-fit px-10 gap-8'>
@@ -27,7 +27,13 @@ const Header = () => {
 							key={`${item.name}${index}`}
 							className='py-1 h-9 opacity-80'
 						>
-							<h3 className='text-title-small-strong tracking-wide'>
+							<h3
+								className={`text-title-small-strong tracking-wide ${
+									currentPath === item.url
+										? 'border-b-3 border-primary-600'
+										: ''
+								}`}
+							>
 								{item.name}
 							</h3>
 						</Link>
