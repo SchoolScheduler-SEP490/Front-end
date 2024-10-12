@@ -1,9 +1,8 @@
-import type { Metadata } from 'next';
 import '@/commons/styles/globals.css';
-import { inter } from '@/utils/fonts';
 import AppProvider from '@/context/app_provider';
+import { inter } from '@/utils/fonts';
+import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { ToastContainer } from 'react-toastify';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -21,11 +20,10 @@ export default function RootLayout({
 	return (
 		<html lang='vi'>
 			<body
-				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden`}
+				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
 			>
 				<AppProvider inititalSessionToken={sessionToken?.value}>
 					{children}
-					<ToastContainer />
 				</AppProvider>
 			</body>
 		</html>
