@@ -3,6 +3,7 @@ import '@/commons/styles/globals.css';
 import { inter } from '@/utils/fonts';
 import AppProvider from '@/context/app_provider';
 import { cookies } from 'next/headers';
+import { ToastContainer } from 'react-toastify';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -24,6 +25,7 @@ export default function RootLayout({
 			>
 				<AppProvider inititalSessionToken={sessionToken?.value}>
 					{children}
+					<ToastContainer />
 				</AppProvider>
 			</body>
 		</html>
