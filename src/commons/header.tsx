@@ -1,8 +1,13 @@
+'use client';
 import { INavList, NAV_LINKS } from '@/utils/constants';
 import Link from 'next/link';
+import './styles/header.css';
+import { useRouter } from 'next/navigation';
 
 const Header = () => {
 	const headerLinks: INavList[] = NAV_LINKS;
+	const router = useRouter();
+	// const currentPath = window.location.pathname;
 
 	return (
 		<nav className='flex justify-between items-center w-screen h-fit px-10 gap-8'>
@@ -15,12 +20,12 @@ const Header = () => {
 			</div>
 
 			<div className='flex justify-between items-center gap-12'>
-				<div className='flex justify-end items-center gap-10 w-fit'>
+				<div className='group flex justify-end items-center gap-10 w-fit'>
 					{headerLinks.map((item, index) => (
 						<Link
 							href={item.url}
 							key={`${item.name}${index}`}
-							className='py-1 h-9 hover:border-b-3 hover:border-primary-500 opacity-80'
+							className='py-1 h-9 opacity-80'
 						>
 							<h3 className='text-title-small-strong tracking-wide'>
 								{item.name}
@@ -29,13 +34,12 @@ const Header = () => {
 					))}
 				</div>
 
-				<div className='login-btn w-32'>
-					<Link href='/login' title='Đăng nhập'>
-						<h3 className='text-title-small-strong tracking-wide text-primary-dark py-1 px-2 border-b-3 border-primary-600 hover:font-semibold hover:text-primary-500 hover:bg-primary-50 w-full text-center'>
-							Đăng nhập
-						</h3>
-					</Link>
-				</div>
+				<button
+					className='login-btn text-center font-semibold text-body-medium'
+					onClick={() => router.push('/login')}
+				>
+					ĐĂNG NHẬP
+				</button>
 			</div>
 		</nav>
 	);

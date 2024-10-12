@@ -1,0 +1,75 @@
+@tailwind components;
+
+@layer components {
+    .hover-bg-animation {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hover-bg-animation::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -100%;
+        width: 100%;
+        height: 100%;
+        background-color: #e6eef2;
+        /* Replace with your hover background color */
+        transition: bottom 0.2s ease-in-out;
+        z-index: -1;
+    }
+
+    .hover-bg-animation:hover::before {
+        bottom: 0;
+    }
+
+    .hover-bg-animation:hover h3 {
+        color: #004a8f;
+        /* Optional: Change text color on hover */
+    }
+}
+
+.login-btn {
+    font-family: inherit;
+    display: inline-block;
+    width: 8em;
+    height: 2.6em;
+    line-height: 2.5em;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px solid var(--primary-normal);
+    transition: color 0.5s;
+    z-index: 1;
+    color: var(--primary-normal);
+}
+
+.login-btn:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background: var(--primary-normal);
+    height: 150px;
+    width: 200px;
+    border-radius: 50%;
+}
+
+.login-btn:hover {
+    color: #fff;
+}
+
+.login-btn:before {
+    top: 100%;
+    left: 100%;
+    transition: all 0.5s;
+}
+
+.login-btn:hover:before {
+    top: -30px;
+    left: -30px;
+}
+
+.login-btn:active:before {
+    background: var(--primary-normal);
+    transition: background 0s;
+}

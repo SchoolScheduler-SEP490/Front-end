@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ISchool } from '../_utils/constants';
 import useCallAPI from './_hooks/useCallAPI';
+import './_styles/landing_styles.css';
 
 export default function Home(): JSX.Element {
 	const { data, isLoading, error } = useCallAPI();
@@ -22,6 +23,10 @@ export default function Home(): JSX.Element {
 		setConstraintSection(nextSection); // Update to the new section
 	};
 
+	const handleGotoTop = () => {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	};
+
 	useEffect(() => {
 		setSchoolData(data?.result?.items);
 	}, [data]);
@@ -31,11 +36,11 @@ export default function Home(): JSX.Element {
 			{/* Banner section */}
 			<section
 				id='banner'
-				className='w-screen h-[200px] flex flex-row justify-between items-centers px-[8vw] overflow-visible'
+				className='w-screen h-[250px] flex flex-row justify-between items-center px-[8vw] overflow-visible'
 			>
 				<div
 					id='slogan'
-					className='w-1/2 flex flex-col justify-start pt-4 items-center'
+					className='w-1/2 h-full flex flex-col pt-4 justify-start items-center'
 				>
 					<h1 className='text-[2.8vw]'>Thời gian hài hòa</h1>
 					<h1 className='text-[3.2vw] font-bold text-primary-500'>
@@ -54,7 +59,7 @@ export default function Home(): JSX.Element {
 									: 'opacity-0 translate-y-10 z-[-1]'
 							}`}
 					>
-						<h3 className='text-title-small-strong'>
+						<h3 className='text-title-small-strong mb-3'>
 							Quản lý Thời khóa biểu
 						</h3>
 						<ul className='list-disc pl-4 text-body-large font-normal opacity-80 flex flex-col gap-2'>
@@ -66,7 +71,7 @@ export default function Home(): JSX.Element {
 						<ContainedButton
 							title='Khám phá'
 							disableRipple
-							styles='w-[150px] h-[35px] bg-primary-400 text-white mt-1'
+							styles='w-[150px] h-[35px] bg-primary-400 text-white mt-3'
 							textStyles='text-title-small font-normal tracking-wider normal-case'
 						/>
 					</section>
@@ -78,7 +83,7 @@ export default function Home(): JSX.Element {
 									: 'opacity-0 translate-y-10 z-[-1]'
 							}`}
 					>
-						<h3 className='text-title-small-strong'>Quản lý lớp học</h3>
+						<h3 className='text-title-small-strong mb-3'>Quản lý lớp học</h3>
 						<ul className='list-disc pl-4 text-body-large font-normal opacity-80 flex flex-col gap-2'>
 							<li>Quản lý các lớp học linh động.</li>
 							<li>
@@ -90,7 +95,7 @@ export default function Home(): JSX.Element {
 						<ContainedButton
 							title='Khám phá'
 							disableRipple
-							styles='w-[150px] h-[35px] bg-primary-400 text-white mt-1'
+							styles='w-[150px] h-[35px] bg-primary-400 text-white mt-3'
 							textStyles='text-title-small font-normal tracking-wider normal-case'
 						/>
 					</section>
@@ -102,7 +107,9 @@ export default function Home(): JSX.Element {
 									: 'opacity-0 translate-y-10 z-[-1]'
 							}`}
 					>
-						<h3 className='text-title-small-strong'>Quản lý giáo viên</h3>
+						<h3 className='text-title-small-strong mb-3'>
+							Quản lý giáo viên
+						</h3>
 						<ul className='list-disc pl-4 text-body-large font-normal opacity-80 flex flex-col gap-2'>
 							<li>Tùy biến lịch dạy giáo viên linh hoạt.</li>
 							<li>Tối ưu lịch dạy cho giáo viên trong cả tuần.</li>
@@ -153,11 +160,12 @@ export default function Home(): JSX.Element {
 					/>
 				) : (
 					<Image
-						className='w-screen h-[400px] object-cover object-center'
+						className='w-screen h-[500px] object-cover object-center'
 						src='/images/landing-banner.png'
 						alt='hero'
+						unoptimized={true}
 						width={1000}
-						height={400}
+						height={500}
 						loading='eager'
 					/>
 				)}
@@ -181,6 +189,7 @@ export default function Home(): JSX.Element {
 							className='w-full h-full object-right-top aspect-auto -scale-x-100'
 							src='/images/landing-schedule-decorator1.jpg'
 							alt='dec'
+							unoptimized={true}
 							width={1000}
 							height={500}
 							loading='lazy'
@@ -199,6 +208,7 @@ export default function Home(): JSX.Element {
 							className='w-full h-full object-none object-right-top'
 							src='/images/landing-schedule-decorator2.png'
 							alt='dec'
+							unoptimized={true}
 							width={500}
 							height={600}
 							loading='lazy'
@@ -222,21 +232,22 @@ export default function Home(): JSX.Element {
 							và duy nhất dành cho những Trường học sử dụng hệ thống của
 							chúng tôi.
 						</p>
-						<div className='w-fit h-fit flex flex-row justify-start gap-1 border-b-2 border-primary-500'>
-							<Link
-								href={'#'}
-								className='text-body-xlarge font-semibold hover:text-primary-400 text-nowrap truncate'
+						<Link
+							href={'#'}
+							className='flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
+						>
+							Tìm hiểu thêm
+							<svg
+								className='w-7 h-7 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full group-hover:border-none p-1 rotate-45'
+								viewBox='0 0 16 19'
+								xmlns='http://www.w3.org/2000/svg'
 							>
-								Tìm hiểu thêm
-							</Link>
-							<Image
-								className='aspect-square object-contain'
-								src={'/images/icons/right-up.png'}
-								alt='arrow'
-								width={20}
-								height={20}
-							/>
-						</div>
+								<path
+									d='M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z'
+									className='fill-gray-800 group-hover:fill-gray-800'
+								></path>
+							</svg>
+						</Link>
 					</div>
 				</div>
 			</section>
@@ -356,17 +367,20 @@ export default function Home(): JSX.Element {
 						<div className='w-fit h-fit flex flex-row justify-start gap-1 border-b-2 border-primary-500'>
 							<Link
 								href={'#'}
-								className='text-body-xlarge font-semibold hover:text-primary-400 text-nowrap truncate'
+								className='flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
 							>
 								Xem tất cả
+								<svg
+									className='w-7 h-7 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full group-hover:border-none p-1 rotate-45'
+									viewBox='0 0 16 19'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path
+										d='M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z'
+										className='fill-gray-800 group-hover:fill-gray-800'
+									></path>
+								</svg>
 							</Link>
-							<Image
-								className='aspect-square object-contain'
-								src={'/images/icons/right-up.png'}
-								alt='arrow'
-								width={20}
-								height={20}
-							/>
 						</div>
 					</div>
 
@@ -525,6 +539,7 @@ export default function Home(): JSX.Element {
 								className='w-full h-full object-cover object-right'
 								src='/images/landing-teacher.png'
 								alt='dec'
+								unoptimized={true}
 								width={800}
 								height={600}
 								loading='lazy'
@@ -598,6 +613,7 @@ export default function Home(): JSX.Element {
 								className='w-full h-full object-cover object-right'
 								src='/images/landing-teacher.png'
 								alt='dec'
+								unoptimized={true}
 								width={800}
 								height={600}
 								loading='lazy'
@@ -698,7 +714,7 @@ export default function Home(): JSX.Element {
 								<Radio
 									sx={{
 										'& .MuiSvgIcon-root': {
-											fontSize: constraintSection == item ? 20 : 15,
+											fontSize: constraintSection == item ? 25 : 15,
 										},
 									}}
 									checked={constraintSection == item}
@@ -811,6 +827,7 @@ export default function Home(): JSX.Element {
 												className='w-full h-[75%] object-cover object-center'
 												src='/images/school-example-2.webp'
 												alt='hero'
+												unoptimized={true}
 												width={1000}
 												height={400}
 												loading='eager'
@@ -839,6 +856,7 @@ export default function Home(): JSX.Element {
 												className='w-full h-[75%] object-cover object-center'
 												src='/images/school-example-3.jpg'
 												alt='hero'
+												unoptimized={true}
 												width={1000}
 												height={400}
 												loading='eager'
@@ -877,7 +895,7 @@ export default function Home(): JSX.Element {
 			</section>
 
 			{/* Register section */}
-			<section className='w-[80vw] h-fit max-h-[400px] bg-primary-400 mx-[10vw] my-[3vh] flex flex-row justify-between items-center px-[5vw] py-[5vh]'>
+			<section className='w-[80vw] h-fit max-h-[400px] bg-primary-400 mx-[10vw] mt-[3vh] flex flex-row justify-between items-center px-[5vw] py-[5vh]'>
 				<div className='w-[50%] flex flex-col justify-start items-start gap-5'>
 					<h1 className='text-title-xl text-white'>
 						Quý thầy cô muốn sử dụng nền tảng của chúng tôi?
@@ -886,12 +904,12 @@ export default function Home(): JSX.Element {
 						Hãy đăng ký ngay để nhận những ưu đãi bất ngờ từ{' '}
 						<strong className='font-semibold'>Schedulify</strong>
 					</h4>
-					<ContainedButton
-						title='Đăng ký'
-						disableRipple
-						styles='!w-[30%] !py-[2px] !bg-primary-50 !text-primary-600'
-						textStyles='text-title-small font-normal tracking-wider normal-case'
-					/>
+					<a className='register-btn' href='#'>
+						<span className='top-key'></span>
+						<span className='text'>ĐĂNG KÝ</span>
+						<span className='bottom-key-1'></span>
+						<span className='bottom-key-2'></span>
+					</a>
 				</div>
 				<Image
 					className='w-[40%] h-full object-contain'
@@ -901,6 +919,36 @@ export default function Home(): JSX.Element {
 					height={250}
 					loading='lazy'
 				/>
+			</section>
+
+			<section className='w-screen h-fit flex justify-end items-baseline px-[10vw]'>
+				<button className='btt-btn' onClick={handleGotoTop}>
+					<div className='text'>
+						<span>Về</span>
+						<span>đầu</span>
+						<span>trang</span>
+					</div>
+					<div className='clone'>
+						<span>Về</span>
+						<span>đầu</span>
+						<span>trang</span>
+					</div>
+					<svg
+						stroke-width='2'
+						stroke='currentColor'
+						viewBox='0 0 24 24'
+						fill='none'
+						className='h-6 w-6'
+						xmlns='http://www.w3.org/2000/svg'
+						width='20px'
+					>
+						<path
+							d='M14 5l7 7m0 0l-7 7m7-7H3'
+							stroke-linejoin='round'
+							stroke-linecap='round'
+						></path>
+					</svg>
+				</button>
 			</section>
 
 			{/* Contact infor section */}
@@ -925,21 +973,6 @@ export default function Home(): JSX.Element {
 					/>
 				</div>
 			</section>
-
-			{/* BacktoTop button */}
-			<div className='fixed bottom-5 right-5 z-10 bg-white rounded-[50%]'>
-				<div className='w-fit h-fit overflow-visible rounded-[50%] border-1 border-primary-200'>
-					<IconButton>
-						<Image
-							className='aspect-square object-contain rotate-180'
-							src={'/images/icons/download-file.png'}
-							alt='arrow'
-							width={25}
-							height={25}
-						/>
-					</IconButton>
-				</div>
-			</div>
 		</div>
 	);
 }
