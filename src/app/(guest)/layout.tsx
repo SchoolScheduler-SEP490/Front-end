@@ -16,7 +16,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='vi'>
-			<body className={`${inter.className} antialiased w-screen h-screen`}>
+			<body
+				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
+			>
 				<Header />
 				{children}
 				<Footer />

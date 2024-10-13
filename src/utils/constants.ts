@@ -8,7 +8,7 @@ export interface INavList {
 export const NAV_LINKS: INavList[] = [
 	{
 		name: 'Trang chủ',
-		url: '/',
+		url: '/landing',
 	},
 	{
 		name: 'Thời khóa biểu',
