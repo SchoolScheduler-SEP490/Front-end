@@ -5,3 +5,5 @@ const SMHeader = () => {
 		</div>
 	);
 };
+
+export default SMHeader;

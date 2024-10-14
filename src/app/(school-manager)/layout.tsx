@@ -1,3 +1,4 @@
+import SMHeader from '@/commons/school_manager/header';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import '@/commons/styles/globals.css';
 import { inter } from '@/utils/fonts';

@@ -47,24 +47,25 @@ export function middleware(request: NextRequest) {
 
 		// Admin routes
 		if (userRole.toLowerCase() === 'admin') {
-			if (adminPaths.some((path) => !pathname.startsWith(path)))
+			if (!adminPaths.some((path) => pathname.startsWith(path)))
 				return NextResponse.redirect(new URL(adminPaths[0], request.url));
 		}
 
 		// Teacher routes
 		else if (userRole.toLowerCase() === 'teacher') {
-			if (teacherPaths.some((path) => !pathname.startsWith(path)))
+			if (teacherPaths.some((path) => pathname.startsWith(path)))
 				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
 		}
 
 		// Teacher Department Head routes
 		else if (userRole.toLowerCase() === 'teacher') {
-			if (teacherPaths.some((path) => !pathname.startsWith(path)))
+			if (!teacherPaths.some((path) => !pathname.startsWith(path)))
 				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
 		}
+
 		// School Manager routes
 		else if (userRole.toLowerCase() === 'schoolmanager') {
-			if (schoolManagerPaths.some((path) => !pathname.startsWith(path)))
+			if (!schoolManagerPaths.some((path) => pathname.startsWith(path)))
 				return NextResponse.redirect(new URL(schoolManagerPaths[0], request.url));
 		}
 	}
