@@ -7,7 +7,21 @@ const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedul
 const authPaths = ['/login', '/register', '/forgot-password'];
 const adminPaths = ['/dashboard'];
 const teacherPaths = ['/published-timetable'];
-const schoolManagerPaths = ['/timetable'];
+const schoolManagerPaths = [
+	'/timetable-management',
+	'/teacher-management',
+	'/subject-management',
+	'/subject-group-management',
+	'/lesson-management',
+	'/class-management',
+	'/room-management',
+	'/curriculum',
+	'/teaching-assignments',
+	'/homeroom-assignments',
+	'/system-constraints',
+	'/import-timetable',
+	'/migrate-timetable',
+];
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
@@ -30,30 +44,28 @@ export function middleware(request: NextRequest) {
 
 		const data = jwtDecode(sessionToken);
 		const userRole = (data as IJWTTokenPayload).role;
+
 		// Admin routes
 		if (userRole.toLowerCase() === 'admin') {
 			if (adminPaths.some((path) => !pathname.startsWith(path)))
-				return NextResponse.redirect(new URL('/dashboard', request.url));
+				return NextResponse.redirect(new URL(adminPaths[0], request.url));
 		}
+
 		// Teacher routes
 		else if (userRole.toLowerCase() === 'teacher') {
 			if (teacherPaths.some((path) => !pathname.startsWith(path)))
-				return NextResponse.redirect(
-					new URL('/published-timetable', request.url)
-				);
+				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
 		}
 
 		// Teacher Department Head routes
 		else if (userRole.toLowerCase() === 'teacher') {
 			if (teacherPaths.some((path) => !pathname.startsWith(path)))
-				return NextResponse.redirect(
-					new URL('/published-timetable', request.url)
-				);
+				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
 		}
 		// School Manager routes
 		else if (userRole.toLowerCase() === 'schoolmanager') {
 			if (schoolManagerPaths.some((path) => !pathname.startsWith(path)))
-				return NextResponse.redirect(new URL('/timetable', request.url));
+				return NextResponse.redirect(new URL(schoolManagerPaths[0], request.url));
 		}
 	}
 	return NextResponse.next();

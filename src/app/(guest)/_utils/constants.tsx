@@ -1,3 +1,5 @@
+import { INavigation } from '@/utils/constants';
+
 export interface ISchoolResponse {
 	status: number;
 	message: string;
@@ -22,3 +24,26 @@ export interface ISchool {
 	status: string;
 	'update-date': string;
 }
+
+export const NAV_LINKS: INavigation[] = [
+	{
+		name: 'Trang chủ',
+		url: '/landing',
+	},
+	{
+		name: 'Thời khóa biểu',
+		url: '/schedules',
+	},
+	{
+		name: 'Trường học',
+		url: '/schools',
+	},
+	{
+		name: 'Cộng đồng',
+		url: '/community',
+	},
+	{
+		name: 'Liên hệ',
+		url: '/contact',
+	},
+];

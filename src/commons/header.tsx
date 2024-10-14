@@ -1,11 +1,12 @@
 'use client';
-import { INavList, NAV_LINKS } from '@/utils/constants';
+import { NAV_LINKS } from '@/app/(guest)/_utils/constants';
+import { INavigation } from '@/utils/constants';
 import Link from 'next/link';
-import './styles/header.css';
 import { usePathname, useRouter } from 'next/navigation';
+import './styles/header.css';
 
 const Header = () => {
-	const headerLinks: INavList[] = NAV_LINKS;
+	const headerLinks: INavigation[] = NAV_LINKS;
 	const router = useRouter();
 	const currentPath = usePathname();
 

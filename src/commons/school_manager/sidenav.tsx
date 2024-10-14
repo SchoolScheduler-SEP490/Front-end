@@ -1,4 +1,4 @@
-const SchoolManagerSidenav = () => {
+const SMSidenav = () => {
 	return (
 		<div className=''>
 			<a href='/students'>Students</a>
@@ -8,4 +8,4 @@ const SchoolManagerSidenav = () => {
 	);
 };
 
-export default SchoolManagerSidenav;
+export default SMSidenav;

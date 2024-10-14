@@ -16,6 +16,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
+import { useToast } from 'react-toastify';
+import { TRANSLATOR } from '@/utils/dictionary';
+import useNotify from '@/hooks/useNotify';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -35,6 +38,7 @@ export const LoginForm = () => {
 	const handleRegister = () => {
 		router.push('/register');
 	};
+
 	const handleForgotPassword = () => {
 		router.push('/forgot-password');
 	};
@@ -46,7 +50,7 @@ export const LoginForm = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ email: email, password: password }),
+				body: JSON.stringify({ email: email.trim(), password: password.trim() }),
 			}).then(async (response) => {
 				const loginResponse: ILoginResponse = { ...(await response.json()) };
 				let data: IUser | undefined = undefined;
@@ -64,6 +68,13 @@ export const LoginForm = () => {
 							expired: new Date(loginResponse.expired ?? ''),
 						},
 					};
+				} else {
+					useNotify({
+						message: TRANSLATOR[loginResponse.message] ?? 'Đã có lỗi xảy ra',
+						type: 'error',
+						position: 'top-right',
+						variant: 'light',
+					});
 				}
 				return data;
 			});
@@ -84,9 +95,8 @@ export const LoginForm = () => {
 				}
 				return data;
 			});
-			router.refresh();
-			window.location.href = '\\';
 			setSessionToken(resultFromNextServer.payload.jwt.token);
+			window.location.reload();
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
