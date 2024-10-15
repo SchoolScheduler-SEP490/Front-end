@@ -1,3 +1,5 @@
+'use client';
+
 const SMSidenav = () => {
 	return (
 		<div className=''>

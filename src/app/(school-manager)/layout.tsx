@@ -16,6 +16,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='vi'>
+			<head>
+				<link rel='stylesheet' href='@/commons/styles/globals.css' />
+			</head>
 			<body
 				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth flex flex-row justify-start items-start`}
 			>

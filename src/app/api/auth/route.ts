@@ -1,9 +1,12 @@
+import { IUser } from '@/utils/constants';
+
 export async function POST(request: Request) {
 	const res = await request.json();
-	console.log('>>>Response: ', JSON.stringify(res, null, 2));
-	const sessionToken = res?.jwt?.token ?? undefined;
+	const requestBody: IUser = { ...res };
+	const sessionToken = requestBody.jwt.token ?? undefined;
+	const refreshToken = requestBody.jwt.refreshToken ?? undefined;
 
-	if (!sessionToken) {
+	if (!sessionToken && !refreshToken) {
 		return Response.json(
 			{ message: 'Không nhận được session token' },
 			{
@@ -14,7 +17,7 @@ export async function POST(request: Request) {
 	return Response.json(res, {
 		status: 200,
 		headers: {
-			'Set-Cookie': `sessionToken=${sessionToken}; Path=/; HttpOnly`,
+			'Set-Cookie': `sessionToken=${sessionToken};refreshToken=${refreshToken}; Path=/; HttpOnly`,
 		},
 	});
 }

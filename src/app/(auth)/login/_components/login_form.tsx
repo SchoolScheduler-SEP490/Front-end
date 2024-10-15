@@ -5,7 +5,9 @@ import {
 	ILoginResponse,
 } from '@/app/(auth)/_utils/constants';
 import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import { IUser } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
 import { inter } from '@/utils/fonts';
 import { IconButton, styled } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -16,9 +18,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
-import { useToast } from 'react-toastify';
-import { TRANSLATOR } from '@/utils/dictionary';
-import useNotify from '@/hooks/useNotify';
 
 const CustomButton = styled(Button)({
 	width: '100%',
