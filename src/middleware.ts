@@ -53,7 +53,7 @@ export function middleware(request: NextRequest) {
 
 		// Teacher routes
 		else if (userRole.toLowerCase() === 'teacher') {
-			if (teacherPaths.some((path) => pathname.startsWith(path)))
+			if (!teacherPaths.some((path) => pathname.startsWith(path)))
 				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
 		}
 

@@ -1,3 +1,5 @@
+'use client';
+
 export default function SMLanding() {
 	return (
 		<div className='w-screen h-screen bg-primary-400'>
