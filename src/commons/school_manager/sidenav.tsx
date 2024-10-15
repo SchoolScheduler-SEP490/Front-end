@@ -2,10 +2,8 @@
 
 const SMSidenav = () => {
 	return (
-		<div className=''>
-			<a href='/students'>Students</a>
-			<a href='/teachers'>Teachers</a>
-			<a href='/courses'>Courses</a>
+		<div className='w-[15%] h-screen flex flex-col justify-start items-start gap-5 bg-green-500'>
+			Somethign
 		</div>
 	);
 };
