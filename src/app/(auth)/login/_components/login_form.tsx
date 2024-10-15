@@ -5,7 +5,9 @@ import {
 	ILoginResponse,
 } from '@/app/(auth)/_utils/constants';
 import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import { IUser } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
 import { inter } from '@/utils/fonts';
 import { IconButton, styled } from '@mui/material';
 import Button from '@mui/material/Button';
@@ -14,7 +16,7 @@ import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
 
 const CustomButton = styled(Button)({
@@ -35,6 +37,7 @@ export const LoginForm = () => {
 	const handleRegister = () => {
 		router.push('/register');
 	};
+
 	const handleForgotPassword = () => {
 		router.push('/forgot-password');
 	};
@@ -46,7 +49,7 @@ export const LoginForm = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ email: email, password: password }),
+				body: JSON.stringify({ email: email.trim(), password: password.trim() }),
 			}).then(async (response) => {
 				const loginResponse: ILoginResponse = { ...(await response.json()) };
 				let data: IUser | undefined = undefined;
@@ -64,6 +67,13 @@ export const LoginForm = () => {
 							expired: new Date(loginResponse.expired ?? ''),
 						},
 					};
+				} else {
+					useNotify({
+						message: TRANSLATOR[loginResponse.message] ?? 'Đã có lỗi xảy ra',
+						type: 'error',
+						position: 'top-right',
+						variant: 'light',
+					});
 				}
 				return data;
 			});
@@ -84,9 +94,13 @@ export const LoginForm = () => {
 				}
 				return data;
 			});
-			router.refresh();
-			window.location.href = '\\';
 			setSessionToken(resultFromNextServer.payload.jwt.token);
+
+			// This is applied when use in Production
+			// window.location.reload();
+
+			// This is applied when use in Development
+			router.push('/timetable-management');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
@@ -103,14 +117,21 @@ export const LoginForm = () => {
 		},
 		validationSchema: loginSchema,
 		onSubmit: async (formData) => {
-			await handleLogin(formData);
+			// await handleLogin(formData);
 		},
 	});
 
 	return (
 		<div className='w-full'>
 			<form
-				onSubmit={formik.handleSubmit}
+				id='formId'
+				onSubmit={(event: any) => {
+					event.preventDefault();
+					handleLogin({
+						email: formik.values.email,
+						password: formik.values.password,
+					});
+				}}
 				className='flex flex-col justify-start items-center gap-3'
 			>
 				<TextField
@@ -182,6 +203,7 @@ export const LoginForm = () => {
 					variant='contained'
 					disableRipple
 					type='submit'
+					id='login-btn'
 					className='mt-2'
 				>
 					<h4 className='text-body-large-strong font-medium tracking-widest'>

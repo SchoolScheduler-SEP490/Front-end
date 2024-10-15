@@ -2,12 +2,12 @@ import Image from 'next/image';
 
 const LandingWCU = () => {
 	return (
-		<section className='w-screen h-[650px] bg-primary-600 py-[5vh] px-[10vw]'>
+		<section className='w-screen h-[600px] bg-primary-600 py-[5vh] px-[10vw]'>
 			<h1 className='w-full h-[15%] text-center text-[2.5vw] text-white font-semibold tracking-wider'>
 				Lý do chọn Schedulify
 			</h1>
 			<div className='w-full h-[85%] flex flex-wrap justify-between items-center'>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/landing-schedule.png'}
@@ -22,7 +22,7 @@ const LandingWCU = () => {
 						nhà trường
 					</p>
 				</div>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/hand-in-hand.png'}
@@ -37,7 +37,7 @@ const LandingWCU = () => {
 						với mọi độ tuổi
 					</p>
 				</div>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/transformation.png'}
@@ -52,7 +52,7 @@ const LandingWCU = () => {
 						tập thông minh
 					</p>
 				</div>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/balance.png'}
@@ -67,7 +67,7 @@ const LandingWCU = () => {
 						cầu của từng trường
 					</p>
 				</div>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/landing-setting.png'}
@@ -82,7 +82,7 @@ const LandingWCU = () => {
 						công sức và thời gian
 					</p>
 				</div>
-				<div className='w-[27%] h-[30%] flex flex-col justify-start items-center gap-5'>
+				<div className='w-[27%] h-[35%] flex flex-col justify-start items-center gap-5'>
 					<div className='w-[65px] h-[65px] bg-primary-300 rounded-md flex justify-center items-center'>
 						<Image
 							src={'/images/icons/combine.png'}

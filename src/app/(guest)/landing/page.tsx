@@ -73,7 +73,7 @@ export default function Home(): JSX.Element {
 						</ul>
 						<Link
 							href={'#'}
-							className='w-[25%] !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
+							className='w-[25%] min-w-[12vw] truncate !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
 						>
 							Khám phá
 							<svg
@@ -107,7 +107,7 @@ export default function Home(): JSX.Element {
 						</ul>
 						<Link
 							href={'#'}
-							className='w-[25%] !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
+							className='w-[25%] min-w-[12vw] truncate !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
 						>
 							Khám phá
 							<svg
@@ -141,7 +141,7 @@ export default function Home(): JSX.Element {
 						</ul>
 						<Link
 							href={'#'}
-							className='w-[25%] !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
+							className='w-[25%] min-w-[12vw] truncate !mt-3 flex justify-center gap-2 items-center border-b-2 border-primary-600 text-lg bg-gray-50 lg:font-semibold isolation-auto before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-primary-400 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-4 py-1 overflow-hidden group'
 						>
 							Khám phá
 							<svg
@@ -209,12 +209,12 @@ export default function Home(): JSX.Element {
 						Hãy đăng ký ngay để nhận những ưu đãi bất ngờ từ{' '}
 						<strong className='font-semibold'>Schedulify</strong>
 					</h4>
-					<a className='register-btn' href='#'>
+					<Link className='register-btn' href='/register'>
 						<span className='top-key'></span>
 						<span className='text'>ĐĂNG KÝ</span>
 						<span className='bottom-key-1'></span>
 						<span className='bottom-key-2'></span>
-					</a>
+					</Link>
 				</div>
 				<Image
 					className='w-[45%] h-full object-contain'
