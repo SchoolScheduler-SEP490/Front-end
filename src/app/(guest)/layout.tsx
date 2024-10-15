@@ -9,20 +9,16 @@ export const metadata: Metadata = {
 	title: 'Schedulify | Trang chủ',
 };
 
-export default function RootLayout({
+export default function GuestLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang='vi'>
-			<body
-				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
-			>
-				<Header />
-				{children}
-				<Footer />
-			</body>
-		</html>
+		<section>
+			<Header />
+			{children}
+			<Footer />
+		</section>
 	);
 }

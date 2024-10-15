@@ -6,11 +6,9 @@ const config: Config = {
 		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/commons/**/*.{js,ts,jsx,tsx,mdx}',
+		'./src/**/*.{js,ts,jsx,tsx,mdx}',
 	],
 	theme: {
-		gridTemplateColumns: {
-			'12': 'repeat(12, minmax(0, 1fr))',
-		},
 		extend: {
 			colors: {
 				background: 'var(--background)',

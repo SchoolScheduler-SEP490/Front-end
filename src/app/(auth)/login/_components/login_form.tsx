@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
 
 const CustomButton = styled(Button)({
@@ -95,7 +95,12 @@ export const LoginForm = () => {
 				return data;
 			});
 			setSessionToken(resultFromNextServer.payload.jwt.token);
-			window.location.reload();
+
+			// This is applied when use in Production
+			// window.location.reload();
+
+			// This is applied when use in Development
+			router.push('/timetable-management');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
@@ -112,14 +117,21 @@ export const LoginForm = () => {
 		},
 		validationSchema: loginSchema,
 		onSubmit: async (formData) => {
-			await handleLogin(formData);
+			// await handleLogin(formData);
 		},
 	});
 
 	return (
 		<div className='w-full'>
 			<form
-				onSubmit={formik.handleSubmit}
+				id='formId'
+				onSubmit={(event: any) => {
+					event.preventDefault();
+					handleLogin({
+						email: formik.values.email,
+						password: formik.values.password,
+					});
+				}}
 				className='flex flex-col justify-start items-center gap-3'
 			>
 				<TextField
@@ -191,6 +203,7 @@ export const LoginForm = () => {
 					variant='contained'
 					disableRipple
 					type='submit'
+					id='login-btn'
 					className='mt-2'
 				>
 					<h4 className='text-body-large-strong font-medium tracking-widest'>
