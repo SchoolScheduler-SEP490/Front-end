@@ -14,11 +14,9 @@ export default function SMLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<section className='w-screen h-fit min-h-screen'>
-			<div className='w-[20%] h-screen'>
-				<SMSidenav />
-			</div>
-			<div className='w-[80%] h-screen flex flex-col justify-start items-start'>
+		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start'>
+			<SMSidenav />
+			<div className='w-[85%] h-screen flex flex-col justify-start items-start'>
 				<SMHeader />
 				{children}
 			</div>
