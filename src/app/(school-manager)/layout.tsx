@@ -1,3 +1,5 @@
+import SMHeader from '@/commons/school_manager/header';
+import SMSidenav from '@/commons/school_manager/sidenav';
 import '@/commons/styles/globals.css';
 import { inter } from '@/utils/fonts';
 import type { Metadata } from 'next';
@@ -14,8 +16,16 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang='vi'>
-			<body className={`${inter.className} antialiased w-screen h-screen`}>
-				{children}
+			<body
+				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth flex flex-row justify-start items-start`}
+			>
+				<div className='w-[20%] h-screen'>
+					<SMSidenav />
+				</div>
+				<div className='w-[80%] h-screen flex flex-col justify-start items-start'>
+					<SMHeader />
+					{children}
+				</div>
 			</body>
 		</html>
 	);

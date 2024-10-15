@@ -1,32 +1,9 @@
 import exp from 'constants';
 
-export interface INavList {
+export interface INavigation {
 	name: string;
 	url: string;
 }
-
-export const NAV_LINKS: INavList[] = [
-	{
-		name: 'Trang chủ',
-		url: '/landing',
-	},
-	{
-		name: 'Thời khóa biểu',
-		url: '/schedules',
-	},
-	{
-		name: 'Trường học',
-		url: '/schools',
-	},
-	{
-		name: 'Cộng đồng',
-		url: '/community',
-	},
-	{
-		name: 'Liên hệ',
-		url: '/contact',
-	},
-];
 
 export interface IUser {
 	id: string;

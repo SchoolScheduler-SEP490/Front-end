@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 const LandingPros = () => {
 	return (
-		<section className='w-screen h-[48vh] bg-primary-50 px-[10vw] pt-[5vh] flex flex-row justify-between items-center'>
+		<section className='w-screen h-fit min-h-[50vh] bg-primary-50 px-[10vw] py-[5vh] flex flex-row justify-between items-start'>
 			<div className='w-[20%] h-full flex flex-col justify-start items-start gap-2'>
 				<div className='w-fit h-fit p-3 mb-3 bg-white rounded-[50%] border-1 border-secondary-darker'>
 					<Image

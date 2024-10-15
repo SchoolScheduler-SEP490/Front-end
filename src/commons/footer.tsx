@@ -1,9 +1,10 @@
-import { INavList, NAV_LINKS } from '@/utils/constants';
+import { NAV_LINKS } from '@/app/(guest)/_utils/constants';
+import { INavigation } from '@/utils/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const Footer = (): JSX.Element => {
-	const footerLinks: INavList[] = NAV_LINKS;
+	const footerLinks: INavigation[] = NAV_LINKS;
 
 	return (
 		<nav className='w-screen h-fit px-[8vw] pt-20 pb-5 bg-primary-800 text-white flex flex-col gap-5'>
