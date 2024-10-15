@@ -2,6 +2,8 @@ import { jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { IJWTTokenPayload } from './app/(auth)/_utils/constants';
+import { redirect } from 'next/navigation';
+import { red } from '@mui/material/colors';
 
 const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedules'];
 const authPaths = ['/login', '/register', '/forgot-password'];
@@ -34,12 +36,12 @@ export function middleware(request: NextRequest) {
 				pathname.startsWith(path)
 			)
 		) {
-			return NextResponse.redirect(new URL('/landing', request.url));
+			redirect('/landing');
 		}
 		// return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
 	} else {
 		if ([...authPaths, ...publicPaths].some((path) => pathname.startsWith(path))) {
-			return NextResponse.redirect(new URL('/', request.url));
+			redirect('/');
 		}
 
 		const data = jwtDecode(sessionToken);
@@ -48,25 +50,25 @@ export function middleware(request: NextRequest) {
 		// Admin routes
 		if (userRole.toLowerCase() === 'admin') {
 			if (!adminPaths.some((path) => pathname.startsWith(path)))
-				return NextResponse.redirect(new URL(adminPaths[0], request.url));
+				redirect(adminPaths[0]);
 		}
 
 		// Teacher routes
 		else if (userRole.toLowerCase() === 'teacher') {
 			if (!teacherPaths.some((path) => pathname.startsWith(path)))
-				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
+				redirect(teacherPaths[0]);
 		}
 
 		// Teacher Department Head routes
 		else if (userRole.toLowerCase() === 'teacher') {
 			if (!teacherPaths.some((path) => !pathname.startsWith(path)))
-				return NextResponse.redirect(new URL(teacherPaths[0], request.url));
+				redirect(teacherPaths[0]);
 		}
 
 		// School Manager routes
 		else if (userRole.toLowerCase() === 'schoolmanager') {
 			if (!schoolManagerPaths.some((path) => pathname.startsWith(path)))
-				return NextResponse.redirect(new URL(schoolManagerPaths[0], request.url));
+				redirect(schoolManagerPaths[0]);
 		}
 	}
 	return NextResponse.next();
