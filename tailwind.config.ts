@@ -49,6 +49,15 @@ const config: Config = {
 					'dark-active': 'var(--tertiary-dark-active)',
 					darker: 'var(--tertiary-darker)',
 				},
+				basic: {
+					gray: 'var(--basic-gray)',
+					'gray-hover': 'var(--basic-gray-hover)',
+					'gray-active': 'var(--basic-gray-active)',
+					positive: 'var(--basic-positive)',
+					'positive-hover': 'var(--basic-positive-hover)',
+					negative: 'var(--basic-negative)',
+					'negative-hover': 'var(--basic-negative-hover)',
+				},
 			},
 			borderWidth: {
 				1: '1px',
