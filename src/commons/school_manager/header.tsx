@@ -8,12 +8,12 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 	return (
 		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
 			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
-				<div className='relative w-[30px] h-[80%]'>
+				<div className='relative w-[25px] h-[50%]'>
 					<input id='menuToggler' type='checkbox' />
 					<label className='toggle' htmlFor='menuToggler'>
-						<div id='bar2' className='bars'></div>
-						<div id='bar1' className='bars'></div>
-						<div id='bar3' className='bars'></div>
+						<div id='bar2' className='bars' />
+						<div id='bar1' className='bars' />
+						<div id='bar3' className='bars' />
 					</label>
 				</div>
 				{children}
