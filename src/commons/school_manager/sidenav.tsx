@@ -56,7 +56,7 @@ const SMSidenav = () => {
 							<div
 								key={item.name}
 								className={`w-[94%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 mx[2%] rounded-[5px] hover:bg-basic-gray-hover hover:cursor-pointer 
-									${currentPath === item.url ? '!bg-basic-gray-active' : ''}`}
+									${currentPath === item.url ? 'bg-basic-gray-active' : ''}`}
 								onClick={() => handleNavigate(item.url)}
 							>
 								<Image
