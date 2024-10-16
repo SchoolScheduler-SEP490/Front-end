@@ -7,20 +7,23 @@ import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants'
 export default function Home(): JSX.Element {
 	const cookieStore = cookies();
 	const sessionToken = cookieStore.get('sessionToken');
-	const data = jwtDecode(sessionToken?.value ?? '');
-	const userRole = (data as IJWTTokenPayload).role;
-	switch (userRole.toLowerCase()) {
-		case 'schoolmanager':
-			redirect(schoolManagerPaths[0]);
-		case 'admin':
-			redirect(adminPaths[0]);
-		case 'teacher':
-			redirect(teacherPaths[0]);
-		case 'teacher':
-			redirect(teacherPaths[0]);
-		default:
-			redirect('/landing');
+	if (sessionToken) {
+		const data = jwtDecode(sessionToken?.value ?? '');
+		const userRole: string = (data as IJWTTokenPayload).role;
+		switch (userRole.toLowerCase()) {
+			case 'schoolmanager':
+				redirect(schoolManagerPaths[0]);
+			case 'admin':
+				redirect(adminPaths[0]);
+			case 'teacher':
+				redirect(teacherPaths[0]);
+			case 'teacher':
+				redirect(teacherPaths[0]);
+			default:
+				redirect('/landing');
+		}
 	}
+	redirect('/landing');
 
 	return (
 		<div>
