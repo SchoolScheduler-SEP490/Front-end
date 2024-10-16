@@ -2,28 +2,13 @@ import { jwtDecode } from 'jwt-decode';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { IJWTTokenPayload } from './app/(auth)/_utils/constants';
-import { redirect } from 'next/navigation';
-import { red } from '@mui/material/colors';
-
-const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedules'];
-const authPaths = ['/login', '/register', '/forgot-password'];
-const adminPaths = ['/dashboard'];
-const teacherPaths = ['/published-timetable'];
-const schoolManagerPaths = [
-	'/timetable-management',
-	'/teacher-management',
-	'/subject-management',
-	'/subject-group-management',
-	'/lesson-management',
-	'/class-management',
-	'/room-management',
-	'/curriculum',
-	'/teaching-assignments',
-	'/homeroom-assignments',
-	'/system-constraints',
-	'/import-timetable',
-	'/migrate-timetable',
-];
+import {
+	adminPaths,
+	authPaths,
+	publicPaths,
+	schoolManagerPaths,
+	teacherPaths,
+} from './utils/constants';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
@@ -31,44 +16,87 @@ export function middleware(request: NextRequest) {
 	const sessionToken = request.cookies.get('sessionToken')?.value;
 
 	if (!sessionToken) {
+		//--> Nếu chưa đăng nhập thì không thể vào các trang private
 		if (
-			[...adminPaths, ...teacherPaths, ...schoolManagerPaths].some((path) =>
+			// Nếu đường dẫn không bắt đầu bằng các đường dẫn public hoặc auth thì 404
+			[...schoolManagerPaths, ...teacherPaths, ...adminPaths].some((path) =>
 				pathname.startsWith(path)
 			)
 		) {
-			redirect('/landing');
+			return NextResponse.redirect(request.nextUrl, { status: 404 });
 		}
 		// return NextResponse.rewrite(new URL('/404', request.url), { status: 404 });
 	} else {
-		if ([...authPaths, ...publicPaths].some((path) => pathname.startsWith(path))) {
-			redirect('/');
-		}
+		//---> Nếu đã đăng nhập thì kiểm tra role để xác định đường dẫn
+		try {
+			const data = jwtDecode(sessionToken);
+			const userRole = (data as IJWTTokenPayload).role;
 
-		const data = jwtDecode(sessionToken);
-		const userRole = (data as IJWTTokenPayload).role;
-
-		// Admin routes
-		if (userRole.toLowerCase() === 'admin') {
-			if (!adminPaths.some((path) => pathname.startsWith(path)))
-				redirect(adminPaths[0]);
-		}
-
-		// Teacher routes
-		else if (userRole.toLowerCase() === 'teacher') {
-			if (!teacherPaths.some((path) => pathname.startsWith(path)))
-				redirect(teacherPaths[0]);
-		}
-
-		// Teacher Department Head routes
-		else if (userRole.toLowerCase() === 'teacher') {
-			if (!teacherPaths.some((path) => !pathname.startsWith(path)))
-				redirect(teacherPaths[0]);
-		}
-
-		// School Manager routes
-		else if (userRole.toLowerCase() === 'schoolmanager') {
-			if (!schoolManagerPaths.some((path) => pathname.startsWith(path)))
-				redirect(schoolManagerPaths[0]);
+			switch (userRole.toLowerCase()) {
+				// Nếu là school manager thì chỉ được vào các trang school manager
+				case 'schoolmanager':
+					if (
+						pathname === '/' ||
+						[...publicPaths, ...authPaths].some((path) =>
+							pathname.startsWith(path)
+						)
+					) {
+						return NextResponse.redirect(schoolManagerPaths[0]);
+					} else if (
+						schoolManagerPaths.some((path) => pathname.startsWith(path))
+					) {
+						return NextResponse.next();
+					} else {
+						return NextResponse.redirect(request.nextUrl, { status: 404 });
+					}
+				// Nếu là admin thì chỉ được vào các trang admin
+				case 'admin':
+					if (
+						pathname === '/' ||
+						[...publicPaths, ...authPaths].some((path) =>
+							pathname.startsWith(path)
+						)
+					) {
+						return NextResponse.redirect(adminPaths[0]);
+					} else if (adminPaths.some((path) => pathname.startsWith(path))) {
+						return NextResponse.next();
+					} else {
+						return NextResponse.redirect(request.nextUrl, { status: 404 });
+					}
+				// Nếu là giáo viên thì chỉ được vào các trang giáo viên
+				case 'teacher':
+					if (
+						pathname === '/' ||
+						[...publicPaths, ...authPaths].some((path) =>
+							pathname.startsWith(path)
+						)
+					) {
+						return NextResponse.redirect(teacherPaths[0]);
+					} else if (teacherPaths.some((path) => pathname.startsWith(path))) {
+						return NextResponse.next();
+					} else {
+						return NextResponse.redirect(request.nextUrl, { status: 404 });
+					}
+				// Nếu là trưởng bộ môn thì chỉ được vào các trang trưởng bộ môn
+				case 'teacherdepartmenthead':
+					if (
+						pathname === '/' ||
+						[...publicPaths, ...authPaths].some((path) =>
+							pathname.startsWith(path)
+						)
+					) {
+						return NextResponse.redirect(teacherPaths[0]);
+					} else if (teacherPaths.some((path) => pathname.startsWith(path))) {
+						return NextResponse.next();
+					} else {
+						return NextResponse.redirect(request.nextUrl, { status: 404 });
+					}
+				default:
+					// Các trường hợp còn lại thì quy đồng về cái này
+					return NextResponse.redirect('/');
+			}
+		} catch (e: any) {
+			//Do something with the error
 		}
 	}
 	return NextResponse.next();

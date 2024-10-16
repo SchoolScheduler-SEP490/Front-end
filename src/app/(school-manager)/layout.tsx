@@ -1,4 +1,3 @@
-import SMHeader from '@/commons/school_manager/header';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import '@/commons/styles/globals.css';
 import type { Metadata } from 'next';
@@ -14,14 +13,9 @@ export default function SMLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<section className='w-screen h-fit min-h-screen'>
-			<div className='w-[20%] h-screen'>
-				<SMSidenav />
-			</div>
-			<div className='w-[80%] h-screen flex flex-col justify-start items-start'>
-				<SMHeader />
-				{children}
-			</div>
+		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start'>
+			<SMSidenav />
+			{children}
 		</section>
 	);
 }

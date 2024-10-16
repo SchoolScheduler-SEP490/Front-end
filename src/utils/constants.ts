@@ -1,5 +1,3 @@
-import exp from 'constants';
-
 export interface INavigation {
 	name: string;
 	url: string;
@@ -17,3 +15,29 @@ export interface IJWT {
 	refreshToken: string;
 	expired: Date;
 }
+
+export const publicPaths = [
+	'/landing',
+	'/community',
+	'/contact',
+	'/schools',
+	'/schedules',
+];
+export const authPaths = ['/login', '/register', '/forgot-password'];
+export const adminPaths = ['/dashboard'];
+export const teacherPaths = ['/published-timetable'];
+export const schoolManagerPaths = [
+	'/timetable-management',
+	'/teacher-management',
+	'/subject-management',
+	'/subject-group-management',
+	'/lesson-management',
+	'/class-management',
+	'/room-management',
+	'/curriculum',
+	'/teaching-assignments',
+	'/homeroom-assignments',
+	'/system-constraints',
+	'/import-timetable',
+	'/migrate-timetable',
+];
