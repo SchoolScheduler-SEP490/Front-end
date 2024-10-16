@@ -19,7 +19,7 @@ const BlogsSection = () => {
           Khám phá bài viết
         </h3>
       </div>
-        <div className="grid grid-cols-3 grid-rows-2 grid-flow-col justify-evenly gap-10">
+        <div className="grid grid-cols-3 grid-rows-2 grid-flow-col justify-evenly gap-10 ml-[6%]">
 
           <Card sx={{ width: 345 }}>
             <CardActionArea>
