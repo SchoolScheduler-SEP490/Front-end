@@ -18,3 +18,5 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Confirm otp reset password success. You can reset password now.':
 		'Xác nhận mã OTP thành công',
 };
+
+export const STATUS_TRANSLATOR: { [key: string]: string } = {};

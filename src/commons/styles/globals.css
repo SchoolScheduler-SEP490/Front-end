@@ -63,13 +63,13 @@
   --tertiary-dark-active: #733018;
   --tertiary-darker: #592513;
 
-  --basic-gray: rgba(0, 0, 0, 0.6);
+  --basic-gray: rgba(0, 0, 0, .6);
   --basic-gray-hover: #F5F5F5;
   --basic-gray-active: #E0E0E0;
   --basic-positive: #0B6E4F;
-  --basic-positive-hover: #00FF94;
+  --basic-positive-hover: rgba(0, 255, 148, .2);
   --basic-negative: #CC0000;
-  --basic-negative-hover: #F54B4B;
+  --basic-negative-hover: rgba(245, 75, 75, .2);
 
   /* Font sizes */
   --font-size-66: 4.125rem;
