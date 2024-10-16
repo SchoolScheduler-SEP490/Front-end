@@ -64,8 +64,8 @@
   --tertiary-darker: #592513;
 
   --basic-gray: rgba(0, 0, 0, 0.6);
-  --basic-gray-hover: #E0E0E0;
-  --basic-gray-active: #F5F5F5;
+  --basic-gray-hover: #F5F5F5;
+  --basic-gray-active: #E0E0E0;
   --basic-positive: #0B6E4F;
   --basic-positive-hover: #00FF94;
   --basic-negative: #CC0000;
