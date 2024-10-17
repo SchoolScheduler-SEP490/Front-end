@@ -1,6 +1,14 @@
-import * as React from 'react';
-import { alpha } from '@mui/material/styles';
+'use client';
+
+import SMHeader from '@/commons/school_manager/header';
+import { inter } from '@/utils/fonts';
+import DeleteIcon from '@mui/icons-material/Delete';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import { alpha } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,58 +18,72 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
+import * as React from 'react';
 
-interface Data {
+interface ITimetableTableData {
 	id: number;
-	calories: number;
-	carbs: number;
-	fat: number;
-	name: string;
-	protein: number;
+	timetableCode: string;
+	timetableName: string;
+	appliedDate: string;
+	endDate: string;
+	fitness: number;
+	status: string;
 }
 
-function createData(
+function importRecord(
 	id: number,
-	name: string,
-	calories: number,
-	fat: number,
-	carbs: number,
-	protein: number
-): Data {
+	timetableCode: string,
+	timetableName: string,
+	appliedDate: string,
+	endDate: string,
+	fitness: number,
+	status: string
+): ITimetableTableData {
 	return {
 		id,
-		name,
-		calories,
-		fat,
-		carbs,
-		protein,
+		timetableCode,
+		timetableName,
+		appliedDate,
+		endDate,
+		fitness,
+		status,
 	};
 }
 
-const rows = [
-	createData(1, 'Cupcake', 305, 3.7, 67, 4.3),
-	createData(2, 'Donut', 452, 25.0, 51, 4.9),
-	createData(3, 'Eclair', 262, 16.0, 24, 6.0),
-	createData(4, 'Frozen yoghurt', 159, 6.0, 24, 4.0),
-	createData(5, 'Gingerbread', 356, 16.0, 49, 3.9),
-	createData(6, 'Honeycomb', 408, 3.2, 87, 6.5),
-	createData(7, 'Ice cream sandwich', 237, 9.0, 37, 4.3),
-	createData(8, 'Jelly Bean', 375, 0.0, 94, 0.0),
-	createData(9, 'KitKat', 518, 26.0, 65, 7.0),
-	createData(10, 'Lollipop', 392, 0.2, 98, 0.0),
-	createData(11, 'Marshmallow', 318, 0, 81, 2.0),
-	createData(12, 'Nougat', 360, 19.0, 9, 37.0),
-	createData(13, 'Oreo', 437, 18.0, 63, 4.0),
+const timetableTableData: ITimetableTableData[] = [
+	importRecord(
+		1,
+		'T01',
+		'Thời khóa biểu 1',
+		'2022-09-01',
+		'2022-09-30',
+		100,
+		'Công bố'
+	),
+	importRecord(
+		2,
+		'T02',
+		'Thời khóa biểu 2',
+		'2022-09-01',
+		'2022-09-30',
+		60,
+		'Chờ duyệt'
+	),
+	importRecord(
+		3,
+		'T03',
+		'Thời khóa biểu 3',
+		'2022-09-01',
+		'2022-09-30',
+		80,
+		'Chờ duyệt'
+	),
+	importRecord(4, 'T04', 'Thời khóa biểu 4', '2022-09-01', '2022-09-30', 5, 'Vô hiệu'),
+	importRecord(5, 'T05', 'Thời khóa biểu 5', '2022-09-01', '2022-09-30', 95, 'Vô hiệu'),
+	importRecord(6, 'T06', 'Thời khóa biểu 6', '2022-09-01', '2022-09-30', 69, 'Vô hiệu'),
 ];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -90,58 +112,67 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
 	disablePadding: boolean;
-	id: keyof Data;
+	id: keyof ITimetableTableData;
 	label: string;
-	numeric: boolean;
+	centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
 	{
-		id: 'name',
-		numeric: false,
-		disablePadding: true,
-		label: 'Dessert (100g serving)',
+		id: 'id' as keyof ITimetableTableData,
+		centered: true,
+		disablePadding: false,
+		label: 'Mã TKB',
 	},
 	{
-		id: 'calories',
-		numeric: true,
+		id: 'timetableName' as keyof ITimetableTableData,
+		centered: false,
 		disablePadding: false,
-		label: 'Calories',
+		label: 'Tên',
 	},
 	{
-		id: 'fat',
-		numeric: true,
+		id: 'appliedDate' as keyof ITimetableTableData,
+		centered: true,
 		disablePadding: false,
-		label: 'Fat (g)',
+		label: 'Ngày áp dụng',
 	},
 	{
-		id: 'carbs',
-		numeric: true,
+		id: 'endDate' as keyof ITimetableTableData,
+		centered: true,
 		disablePadding: false,
-		label: 'Carbs (g)',
+		label: 'Ngày kết thúc',
 	},
 	{
-		id: 'protein',
-		numeric: true,
+		id: 'fitness' as keyof ITimetableTableData,
+		centered: true,
 		disablePadding: false,
-		label: 'Protein (g)',
+		label: 'Độ phù hợp',
+	},
+	{
+		id: 'status' as keyof ITimetableTableData,
+		centered: true,
+		disablePadding: false,
+		label: 'Trạng thái',
 	},
 ];
 
+// For extrafunction of Table head (filter, sort, etc.)
 interface EnhancedTableProps {
 	numSelected: number;
-	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+	onRequestSort: (
+		event: React.MouseEvent<unknown>,
+		property: keyof ITimetableTableData
+	) => void;
 	onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	order: Order;
 	orderBy: string;
 	rowCount: number;
 }
-
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
 		props;
 	const createSortHandler =
-		(property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+		(property: keyof ITimetableTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -162,9 +193,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 				{headCells.map((headCell) => (
 					<TableCell
 						key={headCell.id}
-						align={headCell.numeric ? 'right' : 'left'}
+						align={headCell.centered ? 'center' : 'left'}
 						padding={headCell.disablePadding ? 'none' : 'normal'}
 						sortDirection={orderBy === headCell.id ? order : false}
+						sx={{ fontWeight: 'bold', paddingLeft: '3%' }}
 					>
 						<TableSortLabel
 							active={orderBy === headCell.id}
@@ -173,7 +205,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						>
 							{headCell.label}
 							{orderBy === headCell.id ? (
-								<Box component='span' sx={visuallyHidden}>
+								<Box
+									component='span'
+									sx={[
+										visuallyHidden,
+										{ position: 'absolute', zIndex: 10 },
+									]}
+								>
 									{order === 'desc'
 										? 'sorted descending'
 										: 'sorted ascending'}
@@ -186,6 +224,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 		</TableHead>
 	);
 }
+
+// For extrafunction of Table toolbar (delete, filter, etc.)
 interface EnhancedTableToolbarProps {
 	numSelected: number;
 }
@@ -208,23 +248,14 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 			]}
 		>
 			{numSelected > 0 ? (
-				<Typography
-					sx={{ flex: '1 1 100%' }}
-					color='inherit'
-					variant='subtitle1'
-					component='div'
-				>
-					{numSelected} selected
-				</Typography>
+				<h2 className='text-title-medium-strong font-semibold w-full text-left flex justify-start items-center gap-1'>
+					Thời khóa biểu{' '}
+					<p className='text-body-medium pt-[2px]'>(đã chọn {numSelected})</p>
+				</h2>
 			) : (
-				<Typography
-					sx={{ flex: '1 1 100%' }}
-					variant='h6'
-					id='tableTitle'
-					component='div'
-				>
-					Nutrition
-				</Typography>
+				<h2 className='text-title-medium-strong font-semibold w-full text-left'>
+					Thời khóa biểu
+				</h2>
 			)}
 			{numSelected > 0 ? (
 				<Tooltip title='Delete'>
@@ -242,17 +273,19 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 		</Toolbar>
 	);
 }
-export default function EnhancedTable() {
+
+interface ICustomTableProps {}
+
+const CustomTable = () => {
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof Data>('calories');
+	const [orderBy, setOrderBy] = React.useState<keyof ITimetableTableData>('fitness');
 	const [selected, setSelected] = React.useState<readonly number[]>([]);
 	const [page, setPage] = React.useState(0);
-	const [dense, setDense] = React.useState(false);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
-		property: keyof Data
+		property: keyof ITimetableTableData
 	) => {
 		const isAsc = orderBy === property && order === 'asc';
 		setOrder(isAsc ? 'desc' : 'asc');
@@ -261,7 +294,7 @@ export default function EnhancedTable() {
 
 	const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.checked) {
-			const newSelected = rows.map((n) => n.id);
+			const newSelected = timetableTableData.map((n) => n.id);
 			setSelected(newSelected);
 			return;
 		}
@@ -296,16 +329,12 @@ export default function EnhancedTable() {
 		setPage(0);
 	};
 
-	const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setDense(event.target.checked);
-	};
-
-	// Avoid a layout jump when reaching the last page with empty rows.
-	const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+	const emptyRows =
+		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - timetableTableData.length) : 0;
 
 	const visibleRows = React.useMemo(
 		() =>
-			[...rows]
+			[...timetableTableData]
 				.sort(getComparator(order, orderBy))
 				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
 		[order, orderBy, page, rowsPerPage]
@@ -319,7 +348,7 @@ export default function EnhancedTable() {
 					<Table
 						sx={{ minWidth: 750 }}
 						aria-labelledby='tableTitle'
-						size={dense ? 'small' : 'medium'}
+						size='medium'
 					>
 						<EnhancedTableHead
 							numSelected={selected.length}
@@ -327,7 +356,7 @@ export default function EnhancedTable() {
 							orderBy={orderBy}
 							onSelectAllClick={handleSelectAllClick}
 							onRequestSort={handleRequestSort}
-							rowCount={rows.length}
+							rowCount={timetableTableData.length}
 						/>
 						<TableBody>
 							{visibleRows.map((row, index) => {
@@ -359,22 +388,53 @@ export default function EnhancedTable() {
 											id={labelId}
 											scope='row'
 											padding='none'
+											align='center'
 										>
-											{row.name}
+											{row.timetableCode}
 										</TableCell>
-										<TableCell align='right'>
-											{row.calories}
+										<TableCell align='left'>
+											{row.timetableName}
 										</TableCell>
-										<TableCell align='right'>{row.fat}</TableCell>
-										<TableCell align='right'>{row.carbs}</TableCell>
-										<TableCell align='right'>{row.protein}</TableCell>
+										<TableCell align='center'>
+											{row.appliedDate}
+										</TableCell>
+										<TableCell align='center'>
+											{row.endDate}
+										</TableCell>
+										<TableCell align='center'>
+											<h2
+												className={`font-semibold ${
+													row.fitness > 90
+														? 'text-basic-positive'
+														: 'text-basic-negative'
+												}`}
+											>
+												{row.fitness}%
+											</h2>
+										</TableCell>
+										<TableCell align='center'>
+											<div className='w-full h-full flex justify-center items-center'>
+												<div
+													className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+														${
+															row.status === 'Công bố'
+																? 'bg-basic-positive-hover text-basic-positive'
+																: row.status === 'Vô hiệu'
+																? 'bg-basic-negative-hover text-basic-negative'
+																: 'bg-basic-gray-hover text-basic-gray'
+														}`}
+												>
+													{row.status}
+												</div>
+											</div>
+										</TableCell>
 									</TableRow>
 								);
 							})}
 							{emptyRows > 0 && (
 								<TableRow
 									style={{
-										height: (dense ? 33 : 53) * emptyRows,
+										height: 53 * emptyRows,
 									}}
 								>
 									<TableCell colSpan={6} />
@@ -386,17 +446,13 @@ export default function EnhancedTable() {
 				<TablePagination
 					rowsPerPageOptions={[5, 10, 25]}
 					component='div'
-					count={rows.length}
+					count={timetableTableData.length}
 					rowsPerPage={rowsPerPage}
 					page={page}
 					onPageChange={handleChangePage}
 					onRowsPerPageChange={handleChangeRowsPerPage}
 				/>
 			</Paper>
-			<FormControlLabel
-				control={<Switch checked={dense} onChange={handleChangeDense} />}
-				label='Dense padding'
-			/>
 		</Box>
 	);
-}
+};
