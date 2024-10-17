@@ -1,1 +1,10 @@
-// Delete this file after adding your own hooks in the directory
+export interface ITeacherTableData {
+	id: number;
+	teacherCode: string;
+	teacherName: string;
+	nameAbbreviation: string;
+	subjectDepartment: string;
+	email: string;
+	phoneNumber: string;
+	status: string;
+}
