@@ -9,10 +9,16 @@ import {
 
 const ContactSection = () => {
   return (
-    <section className="w-full py-12 mx-[10%]">
+    <section className="w-full py-12">
       <Box className="container mx-auto" sx={{ maxWidth: "1000px" }}>
-        <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={4}>
-          <Box flex={{ xs: "1", md: "2" }}>
+        <Box 
+          display="flex" 
+          flexDirection={{ xs: "column", md: "row" }} 
+          justifyContent="space-evenly"
+          gap={4}
+        >
+          {/* Left Form */}
+          <Box sx={{ flex: 1, maxWidth: "580px" }}>
             <Typography
               variant="h4"
               sx={{ marginBottom: "1.5rem", fontWeight: 600 }}
@@ -23,7 +29,7 @@ const ContactSection = () => {
             <form className="space-y-6">
               <Box
                 display="flex"
-                gap={4}
+                gap={2}
                 flexDirection={{ xs: "column", sm: "row" }}
               >
                 <TextField
@@ -65,10 +71,9 @@ const ContactSection = () => {
                   control={<Checkbox color="primary" />}
                   label="Đăng ký nhận thông tin từ chúng tôi"
                 />
-                <Button
+                <Button className="bg-primary-300 text-white hover:bg-primary-700"
                   type="submit"
                   variant="contained"
-                  color="primary"
                   sx={{ padding: "10px 24px" }}
                 >
                   Gửi thông tin
@@ -77,12 +82,13 @@ const ContactSection = () => {
             </form>
           </Box>
 
-          <Box flex={{ xs: "1", md: "2" }}>
+          {/* Right Information */}
+          <Box sx={{ flex: 1, maxWidth: "480px" }}>
             <Box
               sx={{
-                padding: "2rem",
+                padding: "1rem",
                 backgroundColor: "#EEF4F8",
-                borderRadius: "8px",
+                borderRadius: "5px",
                 boxShadow: 1,
               }}
             >
@@ -90,28 +96,28 @@ const ContactSection = () => {
                 variant="h6"
                 sx={{ marginBottom: "1rem", fontWeight: "bold" }}
               >
-                Our Information
+                Thông tin liên hệ
+              </Typography>
+              <Typography className="leading-loose"
+                variant="body2"
+                color="textSecondary"
+                sx={{ marginBottom: "0.5rem" }}
+              >
+                 Lô E2a-7, Đường D1, Đ. D1, Long Thạnh Mỹ, Thành Phố Thủ Đức, Hồ Chí Minh 700000
               </Typography>
               <Typography
                 variant="body2"
                 color="textSecondary"
                 sx={{ marginBottom: "0.5rem" }}
               >
-                1234 Education Lane, Learning City, EDFG States 56789
+                schedulify@gmail.com
               </Typography>
               <Typography
                 variant="body2"
                 color="textSecondary"
                 sx={{ marginBottom: "0.5rem" }}
               >
-                admission@edmunhigh.edu
-              </Typography>
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                sx={{ marginBottom: "0.5rem" }}
-              >
-                +1 (555) 123 - 4567
+                028 7300 5588
               </Typography>
             </Box>
           </Box>

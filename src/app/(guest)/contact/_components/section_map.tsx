@@ -30,20 +30,16 @@ const GoogleMapSection = () => {
         </Box>
 
         <Button
+          className="bg-primary-300 text-white"
           variant="contained"
-          color="primary"
           href="https://www.google.com/maps/dir//%C4%91%E1%BA%A1i+h%E1%BB%8Dc+fpt/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x31752731176b07b1:0xb752b24b379bae5e?sa=X&ved=1t:3061&ictx=111"
           target="_blank"
           rel="noopener noreferrer"
           sx={{
             position: "absolute", 
-            bottom: 16, 
+            bottom: 50, 
             left: "50%", 
             transform: "translateX(-50%)", 
-            backgroundColor: "#1C6DD0",
-            "&:hover": {
-              backgroundColor: "#155AB7",
-            },
           }}
         >
           Xem trong Google Maps
