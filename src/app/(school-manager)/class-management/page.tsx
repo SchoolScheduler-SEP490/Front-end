@@ -310,7 +310,7 @@ export default function SMClass() {
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Môn học
+						Lớp học
 					</h3>
 				</div>
 			</SMHeader>
