@@ -1,8 +1,7 @@
-import type { Metadata } from 'next';
-import '@/commons/styles/globals.css';
-import { inter } from '@/utils/fonts';
-import Header from '@/commons/header';
 import Footer from '@/commons/footer';
+import Header from '@/commons/header';
+import '@/commons/styles/globals.css';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
