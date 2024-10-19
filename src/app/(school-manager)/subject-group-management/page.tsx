@@ -231,7 +231,7 @@ export default function SMSubjectGroup() {
 					</h3>
 				</div>
 			</SMHeader>
-			<div className='w-full h-fit flex flex-col justify-center items-center px-[20vw] pt-[5vh]'>
+			<div className='w-full h-fit flex flex-col justify-center items-center px-[15vw] pt-[5vh]'>
 				<Box sx={{ width: '100%' }}>
 					<Paper sx={{ width: '100%', mb: 2 }}>
 						<Toolbar

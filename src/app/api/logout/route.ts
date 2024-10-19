@@ -4,7 +4,6 @@ export async function POST(request: Request) {
 	const res = await request.json();
 	const logoutBody: ILogoutReqBody = { ...res };
 	const sessionToken: string = logoutBody.sessionToken ?? undefined;
-	const refreshToken: string = logoutBody.refreshToken ?? undefined;
 
 	if (!sessionToken) {
 		return Response.json(
@@ -18,7 +17,11 @@ export async function POST(request: Request) {
 	return Response.json(res, {
 		status: 200,
 		headers: {
-			'Set-Cookie': `sessionToken=;refreshToken=; Path=/; HttpOnly`,
+			'Set-Cookie': [
+				'sessionToken=; HttpOnly; Path=/; Max-Age=0',
+				'refreshToken=; HttpOnly; Path=/; Max-Age=0',
+				// Add other cookies you want to remove here
+			].join(','),
 		},
 	});
 }

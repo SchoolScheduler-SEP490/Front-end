@@ -14,11 +14,14 @@ export const useAppContext = () => {
 export default function AppProvider({
 	children,
 	inititalSessionToken = '',
+	inititalRefreshToken = '',
 }: {
 	children: React.ReactNode;
 	inititalSessionToken?: string;
+	inititalRefreshToken?: string;
 }) {
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
+	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	return (
 		<AppContext.Provider value={{ sessionToken, setSessionToken }}>
 			{children}

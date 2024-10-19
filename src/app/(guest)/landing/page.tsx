@@ -2,17 +2,17 @@
 
 import ContainedButton from '@/commons/button-contained';
 import { IconButton, Radio, TextField } from '@mui/material';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
+import './_styles/landing_styles.css';
 const LandingHero = dynamic(() => import('./_components/secion_hero'));
 const LandingConstraints = dynamic(() => import('./_components/section_constraint'));
 const LandingDescription = dynamic(() => import('./_components/section_description'));
 const LandingPros = dynamic(() => import('./_components/section_pros'));
 const LandingSchools = dynamic(() => import('./_components/section_schools'));
 const LandingWCU = dynamic(() => import('./_components/section_wcu'));
-import './_styles/landing_styles.css';
-import dynamic from 'next/dynamic';
-import Link from 'next/link';
 
 export default function Home(): JSX.Element {
 	const [currentSection, setCurrentSection] = useState(1);

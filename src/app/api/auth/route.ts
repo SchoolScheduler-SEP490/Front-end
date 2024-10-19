@@ -17,7 +17,10 @@ export async function POST(request: Request) {
 	return Response.json(res, {
 		status: 200,
 		headers: {
-			'Set-Cookie': `sessionToken=${sessionToken};refreshToken=${refreshToken}; Path=/; HttpOnly`,
+			'Set-Cookie': [
+				`sessionToken=${sessionToken}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
+				`refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
+			].join(','),
 		},
 	});
 }
