@@ -3,6 +3,8 @@ import { createContext, useContext, useState } from 'react';
 const AppContext = createContext({
 	sessionToken: '',
 	setSessionToken: (sessionToken: string) => {},
+	refreshToken: '',
+	setRefreshToken: (refreshToken: string) => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -23,7 +25,9 @@ export default function AppProvider({
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	return (
-		<AppContext.Provider value={{ sessionToken, setSessionToken }}>
+		<AppContext.Provider
+			value={{ sessionToken, setSessionToken, refreshToken, setRefreshToken }}
+		>
 			{children}
 		</AppContext.Provider>
 	);
