@@ -9,10 +9,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import '../styles/sm_sidenav.css';
+import { useEffect, useState } from 'react';
 
 const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
+	const [showDropdowns, setShowDropdowns] = useState<string[]>([]);
 
 	const handleLogout = () => {
 		// handle logout
@@ -23,9 +25,13 @@ const SMSidenav = () => {
 		router.push(url);
 	};
 
+	useEffect(() => {}, []);
+
+	const toggleDropdown = (category: string) => {};
+
 	return (
-		<div className='relative w-[16%] h-screen flex flex-col justify-start items-start gap-5 bg-white'>
-			<div className='absolute top-0 left-0 z-10 bg-white w-full min-h-[55px] flex justify-center items-center border-b-1 border-gray-400'>
+		<div className='relative w-[16%] h-screen flex flex-col justify-start items-start gap-5 bg-white border-r-1 border-gray-400'>
+			<div className='absolute top-0 left-0 z-10 bg-white w-full min-h-[50px] flex justify-center items-center border-b-1 border-gray-400'>
 				<Link
 					href={'/'}
 					className='w-fit h-full text-primary-500 text-title-xl-strong font-bold'
@@ -33,14 +39,14 @@ const SMSidenav = () => {
 					Schedulify
 				</Link>
 			</div>
-			<div className='w-full h-fit py-[80px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
+			<div className='w-full h-fit py-[70px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
 				{SM_SIDENAV.map((category: ISMSidenav) => (
 					<div
 						key={`${category.category}-${Math.random}`}
 						className='w-full flex flex-col justify-start items-center'
 					>
-						<div className='w-full pl-2 pr-3 py-2 flex flex-row justify-between items-center hover:bg-basic-gray-hover hover:cursor-pointer'>
-							<h3 className='text-primary-400 text-title-medium-strong'>
+						<div className='w-full h-fit pl-2 pr-5 py-2 flex flex-row justify-between items-center hover:bg-basic-gray-hover hover:cursor-pointer'>
+							<h3 className='text-primary-400 text-title-small-strong'>
 								{category.category}
 							</h3>
 							<Image
@@ -48,15 +54,15 @@ const SMSidenav = () => {
 								src={'/images/icons/drop-arrow.png'}
 								alt='drop-arrow'
 								unoptimized={true}
-								width={15}
-								height={15}
+								width={13}
+								height={13}
 							/>
 						</div>
 						{category.items.map((item: ISMNavigation) => (
 							<div
 								key={item.name}
-								className={`w-[94%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 mx[2%] rounded-[5px] hover:bg-basic-gray-hover hover:cursor-pointer 
-									${currentPath === item.url ? 'bg-basic-gray-active' : ''}`}
+								className={`w-[94%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 mx[2%] rounded-[5px] hover:cursor-pointer 
+									${currentPath === item.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 								onClick={() => handleNavigate(item.url)}
 							>
 								<Image

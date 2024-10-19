@@ -1,1 +1,11 @@
-// Delete this file after adding your own hooks in the directory
+interface ITeacherTableData {
+	id: number;
+	teacherCode: string;
+	teacherName: string;
+	nameAbbreviation: string;
+	subjectDepartment: string;
+	phoneNumber: string;
+	email: string;
+	status: string;
+}
+
