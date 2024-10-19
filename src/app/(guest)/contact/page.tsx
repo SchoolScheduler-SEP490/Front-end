@@ -26,9 +26,9 @@ export default function Home() {
         <FAQSection/>
       </div>
 
-      <div className="mb-16">
-        <JoinCommunitySection />
-      </div>
-    </div>
-  );
+			<div className='mb-16'>
+				<JoinCommunitySection />
+			</div>
+		</div>
+	);
 }

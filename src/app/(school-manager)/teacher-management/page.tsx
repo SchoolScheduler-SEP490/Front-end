@@ -60,7 +60,7 @@ const teacherData: ITeacherTableData[] = [
 ];
 export default function Home() {
 	return (
-		<div className='w-[100%] h-screen flex flex-col justify-start'>
+		<div className='w-[84%] h-screen flex flex-col justify-start'>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -68,7 +68,7 @@ export default function Home() {
 					</h3>
 				</div>
 			</SMHeader>
-			<div className='w-full h-fit flex flex-col justify-center items-center px-[2vw] pt-[5vh]'>
+			<div className='w-full h-fit flex flex-col justify-center items-center px-[1vw] pt-[5vh]'>
 				<TeacherTable teachers={teacherData} />
 			</div>
 		</div>
