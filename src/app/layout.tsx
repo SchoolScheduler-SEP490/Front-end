@@ -3,6 +3,10 @@ import AppProvider from '@/context/app_provider';
 import { inter } from '@/utils/fonts';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { IJWTTokenPayload } from './(auth)/_utils/constants';
+import { jwtDecode } from 'jwt-decode';
+import { Bounce, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -21,6 +25,10 @@ export default function RootLayout({
 	const cookieStore = cookies();
 	const sessionToken = cookieStore.get('sessionToken');
 	const refreshToken = cookieStore.get('refreshToken');
+	let userData: IJWTTokenPayload = {} as IJWTTokenPayload;
+	if (sessionToken) {
+		userData = jwtDecode(sessionToken.value);
+	}
 
 	return (
 		<html lang='vi'>
@@ -30,9 +38,23 @@ export default function RootLayout({
 				<AppProvider
 					inititalSessionToken={sessionToken?.value}
 					inititalRefreshToken={refreshToken?.value}
+					initUserRole={userData.role ?? 'Unknown'}
 				>
 					{children}
 				</AppProvider>
+				<ToastContainer
+					position='top-right'
+					autoClose={5000}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick
+					rtl={false}
+					pauseOnFocusLoss
+					draggable
+					pauseOnHover
+					theme='light'
+					transition={Bounce}
+				/>
 			</body>
 		</html>
 	);

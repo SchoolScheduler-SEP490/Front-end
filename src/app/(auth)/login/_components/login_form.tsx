@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
 
 const CustomButton = styled(Button)({
@@ -29,7 +29,7 @@ const CustomButton = styled(Button)({
 });
 
 export const LoginForm = () => {
-	const { setSessionToken } = useAppContext();
+	const { setSessionToken, setRefreshToken, setUserRole } = useAppContext();
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 	const [showPassword, setShowPassword] = useState(false);
@@ -95,12 +95,10 @@ export const LoginForm = () => {
 				return data;
 			});
 			setSessionToken(resultFromNextServer.payload.jwt.token);
+			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
+			setUserRole(resultFromNextServer.payload.role);
 
-			// This is applied when use in Production
-			// window.location.reload();
-
-			// This is applied when use in Development
-			router.push('/timetable-management');
+			router.push('/');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
@@ -202,9 +200,10 @@ export const LoginForm = () => {
 				<CustomButton
 					variant='contained'
 					disableRipple
+					disabled={!formik.isValid}
 					type='submit'
 					id='login-btn'
-					className='mt-2'
+					className='mt-2 dis'
 				>
 					<h4 className='text-body-large-strong font-medium tracking-widest'>
 						ĐĂNG NHẬP
