@@ -16,7 +16,7 @@ import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
 import LoadingComponent from '@/commons/loading';
 
@@ -71,6 +71,7 @@ export const LoginForm = () => {
 						},
 					};
 				} else {
+					setIsLoggingIn(false);
 					useNotify({
 						message: TRANSLATOR[loginResponse.message] ?? 'Đã có lỗi xảy ra',
 						type: 'error',
@@ -107,6 +108,15 @@ export const LoginForm = () => {
 			console.log('>>>ERROR: ', error);
 		}
 	};
+
+	useEffect(() => {
+		if (isLoggingIn) {
+			const timer = setTimeout(() => {
+				setIsLoggingIn(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [isLoggingIn]);
 
 	const handleShowPassword = () => {
 		setShowPassword(!showPassword);
