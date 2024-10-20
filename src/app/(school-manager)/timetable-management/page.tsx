@@ -1,7 +1,6 @@
 'use client';
 
 import SMHeader from '@/commons/school_manager/header';
-import { useAppContext } from '@/context/app_provider';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Box from '@mui/material/Box';
@@ -20,7 +19,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import { visuallyHidden } from '@mui/utils';
-import { notFound, useRouter } from 'next/navigation';
 import * as React from 'react';
 
 interface ITimetableTableData {
@@ -258,13 +256,13 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 				</h2>
 			)}
 			{numSelected > 0 ? (
-				<Tooltip title='Delete'>
+				<Tooltip title='Xóa'>
 					<IconButton color='error'>
 						<DeleteIcon color='error' />
 					</IconButton>
 				</Tooltip>
 			) : (
-				<Tooltip title='Filter list'>
+				<Tooltip title='Lọc'>
 					<IconButton>
 						<FilterListIcon />
 					</IconButton>
