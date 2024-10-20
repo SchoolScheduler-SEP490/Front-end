@@ -37,8 +37,9 @@ export default function AppProvider({
 		refreshToken ? ['/api/refresh', refreshToken] : null,
 		([url, token]) => fetchWithToken(url, token),
 		{
+			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
-			refreshInterval: 600000,
+			refreshInterval: 480000,
 		}
 	);
 
@@ -50,8 +51,10 @@ export default function AppProvider({
 	}, [data]);
 
 	if (error) {
-		console.error('Lỗi làm mới token: ', error);
-		// Xử lý trường hợp lỗi (ví dụ: đăng xuất người dùng)
+		useNotify({
+			message: error.message,
+			type: 'error',
+		});
 	}
 
 	return (
