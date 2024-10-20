@@ -1,14 +1,14 @@
-import { jwtDecode } from 'jwt-decode';
-import { cookies } from 'next/headers';
-import { IJWTTokenPayload } from './(auth)/_utils/constants';
-import { redirect } from 'next/navigation';
+'use client';
+import { useAppContext } from '@/context/app_provider';
 import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants';
+import { jwtDecode } from 'jwt-decode';
+import { redirect } from 'next/navigation';
+import { IJWTTokenPayload } from './(auth)/_utils/constants';
 
 export default function Home(): JSX.Element {
-	const cookieStore = cookies();
-	const sessionToken = cookieStore.get('sessionToken');
+	const { sessionToken } = useAppContext();
 	if (sessionToken) {
-		const data = jwtDecode(sessionToken?.value ?? '');
+		const data = jwtDecode(sessionToken ?? '');
 		const userRole: string = (data as IJWTTokenPayload).role;
 		switch (userRole.toLowerCase()) {
 			case 'schoolmanager':

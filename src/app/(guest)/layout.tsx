@@ -1,18 +1,22 @@
+'use client';
 import Footer from '@/commons/footer';
 import Header from '@/commons/header';
-import '@/commons/styles/globals.css';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-	icons: ['/images/logo.png'],
-	title: 'Schedulify | Trang chủ',
-};
+import { useAppContext } from '@/context/app_provider';
+import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 export default function GuestLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const { sessionToken } = useAppContext();
+	const router = useRouter();
+	useMemo(() => {
+		if (sessionToken) {
+			router.push('/');
+		}
+	}, [sessionToken]);
 	return (
 		<section>
 			<Header />
