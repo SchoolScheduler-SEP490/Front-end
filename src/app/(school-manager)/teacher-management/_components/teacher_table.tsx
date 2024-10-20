@@ -264,7 +264,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
-              orderBy={orderBy}
+              orderBy={orderBy as string}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={teachers.length}
