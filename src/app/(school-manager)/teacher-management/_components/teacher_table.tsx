@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
-import { ITeacherTableData } from "../_hooks/custom_hook";
+import { ITeacherTableData } from "../_hooks/useTeacherData";
 
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
