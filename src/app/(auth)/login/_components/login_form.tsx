@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
+import LoadingComponent from '@/commons/loading';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -33,6 +34,7 @@ export const LoginForm = () => {
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 	const [showPassword, setShowPassword] = useState(false);
+	const [isLoggingIn, setIsLoggingIn] = useState(false);
 
 	const handleRegister = () => {
 		router.push('/register');
@@ -44,6 +46,7 @@ export const LoginForm = () => {
 
 	const handleLogin = async ({ email, password }: ILoginForm) => {
 		try {
+			setIsLoggingIn(true);
 			const result = await fetch(`${api}/api/users/login`, {
 				method: 'POST',
 				headers: {
@@ -97,6 +100,7 @@ export const LoginForm = () => {
 			setSessionToken(resultFromNextServer.payload.jwt.token);
 			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
 			setUserRole(resultFromNextServer.payload.role);
+			setIsLoggingIn(false);
 
 			router.push('/');
 		} catch (error: any) {
@@ -121,6 +125,7 @@ export const LoginForm = () => {
 
 	return (
 		<div className='w-full'>
+			<LoadingComponent loadingStatus={isLoggingIn} />
 			<form
 				id='formId'
 				onSubmit={(event: any) => {

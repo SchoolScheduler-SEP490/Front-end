@@ -1,5 +1,8 @@
 'use client';
-import { createContext, useContext, useState } from 'react';
+import useNotify from '@/hooks/useNotify';
+import fetchWithToken from '@/hooks/useRefreshToken';
+import { createContext, useContext, useEffect, useState } from 'react';
+import useSWR from 'swr';
 const AppContext = createContext({
 	sessionToken: '',
 	setSessionToken: (sessionToken: string) => {},
@@ -29,6 +32,27 @@ export default function AppProvider({
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
+
+	const { data, error } = useSWR(
+		refreshToken ? ['/api/refresh', refreshToken] : null,
+		([url, token]) => fetchWithToken(url, token),
+		{
+			revalidateOnReconnect: true,
+			refreshInterval: 600000,
+		}
+	);
+
+	useEffect(() => {
+		if (data) {
+			setSessionToken(data['jwt-token']);
+			setRefreshToken(data['jwt-refresh-token']);
+		}
+	}, [data]);
+
+	if (error) {
+		console.error('Lỗi làm mới token: ', error);
+		// Xử lý trường hợp lỗi (ví dụ: đăng xuất người dùng)
+	}
 
 	return (
 		<AppContext.Provider
