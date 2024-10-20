@@ -14,14 +14,17 @@ export async function POST(request: Request) {
 		);
 	}
 
-	return Response.json(res, {
-		status: 200,
-		headers: {
-			'Set-Cookie': [
-				'sessionToken=; HttpOnly; Path=/; Max-Age=0',
-				'refreshToken=; HttpOnly; Path=/; Max-Age=0',
-				// Add other cookies you want to remove here
-			].join(','),
-		},
-	});
+	return Response.json(
+		{ message: 'Đã đăng xuất' },
+		{
+			status: 200,
+			headers: {
+				'Set-Cookie': [
+					'sessionToken=; HttpOnly; Path=/; Max-Age=0',
+					'refreshToken=; HttpOnly; Path=/; Max-Age=0',
+					// Add other cookies you want to remove here
+				].join(','),
+			},
+		}
+	);
 }
