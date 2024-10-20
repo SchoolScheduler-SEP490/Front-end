@@ -5,19 +5,44 @@ import {
 	ISMSidenav,
 	SM_SIDENAV,
 } from '@/app/(school-manager)/_utils/contants';
+import { useAppContext } from '@/context/app_provider';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import '../styles/sm_sidenav.css';
 import { useEffect, useState } from 'react';
+import '../styles/sm_sidenav.css';
+import { useToast } from 'react-toastify';
+import useNotify from '@/hooks/useNotify';
 
 const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
 	const [showDropdowns, setShowDropdowns] = useState<string[]>([]);
+	const { sessionToken, setSessionToken, setRefreshToken, setUserRole } =
+		useAppContext();
 
-	const handleLogout = () => {
-		// handle logout
+	const handleLogout = async () => {
+		await fetch('/api/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ sessionToken }),
+		}).then(async (res) => {
+			if (res.status === 200) {
+				const data = await res.json();
+				setSessionToken('');
+				setRefreshToken('');
+				setUserRole('');
+				useNotify({
+					message: data.message ?? 'Đã có lỗi xảy ra',
+					type: 'error',
+					position: 'top-right',
+					variant: 'light',
+				});
+			}
+		});
+		router.push('/');
 	};
 
 	const handleNavigate = (url: string) => {
