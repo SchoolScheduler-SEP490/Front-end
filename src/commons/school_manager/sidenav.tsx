@@ -6,13 +6,12 @@ import {
 	SM_SIDENAV,
 } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import '../styles/sm_sidenav.css';
-import { useToast } from 'react-toastify';
-import useNotify from '@/hooks/useNotify';
 
 const SMSidenav = () => {
 	const currentPath = usePathname();
