@@ -17,8 +17,6 @@ import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
 import { ISubjectTableData } from '../../_utils/contants';
-import LoadingComponent from '@/commons/loading';
-import { mutate } from 'swr';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
