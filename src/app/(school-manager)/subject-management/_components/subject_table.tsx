@@ -254,7 +254,15 @@ const SubjectTable = (props: ISubjectTableProps) => {
 											>
 												{row.id}
 											</TableCell>
-											<TableCell align='left'>
+											<TableCell
+												align='left'
+												sx={{
+													maxWidth: '100px` !important',
+													whiteSpace: 'nowrap',
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+												}}
+											>
 												{row.subjectName}
 											</TableCell>
 											<TableCell align='center'>

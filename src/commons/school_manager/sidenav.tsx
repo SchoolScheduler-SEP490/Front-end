@@ -17,7 +17,7 @@ const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
 	const [showDropdowns, setShowDropdowns] = useState<string[]>([]);
-	const { sessionToken, setSessionToken, setRefreshToken, setUserRole } =
+	const { sessionToken, setSessionToken, setRefreshToken, setUserRole, setSchoolId } =
 		useAppContext();
 
 	const handleLogout = async () => {
@@ -33,6 +33,7 @@ const SMSidenav = () => {
 				setSessionToken('');
 				setRefreshToken('');
 				setUserRole('');
+				setSchoolId('');
 				useNotify({
 					message: data.message ?? 'Đã có lỗi xảy ra',
 					type: 'error',
@@ -41,7 +42,7 @@ const SMSidenav = () => {
 				});
 			}
 		});
-		router.push('/');
+		router.replace('/');
 	};
 
 	const handleNavigate = (url: string) => {
