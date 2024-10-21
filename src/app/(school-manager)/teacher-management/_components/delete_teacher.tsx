@@ -18,15 +18,22 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open,
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={() => {
+          console.log("Cancel deletion");
+          onClose();
+        }} color="primary">
           Hủy
         </Button>
-        <Button onClick={onConfirm} color="secondary" variant="contained">
+        <Button className='bg-primary-600' onClick={() => {
+          console.log("Confirming deletion");
+          onConfirm();
+        }} variant="contained">
           Xác nhận
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
 
 export default DeleteConfirmationModal;

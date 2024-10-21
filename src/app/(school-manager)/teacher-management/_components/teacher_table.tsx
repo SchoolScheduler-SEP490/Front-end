@@ -20,6 +20,8 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
 import { ITeacherTableData } from "../_libs/apiTeacher";
+import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
+import DeleteConfirmationModal from "./delete_teacher";
 
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
@@ -136,10 +138,12 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
   numSelected: number;
+  onDeleteClick: () => void;
+  isDeleting: boolean;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
+  const { numSelected, onDeleteClick, isDeleting } = props;
 
   return (
     <Toolbar
@@ -169,7 +173,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       )}
       {numSelected > 0 ? (
         <Tooltip title="Delete">
-          <IconButton>
+          <IconButton onClick={onDeleteClick} disabled={isDeleting}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -191,6 +195,8 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
+  const {deleteTeacher, isDeleting} = useDeleteTeacher();
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -229,6 +235,29 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
     setSelected(newSelected);
   };
 
+  const handleDeleteTeacher = async () => {
+    console.log(`Selected teachers to delete: ${selected.join(', ')}`);
+    
+    for (const id of selected) {
+      const isDeleted = await deleteTeacher(id);
+      if (isDeleted) {
+        console.log(`Teacher with ID: ${id} has been deleted successfully.`);
+      } else {
+        console.warn(`Failed to delete teacher with ID: ${id}.`);
+      }
+    }
+  
+    setSelected([]);
+    setOpenDeleteModal(false);
+  };
+
+  const handleOpenDeleteModal = () => {
+    setOpenDeleteModal(true);
+  };
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
+  };
+
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -254,7 +283,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} onDeleteClick={handleOpenDeleteModal} isDeleting={isDeleting} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -345,8 +374,15 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+      <DeleteConfirmationModal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleDeleteTeacher}
+        selectedCount={selected.length}
+      />
     </Box>
   );
 };
 
 export default TeacherTable;
+
