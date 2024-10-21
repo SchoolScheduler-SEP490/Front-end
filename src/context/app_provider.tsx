@@ -55,10 +55,6 @@ export default function AppProvider({
 		if (data) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
-			useNotify({
-				message: 'Đã cập nhật token',
-				type: 'success',
-			});
 		}
 	}, [data]);
 
