@@ -17,10 +17,13 @@ export function useDeleteTeacher() {
         throw new Error('Session token not found. Please log in.');
       }
 
+      console.log(`Attempting to delete teacher with ID: ${teacherId}`);
       await deleteTeacherById(api, teacherId, sessionToken);
+      console.log(`Successfully deleted teacher with ID: ${teacherId}`);
       setIsDeleting(false);
       return true;
     } catch (err) {
+      console.error(`Failed to delete teacher with ID: ${teacherId}`, err);
       setDeleteError('Failed to delete teacher.');
       setIsDeleting(false);
       return false;
