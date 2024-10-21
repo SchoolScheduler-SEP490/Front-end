@@ -41,3 +41,17 @@ export const schoolManagerPaths = [
 	'/import-timetable',
 	'/migrate-timetable',
 ];
+
+export interface IPaginatedResponse<T> {
+	status: number;
+	message: string;
+	result: {
+		'total-item-count': number;
+		'page-size': number;
+		'total-pages-count': number;
+		'page-index': number;
+		next: boolean;
+		previous: boolean;
+		items: T[];
+	};
+}

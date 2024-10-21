@@ -10,6 +10,9 @@ const AppContext = createContext({
 	setRefreshToken: (refreshToken: string) => {},
 	userRole: '',
 	setUserRole: (userRole: string) => {},
+	schoolId: '',
+	setSchoolId: (schoolId: string) => {},
+	schoolName: '',
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -23,21 +26,26 @@ export default function AppProvider({
 	inititalSessionToken = '',
 	inititalRefreshToken = '',
 	initUserRole = '',
+	initSchoolId = '',
+	initSchoolName = '',
 }: {
 	children: React.ReactNode;
 	inititalSessionToken?: string;
 	inititalRefreshToken?: string;
 	initUserRole?: string;
+	initSchoolId?: string;
+	initSchoolName?: string;
 }) {
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
+	const [schoolId, setSchoolId] = useState(initSchoolId);
+	const schoolName = initSchoolName;
 
 	const { data, error } = useSWR(
 		refreshToken ? ['/api/refresh', refreshToken] : null,
 		([url, token]) => fetchWithToken(url, token),
 		{
-			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
 			refreshInterval: 480000,
 		}
@@ -66,6 +74,9 @@ export default function AppProvider({
 				setRefreshToken,
 				userRole,
 				setUserRole,
+				schoolId,
+				setSchoolId,
+				schoolName,
 			}}
 		>
 			{children}
