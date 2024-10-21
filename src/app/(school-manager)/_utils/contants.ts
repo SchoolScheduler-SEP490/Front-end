@@ -86,3 +86,24 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		],
 	},
 ];
+
+export interface ISubject {
+	id: number;
+	'subject-name': string;
+	abbreviation: string;
+	'is-required': boolean;
+	description: string;
+	'total-slot-in-year': number;
+	'slot-specialized': number;
+	'create-date': string;
+	'update-date': string;
+	'is-deleted': boolean;
+}
+
+export interface ISubjectTableData {
+	id: number;
+	subjectName: string;
+	subjectCode: string;
+	subjectGroup: string;
+	subjectType: string;
+}
