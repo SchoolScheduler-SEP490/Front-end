@@ -24,7 +24,7 @@ export default function SMSubject() {
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
 	const { schoolId, sessionToken } = useAppContext();
-	const { data, error, isValidating, mutate } = useFetchData({
+	const { data, error, isLoading, isValidating, mutate } = useFetchData({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		pageSize: rowsPerPage,
@@ -54,7 +54,7 @@ export default function SMSubject() {
 	}, [data?.result?.items, page, rowsPerPage]);
 
 	if (isValidating) {
-		return <LoadingComponent loadingStatus={isValidating} />;
+		return <LoadingComponent loadingStatus={isLoading} />;
 	}
 
 	if (error) {

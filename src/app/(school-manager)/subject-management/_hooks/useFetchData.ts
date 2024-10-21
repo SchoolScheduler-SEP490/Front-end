@@ -31,7 +31,7 @@ const useFetchData = (props: IFetcherProps) => {
 		});
 		const data = await response.json();
 		if (!response.ok) {
-			throw new error(data.message);
+			throw new Error(data.message);
 		}
 		return data;
 	}
@@ -47,7 +47,7 @@ const useFetchData = (props: IFetcherProps) => {
 		}),
 	}).toString();
 
-	const { data, error, isValidating, mutate } = useSWR(
+	const { data, error, isLoading, isValidating, mutate } = useSWR(
 		`${api}/api/subjects?${queryString}`,
 		fetcher,
 		{
@@ -58,7 +58,7 @@ const useFetchData = (props: IFetcherProps) => {
 		}
 	);
 
-	return { data, error, isValidating, mutate };
+	return { data, error, isLoading, isValidating, mutate };
 };
 
 export default useFetchData;
