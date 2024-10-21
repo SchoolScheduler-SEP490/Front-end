@@ -55,3 +55,8 @@ export interface IPaginatedResponse<T> {
 		items: T[];
 	};
 }
+
+export interface ICommonOption {
+	img: string;
+	title: string;
+}

@@ -1,7 +1,8 @@
 'use client';
 
+import { ICommonOption } from '@/utils/constants';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Toolbar, Tooltip } from '@mui/material';
+import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -152,6 +153,11 @@ interface ISubjectTableProps {
 	totalRows?: number;
 }
 
+const dropdownOptions: ICommonOption[] = [
+	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
+	{ img: '/images/icons/delete.png', title: 'Xóa môn học' },
+];
+
 const SubjectTable = (props: ISubjectTableProps) => {
 	const {
 		subjectTableData,
@@ -164,7 +170,16 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	const [order, setOrder] = React.useState<Order>('asc');
 	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('id');
 	const [page, setPage] = React.useState<number>(serverPage);
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const open = Boolean(anchorEl);
 	const [maxCurrentPage, setMaxCurrentPage] = React.useState<number>(serverPage);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleMenuItemClick = (event: any, index: number) => {
+		setAnchorEl(null);
+	};
 
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
@@ -185,8 +200,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setRowsPerPage(parseInt(event.target.value, 10));
-		setRowsPerPage(0);
+		setRowsPerPage(parseInt(event.target.value));
 	};
 
 	const emptyRows =
@@ -286,6 +300,17 @@ const SubjectTable = (props: ISubjectTableProps) => {
 												<IconButton
 													color='success'
 													sx={{ zIndex: 10 }}
+													id='basic-button'
+													aria-controls={
+														open
+															? `basic-menu${index}`
+															: undefined
+													}
+													aria-haspopup='true'
+													aria-expanded={
+														open ? 'true' : undefined
+													}
+													onClick={handleClick}
 												>
 													<Image
 														src='/images/icons/menu.png'
@@ -295,6 +320,42 @@ const SubjectTable = (props: ISubjectTableProps) => {
 														height={20}
 													/>
 												</IconButton>
+												<Menu
+													id={`basic-menu${index}`}
+													anchorEl={anchorEl}
+													elevation={1}
+													open={open}
+													onClose={() => setAnchorEl(null)}
+													MenuListProps={{
+														'aria-labelledby': 'basic-button',
+													}}
+												>
+													{dropdownOptions.map(
+														(option, index) => (
+															<MenuItem
+																key={option.title}
+																onClick={(event: any) =>
+																	handleMenuItemClick(
+																		event,
+																		index
+																	)
+																}
+																className='flex flex-row items-center'
+															>
+																<Image
+																	className='mr-4'
+																	src={option.img}
+																	alt={option.title}
+																	width={15}
+																	height={15}
+																/>
+																<h2 className='text-body-medium'>
+																	{option.title}
+																</h2>
+															</MenuItem>
+														)
+													)}
+												</Menu>
 											</TableCell>
 										</TableRow>
 									);

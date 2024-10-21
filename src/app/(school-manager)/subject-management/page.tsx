@@ -9,17 +9,6 @@ import { ISubject, ISubjectTableData } from '../_utils/contants';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
 
-function importRecord(props: ISubjectTableData): ISubjectTableData {
-	const { id, subjectName, subjectCode, subjectGroup, subjectType } = props;
-	return {
-		id,
-		subjectName,
-		subjectCode,
-		subjectGroup,
-		subjectType,
-	};
-}
-
 export default function SMSubject() {
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -31,6 +20,7 @@ export default function SMSubject() {
 		pageIndex: page + 1,
 	});
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
+	const [previousRPP, setPreviousRPP] = React.useState<number>(rowsPerPage);
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>(
 		[]
 	);
@@ -39,6 +29,7 @@ export default function SMSubject() {
 		mutate();
 		if (data?.status === 200) {
 			setTotalRows(data.result['total-item-count']);
+			setPreviousRPP(rowsPerPage);
 			let index = page * rowsPerPage + 1;
 			const tableData: ISubjectTableData[] = data.result.items.map(
 				(record: ISubject) => ({
@@ -46,10 +37,16 @@ export default function SMSubject() {
 					subjectName: record['subject-name'],
 					subjectCode: record.abbreviation,
 					subjectGroup: record.description,
-					subjectType: record.id % 2 === 0 ? 'Bắt buộc' : 'Tự chọn',
+					subjectType: record['is-required'] ? 'Bắt buộc' : 'Tự chọn',
 				})
 			);
 			setSubjectTableData([...subjectTableData, ...tableData]);
+			if (previousRPP !== rowsPerPage) {
+				setSubjectTableData([...tableData]);
+				setPage(0);
+			} else {
+				setSubjectTableData([...subjectTableData, ...tableData]);
+			}
 		}
 	}, [data?.result?.items, page, rowsPerPage]);
 
@@ -65,7 +62,7 @@ export default function SMSubject() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll'>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
