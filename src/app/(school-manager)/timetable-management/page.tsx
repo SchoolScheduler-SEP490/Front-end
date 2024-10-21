@@ -280,6 +280,9 @@ export default function SMLanding() {
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+	const emptyRows =
+		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - timetableTableData.length) : 0;
+
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
 		property: keyof ITimetableTableData
@@ -298,7 +301,7 @@ export default function SMLanding() {
 		setSelected([]);
 	};
 
-	const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+	const handleOneClick = (event: React.MouseEvent<unknown>, id: number) => {
 		const selectedIndex = selected.indexOf(id);
 		let newSelected: readonly number[] = [];
 
@@ -325,9 +328,6 @@ export default function SMLanding() {
 		setRowsPerPage(parseInt(event.target.value, 10));
 		setPage(0);
 	};
-
-	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - timetableTableData.length) : 0;
 
 	const visibleRows = React.useMemo(
 		() =>
@@ -373,7 +373,7 @@ export default function SMLanding() {
 											<TableRow
 												hover
 												onClick={(event) =>
-													handleClick(event, row.id)
+													handleOneClick(event, row.id)
 												}
 												role='checkbox'
 												aria-checked={isItemSelected}
