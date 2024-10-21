@@ -38,7 +38,9 @@ export default function RootLayout({
 				<AppProvider
 					inititalSessionToken={sessionToken?.value}
 					inititalRefreshToken={refreshToken?.value}
-					initUserRole={userData.role ?? 'Unknown'}
+					initUserRole={userData.role ?? 'Không xác định'}
+					initSchoolId={userData.schoolId ?? 'Không xác định'}
+					initSchoolName={userData.schoolName ?? 'Không xác định'}
 				>
 					{children}
 				</AppProvider>

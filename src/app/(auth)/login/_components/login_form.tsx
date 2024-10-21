@@ -16,8 +16,9 @@ import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
+import LoadingComponent from '@/commons/loading';
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -33,6 +34,7 @@ export const LoginForm = () => {
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 	const [showPassword, setShowPassword] = useState(false);
+	const [isLoggingIn, setIsLoggingIn] = useState(false);
 
 	const handleRegister = () => {
 		router.push('/register');
@@ -44,6 +46,7 @@ export const LoginForm = () => {
 
 	const handleLogin = async ({ email, password }: ILoginForm) => {
 		try {
+			setIsLoggingIn(true);
 			const result = await fetch(`${api}/api/users/login`, {
 				method: 'POST',
 				headers: {
@@ -68,6 +71,7 @@ export const LoginForm = () => {
 						},
 					};
 				} else {
+					setIsLoggingIn(false);
 					useNotify({
 						message: TRANSLATOR[loginResponse.message] ?? 'Đã có lỗi xảy ra',
 						type: 'error',
@@ -97,12 +101,22 @@ export const LoginForm = () => {
 			setSessionToken(resultFromNextServer.payload.jwt.token);
 			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
 			setUserRole(resultFromNextServer.payload.role);
+			setIsLoggingIn(false);
 
 			router.push('/');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
 	};
+
+	useEffect(() => {
+		if (isLoggingIn) {
+			const timer = setTimeout(() => {
+				setIsLoggingIn(false);
+			}, 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [isLoggingIn]);
 
 	const handleShowPassword = () => {
 		setShowPassword(!showPassword);
@@ -121,6 +135,7 @@ export const LoginForm = () => {
 
 	return (
 		<div className='w-full'>
+			<LoadingComponent loadingStatus={isLoggingIn} />
 			<form
 				id='formId'
 				onSubmit={(event: any) => {

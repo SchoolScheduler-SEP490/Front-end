@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
-import { ITeacherTableData } from "../_hooks/custom_hook";
+import { ITeacherTableData } from "../_hooks/useTeacherData";
 
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
@@ -264,7 +264,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
-              orderBy={orderBy}
+              orderBy={orderBy as string}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={teachers.length}

@@ -2,63 +2,12 @@
 
 import SMHeader from '@/commons/school_manager/header';
 import TeacherTable from './_components/teacher_table';
-import { ITeacherTableData } from './_hooks/custom_hook';
+import { useTeacherData } from './_hooks/useTeacherData';
+import LoadingComponent from '@/commons/loading';
 
-const teacherData: ITeacherTableData[] = [
-	{
-		id: 1,
-		teacherCode: '1',
-		teacherName: 'Nguyễn Hà Thanh Mai',
-		nameAbbreviation: 'MaiNHT',
-		subjectDepartment: 'Ngữ Văn',
-		phoneNumber: '0981457821',
-		email: 'mainht@gmail.com',
-		status: 'Hoạt động',
-	},
-	{
-		id: 2,
-		teacherCode: '2',
-		teacherName: 'Nguyễn Chiến Thắng',
-		nameAbbreviation: 'ThangNC',
-		subjectDepartment: 'Toán - Vật Lý - Hóa Học',
-		phoneNumber: '0909654321',
-		email: 'chuatebongtoi@gmail.com',
-		status: 'Hoạt động',
-	},
-	{
-		id: 3,
-		teacherCode: '3',
-		teacherName: 'Lương Hoàng Anh',
-		nameAbbreviation: 'AnhLH',
-		subjectDepartment: 'Công Nghệ - GDCD',
-		phoneNumber: '0987654321',
-		email: 'anhhl@gmail.com',
-		status: 'Vô hiệu',
-	},
-
-	{
-		id: 4,
-		teacherCode: '4',
-		teacherName: 'Nguyễn Thành Long',
-		nameAbbreviation: 'LongNT',
-		subjectDepartment: 'Sinh Học - Lịch Sử - Địa Lý',
-		phoneNumber: '0963791460',
-		email: 'nuhoanganhsang@gmail.com',
-		status: 'Hoạt động',
-	},
-
-	{
-		id: 5,
-		teacherCode: '5',
-		teacherName: 'Lâm Hữu Khánh Phương',
-		nameAbbreviation: 'PhuongLHK',
-		subjectDepartment: 'Tiếng Anh',
-		phoneNumber: '0886310928',
-		email: 'phuonglhkfe@gmail.com',
-		status: 'Vô hiệu',
-	},
-];
 export default function Home() {
+	const { teachers, isLoading, error } = useTeacherData();
+
 	return (
 		<div className='w-[84%] h-screen flex flex-col justify-start'>
 			<SMHeader>
@@ -69,7 +18,12 @@ export default function Home() {
 				</div>
 			</SMHeader>
 			<div className='w-full h-fit flex flex-col justify-center items-center px-[1vw] pt-[5vh]'>
-				<TeacherTable teachers={teacherData} />
+				<LoadingComponent loadingStatus={isLoading} />
+				{error ? (
+					<p>Error: {error}</p>
+				) : (
+					<TeacherTable teachers={teachers} />
+				)}
 			</div>
 		</div>
 	);

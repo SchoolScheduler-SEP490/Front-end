@@ -14,6 +14,8 @@ export interface ILoginResponse {
 export interface IJWTTokenPayload {
 	email: string;
 	accountId: string;
+	schoolId: string;
+	schoolName: string;
 	jti: string;
 	role: string;
 	exp: number;
