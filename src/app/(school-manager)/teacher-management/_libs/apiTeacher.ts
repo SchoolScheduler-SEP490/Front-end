@@ -8,6 +8,19 @@ export interface ITeacherTableData {
     phoneNumber: string;
     status: string;
   }
+
+  export interface IAddTeacherData {
+    "first-name": string;
+    "last-name": string;
+    abbreviation: string;
+    email: string;
+    gender: string;
+    "department-code": string;
+    "date-of-birth": string;
+    "teacher-role": string;
+    status: string;
+    phone: string;
+  }
   
   export const getTeachers = async (
     api: string, 
@@ -78,3 +91,40 @@ export interface ITeacherTableData {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   };
+
+  export const addTeacher = async (
+    api: string,
+    schoolId: number,
+    sessionToken: string,
+    teacherData: IAddTeacherData
+  ): Promise<boolean> => {
+    if (!sessionToken) {
+      console.error('Session token is not found. Please log in.');
+      return false;
+    }
+  
+    const url = `${api}/api/teachers/${schoolId}/teachers`;
+    const requestBody = [teacherData];
+    console.log('Request Body:', requestBody);
+  
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+  
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        return false;
+      }
+  
+      return true; // Trả về `true` khi thành công
+    } catch (error) {
+      console.error("Error occurred while sending request:", error);
+      return false;
+    }
+  };  

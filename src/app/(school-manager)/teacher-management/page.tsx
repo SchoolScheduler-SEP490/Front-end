@@ -6,7 +6,7 @@ import { useTeacherData } from './_hooks/useTeacherData';
 import LoadingComponent from '@/commons/loading';
 
 export default function Home() {
-	const { teachers, isLoading, error } = useTeacherData();
+	const { teachers, fetchTeachers, isLoading, error } = useTeacherData();
 
 	return (
 		<div className='w-[84%] h-screen flex flex-col justify-start'>
@@ -22,7 +22,7 @@ export default function Home() {
 				{error ? (
 					<p>Error: {error}</p>
 				) : (
-					<TeacherTable teachers={teachers} />
+					<TeacherTable teachers={teachers} fetchTeachers={fetchTeachers} />
 				)}
 			</div>
 		</div>

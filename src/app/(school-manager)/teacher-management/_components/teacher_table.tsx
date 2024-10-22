@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   Box,
+  Button,
   Checkbox,
   IconButton,
   Paper,
@@ -19,12 +20,15 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
-import { ITeacherTableData } from "../_libs/apiTeacher";
+import { addTeacher, IAddTeacherData, ITeacherTableData } from "../_libs/apiTeacher";
 import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
 import DeleteConfirmationModal from "./delete_teacher";
-
+import AddTeacherForm, { TeacherFormData } from "./add_teacher";
+import { useAddTeacher } from "../_hooks/useAddTeacher";
+import useNotify from "@/hooks/useNotify";
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
+  fetchTeachers: () => void;
 }
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
@@ -140,10 +144,11 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   onDeleteClick: () => void;
   isDeleting: boolean;
+  onAddClick: () => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected, onDeleteClick, isDeleting } = props;
+  const { numSelected, onDeleteClick, isDeleting, onAddClick } = props;
 
   return (
     <Toolbar
@@ -151,6 +156,8 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         {
           pl: { sm: 2 },
           pr: { xs: 1, sm: 1 },
+          display: 'flex',
+          justifyContent: 'space-around'
         },
         numSelected > 0 && {
           bgcolor: (theme) =>
@@ -171,24 +178,34 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           Danh sách giáo viên
         </h2>
       )}
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton onClick={onDeleteClick} disabled={isDeleting}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+      <Button
+        variant="outlined"
+        color="primary"
+        sx={{ whiteSpace: 'nowrap'}} 
+        onClick={onAddClick}
+      >
+        Thêm giáo viên
+      </Button>
+      <div>
+        {numSelected > 0 ? (
+          <Tooltip title="Delete">
+            <IconButton onClick={onDeleteClick} disabled={isDeleting}>
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Filter list">
+            <IconButton>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </div>
     </Toolbar>
   );
 }
 
-const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
+const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) => {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
     React.useState<keyof ITeacherTableData>("teacherName");
@@ -197,6 +214,10 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const {deleteTeacher, isDeleting} = useDeleteTeacher();
+  const {addNewTeacher, isAdding, addError } = useAddTeacher();
+  const [openAddForm, setOpenAddForm] = React.useState(false);
+  const notify = useNotify;
+
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -251,12 +272,53 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
     setOpenDeleteModal(false);
   };
 
-  const handleOpenDeleteModal = () => {
-    setOpenDeleteModal(true);
-  };
-  const handleCloseDeleteModal = () => {
-    setOpenDeleteModal(false);
-  };
+  const handleAddTeacher = async (teacherData: TeacherFormData) => {
+    const schoolId = 2555;
+    const formattedTeacherData: IAddTeacherData = {
+      "first-name": teacherData.firstName,
+      "last-name": teacherData.lastName,
+      abbreviation: teacherData.abbreviation,
+      email: teacherData.email,
+      gender: teacherData.gender,
+      "department-code": teacherData.departmentCode,
+      "date-of-birth": teacherData.dateOfBirth,
+      "teacher-role": teacherData.teacherRole,
+      status: teacherData.status,
+      phone: teacherData.phone,
+    };
+  
+    console.log("Formatted Teacher Data:", formattedTeacherData);
+  
+    try {
+      const success = await addNewTeacher(schoolId, formattedTeacherData);
+      if (success) {
+        fetchTeachers();
+        setOpenAddForm(false);
+        useNotify({
+          message: "Teacher added successfully!",
+          type: "success"
+        });
+      } else {
+        useNotify({
+          message: "Failed to add teacher. Please check the inputs.",
+          type: "error"
+        });
+      }
+    } catch (error) {
+      console.error("Error adding teacher:", error);
+      useNotify({
+        message: "An unexpected error occurred while adding the teacher.",
+        type: "error"
+      });
+    }
+  };   
+  const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+
+  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+
+  const handleOpenAddForm = () => setOpenAddForm(true);
+
+  const handleCloseAddForm = () => setOpenAddForm(false);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -283,7 +345,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} onDeleteClick={handleOpenDeleteModal} isDeleting={isDeleting} />
+        <EnhancedTableToolbar numSelected={selected.length} onDeleteClick={handleOpenDeleteModal} isDeleting={isDeleting} onAddClick={handleOpenAddForm}  />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -379,6 +441,11 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers }) => {
         onClose={handleCloseDeleteModal}
         onConfirm={handleDeleteTeacher}
         selectedCount={selected.length}
+      />
+      <AddTeacherForm 
+      open={openAddForm}
+      onClose={handleCloseAddForm}
+      onSubmit={handleAddTeacher}
       />
     </Box>
   );
