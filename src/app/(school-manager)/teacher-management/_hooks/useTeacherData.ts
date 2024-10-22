@@ -34,12 +34,12 @@ export function useTeacherData() {
 
   useEffect(() => {
     fetchTeachers();
-  }, [fetchTeachers]);
+  }, []);
 
   return { 
     teachers, 
     isLoading,
     error,
-    fetchTeachers 
+    fetchTeachers
   };
 }

@@ -5,22 +5,24 @@ export const teacherSchema = yup.object().shape({
 
   lastName: yup.string().required('Vui lòng nhập tên giáo viên.'),
 
-  gender: yup.string().required('Vui lòng chọn giới tính.'),
-
-  dateOfBirth: yup.string().required('Vui lòng nhập ngày sinh.'),
+  abbreviation: yup.string().required('Vui lòng nhập tên viết tắt giáo viên.'),
 
   email: yup.string().required('Vui lòng nhập địa chỉ email.').email('Email không hợp lệ. Vui lòng nhập lại.'),
 
-  phone: yup.string().required('Vui lòng nhập số điện thoại.').min(10, 'Số điện thoại không hợp lệ. Vui lòng nhập lại.').max(10, 'Số điện thoại không hợp lệ. Vui lòng nhập lại.'),
+  gender: yup.string().required('Vui lòng chọn giới tính.'),
 
-  nameAbbreviation: yup.string().required('Vui lòng nhập tên viết tắt giáo viên.'),
+  departmentCode: yup.string().required('Vui lòng chọn mã tổ bộ môn.'),
 
-  teachingSubject: yup.string().required('Vui lòng chọn chuyên môn.'),
+  dateOfBirth: yup.string().required('Vui lòng nhập ngày sinh.'),
 
-  subjectDepartment: yup.string().required('Vui lòng chọn tổ bộ môn.'),
+  teacherRole: yup.string().required('Vui lòng chọn vai trò.'),
 
-  role: yup.string().required('Vui lòng chọn vai trò.'),
+  status: yup.string().required('Vui lòng chọn trạng thái.'),
 
-  teacherGroup: yup.string().required('Vui lòng chọn nhóm giáo viên.'),
-
+  phone: yup
+    .string()
+    .required('Vui lòng nhập số điện thoại.')
+    .matches(/^[0-9]+$/, 'Số điện thoại chỉ được chứa số.')
+    .min(10, 'Số điện thoại phải có đúng 10 số.')
+    .max(10, 'Số điện thoại phải có đúng 10 số.'),
 });

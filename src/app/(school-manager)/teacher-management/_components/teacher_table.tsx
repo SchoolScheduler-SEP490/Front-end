@@ -25,7 +25,7 @@ import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
 import DeleteConfirmationModal from "./delete_teacher";
 import AddTeacherForm, { TeacherFormData } from "./add_teacher";
 import { useAddTeacher } from "../_hooks/useAddTeacher";
-
+import useNotify from "@/hooks/useNotify";
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
   fetchTeachers: () => void;
@@ -216,6 +216,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
   const {deleteTeacher, isDeleting} = useDeleteTeacher();
   const {addNewTeacher, isAdding, addError } = useAddTeacher();
   const [openAddForm, setOpenAddForm] = React.useState(false);
+  const notify = useNotify;
 
 
   const handleRequestSort = (
@@ -276,21 +277,41 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
     const formattedTeacherData: IAddTeacherData = {
       "first-name": teacherData.firstName,
       "last-name": teacherData.lastName,
-      abbreviation: teacherData.nameAbbreviation,
+      abbreviation: teacherData.abbreviation,
       email: teacherData.email,
       gender: teacherData.gender,
-      "department-code": teacherData.subjectDepartment,
+      "department-code": teacherData.departmentCode,
       "date-of-birth": teacherData.dateOfBirth,
-      "teacher-role": teacherData.role,
+      "teacher-role": teacherData.teacherRole,
       status: teacherData.status,
       phone: teacherData.phone,
     };
-
-    const success = await addNewTeacher(schoolId, formattedTeacherData);
-    if (success) {
-      fetchTeachers();
+  
+    console.log("Formatted Teacher Data:", formattedTeacherData);
+  
+    try {
+      const success = await addNewTeacher(schoolId, formattedTeacherData);
+      if (success) {
+        fetchTeachers();
+        setOpenAddForm(false);
+        useNotify({
+          message: "Teacher added successfully!",
+          type: "success"
+        });
+      } else {
+        useNotify({
+          message: "Failed to add teacher. Please check the inputs.",
+          type: "error"
+        });
+      }
+    } catch (error) {
+      console.error("Error adding teacher:", error);
+      useNotify({
+        message: "An unexpected error occurred while adding the teacher.",
+        type: "error"
+      });
     }
-  }
+  };   
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
 
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);

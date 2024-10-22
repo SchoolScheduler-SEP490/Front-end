@@ -12,9 +12,13 @@ import {
   FormControl,
   Grid,
   Typography,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
+import dayjs from "dayjs";
 
 interface AddTeacherFormProps {
   open: boolean;
@@ -25,16 +29,14 @@ interface AddTeacherFormProps {
 export interface TeacherFormData {
   firstName: string;
   lastName: string;
-  nameAbbreviation: string;
+  abbreviation: string;
   email: string;
   gender: string;
-  teachingSubject: string;
-  subjectDepartment: string;
+  departmentCode: string;
   dateOfBirth: string;
-  role: string;
+  teacherRole: string;
   status: string;
   phone: string;
-  teacherGroup: string;
 }
 
 const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
@@ -46,20 +48,22 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
     initialValues: {
       firstName: "",
       lastName: "",
-      nameAbbreviation: "",
+      abbreviation: "",
       email: "",
-      gender: "",
-      teachingSubject: "",
-      subjectDepartment: "",
+      gender: "Male", // Set default to "Male"
+      departmentCode: "",
       dateOfBirth: "",
-      role: "",
-      status: "",
+      teacherRole: "Role1", // Set default to "Role1"
+      status: "Active", // Set default to "Active"
       phone: "",
-      teacherGroup: "",
     },
     validationSchema: teacherSchema,
     onSubmit: (values) => {
-      onSubmit(values);
+      const formattedValues = {
+        ...values,
+        dateOfBirth: dayjs(values.dateOfBirth).format("YYYY-MM-DD"),
+      };
+      onSubmit(formattedValues);
       onClose();
     },
   });
@@ -118,6 +122,68 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                 </Grid>
               </Grid>
             </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Tên viết tắt
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    placeholder="Nhập tên viết tắt giáo viên"
+                    name="abbreviation"
+                    type="text"
+                    value={formik.values.abbreviation}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.abbreviation &&
+                      Boolean(formik.errors.abbreviation)
+                    }
+                    helperText={
+                      formik.touched.abbreviation && formik.errors.abbreviation
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Email
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    placeholder="Nhập email"
+                    name="email"
+                    type="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -152,6 +218,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                 </Grid>
               </Grid>
             </Grid>
+
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -159,6 +226,36 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                   xs={3}
                   sx={{ display: "flex", alignItems: "center" }}
                 >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Chuyên môn
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    placeholder="Nhập môn đảm nhiệm"
+                    name="departmentCode"
+                    type="text"
+                    value={formik.values.departmentCode}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.departmentCode &&
+                      Boolean(formik.errors.departmentCode)
+                    }
+                    helperText={               
+                      formik.touched.departmentCode &&
+                      formik.errors.departmentCode
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Ngày sinh
                   </Typography>
@@ -173,17 +270,13 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                     value={formik.values.dateOfBirth}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.dateOfBirth &&
-                      Boolean(formik.errors.dateOfBirth)
-                    }
-                    helperText={
-                      formik.touched.dateOfBirth && formik.errors.dateOfBirth
-                    }
+                    error={formik.touched.dateOfBirth && Boolean(formik.errors.dateOfBirth)}
+                    helperText={formik.touched.dateOfBirth && formik.errors.dateOfBirth}
                   />
                 </Grid>
               </Grid>
             </Grid>
+
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -192,25 +285,55 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Email
+                    Vai trò
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    placeholder="Nhập email"
-                    name="email"
-                    type="email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                  />
+                  <FormControl fullWidth>
+                    <Select
+                      variant="standard"
+                      label="Vai trò"
+                      name="teacherRole"
+                      value={formik.values.teacherRole}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <MenuItem value="Role1">Giáo viên</MenuItem>
+                      <MenuItem value="Role2">Trưởng bộ môn</MenuItem>
+                    </Select>
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Trạng thái
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl fullWidth>
+                    <Select
+                      variant="standard"
+                      name="status"
+                      value={formik.values.status}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <MenuItem value="Active">Hoạt động</MenuItem>
+                      <MenuItem value="Inactive">Vô hiệu</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -228,181 +351,12 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                     fullWidth
                     placeholder="Nhập số điện thoại"
                     name="phone"
-                    type="number"
+                    type="text"
                     value={formik.values.phone}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={formik.touched.phone && Boolean(formik.errors.phone)}
                     helperText={formik.touched.phone && formik.errors.phone}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tên viết tắt
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    placeholder="Nhập tên viết tắt giáo viên"
-                    name="nameAbbreviation"
-                    type="text"
-                    value={formik.values.nameAbbreviation}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.nameAbbreviation &&
-                      Boolean(formik.errors.nameAbbreviation)
-                    }
-                    helperText={
-                      formik.touched.nameAbbreviation &&
-                      formik.errors.nameAbbreviation
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Dạy môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    placeholder="Nhập môn đảm nhiệm"
-                    name="teachingSubject"
-                    type="text"
-                    value={formik.values.teachingSubject}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.teachingSubject &&
-                      Boolean(formik.errors.teachingSubject)
-                    }
-                    helperText={
-                      formik.touched.teachingSubject &&
-                      formik.errors.teachingSubject
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tổ bộ môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    placeholder="Chọn tổ bộ môn"
-                    name="subjectDepartment"
-                    type="text"
-                    value={formik.values.subjectDepartment}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.subjectDepartment &&
-                      Boolean(formik.errors.subjectDepartment)
-                    }
-                    helperText={
-                      formik.touched.subjectDepartment &&
-                      formik.errors.subjectDepartment
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Vai trò
-                  </Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <FormControl component="fieldset">
-                    <RadioGroup
-                      row
-                      name="role"
-                      value={formik.values.role}
-                      onChange={formik.handleChange}
-                    >
-                      <FormControlLabel
-                        value="Male"
-                        control={<Radio />}
-                        label="Giáo viên"
-                      />
-                      <FormControlLabel
-                        value="Female"
-                        control={<Radio />}
-                        label="Trưởng bộ môn"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Nhóm GV
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    placeholder="Chọn nhóm giáo viên"
-                    name="teacherGroup"
-                    type="text"
-                    value={formik.values.teacherGroup}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched.teacherGroup &&
-                      Boolean(formik.errors.teacherGroup)
-                    }
-                    helperText={
-                      formik.touched.teacherGroup && formik.errors.teacherGroup
-                    }
                   />
                 </Grid>
               </Grid>

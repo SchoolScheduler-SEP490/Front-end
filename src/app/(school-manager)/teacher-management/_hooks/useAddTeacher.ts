@@ -18,16 +18,16 @@ export function useAddTeacher() {
       }
 
       await addTeacher(api, schoolId, sessionToken, teacherData);
-      console.log(`Successfully added teacher with ID: ${teacherData}`);
+      console.log(`Successfully added teacher:`, teacherData);
       setIsAdding(false);
       return true;
     } catch (err) {
       setAddError('Failed to add new teacher.');
       console.error('Error adding teacher:', err);
       setIsAdding(false);
-      return false; 
+      return false;
     }
-  };
+  };  
 
   return { addNewTeacher, isAdding, addError };
 }
