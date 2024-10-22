@@ -51,7 +51,26 @@ export default function SMSubject() {
 	}, [data?.result?.items, page, rowsPerPage]);
 
 	if (isValidating) {
-		return <LoadingComponent loadingStatus={isLoading} />;
+		return (
+			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll'>
+				<LoadingComponent loadingStatus={isLoading} />
+				<SMHeader>
+					<div>
+						<h3 className='text-title-small text-white font-semibold tracking-wider'>
+							Môn học
+						</h3>
+					</div>
+				</SMHeader>
+				<SubjectTable
+					subjectTableData={subjectTableData ?? []}
+					serverPage={page}
+					setServerPage={setPage}
+					rowsPerPage={rowsPerPage}
+					setRowsPerPage={setRowsPerPage}
+					totalRows={totalRows}
+				/>
+			</div>
+		);
 	}
 
 	if (error) {

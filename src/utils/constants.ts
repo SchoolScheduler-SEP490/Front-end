@@ -60,3 +60,5 @@ export interface ICommonOption {
 	img: string;
 	title: string;
 }
+
+export const SUBJECT_GROUP_TYPE = ['TN', 'XH', 'CN_VA_MT', 'BAT_BUOC', 'TU_CHON'];

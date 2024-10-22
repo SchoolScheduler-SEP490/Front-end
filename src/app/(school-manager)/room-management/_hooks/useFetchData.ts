@@ -5,21 +5,11 @@ interface IFetcherProps {
 	schoolId: string;
 	pageSize: number;
 	pageIndex: number;
-	subjectName?: string;
-	isRequired?: boolean;
-	deletedIncluded?: boolean;
+	roomTypeId?: number;
 }
 
 const useFetchData = (props: IFetcherProps) => {
-	const {
-		sessionToken,
-		schoolId,
-		pageSize,
-		pageIndex,
-		subjectName,
-		isRequired,
-		deletedIncluded,
-	} = props;
+	const { sessionToken, schoolId, pageSize, pageIndex, roomTypeId } = props;
 	const api = process.env.NEXT_PUBLIC_API_URL;
 
 	async function fetcher(url: string) {
@@ -39,15 +29,11 @@ const useFetchData = (props: IFetcherProps) => {
 		schoolId: schoolId,
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
-		...(subjectName && { subjectName: subjectName }),
-		...(isRequired !== undefined && { isRequired: isRequired.toString() }),
-		...(deletedIncluded !== undefined && {
-			includeDeleted: deletedIncluded.toString(),
-		}),
+		...(roomTypeId !== undefined && { RoomTypeId: roomTypeId.toString() }),
 	}).toString();
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(
-		`${api}/api/subjects?${queryString}`,
+		`${api}/api/Room?${queryString}`,
 		fetcher,
 		{
 			revalidateOnFocus: false,
