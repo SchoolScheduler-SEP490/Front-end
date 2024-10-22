@@ -16,7 +16,6 @@ export function useTeacherData() {
 
   const fetchTeachers = useCallback(async () => {
     try {
-      setIsLoading(true);
       if (!sessionToken) {
         throw new Error('Session token not found. Please log in.');
       }

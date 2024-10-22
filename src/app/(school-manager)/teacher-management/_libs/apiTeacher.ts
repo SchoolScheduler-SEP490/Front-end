@@ -8,6 +8,19 @@ export interface ITeacherTableData {
     phoneNumber: string;
     status: string;
   }
+
+  export interface IAddTeacherData {
+    "first-name": string;
+    "last-name": string;
+    abbreviation: string;
+    email: string;
+    gender: string;
+    "department-code": string;
+    "date-of-birth": string;
+    "teacher-role": string;
+    status: string;
+    phone: string;
+  }
   
   export const getTeachers = async (
     api: string, 
@@ -74,6 +87,32 @@ export interface ITeacherTableData {
       }
     });
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  };
+
+  export const addTeacher = async (
+    api: string,
+    schoolId: number,
+    sessionToken: string,
+    teacherData: IAddTeacherData
+  ): Promise<void> => {
+    if (!sessionToken) {
+      throw new Error('Session token is not found. Please log in.');
+    }
+  
+    const url = `${api}/api/teachers/${schoolId}/teachers`;
+  
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(teacherData),
+    });
+  
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
