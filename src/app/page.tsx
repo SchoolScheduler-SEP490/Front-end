@@ -31,4 +31,5 @@ export default function Home(): JSX.Element {
 	}, []);
 
 	return <LoadingComponent loadingStatus={false} />;
+	return <LoadingComponent loadingStatus={true} />;
 }

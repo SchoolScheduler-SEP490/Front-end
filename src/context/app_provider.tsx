@@ -50,7 +50,7 @@ export default function AppProvider({
 		([url, token]) => fetchWithToken(url, token),
 		{
 			revalidateOnReconnect: true,
-			revalidateOnMount: false,
+			revalidateOnMount: true,
 			revalidateOnFocus: true,
 			refreshInterval: 480000,
 		}
