@@ -20,6 +20,7 @@ import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
 import dayjs from "dayjs";
 
+//Add new teacher form
 interface AddTeacherFormProps {
   open: boolean;
   onClose: () => void;
@@ -50,11 +51,11 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
       lastName: "",
       abbreviation: "",
       email: "",
-      gender: "Male", // Set default to "Male"
+      gender: "Male", 
       departmentCode: "",
       dateOfBirth: "",
-      teacherRole: "Role1", // Set default to "Role1"
-      status: "Active", // Set default to "Active"
+      teacherRole: "Role1", 
+      status: "Active", 
       phone: "",
     },
     validationSchema: teacherSchema,
