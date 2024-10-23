@@ -42,9 +42,10 @@ export default function AppProvider({
 	const [userRole, setUserRole] = useState(initUserRole);
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const [schoolName, setSchoolName] = useState(initSchoolName);
+	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
 
 	const handleLogout = async () => {
-		await fetch('/api/logout', {
+		await fetch(`${serverApi}/api/logout`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ export default function AppProvider({
 
 	const { data, error } = useSWR(
 		refreshToken.length > 0 && userRole.length > 0
-			? ['/api/refresh', refreshToken]
+			? [`${serverApi}/api/refresh`, refreshToken]
 			: null,
 		([url, token]) => fetchWithToken(url, token),
 		{
