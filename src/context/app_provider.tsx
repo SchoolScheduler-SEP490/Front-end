@@ -67,7 +67,7 @@ export default function AppProvider({
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ sessionToken: sessionToken ?? '' }),
+				body: JSON.stringify({ sessionToken: sessionToken ?? undefined }),
 			}).then((res) => {
 				if (res.ok) {
 					setSessionToken('');
