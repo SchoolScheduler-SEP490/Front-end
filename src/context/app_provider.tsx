@@ -43,6 +43,24 @@ export default function AppProvider({
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const [schoolName, setSchoolName] = useState(initSchoolName);
 
+	const handleLogout = async () => {
+		await fetch('/api/logout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ sessionToken: sessionToken ?? undefined }),
+		}).then((res) => {
+			if (res.ok) {
+				setSessionToken('');
+				setRefreshToken('');
+				setUserRole('');
+				setSchoolId('');
+				setSchoolName('');
+			}
+		});
+	};
+
 	const { data, error } = useSWR(
 		refreshToken.length > 0 && userRole.length > 0
 			? ['/api/refresh', refreshToken]
@@ -62,21 +80,7 @@ export default function AppProvider({
 			setRefreshToken(data['jwt-refresh-token']);
 			setUserRole(userRole);
 		} else if (userRole.length === 0 || refreshToken.length === 0) {
-			fetch('/api/logout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ sessionToken: sessionToken ?? '' }),
-			}).then((res) => {
-				if (res.ok) {
-					setSessionToken('');
-					setRefreshToken('');
-					setUserRole('');
-					setSchoolId('');
-					setSchoolName('');
-				}
-			});
+			handleLogout();
 		}
 		if (error) {
 			useNotify({
