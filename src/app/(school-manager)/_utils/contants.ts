@@ -87,6 +87,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 	},
 ];
 
+// Subject response data
 export interface ISubject {
 	id: number;
 	'subject-name': string;
@@ -100,10 +101,29 @@ export interface ISubject {
 	'is-deleted': boolean;
 }
 
+// Subject data used for table display
 export interface ISubjectTableData {
 	id: number;
 	subjectName: string;
 	subjectCode: string;
 	subjectGroup: string;
 	subjectType: string;
+}
+
+// Subject data used for subject creating request
+export interface IAddSubjectRequestBody {
+	'subject-name': string;
+	abbreviation: string;
+	description: string;
+	'is-required': boolean;
+	'subject-group-type': string;
+}
+
+export interface IRoomTableData {
+	id: number;
+	roomName: string;
+	buildingName: string;
+	availableSubjects: string;
+	roomType: string;
+	status: string;
 }
