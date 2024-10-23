@@ -122,9 +122,10 @@ export interface ITeacherTableData {
         return false;
       }
   
-      return true; // Trả về `true` khi thành công
+      return true;
     } catch (error) {
       console.error("Error occurred while sending request:", error);
       return false;
     }
   };  
+

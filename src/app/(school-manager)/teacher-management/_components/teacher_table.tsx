@@ -1,9 +1,9 @@
 import * as React from "react";
 import {
   Box,
-  Button,
-  Checkbox,
   IconButton,
+  Menu,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -31,12 +31,19 @@ import AddTeacherForm, { TeacherFormData } from "./add_teacher";
 import { useAddTeacher } from "../_hooks/useAddTeacher";
 import useNotify from "@/hooks/useNotify";
 import Image from "next/image";
+import AddIcon from "@mui/icons-material/Add";
+import { ICommonOption } from "@/utils/constants";
 
-//Teacher's data table 
+//Teacher's data table
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
   fetchTeachers: () => void;
 }
+
+const dropdownOptions: ICommonOption[] = [
+  { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
+  { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
+];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -98,17 +105,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all teachers",
-            }}
-          />
-        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -169,33 +165,16 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           display: "flex",
           justifyContent: "space-around",
         },
-        numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        },
       ]}
     >
-      {numSelected > 0 ? (
-        <h2 className="text-title-medium-strong font-semibold w-full text-left flex justify-start items-center gap-1">
-          Danh sách giáo viên{" "}
-          <p className="text-body-medium pt-[2px]">(đã chọn {numSelected})</p>
-        </h2>
-      ) : (
-        <h2 className="text-title-medium-strong font-semibold w-full text-left">
-          Danh sách giáo viên
-        </h2>
-      )}
-      <Button
-        variant="outlined"
-        color="primary"
-        sx={{ whiteSpace: "nowrap" }}
-        onClick={onAddClick}
-      >
-        Thêm giáo viên
-      </Button>
+      <h2 className="text-title-medium-strong font-semibold w-full text-left flex justify-start items-center gap-1">
+        Danh sách giáo viên
+      </h2>
+      <Tooltip title="Thêm giáo viên">
+        <IconButton onClick={onAddClick}>
+          <AddIcon />
+        </IconButton>
+      </Tooltip>
       <div>
         {numSelected > 0 ? (
           <Tooltip title="Delete">
@@ -230,7 +209,9 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
   const { addNewTeacher, isAdding, addError } = useAddTeacher();
   const [openAddForm, setOpenAddForm] = React.useState(false);
   const notify = useNotify;
-
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const [selectedTeacherId, setSelectedTeacherId] = React.useState<number | null>(null);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -250,49 +231,43 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
   };
 
   const handleDeleteTeacher = async () => {
-    console.log(`Selected teachers to delete: ${selected.join(", ")}`);
-
-    for (const id of selected) {
-      const isDeleted = await deleteTeacher(id);
-      if (isDeleted) {
-        fetchTeachers();
-        useNotify({
-          message: "Xóa dữ liệu của giáo viên thành công!",
-          type: "success",
-        });
-        console.log(`Teacher with ID: ${id} has been deleted successfully.`);
-      } else {
-        useNotify({
-          message: "Xóa giáo viên thất bại. Vui lòng thử lại!",
-          type: "error",
-        });
-        console.warn(`Failed to delete teacher with ID: ${id}.`);
-      }
+    if (selectedTeacherId !== null) { 
+        try {
+            const isDeleted = await deleteTeacher(selectedTeacherId); 
+            if (isDeleted) {
+                fetchTeachers(); 
+                notify({
+                    message: `Xóa thông tin giáo viên thành công.`,
+                    type: "success",
+                });
+                console.log(`Teacher with ID: ${selectedTeacherId} has been deleted successfully.`);
+            } else {
+                notify({
+                    message: `Xóa thông tin giáo viên thất bại. Vui lòng thử lại!`,
+                    type: "error",
+                });
+                console.warn(`Failed to delete teacher with ID: ${selectedTeacherId}.`);
+            }
+        } catch (error) {
+            console.error(`Error deleting teacher with ID: ${selectedTeacherId}`, error);
+            notify({
+                message: `Lỗi khi xóa giáo viên có ID: ${selectedTeacherId}. Vui lòng thử lại.`,
+                type: "error",
+            });
+        }
     }
-
-    setSelected([]);
+    setSelectedTeacherId(null);
     setOpenDeleteModal(false);
-  };
+};
 
   const handleAddTeacher = async (teacherData: TeacherFormData) => {
     const schoolId = 2555;
@@ -334,6 +309,15 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
       });
     }
   };
+
+  const handleMenuItemClick = (event: any, id: number, optionTitle: string) => {
+    if (optionTitle === "Xóa giáo viên") {
+        setSelectedTeacherId(id); 
+        handleOpenDeleteModal();
+    }
+    handleMenuClose();
+};
+
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
 
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
@@ -395,21 +379,11 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
                     role="checkbox"
-                    aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </TableCell>
                     <TableCell
                       component="th"
                       id={labelId}
@@ -439,7 +413,15 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                       </div>
                     </TableCell>
                     <TableCell width={80}>
-                      <IconButton color="success" sx={{ zIndex: 10 }}>
+                      <IconButton
+                        color="success"
+                        sx={{ zIndex: 10 }}
+                        id="basic-button"
+                        aria-controls={open ? `basic-menu${index}` : undefined}
+                        aria-haspopup="true"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={handleClick}
+                      >
                         <Image
                           src="/images/icons/menu.png"
                           alt="notification-icon"
@@ -448,6 +430,38 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                           height={20}
                         />
                       </IconButton>
+                      <Menu
+                        id={`basic-menu${index}`}
+                        anchorEl={anchorEl}
+                        elevation={1}
+                        open={open}
+                        onClose={handleMenuClose}
+                        MenuListProps={{
+                          "aria-labelledby": "basic-button",
+                        }}
+                      >
+                        {dropdownOptions.map((option, index) => (
+                          <MenuItem
+                            key={option.title}
+                            onClick={(event: any) =>
+                              handleMenuItemClick(event, row.id, option.title)
+                            }
+                            className={`flex flex-row items-center ${
+                              index === dropdownOptions.length - 1 &&
+                              "hover:bg-basic-negative-hover hover:text-basic-negative"
+                            }`}
+                          >
+                            <Image
+                              className="mr-4"
+                              src={option.img}
+                              alt={option.title}
+                              width={15}
+                              height={15}
+                            />
+                            <h2 className="text-body-medium">{option.title}</h2>
+                          </MenuItem>
+                        ))}
+                      </Menu>
                     </TableCell>
                   </TableRow>
                 );
@@ -490,4 +504,3 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
 };
 
 export default TeacherTable;
-

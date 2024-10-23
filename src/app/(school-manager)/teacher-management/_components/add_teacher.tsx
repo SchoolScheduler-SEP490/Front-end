@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -15,12 +15,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
 import dayjs from "dayjs";
+import CloseIcon from '@mui/icons-material/Close';
+import ContainedButton from "@/commons/button-contained";
 
 //Add new teacher form
+// const [open, setOpen] = useState(true);
 interface AddTeacherFormProps {
   open: boolean;
   onClose: () => void;
@@ -68,13 +72,27 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
       onClose();
     },
   });
-
+  // const handleClose = () => {  
+  //   setOpen(false);
+  // };
   return (
+    //chinh handle close 
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Thêm Giáo viên</DialogTitle>
+      				<div
+					id='modal-header'
+					className='w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3'
+				>
+					<Typography
+						variant='h6'
+						component='h2'
+						className='text-title-medium-strong font-semibold opacity-60'
+					>
+						Thêm giáo viên
+					</Typography>
+          </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -364,14 +382,21 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Hủy
-          </Button>
-          <Button type="submit" color="primary" variant="contained">
-            Tạo mới
-          </Button>
-        </DialogActions>
+        <div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
+						<ContainedButton
+							title='Thêm môn học'
+							disableRipple
+							type='submit'
+							disabled={!formik.isValid}
+							styles='bg-primary-300 text-white !py-1 px-4'
+						/>
+						<ContainedButton
+							title='Huỷ'
+							onClick={onClose}
+							disableRipple
+							styles='bg-basic-gray-active text-basic-gray !py-1 px-4'
+						/>
+					</div>
       </form>
     </Dialog>
   );
