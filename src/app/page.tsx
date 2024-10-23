@@ -12,7 +12,6 @@ export default function Home(): JSX.Element {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		setIsLoading(!isLoading);
 		if (sessionToken) {
 			const data = jwtDecode(sessionToken ?? '');
 			const userRole: string = (data as IJWTTokenPayload).role;
@@ -29,6 +28,7 @@ export default function Home(): JSX.Element {
 					redirect('/landing');
 			}
 		}
+		setIsLoading(!isLoading);
 	}, [sessionToken]);
 
 	return <LoadingComponent loadingStatus={true} />;
