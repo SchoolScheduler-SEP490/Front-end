@@ -22,6 +22,7 @@ import { ISubjectTableData } from '../../_utils/contants';
 import AddSubjectModal from './subject_add_modal';
 import useNotify from '@/hooks/useNotify';
 import DeleteSubjectModal from './subject_delete_modal';
+import UpdateSubjectModal from './subject_update_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -180,20 +181,19 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
-	const [selectedRow, setSelectedRow] = React.useState<number | undefined>();
+	const [selectedRow, setSelectedRow] = React.useState<ISubjectTableData | undefined>();
 
 	const open = Boolean(anchorEl);
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
+	const handleClick = (
+		event: React.MouseEvent<HTMLButtonElement>,
+		row: ISubjectTableData
+	) => {
+		setAnchorEl((event.target as HTMLElement) ?? null);
+		setSelectedRow(row);
 	};
 
-	const handleMenuItemClick = (event: any, id: number, index: number) => {
-		setSelectedRow(id);
-		useNotify({
-			message: 'ID: ' + id,
-			type: 'warning',
-		});
+	const handleMenuItemClick = (index: number) => {
 		switch (index) {
 			case 0:
 				setIUpdateModalOpen(true);
@@ -339,7 +339,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 												<IconButton
 													color='success'
 													sx={{ zIndex: 10 }}
-													id='basic-button'
+													id={`basic-button${
+														row.subjectCode + index
+													}`}
 													aria-controls={
 														open
 															? `basic-menu${index}`
@@ -349,7 +351,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 													aria-expanded={
 														open ? 'true' : undefined
 													}
-													onClick={handleClick}
+													onClick={(event) =>
+														handleClick(event, row)
+													}
 												>
 													<Image
 														src='/images/icons/menu.png'
@@ -360,46 +364,44 @@ const SubjectTable = (props: ISubjectTableProps) => {
 													/>
 												</IconButton>
 												<Menu
-													id={`basic-menu${index}`}
+													id={row.subjectCode + 'menu' + index}
 													anchorEl={anchorEl}
 													elevation={1}
 													open={open}
 													onClose={() => setAnchorEl(null)}
 													MenuListProps={{
-														'aria-labelledby': 'basic-button',
+														'aria-labelledby': `${
+															row.subjectCode +
+															'menu' +
+															index
+														}`,
 													}}
 												>
-													{dropdownOptions.map(
-														(option, index) => (
-															<MenuItem
-																key={option.title}
-																onClick={(event: any) =>
-																	handleMenuItemClick(
-																		event,
-																		row.id,
-																		index
-																	)
-																}
-																className={`flex flex-row items-center ${
-																	index ===
-																		dropdownOptions.length -
-																			1 &&
-																	'hover:bg-basic-negative-hover hover:text-basic-negative'
-																}`}
-															>
-																<Image
-																	className='mr-4'
-																	src={option.img}
-																	alt={option.title}
-																	width={15}
-																	height={15}
-																/>
-																<h2 className='text-body-medium'>
-																	{option.title}
-																</h2>
-															</MenuItem>
-														)
-													)}
+													{dropdownOptions.map((option, i) => (
+														<MenuItem
+															key={option.title + i}
+															onClick={() =>
+																handleMenuItemClick(i)
+															}
+															className={`flex flex-row items-center ${
+																i ===
+																	dropdownOptions.length -
+																		1 &&
+																'hover:bg-basic-negative-hover hover:text-basic-negative'
+															}`}
+														>
+															<Image
+																className='mr-4'
+																src={option.img}
+																alt={option.title}
+																width={15}
+																height={15}
+															/>
+															<h2 className='text-body-medium'>
+																{option.title}
+															</h2>
+														</MenuItem>
+													))}
 												</Menu>
 											</TableCell>
 										</TableRow>
@@ -432,11 +434,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 			<DeleteSubjectModal
 				open={isDeleteModalOpen}
 				setOpen={setIsDeleteModalOpen}
-				subjectName={
-					subjectTableData.find((subject) => subject.id === selectedRow)
-						?.subjectName ?? 'Không xác định'
-				}
+				subjectName={selectedRow?.subjectName ?? 'Không xác định'}
 			/>
+			{/* <UpdateSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} oldData={}/> */}
 		</div>
 	);
 };

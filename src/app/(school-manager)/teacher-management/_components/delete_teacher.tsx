@@ -14,7 +14,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open,
       <DialogTitle>Xác nhận xóa giáo viên</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Bạn có chắc chắn muốn xóa {selectedCount} giáo viên đã chọn không? Thao tác này không thể hoàn tác.
+          Bạn có chắc chắn muốn xóa giáo viên đã chọn không? Thao tác này không thể hoàn tác.
         </DialogContentText>
       </DialogContent>
       <DialogActions>

@@ -1,7 +1,7 @@
 'use client';
 import useNotify from '@/hooks/useNotify';
 import fetchWithToken from '@/hooks/useRefreshToken';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 import useSWR from 'swr';
 const AppContext = createContext({
 	sessionToken: '',
@@ -13,6 +13,7 @@ const AppContext = createContext({
 	schoolId: '',
 	setSchoolId: (schoolId: string) => {},
 	schoolName: '',
+	setSchoolName: (schoolName: string) => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -40,30 +41,50 @@ export default function AppProvider({
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
 	const [schoolId, setSchoolId] = useState(initSchoolId);
-	const schoolName = initSchoolName;
+	const [schoolName, setSchoolName] = useState(initSchoolName);
 
 	const { data, error } = useSWR(
-		refreshToken ? ['/api/refresh', refreshToken] : null,
+		refreshToken.length > 0 && userRole.length > 0
+			? ['/api/refresh', refreshToken]
+			: null,
 		([url, token]) => fetchWithToken(url, token),
 		{
 			revalidateOnReconnect: true,
+			revalidateOnMount: true,
+			revalidateOnFocus: true,
 			refreshInterval: 480000,
 		}
 	);
 
-	useEffect(() => {
-		if (data && sessionToken) {
+	useMemo(() => {
+		if (data && sessionToken.length > 0 && userRole.length > 0) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
+			setUserRole(userRole);
+		} else if (userRole.length === 0 || refreshToken.length === 0) {
+			fetch('/api/logout', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ sessionToken: sessionToken }),
+			}).then((res) => {
+				if (res.ok) {
+					setSessionToken('');
+					setRefreshToken('');
+					setUserRole('');
+					setSchoolId('');
+					setSchoolName('');
+				}
+			});
+		}
+		if (error) {
+			useNotify({
+				message: error.message,
+				type: 'error',
+			});
 		}
 	}, [data]);
-
-	if (error) {
-		useNotify({
-			message: error.message,
-			type: 'error',
-		});
-	}
 
 	return (
 		<AppContext.Provider
@@ -77,6 +98,7 @@ export default function AppProvider({
 				schoolId,
 				setSchoolId,
 				schoolName,
+				setSchoolName,
 			}}
 		>
 			{children}

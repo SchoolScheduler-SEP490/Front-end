@@ -30,7 +30,8 @@ const CustomButton = styled(Button)({
 });
 
 export const LoginForm = () => {
-	const { setSessionToken, setRefreshToken, setUserRole } = useAppContext();
+	const { setSessionToken, setRefreshToken, setUserRole, setSchoolId, setSchoolName } =
+		useAppContext();
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 	const [showPassword, setShowPassword] = useState(false);
@@ -70,6 +71,8 @@ export const LoginForm = () => {
 							expired: new Date(loginResponse.expired ?? ''),
 						},
 					};
+					setSchoolId(decodedToken?.schoolId ?? '');
+					setSchoolName(decodedToken?.schoolName ?? '');
 				} else {
 					setIsLoggingIn(false);
 					useNotify({
@@ -103,6 +106,7 @@ export const LoginForm = () => {
 			setUserRole(resultFromNextServer.payload.role);
 			setIsLoggingIn(false);
 
+			// Redirect to landing page of each role after login
 			router.push('/');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
