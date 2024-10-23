@@ -42,10 +42,29 @@ export default function AppProvider({
 	const [userRole, setUserRole] = useState(initUserRole);
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const [schoolName, setSchoolName] = useState(initSchoolName);
+	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
+
+	const handleLogout = async () => {
+		await fetch(`${serverApi}/api/logout`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ sessionToken: sessionToken ?? undefined }),
+		}).then((res) => {
+			if (res.ok) {
+				setSessionToken('');
+				setRefreshToken('');
+				setUserRole('');
+				setSchoolId('');
+				setSchoolName('');
+			}
+		});
+	};
 
 	const { data, error } = useSWR(
 		refreshToken.length > 0 && userRole.length > 0
-			? ['/api/refresh', refreshToken]
+			? [`${serverApi}/api/refresh`, refreshToken]
 			: null,
 		([url, token]) => fetchWithToken(url, token),
 		{
@@ -62,21 +81,7 @@ export default function AppProvider({
 			setRefreshToken(data['jwt-refresh-token']);
 			setUserRole(userRole);
 		} else if (userRole.length === 0 || refreshToken.length === 0) {
-			fetch('/api/logout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ sessionToken: sessionToken }),
-			}).then((res) => {
-				if (res.ok) {
-					setSessionToken('');
-					setRefreshToken('');
-					setUserRole('');
-					setSchoolId('');
-					setSchoolName('');
-				}
-			});
+			handleLogout();
 		}
 		if (error) {
 			useNotify({

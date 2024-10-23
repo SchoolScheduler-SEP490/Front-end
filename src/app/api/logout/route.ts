@@ -3,7 +3,7 @@ import { ILogoutReqBody } from '../_utils/constants';
 export async function POST(request: Request) {
 	const res = await request.json();
 	const logoutBody: ILogoutReqBody = { ...res };
-	const sessionToken: string = logoutBody.sessionToken ?? undefined;
+	const sessionToken: string = logoutBody?.sessionToken ?? undefined;
 
 	if (!sessionToken) {
 		return Response.json(
