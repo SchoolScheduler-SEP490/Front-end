@@ -33,6 +33,7 @@ import useNotify from "@/hooks/useNotify";
 import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
+import { useEditTeacher } from "../_hooks/useEditTeacher";
 
 //Teacher's data table
 interface TeacherTableProps {
@@ -211,7 +212,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
   const notify = useNotify;
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const [selectedTeacherId, setSelectedTeacherId] = React.useState<number | null>(null);
+  const [selectedRow, setSelectedRow] = React.useState<number | null>(null);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -231,8 +232,10 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
     setSelected([]);
   };
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>, row: ITeacherTableData) => {
 		setAnchorEl(event.currentTarget);
+    setSelectedRow(row.id);
+    console.log("Selected row:", row.id);
 	};
 
   const handleMenuClose = () => {
@@ -240,32 +243,32 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
   };
 
   const handleDeleteTeacher = async () => {
-    if (selectedTeacherId !== null) { 
+    if (selectedRow !== null) { 
         try {
-            const isDeleted = await deleteTeacher(selectedTeacherId); 
+            const isDeleted = await deleteTeacher(selectedRow); 
             if (isDeleted) {
                 fetchTeachers(); 
                 notify({
                     message: `Xóa thông tin giáo viên thành công.`,
                     type: "success",
                 });
-                console.log(`Teacher with ID: ${selectedTeacherId} has been deleted successfully.`);
+                console.log(`Teacher with ID: ${selectedRow} has been deleted successfully.`);
             } else {
                 notify({
                     message: `Xóa thông tin giáo viên thất bại. Vui lòng thử lại!`,
                     type: "error",
                 });
-                console.warn(`Failed to delete teacher with ID: ${selectedTeacherId}.`);
+                console.warn(`Failed to delete teacher with ID: ${selectedRow}.`);
             }
         } catch (error) {
-            console.error(`Error deleting teacher with ID: ${selectedTeacherId}`, error);
+            console.error(`Error deleting teacher with ID: ${selectedRow}`, error);
             notify({
-                message: `Lỗi khi xóa giáo viên có ID: ${selectedTeacherId}. Vui lòng thử lại.`,
+                message: `Lỗi khi xóa giáo viên có ID: ${selectedRow}. Vui lòng thử lại.`,
                 type: "error",
             });
         }
     }
-    setSelectedTeacherId(null);
+    setSelectedRow(null);
     setOpenDeleteModal(false);
 };
 
@@ -312,11 +315,14 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
 
   const handleMenuItemClick = (event: any, id: number, optionTitle: string) => {
     if (optionTitle === "Xóa giáo viên") {
-        setSelectedTeacherId(id); 
+        setSelectedRow(id); 
         handleOpenDeleteModal();
+    } else if (optionTitle === "Chỉnh sửa thông tin" && selectedRow) {;
     }
     handleMenuClose();
+    console.log("Selected Teacher ID:", id);
 };
+  
 
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
 
@@ -420,7 +426,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                         aria-controls={open ? `basic-menu${index}` : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
-                        onClick={handleClick}
+                        onClick={((event) => handleClick(event, row))}
                       >
                         <Image
                           src="/images/icons/menu.png"
@@ -430,11 +436,12 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                           height={20}
                         />
                       </IconButton>
+
                       <Menu
                         id={`basic-menu${index}`}
                         anchorEl={anchorEl}
                         elevation={1}
-                        open={open}
+                        open={Boolean(anchorEl) && selectedRow === row.id}
                         onClose={handleMenuClose}
                         MenuListProps={{
                           "aria-labelledby": "basic-button",
@@ -499,6 +506,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
         onClose={handleCloseAddForm}
         onSubmit={handleAddTeacher}
       />
+
     </Box>
   );
 };

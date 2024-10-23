@@ -47,7 +47,7 @@ export default function AppProvider({
 		([url, token]) => fetchWithToken(url, token),
 		{
 			revalidateOnReconnect: true,
-			revalidateOnMount: false,
+			revalidateOnMount: true,
 			revalidateOnFocus: true,
 			refreshInterval: 480000,
 		}
@@ -57,10 +57,7 @@ export default function AppProvider({
 		if (data && sessionToken.length > 0 && userRole.length > 0) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
-			useNotify({
-				message: 'Đã cập nhật phiên làm việc',
-				type: 'info',
-			});
+			setUserRole(userRole);
 		}
 		if (error) {
 			useNotify({
