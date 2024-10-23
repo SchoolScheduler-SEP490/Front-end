@@ -22,6 +22,7 @@ export async function POST(request: Request) {
 				'Set-Cookie': [
 					'sessionToken=; HttpOnly; Path=/; Max-Age=0',
 					'refreshToken=; HttpOnly; Path=/; Max-Age=0',
+					'userRole=; HttpOnly; Path=/; Max-Age=0',
 					// Add other cookies you want to remove here
 				].join(','),
 			},
