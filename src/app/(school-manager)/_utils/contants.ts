@@ -127,3 +127,11 @@ export interface IRoomTableData {
 	roomType: string;
 	status: string;
 }
+
+export interface ICreateSubjectResponse {
+	message: string;
+	result: {
+		'added-subjects': string[];
+	};
+	status: number;
+}

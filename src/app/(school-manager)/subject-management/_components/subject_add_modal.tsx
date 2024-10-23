@@ -1,7 +1,10 @@
 'use client';
 
 import ContainedButton from '@/commons/button-contained';
+import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import { SUBJECT_GROUP_TYPE } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Box,
@@ -17,7 +20,9 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { IAddSubjectRequestBody } from '../../_utils/contants';
+import { useState } from 'react';
+import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../../_utils/contants';
+import useCreateSubject from '../_hooks/useCreateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
 
 const style = {
@@ -37,13 +42,35 @@ interface IAddSubjectModalProps {
 
 const AddSubjectModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen } = props;
+	const { schoolId, sessionToken } = useAppContext();
+	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
+		undefined
+	);
 
 	const handleClose = () => {
 		formik.handleReset;
 		setOpen(false);
 	};
-	const handleFormSubmit = (body: IAddSubjectRequestBody) => {
-		alert(JSON.stringify(body, null, 2));
+
+	const handleFormSubmit = async (body: IAddSubjectRequestBody) => {
+		setResponse(
+			await useCreateSubject({
+				formData: [
+					{
+						...body,
+						'is-required':
+							body['is-required'].toString() === 'true' ? true : false,
+					},
+				],
+				schoolId: schoolId,
+				sessionToken: sessionToken,
+			})
+		);
+		useNotify({
+			type: response?.status === 201 ? 'success' : 'error',
+			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
+		});
+		handleClose();
 	};
 
 	const formik = useFormik({

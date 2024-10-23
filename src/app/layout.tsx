@@ -25,6 +25,8 @@ export default function RootLayout({
 	const cookieStore = cookies();
 	const sessionToken = cookieStore.get('sessionToken');
 	const refreshToken = cookieStore.get('refreshToken');
+	const userRole = cookieStore.get('userRole');
+
 	let userData: IJWTTokenPayload = {} as IJWTTokenPayload;
 	if (sessionToken) {
 		userData = jwtDecode(sessionToken.value);
@@ -38,7 +40,7 @@ export default function RootLayout({
 				<AppProvider
 					inititalSessionToken={sessionToken?.value}
 					inititalRefreshToken={refreshToken?.value}
-					initUserRole={userData.role ?? 'Không xác định'}
+					initUserRole={userRole?.value}
 					initSchoolId={userData.schoolId ?? 'Không xác định'}
 					initSchoolName={userData.schoolName ?? 'Không xác định'}
 				>
