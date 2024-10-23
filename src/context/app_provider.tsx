@@ -42,14 +42,16 @@ export default function AppProvider({
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const schoolName = initSchoolName;
 
-	const { data, error } = useSWR(
-		refreshToken ? ['/api/refresh', refreshToken] : null,
-		([url, token]) => fetchWithToken(url, token),
-		{
-			revalidateOnReconnect: true,
-			refreshInterval: 480000,
-		}
-	);
+	const { data, error } = sessionToken
+		? useSWR(
+				refreshToken ? ['/api/refresh', refreshToken] : null,
+				([url, token]) => fetchWithToken(url, token),
+				{
+					revalidateOnReconnect: true,
+					refreshInterval: 480000,
+				}
+		  )
+		: { data: null, error: null };
 
 	useEffect(() => {
 		if (data && sessionToken) {

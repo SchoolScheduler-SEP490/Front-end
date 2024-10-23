@@ -2,10 +2,7 @@
 import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
 import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants';
-import { jwtDecode } from 'jwt-decode';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { IJWTTokenPayload } from './(auth)/_utils/constants';
 
 export default function Home(): JSX.Element {
 	const { sessionToken, userRole } = useAppContext();
