@@ -129,3 +129,39 @@ export interface ITeacherTableData {
     }
   };  
 
+  export const updateTeacher = async (
+    api: string,
+    id: number,
+    sessionToken: string,
+    teacherData: IAddTeacherData
+  ): Promise<boolean> => {
+    if (!sessionToken) {
+      console.error('Session token is not found. Please log in.');
+      return false;
+    }
+
+    const url = `${api}/api/teachers/${id}`;
+    const requestBody = teacherData;
+    console.log('Request Body:', requestBody);
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionToken}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error occurred while sending request:", error);
+      return false;
+    }
+}
