@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Button,
   Dialog,
@@ -12,57 +12,33 @@ import {
   Typography,
   Select,
   MenuItem,
-  IconButton,
+  Grid2,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
 import dayjs from "dayjs";
-import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
+import { TeacherFormData } from "./add_teacher";
 
-//Add new teacher form
-
-interface AddTeacherFormProps {
+interface EditTeacherFormProps {
   open: boolean;
   onClose: () => void;
   onSubmit: (teacherData: TeacherFormData) => void;
-  initialValues?: TeacherFormData | null;
+  initialData: TeacherFormData;
 }
 
-export interface TeacherFormData {
-  firstName: string;
-  lastName: string;
-  abbreviation: string;
-  email: string;
-  gender: string;
-  departmentCode: string;
-  dateOfBirth: string;
-  teacherRole: string;
-  status: string;
-  phone: string;
-}
-
-const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
+const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
   open,
   onClose,
   onSubmit,
-  initialValues,
+  initialData,
 }) => {
   const formik = useFormik({
-    initialValues: initialValues || {
-      firstName: "",
-      lastName: "",
-      abbreviation: "",
-      email: "",
-      gender: "Male",
-      departmentCode: "",
-      dateOfBirth: "",
-      teacherRole: "Role1",
-      status: "Active",
-      phone: "",
+    initialValues: {
+      ...initialData,
+      dateOfBirth: dayjs(initialData.dateOfBirth).format("YYYY-MM-DD"),
     },
     validationSchema: teacherSchema,
-    enableReinitialize: true,
     onSubmit: (values) => {
       const formattedValues = {
         ...values,
@@ -79,18 +55,20 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
       >
-        {initialValues ? "Chỉnh sửa giáo viên" : "Thêm giáo viên"}
+        <Typography
+          variant="h6"
+          component="h2"
+          className="text-title-medium-strong font-semibold opacity-60"
+        >
+          Chỉnh sửa giáo viên
+        </Typography>
       </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
-          <Grid container spacing={2}>
+          <Grid2 container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Họ và tên
                   </Typography>
@@ -135,11 +113,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Tên viết tắt
                   </Typography>
@@ -168,11 +142,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Email
                   </Typography>
@@ -196,11 +166,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Giới tính
                   </Typography>
@@ -231,11 +197,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Chuyên môn
                   </Typography>
@@ -265,11 +227,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Ngày sinh
                   </Typography>
@@ -298,11 +256,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Vai trò
                   </Typography>
@@ -327,11 +281,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Trạng thái
                   </Typography>
@@ -355,11 +305,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
+                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Số điện thoại
                   </Typography>
@@ -380,11 +326,11 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          </Grid2>
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Thêm giáo viên"
+            title="Lưu thay đổi"
             disableRipple
             type="submit"
             disabled={!formik.isValid}
@@ -402,4 +348,4 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
   );
 };
 
-export default AddTeacherForm;
+export default EditTeacherForm;

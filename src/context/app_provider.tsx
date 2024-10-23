@@ -42,30 +42,30 @@ export default function AppProvider({
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const schoolName = initSchoolName;
 
-	const { data, error } = sessionToken
-		? useSWR(
-				refreshToken ? ['/api/refresh', refreshToken] : null,
-				([url, token]) => fetchWithToken(url, token),
-				{
-					revalidateOnReconnect: true,
-					refreshInterval: 480000,
-				}
-		  )
-		: { data: null, error: null };
+	const { data, error } = useSWR(
+		refreshToken ? ['/api/refresh', refreshToken] : null,
+		([url, token]) => fetchWithToken(url, token),
+		{
+			revalidateOnReconnect: true,
+			revalidateOnMount: true,
+			revalidateOnFocus: true,
+			refreshInterval: 480000,
+		}
+	);
 
 	useEffect(() => {
-		if (data && sessionToken) {
+		if (data && sessionToken.length > 0 && userRole.length > 0) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
+			setUserRole(userRole);
+		}
+		if (error) {
+			useNotify({
+				message: error.message,
+				type: 'error',
+			});
 		}
 	}, [data]);
-
-	if (error) {
-		useNotify({
-			message: error.message,
-			type: 'error',
-		});
-	}
 
 	return (
 		<AppContext.Provider

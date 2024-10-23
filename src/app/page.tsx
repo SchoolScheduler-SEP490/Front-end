@@ -24,5 +24,5 @@ export default function Home(): JSX.Element {
 	}
 	redirect('/landing');
 
-	return <LoadingComponent loadingStatus={true} />;
+  return <LoadingComponent loadingStatus={true} />;
 }
