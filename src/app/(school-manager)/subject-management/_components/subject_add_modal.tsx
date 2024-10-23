@@ -39,6 +39,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen } = props;
 
 	const handleClose = () => {
+		formik.handleReset;
 		setOpen(false);
 	};
 	const handleFormSubmit = (body: IAddSubjectRequestBody) => {
@@ -232,7 +233,6 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 								id='subject-group-type'
 								name='subject-group-type'
 								label='Nhập loại môn học'
-								defaultValue={''}
 								value={formik.values['subject-group-type']}
 								onChange={formik.handleChange('subject-group-type')}
 								onBlur={formik.handleBlur}
@@ -251,9 +251,9 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 								}
 								variant='standard'
 							>
-								{SUBJECT_GROUP_TYPE.map((title) => (
-									<option key={title} value={title}>
-										{title}
+								{SUBJECT_GROUP_TYPE.map((option) => (
+									<option key={option.value} value={option.key}>
+										{option.key}
 									</option>
 								))}
 							</TextField>

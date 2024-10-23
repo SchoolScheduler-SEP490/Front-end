@@ -61,4 +61,11 @@ export interface ICommonOption {
 	title: string;
 }
 
-export const SUBJECT_GROUP_TYPE = ['TN', 'XH', 'CN_VA_MT', 'BAT_BUOC', 'TU_CHON'];
+export const SUBJECT_GROUP_TYPE: { key: string; value: number }[] = [
+	{ key: '', value: -1 },
+	{ key: 'TN', value: 0 },
+	{ key: 'XH', value: 1 },
+	{ key: 'CN_VA_MT', value: 2 },
+	{ key: 'BAT_BUOC', value: 3 },
+	{ key: 'TU_CHON', value: 4 },
+];
