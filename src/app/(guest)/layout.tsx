@@ -2,7 +2,7 @@
 import Footer from '@/commons/footer';
 import Header from '@/commons/header';
 import { useAppContext } from '@/context/app_provider';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useMemo } from 'react';
 
 export default function GuestLayout({
@@ -10,13 +10,13 @@ export default function GuestLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { sessionToken, userRole } = useAppContext();
-	const router = useRouter();
+	const { userRole } = useAppContext();
+
 	useMemo(() => {
-		if (sessionToken && userRole.length > 0) {
-			router.push('/');
+		if (userRole.length > 0) {
+			redirect('/');
 		}
-	}, [sessionToken]);
+	}, [userRole]);
 
 	return (
 		<section>
