@@ -1,9 +1,7 @@
 'use client';
 
-import { ICommonOption } from '@/utils/constants';
-import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
+import { Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -18,8 +16,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
-import { ISubjectTableData } from '../../_utils/contants';
-import AddSubjectModal from './subject_add_modal';
+import { IRoomTableData } from '../../_utils/contants';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -47,41 +44,47 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
 	disablePadding: boolean;
-	id: keyof ISubjectTableData;
+	id: keyof IRoomTableData;
 	label: string;
 	centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
 	{
-		id: 'id' as keyof ISubjectTableData,
-		centered: false,
+		id: 'id' as keyof IRoomTableData,
+		centered: true,
 		disablePadding: false,
 		label: 'STT',
 	},
 	{
-		id: 'subjectName' as keyof ISubjectTableData,
+		id: 'roomName' as keyof IRoomTableData,
 		centered: false,
-		disablePadding: false,
-		label: 'Tên môn học',
+		disablePadding: true,
+		label: 'Tên phòng',
 	},
 	{
-		id: 'subjectCode' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Mã môn',
-	},
-	{
-		id: 'subjectGroup' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Tổ bộ môn',
-	},
-	{
-		id: 'subjectType' as keyof ISubjectTableData,
+		id: 'buildingName' as keyof IRoomTableData,
 		centered: true,
 		disablePadding: true,
-		label: 'Loại môn học',
+		label: 'Toà nhà',
+	},
+	{
+		id: 'availableSubjects' as keyof IRoomTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Môn học sử dụng',
+	},
+	{
+		id: 'roomType' as keyof IRoomTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Loại phòng',
+	},
+	{
+		id: 'status' as keyof IRoomTableData,
+		centered: true,
+		disablePadding: true,
+		label: 'Trạng thái',
 	},
 ];
 
@@ -89,7 +92,7 @@ const headCells: readonly HeadCell[] = [
 interface EnhancedTableProps {
 	onRequestSort: (
 		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectTableData
+		property: keyof IRoomTableData
 	) => void;
 	order: Order;
 	orderBy: string;
@@ -98,7 +101,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { order, orderBy, rowCount, onRequestSort } = props;
 	const createSortHandler =
-		(property: keyof ISubjectTableData) => (event: React.MouseEvent<unknown>) => {
+		(property: keyof IRoomTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -113,7 +116,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						sortDirection={orderBy === headCell.id ? order : false}
 						sx={[
 							{ fontWeight: 'bold' },
-							headCell.centered ? { paddingLeft: '3%' } : {},
+							headCell.centered ? { paddingLeft: '2%' } : {},
 						]}
 					>
 						<TableSortLabel
@@ -132,7 +135,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 								>
 									{order === 'desc'
 										? 'sorted descending'
-										: 'sorted 1ascending'}
+										: 'sorted ascending'}
 								</Box>
 							) : null}
 						</TableSortLabel>
@@ -146,8 +149,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 	);
 }
 
-interface ISubjectTableProps {
-	subjectTableData: ISubjectTableData[];
+interface IRoomTableProps {
+	roomTableData: IRoomTableData[];
 	serverPage: number;
 	setServerPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
@@ -155,44 +158,17 @@ interface ISubjectTableProps {
 	totalRows?: number;
 }
 
-const dropdownOptions: ICommonOption[] = [
-	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
-	{ img: '/images/icons/delete.png', title: 'Xóa môn học' },
-];
-
-const SubjectTable = (props: ISubjectTableProps) => {
-	const {
-		subjectTableData,
-		serverPage,
-		rowsPerPage,
-		setServerPage,
-		setRowsPerPage,
-		totalRows,
-	} = props;
-
+const RoomTable = (props: IRoomTableProps) => {
+	const { roomTableData, rowsPerPage, serverPage, setRowsPerPage, setServerPage } =
+		props;
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('id');
+	const [orderBy, setOrderBy] = React.useState<keyof IRoomTableData>('id');
 	const [page, setPage] = React.useState<number>(serverPage);
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [maxCurrentPage, setMaxCurrentPage] = React.useState<number>(serverPage);
-	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
-	const open = Boolean(anchorEl);
-
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-		setAnchorEl(event.currentTarget);
-	};
-
-	const handleMenuItemClick = (event: any, id: number) => {
-		setAnchorEl(null);
-	};
-
-	const handleAddSubject = () => {
-		setIsAddModalOpen(true);
-	};
 
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectTableData
+		property: keyof IRoomTableData
 	) => {
 		const isAsc = orderBy === property && order === 'asc';
 		setOrder(isAsc ? 'desc' : 'asc');
@@ -209,21 +185,23 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setRowsPerPage(parseInt(event.target.value));
+		setRowsPerPage(parseInt(event.target.value, 10));
+		setPage(0);
 	};
 
 	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - subjectTableData.length) : 0;
+		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - roomTableData.length) : 0;
 
 	const visibleRows = React.useMemo(
 		() =>
-			[...subjectTableData]
+			[...roomTableData]
 				.sort(getComparator(order, orderBy))
 				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
 		[order, orderBy, page, rowsPerPage]
 	);
+
 	return (
-		<div className='w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]'>
+		<div className='w-full h-fit flex flex-col justify-center items-center px-[15vw] pt-[5vh]'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
@@ -236,14 +214,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 						]}
 					>
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Môn học
+							Lớp học
 						</h2>
-						<Tooltip title='Thêm Môn học'>
-							<IconButton onClick={handleAddSubject}>
-								<AddIcon />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title='Lọc danh sách'>
+						<Tooltip title='Filter list'>
 							<IconButton>
 								<FilterListIcon />
 							</IconButton>
@@ -259,7 +232,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 								order={order}
 								orderBy={orderBy}
 								onRequestSort={handleRequestSort}
-								rowCount={subjectTableData.length}
+								rowCount={roomTableData.length}
 							/>
 							<TableBody>
 								{visibleRows.map((row, index) => {
@@ -280,51 +253,46 @@ const SubjectTable = (props: ISubjectTableProps) => {
 												padding='none'
 												align='center'
 											>
-												{index + 1 + page * rowsPerPage}
-											</TableCell>
-											<TableCell
-												align='left'
-												width={250}
-												sx={{
-													whiteSpace: 'nowrap',
-													overflow: 'hidden',
-													textOverflow: 'ellipsis',
-												}}
-											>
-												{row.subjectName}
-											</TableCell>
-											<TableCell align='left' width={120}>
-												{row.subjectCode}
+												{row.id}
 											</TableCell>
 											<TableCell align='left'>
-												{row.subjectGroup}
+												{row.roomName}
 											</TableCell>
-											<TableCell align='center' width={150}>
+											<TableCell align='center'>
+												{row.buildingName}
+											</TableCell>
+											<TableCell align='left'>
+												{row.availableSubjects}
+											</TableCell>
+											<TableCell align='left'>
 												<h2
 													className={`font-semibold ${
-														row.subjectType === 'Bắt buộc'
-															? 'text-tertiary-normal'
-															: 'text-primary-400'
+														row.roomType === 'Phòng học'
+															? 'text-primary-400'
+															: 'text-tertiary-normal'
 													}`}
 												>
-													{row.subjectType}
+													{row.roomType}
 												</h2>
+											</TableCell>
+											<TableCell align='center'>
+												<div className='w-full h-full flex justify-center items-center'>
+													<div
+														className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+														${
+															row.status === 'Hoạt động'
+																? 'bg-basic-positive-hover text-basic-positive'
+																: 'bg-basic-gray-hover text-basic-gray'
+														}`}
+													>
+														{row.status}
+													</div>
+												</div>
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton
 													color='success'
 													sx={{ zIndex: 10 }}
-													id='basic-button'
-													aria-controls={
-														open
-															? `basic-menu${index}`
-															: undefined
-													}
-													aria-haspopup='true'
-													aria-expanded={
-														open ? 'true' : undefined
-													}
-													onClick={handleClick}
 												>
 													<Image
 														src='/images/icons/menu.png'
@@ -334,47 +302,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 														height={20}
 													/>
 												</IconButton>
-												<Menu
-													id={`basic-menu${index}`}
-													anchorEl={anchorEl}
-													elevation={1}
-													open={open}
-													onClose={() => setAnchorEl(null)}
-													MenuListProps={{
-														'aria-labelledby': 'basic-button',
-													}}
-												>
-													{dropdownOptions.map(
-														(option, index) => (
-															<MenuItem
-																key={option.title}
-																onClick={(event: any) =>
-																	handleMenuItemClick(
-																		event,
-																		row.id
-																	)
-																}
-																className={`flex flex-row items-center ${
-																	index ===
-																		dropdownOptions.length -
-																			1 &&
-																	'hover:bg-basic-negative-hover hover:text-basic-negative'
-																}`}
-															>
-																<Image
-																	className='mr-4'
-																	src={option.img}
-																	alt={option.title}
-																	width={15}
-																	height={15}
-																/>
-																<h2 className='text-body-medium'>
-																	{option.title}
-																</h2>
-															</MenuItem>
-														)
-													)}
-												</Menu>
 											</TableCell>
 										</TableRow>
 									);
@@ -394,7 +321,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					<TablePagination
 						rowsPerPageOptions={[5, 10, 25]}
 						component='div'
-						count={totalRows ?? subjectTableData.length}
+						count={roomTableData.length}
 						rowsPerPage={rowsPerPage}
 						page={page}
 						onPageChange={handleChangePage}
@@ -402,9 +329,8 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			<AddSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} />
 		</div>
 	);
 };
 
-export default SubjectTable;
+export default RoomTable;

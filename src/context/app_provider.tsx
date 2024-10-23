@@ -11,6 +11,7 @@ const AppContext = createContext({
 	userRole: '',
 	setUserRole: (userRole: string) => {},
 	schoolId: '',
+	setSchoolId: (schoolId: string) => {},
 	schoolName: '',
 });
 export const useAppContext = () => {
@@ -38,7 +39,7 @@ export default function AppProvider({
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
-	const schoolId = initSchoolId;
+	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const schoolName = initSchoolName;
 
 	const { data, error } = useSWR(
@@ -74,6 +75,7 @@ export default function AppProvider({
 				userRole,
 				setUserRole,
 				schoolId,
+				setSchoolId,
 				schoolName,
 			}}
 		>

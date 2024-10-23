@@ -1,12 +1,20 @@
 'use client';
+import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
 import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants';
 import { jwtDecode } from 'jwt-decode';
 import { redirect } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { IJWTTokenPayload } from './(auth)/_utils/constants';
 
 export default function Home(): JSX.Element {
 	const { sessionToken } = useAppContext();
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+
+	useEffect(() => {
+		setIsLoading(!isLoading);
+	}, [sessionToken]);
+
 	if (sessionToken) {
 		const data = jwtDecode(sessionToken ?? '');
 		const userRole: string = (data as IJWTTokenPayload).role;
@@ -23,11 +31,6 @@ export default function Home(): JSX.Element {
 				redirect('/landing');
 		}
 	}
-	redirect('/landing');
 
-	return (
-		<div>
-			<h1>Loading...</h1>
-		</div>
-	);
+	return <LoadingComponent loadingStatus={true} />;
 }
