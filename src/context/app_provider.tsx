@@ -72,6 +72,9 @@ export default function AppProvider({
 				if (res.ok) {
 					setSessionToken('');
 					setRefreshToken('');
+					setUserRole('');
+					setSchoolId('');
+					setSchoolName('');
 				}
 			});
 		}
