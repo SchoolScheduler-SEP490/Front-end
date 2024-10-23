@@ -10,13 +10,14 @@ export default function GuestLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { sessionToken } = useAppContext();
+	const { sessionToken, userRole } = useAppContext();
 	const router = useRouter();
 	useMemo(() => {
-		if (sessionToken) {
+		if (sessionToken && userRole.length > 0) {
 			router.push('/');
 		}
 	}, [sessionToken]);
+
 	return (
 		<section>
 			<Header />

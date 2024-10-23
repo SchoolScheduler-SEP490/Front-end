@@ -30,7 +30,8 @@ const CustomButton = styled(Button)({
 });
 
 export const LoginForm = () => {
-	const { setSessionToken, setRefreshToken, setUserRole } = useAppContext();
+	const { setSessionToken, setRefreshToken, setUserRole, setSchoolId } =
+		useAppContext();
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 	const [showPassword, setShowPassword] = useState(false);
@@ -70,6 +71,7 @@ export const LoginForm = () => {
 							expired: new Date(loginResponse.expired ?? ''),
 						},
 					};
+					setSchoolId(decodedToken?.schoolId ?? '');
 				} else {
 					setIsLoggingIn(false);
 					useNotify({
