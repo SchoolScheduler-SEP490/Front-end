@@ -20,12 +20,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
-import { addTeacher, IAddTeacherData, ITeacherTableData } from "../_libs/apiTeacher";
+import {
+  addTeacher,
+  IAddTeacherData,
+  ITeacherTableData,
+} from "../_libs/apiTeacher";
 import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
 import DeleteConfirmationModal from "./delete_teacher";
 import AddTeacherForm, { TeacherFormData } from "./add_teacher";
 import { useAddTeacher } from "../_hooks/useAddTeacher";
 import useNotify from "@/hooks/useNotify";
+import Image from "next/image";
+
+//Teacher's data table 
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
   fetchTeachers: () => void;
@@ -135,6 +142,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             )}
           </TableCell>
         ))}
+        <TableCell>
+          <h2 className="font-semibold text-white"></h2>
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -156,8 +166,8 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         {
           pl: { sm: 2 },
           pr: { xs: 1, sm: 1 },
-          display: 'flex',
-          justifyContent: 'space-around'
+          display: "flex",
+          justifyContent: "space-around",
         },
         numSelected > 0 && {
           bgcolor: (theme) =>
@@ -181,7 +191,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       <Button
         variant="outlined"
         color="primary"
-        sx={{ whiteSpace: 'nowrap'}} 
+        sx={{ whiteSpace: "nowrap" }}
         onClick={onAddClick}
       >
         Thêm giáo viên
@@ -205,7 +215,10 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
-const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) => {
+const TeacherTable: React.FC<TeacherTableProps> = ({
+  teachers,
+  fetchTeachers,
+}) => {
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
     React.useState<keyof ITeacherTableData>("teacherName");
@@ -213,8 +226,8 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-  const {deleteTeacher, isDeleting} = useDeleteTeacher();
-  const {addNewTeacher, isAdding, addError } = useAddTeacher();
+  const { deleteTeacher, isDeleting } = useDeleteTeacher();
+  const { addNewTeacher, isAdding, addError } = useAddTeacher();
   const [openAddForm, setOpenAddForm] = React.useState(false);
   const notify = useNotify;
 
@@ -257,17 +270,26 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
   };
 
   const handleDeleteTeacher = async () => {
-    console.log(`Selected teachers to delete: ${selected.join(', ')}`);
-    
+    console.log(`Selected teachers to delete: ${selected.join(", ")}`);
+
     for (const id of selected) {
       const isDeleted = await deleteTeacher(id);
       if (isDeleted) {
+        fetchTeachers();
+        useNotify({
+          message: "Xóa dữ liệu của giáo viên thành công!",
+          type: "success",
+        });
         console.log(`Teacher with ID: ${id} has been deleted successfully.`);
       } else {
+        useNotify({
+          message: "Xóa giáo viên thất bại. Vui lòng thử lại!",
+          type: "error",
+        });
         console.warn(`Failed to delete teacher with ID: ${id}.`);
       }
     }
-  
+
     setSelected([]);
     setOpenDeleteModal(false);
   };
@@ -286,32 +308,32 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
       status: teacherData.status,
       phone: teacherData.phone,
     };
-  
+
     console.log("Formatted Teacher Data:", formattedTeacherData);
-  
+
     try {
       const success = await addNewTeacher(schoolId, formattedTeacherData);
       if (success) {
         fetchTeachers();
         setOpenAddForm(false);
         useNotify({
-          message: "Teacher added successfully!",
-          type: "success"
+          message: "Thêm giáo viên thành công!",
+          type: "success",
         });
       } else {
         useNotify({
-          message: "Failed to add teacher. Please check the inputs.",
-          type: "error"
+          message: "Thêm giáo viên thất bại. Vui lòng thử lại!",
+          type: "error",
         });
       }
     } catch (error) {
       console.error("Error adding teacher:", error);
       useNotify({
         message: "An unexpected error occurred while adding the teacher.",
-        type: "error"
+        type: "error",
       });
     }
-  };   
+  };
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
 
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
@@ -345,7 +367,12 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} onDeleteClick={handleOpenDeleteModal} isDeleting={isDeleting} onAddClick={handleOpenAddForm}  />
+        <EnhancedTableToolbar
+          numSelected={selected.length}
+          onDeleteClick={handleOpenDeleteModal}
+          isDeleting={isDeleting}
+          onAddClick={handleOpenAddForm}
+        />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -411,6 +438,17 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
                         </div>
                       </div>
                     </TableCell>
+                    <TableCell width={80}>
+                      <IconButton color="success" sx={{ zIndex: 10 }}>
+                        <Image
+                          src="/images/icons/menu.png"
+                          alt="notification-icon"
+                          unoptimized={true}
+                          width={20}
+                          height={20}
+                        />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -442,10 +480,10 @@ const TeacherTable: React.FC<TeacherTableProps> = ({ teachers, fetchTeachers }) 
         onConfirm={handleDeleteTeacher}
         selectedCount={selected.length}
       />
-      <AddTeacherForm 
-      open={openAddForm}
-      onClose={handleCloseAddForm}
-      onSubmit={handleAddTeacher}
+      <AddTeacherForm
+        open={openAddForm}
+        onClose={handleCloseAddForm}
+        onSubmit={handleAddTeacher}
       />
     </Box>
   );
