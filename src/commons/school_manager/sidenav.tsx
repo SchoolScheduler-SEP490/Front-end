@@ -19,9 +19,10 @@ const SMSidenav = () => {
 	const [showDropdowns, setShowDropdowns] = useState<string[]>([]);
 	const { sessionToken, setSessionToken, setRefreshToken, setUserRole, setSchoolId } =
 		useAppContext();
+	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
 
 	const handleLogout = async () => {
-		await fetch('/api/logout', {
+		await fetch(`${serverApi}/api/logout`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
