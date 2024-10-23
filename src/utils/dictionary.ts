@@ -60,7 +60,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Get subject list successful': 'Lấy danh sách môn học thành công',
 	'Get subject successful': 'Lấy thông tin môn học thành công',
 	'Subject name already exist.': 'Tên môn học đã tồn tại',
-	'Operation completed': 'Hoàn tất thêm danh sách môn học',
+	'Operation completed': 'Thêm môn học thành công',
 
 	// Teacher messages
 	'The teacher does not exist.': 'Không tìm thấy giáo viên',

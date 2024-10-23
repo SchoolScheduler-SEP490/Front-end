@@ -20,6 +20,7 @@ export async function POST(request: Request) {
 			'Set-Cookie': [
 				`sessionToken=${sessionToken}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
 				`refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
+				`userRole=${requestBody.role}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
 			].join(','),
 		},
 	});

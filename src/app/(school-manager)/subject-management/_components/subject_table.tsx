@@ -20,6 +20,8 @@ import Image from 'next/image';
 import * as React from 'react';
 import { ISubjectTableData } from '../../_utils/contants';
 import AddSubjectModal from './subject_add_modal';
+import useNotify from '@/hooks/useNotify';
+import DeleteSubjectModal from './subject_delete_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -176,13 +178,36 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [maxCurrentPage, setMaxCurrentPage] = React.useState<number>(serverPage);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
+	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
+	const [selectedRow, setSelectedRow] = React.useState<number | undefined>();
+
 	const open = Boolean(anchorEl);
 
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 
-	const handleMenuItemClick = (event: any, id: number) => {
+	const handleMenuItemClick = (event: any, id: number, index: number) => {
+		setSelectedRow(id);
+		useNotify({
+			message: 'ID: ' + id,
+			type: 'warning',
+		});
+		switch (index) {
+			case 0:
+				setIUpdateModalOpen(true);
+				break;
+			case 1:
+				setIsDeleteModalOpen(true);
+				break;
+			default:
+				useNotify({
+					message: 'Chức năng đang được phát triển',
+					type: 'warning',
+				});
+				break;
+		}
 		setAnchorEl(null);
 	};
 
@@ -351,7 +376,8 @@ const SubjectTable = (props: ISubjectTableProps) => {
 																onClick={(event: any) =>
 																	handleMenuItemClick(
 																		event,
-																		row.id
+																		row.id,
+																		index
 																	)
 																}
 																className={`flex flex-row items-center ${
@@ -403,6 +429,14 @@ const SubjectTable = (props: ISubjectTableProps) => {
 				</Paper>
 			</Box>
 			<AddSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} />
+			<DeleteSubjectModal
+				open={isDeleteModalOpen}
+				setOpen={setIsDeleteModalOpen}
+				subjectName={
+					subjectTableData.find((subject) => subject.id === selectedRow)
+						?.subjectName ?? 'Không xác định'
+				}
+			/>
 		</div>
 	);
 };

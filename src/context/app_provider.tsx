@@ -52,7 +52,7 @@ export default function AppProvider({
 	);
 
 	useEffect(() => {
-		if (data) {
+		if (data && sessionToken) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
 		}
