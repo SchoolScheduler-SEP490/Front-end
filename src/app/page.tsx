@@ -13,24 +13,23 @@ export default function Home(): JSX.Element {
 
 	useEffect(() => {
 		setIsLoading(!isLoading);
-	}, [sessionToken]);
-
-	if (sessionToken) {
-		const data = jwtDecode(sessionToken ?? '');
-		const userRole: string = (data as IJWTTokenPayload).role;
-		switch (userRole.toLowerCase()) {
-			case 'schoolmanager':
-				redirect(schoolManagerPaths[0]);
-			case 'admin':
-				redirect(adminPaths[0]);
-			case 'teacher':
-				redirect(teacherPaths[0]);
-			case 'teacher':
-				redirect(teacherPaths[0]);
-			default:
-				redirect('/landing');
+		if (sessionToken) {
+			const data = jwtDecode(sessionToken ?? '');
+			const userRole: string = (data as IJWTTokenPayload).role;
+			switch (userRole.toLowerCase()) {
+				case 'schoolmanager':
+					redirect(schoolManagerPaths[0]);
+				case 'admin':
+					redirect(adminPaths[0]);
+				case 'teacher':
+					redirect(teacherPaths[0]);
+				case 'teacher':
+					redirect(teacherPaths[0]);
+				default:
+					redirect('/landing');
+			}
 		}
-	}
+	}, [sessionToken]);
 
 	return <LoadingComponent loadingStatus={true} />;
 }
