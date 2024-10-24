@@ -8,6 +8,7 @@ import * as React from 'react';
 import { ISubject, ISubjectTableData } from '../_utils/contants';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
+import useFilterArray from '@/hooks/useFilterArray';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState(0);
@@ -36,11 +37,16 @@ export default function SMSubject() {
 					id: index++,
 					subjectName: record['subject-name'],
 					subjectCode: record.abbreviation,
-					subjectGroup: record.description,
+					subjectGroup: record['subject-group-type'],
 					subjectType: record['is-required'] ? 'Bắt buộc' : 'Tự chọn',
+					subjectKey: record.id,
 				})
 			);
-			setSubjectTableData([...subjectTableData, ...tableData]);
+			const filteredArr: ISubjectTableData[] = useFilterArray(
+				[...subjectTableData, ...tableData],
+				'id'
+			);
+			setSubjectTableData(filteredArr);
 			if (previousRPP !== rowsPerPage) {
 				setSubjectTableData([...tableData]);
 				setPage(0);

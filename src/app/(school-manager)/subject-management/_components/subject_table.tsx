@@ -1,5 +1,6 @@
 'use client';
 
+import useNotify from '@/hooks/useNotify';
 import { ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -20,7 +21,6 @@ import Image from 'next/image';
 import * as React from 'react';
 import { ISubjectTableData } from '../../_utils/contants';
 import AddSubjectModal from './subject_add_modal';
-import useNotify from '@/hooks/useNotify';
 import DeleteSubjectModal from './subject_delete_modal';
 import UpdateSubjectModal from './subject_update_modal';
 
@@ -302,8 +302,8 @@ const SubjectTable = (props: ISubjectTableProps) => {
 												component='th'
 												id={labelId}
 												scope='row'
-												padding='none'
-												align='center'
+												padding='normal'
+												align='left'
 											>
 												{index + 1 + page * rowsPerPage}
 											</TableCell>
@@ -318,10 +318,10 @@ const SubjectTable = (props: ISubjectTableProps) => {
 											>
 												{row.subjectName}
 											</TableCell>
-											<TableCell align='left' width={120}>
+											<TableCell align='left'>
 												{row.subjectCode}
 											</TableCell>
-											<TableCell align='left'>
+											<TableCell align='left' width={130}>
 												{row.subjectGroup}
 											</TableCell>
 											<TableCell align='center' width={150}>
@@ -436,7 +436,11 @@ const SubjectTable = (props: ISubjectTableProps) => {
 				setOpen={setIsDeleteModalOpen}
 				subjectName={selectedRow?.subjectName ?? 'Không xác định'}
 			/>
-			{/* <UpdateSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} oldData={}/> */}
+			<UpdateSubjectModal
+				open={iUpdateModalOpen}
+				setOpen={setIUpdateModalOpen}
+				subjectId={selectedRow?.subjectKey ?? 0}
+			/>
 		</div>
 	);
 };

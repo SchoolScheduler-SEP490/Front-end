@@ -42,9 +42,13 @@ export const schoolManagerPaths = [
 	'/migrate-timetable',
 ];
 
-export interface IPaginatedResponse<T> {
+export interface ICommonResponse<T = any> {
 	status: number;
 	message: string;
+	result: T;
+}
+
+export interface IPaginatedResponse<T> extends ICommonResponse {
 	result: {
 		'total-item-count': number;
 		'page-size': number;

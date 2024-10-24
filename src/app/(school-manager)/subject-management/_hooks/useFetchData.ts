@@ -52,6 +52,7 @@ const useFetchData = (props: IFetcherProps) => {
 		{
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
+			revalidateIfStale: true,
 			revalidateOnMount: true,
 			refreshInterval: 30000,
 		}
