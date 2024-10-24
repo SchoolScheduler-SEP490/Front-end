@@ -3,7 +3,7 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
-import { SUBJECT_GROUP_TYPE } from '@/utils/constants';
+import { ICommonResponse, SUBJECT_GROUP_TYPE } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -20,10 +20,15 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useState } from 'react';
-import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../../_utils/contants';
+import { useEffect, useMemo, useState } from 'react';
+import {
+	IAddSubjectRequestBody,
+	ICreateSubjectResponse,
+	ISubject,
+} from '../../_utils/contants';
 import useCreateSubject from '../_hooks/useCreateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
+import LoadingComponent from '@/commons/loading';
 
 const style = {
 	position: 'absolute',
@@ -38,20 +43,64 @@ const style = {
 interface IUpdateSubjectModalProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	oldData: IAddSubjectRequestBody;
+	subjectId: number;
 }
 
 const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
-	const { open, setOpen, oldData } = props;
+	const { open, setOpen, subjectId } = props;
 	const { schoolId, sessionToken } = useAppContext();
+	const api = process.env.NEXT_PUBLIC_API_URL;
+
 	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
 		undefined
+	);
+	const [oldData, setOldData] = useState<IAddSubjectRequestBody>(
+		{} as IAddSubjectRequestBody
 	);
 
 	const handleClose = () => {
 		formik.handleReset;
 		setOpen(false);
 	};
+
+	useEffect(() => {
+		const fetchSubjectDetail = async () => {
+			const response = await fetch(`${api}/api/subjects/${subjectId}`, {
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${sessionToken}`,
+				},
+			});
+			const data: ICommonResponse<ISubject> = await response.json();
+			if (data.status !== 200) {
+				useNotify({
+					type: 'error',
+					message: data.message,
+				});
+			} else {
+				setOldData({
+					'subject-name': data.result['subject-name'],
+					abbreviation: data.result.abbreviation,
+					description: data.result.description,
+					'is-required': data.result['is-required'],
+					'subject-group-type': data.result['subject-group-type'],
+				});
+			}
+		};
+		if (open) {
+			fetchSubjectDetail();
+		}
+	}, [open]);
+
+	useEffect(() => {
+		formik.setValues({
+			'subject-name': oldData ? oldData['subject-name'] || '' : '',
+			abbreviation: oldData ? oldData.abbreviation || '' : '',
+			description: oldData ? oldData.description || '' : '',
+			'is-required': oldData ? oldData['is-required'] || false : false,
+			'subject-group-type': oldData ? oldData['subject-group-type'] || '' : '',
+		});
+	}, [oldData]);
 
 	const handleFormSubmit = async (body: IAddSubjectRequestBody) => {
 		setResponse(
@@ -67,20 +116,16 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 				sessionToken: sessionToken,
 			})
 		);
-		useNotify({
-			type: response?.status === 201 ? 'success' : 'error',
-			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-		});
 		handleClose();
 	};
 
 	const formik = useFormik({
 		initialValues: {
-			'subject-name': oldData['subject-name'],
-			abbreviation: oldData.abbreviation,
-			description: oldData.description,
-			'is-required': oldData['is-required'],
-			'subject-group-type': oldData['subject-group-type'],
+			'subject-name': '',
+			abbreviation: '',
+			description: '',
+			'is-required': false,
+			'subject-group-type': '',
 		},
 		validationSchema: addSubjectSchema,
 		onSubmit: async (formData) => {
@@ -106,7 +151,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Thêm môn học
+						Cập nhật thông tin môn học
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -289,7 +334,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
-							title='Thêm môn học'
+							title='Cập nhật'
 							disableRipple
 							type='submit'
 							disabled={!formik.isValid}

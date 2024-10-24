@@ -66,10 +66,6 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 				sessionToken: sessionToken,
 			})
 		);
-		useNotify({
-			type: response?.status === 201 ? 'success' : 'error',
-			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-		});
 		handleClose();
 	};
 

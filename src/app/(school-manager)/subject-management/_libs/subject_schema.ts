@@ -7,7 +7,7 @@ export const addSubjectSchema = yup.object().shape({
 		.required('Tên môn học là bắt buộc')
 		.min(3, 'Tên môn học phải có ít nhất 3 ký tự')
 		.matches(
-			RegExp('^[a-zA-Z0-9]+$'),
+			RegExp('^[a-zA-Z0-9À-ỹ ]+$'),
 			'Tên môn học không được chứa các ký tự đặc biệt'
 		),
 	abbreviation: yup

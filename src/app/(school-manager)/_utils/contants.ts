@@ -94,11 +94,10 @@ export interface ISubject {
 	abbreviation: string;
 	'is-required': boolean;
 	description: string;
-	'total-slot-in-year': number;
-	'slot-specialized': number;
 	'create-date': string;
 	'update-date': string;
 	'is-deleted': boolean;
+	'subject-group-type': string;
 }
 
 // Subject data used for table display
@@ -108,6 +107,7 @@ export interface ISubjectTableData {
 	subjectCode: string;
 	subjectGroup: string;
 	subjectType: string;
+	subjectKey: number;
 }
 
 // Subject data used for subject creating request
