@@ -3,6 +3,10 @@ import { ISubjectTableData } from '../../_utils/contants';
 import CloseIcon from '@mui/icons-material/Close';
 import ContainedButton from '@/commons/button-contained';
 import useNotify from '@/hooks/useNotify';
+import { ICommonResponse } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
+import { useAppContext } from '@/context/app_provider';
+import { KeyedMutator, mutate } from 'swr';
 
 const style = {
 	position: 'absolute',
@@ -18,22 +22,41 @@ interface ISubjectDeleteModalProps {
 	open: boolean;
 	setOpen: (status: boolean) => void;
 	subjectName: string;
-	setSubjectTableData?: (data: ISubjectTableData[]) => void;
+	subjectId: number;
+	mutate: KeyedMutator<any>;
 }
 
 const DeleteSubjectModal = (props: ISubjectDeleteModalProps) => {
-	const { open, setOpen, subjectName, setSubjectTableData } = props;
+	const { open, setOpen, subjectName, subjectId, mutate } = props;
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+	const { sessionToken, schoolId } = useAppContext();
 
 	const handleClose = () => {
 		setOpen(false);
 	};
 
-	const handleDeleteSubject = () => {
+	const handleDeleteSubject = async () => {
 		// Neeeds updating
-		useNotify({
-			message: 'Xóa môn học thành công',
-			type: 'success',
+		const response = await fetch(`${apiUrl}/api/subjects/${subjectId}`, {
+			method: 'DELETE',
+			headers: {
+				Authorization: `Bearer ${sessionToken}`,
+			},
 		});
+		const data: ICommonResponse<any> = await response.json();
+		if (data.status !== 200) {
+			useNotify({
+				message: TRANSLATOR[data.message ?? ''] ?? 'Có lỗi xảy ra',
+				type: 'error',
+			});
+			return;
+		} else {
+			await mutate();
+			useNotify({
+				message: TRANSLATOR[data.message ?? ''] ?? 'Xóa môn học thành công',
+				type: 'success',
+			});
+		}
 		handleClose();
 	};
 

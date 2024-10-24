@@ -36,7 +36,6 @@ const useFetchData = (props: IFetcherProps) => {
 	}
 
 	const queryString = new URLSearchParams({
-		schoolId: schoolId,
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
 		...(subjectName && { subjectName: subjectName }),
@@ -47,14 +46,12 @@ const useFetchData = (props: IFetcherProps) => {
 	}).toString();
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(
-		`${api}/api/subjects?${queryString}`,
+		`${api}/api/subjects/${schoolId}/subjects?${queryString}`,
 		fetcher,
 		{
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
 			revalidateIfStale: true,
-			revalidateOnMount: true,
-			refreshInterval: 30000,
 		}
 	);
 

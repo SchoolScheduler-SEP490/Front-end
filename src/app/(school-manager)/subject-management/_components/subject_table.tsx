@@ -19,6 +19,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
+import { KeyedMutator } from 'swr';
 import { ISubjectTableData } from '../../_utils/contants';
 import AddSubjectModal from './subject_add_modal';
 import DeleteSubjectModal from './subject_delete_modal';
@@ -151,12 +152,12 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface ISubjectTableProps {
 	subjectTableData: ISubjectTableData[];
-	setSubjectTableData?: React.Dispatch<React.SetStateAction<ISubjectTableData[]>>;
-	serverPage: number;
-	setServerPage: React.Dispatch<React.SetStateAction<number>>;
+	page: number;
+	setPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
 	setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
 	totalRows?: number;
+	mutate: KeyedMutator<any>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -167,19 +168,17 @@ const dropdownOptions: ICommonOption[] = [
 const SubjectTable = (props: ISubjectTableProps) => {
 	const {
 		subjectTableData,
-		setSubjectTableData,
-		serverPage,
+		page,
 		rowsPerPage,
-		setServerPage,
+		setPage,
 		setRowsPerPage,
 		totalRows,
+		mutate,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
 	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('id');
-	const [page, setPage] = React.useState<number>(serverPage);
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-	const [maxCurrentPage, setMaxCurrentPage] = React.useState<number>(serverPage);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
@@ -227,12 +226,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const handleChangePage = (event: unknown, newPage: number) => {
-		if (newPage > page && newPage > maxCurrentPage) {
-			setMaxCurrentPage(newPage);
-			setServerPage(newPage);
-		} else {
-			setPage(newPage);
-		}
+		setPage(newPage);
 	};
 
 	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -240,13 +234,12 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - subjectTableData.length) : 0;
+		subjectTableData.length < rowsPerPage
+			? rowsPerPage - subjectTableData.length + 1
+			: 0;
 
 	const visibleRows = React.useMemo(
-		() =>
-			[...subjectTableData]
-				.sort(getComparator(order, orderBy))
-				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+		() => [...subjectTableData].sort(getComparator(order, orderBy)),
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
@@ -412,7 +405,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 								{emptyRows > 0 && (
 									<TableRow
 										style={{
-											height: 40 * emptyRows,
+											height: 50 * emptyRows,
 										}}
 									>
 										<TableCell colSpan={6} />
@@ -432,16 +425,23 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			<AddSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} />
+			<AddSubjectModal
+				open={isAddModalOpen}
+				setOpen={setIsAddModalOpen}
+				mutate={mutate}
+			/>
 			<DeleteSubjectModal
 				open={isDeleteModalOpen}
 				setOpen={setIsDeleteModalOpen}
 				subjectName={selectedRow?.subjectName ?? 'Không xác định'}
+				subjectId={selectedRow?.subjectKey ?? 0}
+				mutate={mutate}
 			/>
 			<UpdateSubjectModal
 				open={iUpdateModalOpen}
 				setOpen={setIUpdateModalOpen}
 				subjectId={selectedRow?.subjectKey ?? 0}
+				mutate={mutate}
 			/>
 		</div>
 	);

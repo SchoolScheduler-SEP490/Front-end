@@ -7,14 +7,14 @@ export const addSubjectSchema = yup.object().shape({
 		.required('Tên môn học là bắt buộc')
 		.min(3, 'Tên môn học phải có ít nhất 3 ký tự')
 		.matches(
-			RegExp('^[a-zA-Z0-9À-ỹ ]+$'),
+			RegExp('^[a-zA-Z0-9À-ỹ ,]+$'),
 			'Tên môn học không được chứa các ký tự đặc biệt'
 		),
 	abbreviation: yup
 		.string()
 		.required('Tên tắt TKB là bắt buộc')
 		.matches(
-			RegExp('^[a-zA-Z0-9]+$'),
+			RegExp('^[a-zA-ZÀ-ỹ0-9]+$'),
 			'Tên tắt TKB không được chứa các ký tự đặc biệt'
 		),
 
@@ -34,14 +34,14 @@ export const updateSubjectSchema = yup.object().shape({
 		.required('Tên môn học là bắt buộc')
 		.min(3, 'Tên môn học phải có ít nhất 3 ký tự')
 		.matches(
-			RegExp('^[a-zA-Z0-9À-ỹ ]+$'),
+			RegExp('^[a-zA-Z0-9À-ỹ ,]+$'),
 			'Tên môn học không được chứa các ký tự đặc biệt'
 		),
 	abbreviation: yup
 		.string()
 		.required('Tên tắt TKB là bắt buộc')
 		.matches(
-			RegExp('^[a-zA-Z0-9]+$'),
+			RegExp('^[a-zA-Z0-9À-ỹ]+$'),
 			'Tên tắt TKB không được chứa các ký tự đặc biệt'
 		),
 	description: yup.string().required('Tổ bộ môn là bắt buộc'),
