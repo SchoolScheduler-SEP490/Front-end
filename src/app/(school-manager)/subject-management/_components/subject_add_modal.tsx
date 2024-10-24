@@ -19,11 +19,8 @@ import {
 import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import {
-	IAddSubjectRequestBody,
-	ICreateSubjectResponse,
-	ISubjectTableData,
-} from '../../_utils/contants';
+import { KeyedMutator } from 'swr';
+import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../../_utils/contants';
 import useCreateSubject from '../_hooks/useCreateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
 
@@ -40,11 +37,11 @@ const style = {
 interface IAddSubjectModalProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	setSubjectTableData?: React.Dispatch<React.SetStateAction<ISubjectTableData[]>>;
+	mutate: KeyedMutator<any>;
 }
 
 const AddSubjectModal = (props: IAddSubjectModalProps) => {
-	const { open, setOpen, setSubjectTableData } = props;
+	const { open, setOpen, mutate } = props;
 	const { schoolId, sessionToken } = useAppContext();
 	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
 		undefined
@@ -69,23 +66,9 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 				sessionToken: sessionToken,
 			})
 		);
+		mutate();
 		handleClose();
 	};
-
-	useEffect(() => {
-		if (response?.status === 201 && setSubjectTableData) {
-			setSubjectTableData((prev) => [
-				...prev,
-				{
-					id: prev.length + 1,
-					subjectName: formik.values['subject-name'],
-					subjectCode: formik.values.abbreviation,
-					subjectGroup: formik.values['subject-group-type'],
-					subjectType: formik.values['is-required'] ? 'Bắt buộc' : 'Tự chọn',
-				} as ISubjectTableData,
-			]);
-		}
-	}, [response]);
 
 	const formik = useFormik({
 		initialValues: {

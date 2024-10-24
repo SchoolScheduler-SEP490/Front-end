@@ -20,11 +20,11 @@ import {
 import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { KeyedMutator } from 'swr';
 import {
 	IAddSubjectRequestBody,
 	ICreateSubjectResponse,
 	ISubject,
-	IUpdateSubjectRequestBody,
 } from '../../_utils/contants';
 import useUpdateSubject from '../_hooks/useUpdateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
@@ -43,11 +43,12 @@ interface IUpdateSubjectModalProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	subjectId: number;
+	mutate: KeyedMutator<any>;
 }
 
 const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
-	const { open, setOpen, subjectId } = props;
-	const { schoolId, sessionToken } = useAppContext();
+	const { open, setOpen, subjectId, mutate } = props;
+	const { sessionToken } = useAppContext();
 	const api = process.env.NEXT_PUBLIC_API_URL;
 
 	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
@@ -113,6 +114,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 				sessionToken: sessionToken,
 			})
 		);
+		mutate();
 		handleClose();
 	};
 
