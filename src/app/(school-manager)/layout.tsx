@@ -11,13 +11,12 @@ export default function SMLayout({
 	children: React.ReactNode;
 }>) {
 	const { sessionToken, userRole } = useAppContext();
-	const [isLoading, setLoading] = useState(true);
 
 	useEffect(() => {
 		if (!sessionToken || userRole.toLowerCase() !== 'schoolmanager') {
 			notFound();
 		}
-	}, [sessionToken, userRole, isLoading]);
+	}, [userRole]);
 
 	return (
 		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start'>

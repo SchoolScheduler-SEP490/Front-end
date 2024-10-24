@@ -5,11 +5,12 @@ export async function POST(request: Request) {
 	const req = await request.json();
 	const requestBody: IRefreshReqBody = { ...req };
 	const refreshToken = requestBody.refreshToken ?? undefined;
+	const userRole = requestBody.role ?? undefined;
 	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-	if (!refreshToken) {
+	if (!refreshToken || !userRole) {
 		return Response.json(
-			{ message: 'Không nhận được session token' },
+			{ message: 'Không nhận được dữ liệu' },
 			{
 				status: 400,
 			}
@@ -25,14 +26,17 @@ export async function POST(request: Request) {
 				}
 			);
 		} else {
-			const data = await fetch(
+			const responseData = await fetch(
 				`${apiUrl}/api/users/refresh-token?refreshToken=${refreshToken}`,
 				{ method: 'POST', headers: { 'Content-Type': 'application/json' } }
 			);
-			if (data.status !== 200) {
+			if (responseData.status !== 200) {
 				return Response.json({ message: 'Lỗi khi lấy dữ liệu' }, { status: 500 });
 			}
-			const response: IRefreshTokenResponse = await data.json();
+			const response: IRefreshTokenResponse = {
+				...(await responseData.json()),
+				userRole: userRole,
+			};
 			if (response['jwt-token'] && response['jwt-refresh-token']) {
 				return Response.json(response, {
 					status: 200,
@@ -40,6 +44,7 @@ export async function POST(request: Request) {
 						'Set-Cookie': [
 							`sessionToken=${response['jwt-token']}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
 							`refreshToken=${response['jwt-refresh-token']}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
+							`userRole=${userRole}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
 						].join(','),
 					},
 				});

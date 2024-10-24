@@ -1,25 +1,31 @@
 import { mutate } from 'swr';
-import { IAddSubjectRequestBody } from '../../_utils/contants';
+import { IUpdateSubjectRequestBody } from '../../_utils/contants';
+import useNotify from '@/hooks/useNotify';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 interface ICreateSubjectProps {
-	schoolId: string;
+	subjectId: number;
 	sessionToken: string;
-	formData: IAddSubjectRequestBody[];
+	formData: IUpdateSubjectRequestBody;
 }
 
-const useCreateSubject = async (props: ICreateSubjectProps) => {
-	const { schoolId, formData, sessionToken } = props;
-	const api = process.env.NEXT_PUBLIC_API_URL;
+const useUpdateSubject = async (props: ICreateSubjectProps) => {
+	const { subjectId, formData, sessionToken } = props;
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 	let response;
 
-	async function createSubject(url: string) {
+	async function updateSubject(url: string) {
 		const response = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
-			method: 'POST',
-			body: JSON.stringify(formData),
+			method: 'PUT',
+			body: JSON.stringify({
+				...formData,
+				'total-slot-in-year': 0,
+				'slot-specialized': 0,
+			}),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -31,16 +37,23 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	try {
 		// Sử dụng mutate với POST request
 		response = await mutate(
-			`${api}/api/subjects$/{schoolId}/subjects`,
-			createSubject(`${api}/api/subjects/${schoolId}/subjects`),
+			`${apiUrl}/api/subjects/${subjectId}`,
+			updateSubject(`${apiUrl}/api/subjects/${subjectId}`),
 			{
 				revalidate: true,
 			}
 		);
+		useNotify({
+			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
+			type: response?.status === 200 ? 'success' : 'error',
+		});
 		return response;
-	} catch (err) {
-		console.error('Lỗi khi gửi dữ liệu:', err);
+	} catch (err: any) {
+		useNotify({
+			message: TRANSLATOR[err.message ?? ''] ?? 'Có lỗi xảy ra',
+			type: 'error',
+		});
 	}
 };
 
-export default useCreateSubject;
+export default useUpdateSubject;

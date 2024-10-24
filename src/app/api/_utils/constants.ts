@@ -4,6 +4,7 @@ export interface ILogoutReqBody {
 
 export interface IRefreshReqBody {
 	refreshToken: string;
+	role: string;
 }
 
 export interface IRefreshTokenPayload {
@@ -17,4 +18,5 @@ export interface IRefreshTokenResponse {
 	'jwt-token': string;
 	expired: string;
 	'jwt-refresh-token': string;
+	userRole: string;
 }

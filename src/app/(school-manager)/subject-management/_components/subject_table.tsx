@@ -151,6 +151,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface ISubjectTableProps {
 	subjectTableData: ISubjectTableData[];
+	setSubjectTableData?: React.Dispatch<React.SetStateAction<ISubjectTableData[]>>;
 	serverPage: number;
 	setServerPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
@@ -166,6 +167,7 @@ const dropdownOptions: ICommonOption[] = [
 const SubjectTable = (props: ISubjectTableProps) => {
 	const {
 		subjectTableData,
+		setSubjectTableData,
 		serverPage,
 		rowsPerPage,
 		setServerPage,

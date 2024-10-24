@@ -1,17 +1,16 @@
 'use client';
 import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
-import useNotify from '@/hooks/useNotify';
 import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants';
 import { redirect } from 'next/navigation';
 import { useMemo } from 'react';
 
 export default function Home(): JSX.Element {
-	const { sessionToken, userRole } = useAppContext();
+	const { userRole } = useAppContext();
 
 	useMemo(() => {
-		if (sessionToken) {
-			switch (userRole.toLowerCase()) {
+		if (userRole.length > 0) {
+			switch (userRole?.toLowerCase()) {
 				case 'schoolmanager':
 					redirect(schoolManagerPaths[0]);
 				case 'admin':
@@ -21,15 +20,11 @@ export default function Home(): JSX.Element {
 				case 'teacher':
 					redirect(teacherPaths[0]);
 				default:
-					useNotify({
-						message: 'Không thể xác thực người dùng',
-						type: 'error',
-					});
+					redirect('/landing');
 			}
 		}
 		redirect('/landing');
-	}, []);
+	}, [userRole]);
 
 	return <LoadingComponent loadingStatus={false} />;
-	return <LoadingComponent loadingStatus={true} />;
 }

@@ -102,6 +102,7 @@ export default function SMSubject() {
 				rowsPerPage={rowsPerPage}
 				setRowsPerPage={setRowsPerPage}
 				totalRows={totalRows}
+				setSubjectTableData={setSubjectTableData}
 			/>
 		</div>
 	);

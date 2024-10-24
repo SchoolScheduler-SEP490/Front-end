@@ -4,7 +4,6 @@ import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import { ICommonResponse, SUBJECT_GROUP_TYPE } from '@/utils/constants';
-import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Box,
@@ -20,15 +19,15 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	IAddSubjectRequestBody,
 	ICreateSubjectResponse,
 	ISubject,
+	IUpdateSubjectRequestBody,
 } from '../../_utils/contants';
-import useCreateSubject from '../_hooks/useCreateSubject';
+import useUpdateSubject from '../_hooks/useUpdateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
-import LoadingComponent from '@/commons/loading';
 
 const style = {
 	position: 'absolute',
@@ -104,15 +103,13 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 
 	const handleFormSubmit = async (body: IAddSubjectRequestBody) => {
 		setResponse(
-			await useCreateSubject({
-				formData: [
-					{
-						...body,
-						'is-required':
-							body['is-required'].toString() === 'true' ? true : false,
-					},
-				],
-				schoolId: schoolId,
+			await useUpdateSubject({
+				formData: {
+					...body,
+					'is-required':
+						body['is-required'].toString() === 'true' ? true : false,
+				},
+				subjectId: subjectId,
 				sessionToken: sessionToken,
 			})
 		);
