@@ -43,8 +43,17 @@ export default function SMSubject() {
 		}
 	}, [data]);
 
+	const getMaxPage = () => {
+		if (totalRows === 0) return 1;
+		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
+	};
+
 	React.useEffect(() => {
-		mutate({ pageSize: rowsPerPage, pageIndex: page });
+		setPage((prev: number) => Math.min(prev, getMaxPage() - 1));
+		mutate({
+			pageSize: rowsPerPage,
+			pageIndex: page,
+		});
 	}, [page, rowsPerPage]);
 
 	if (isValidating) {
