@@ -46,10 +46,9 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
   open,
   onClose,
   onSubmit,
-  initialValues,
 }) => {
   const formik = useFormik({
-    initialValues: initialValues || {
+    initialValues: {
       firstName: "",
       lastName: "",
       abbreviation: "",
@@ -73,13 +72,27 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
     },
   });
 
+  const handleClose = () => {
+		formik.handleReset;
+		onClose();
+	};
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
       >
-        {initialValues ? "Chỉnh sửa giáo viên" : "Thêm giáo viên"}
+        <Typography
+          variant="h6"
+          component="h2"
+          className="text-title-medium-strong font-normal opacity-60"
+        >
+          Thêm giáo viên
+        </Typography>
+        <IconButton onClick={handleClose}>
+						<CloseIcon />
+					</IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>

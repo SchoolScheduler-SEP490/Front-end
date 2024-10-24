@@ -1,6 +1,5 @@
 export interface ITeacherTableData {
     id: number;
-    teacherCode: string;
     teacherName: string;
     nameAbbreviation: string;
     subjectDepartment: string;
@@ -20,6 +19,21 @@ export interface ITeacherTableData {
     "teacher-role": string;
     status: string;
     phone: string;
+  }
+
+  export interface IUpdateTeacherData {
+    "first-name": string;
+    "last-name": string;
+    abbreviation: string;
+    email: string;
+    gender: string;
+    "department-id": number;
+    "date-of-birth": string;
+    "school-id": number;
+    "teacher-role": string;
+    status: string;
+    phone: string;
+    "is-deleted": boolean;
   }
   
   export const getTeachers = async (
@@ -133,7 +147,7 @@ export interface ITeacherTableData {
     api: string,
     id: number,
     sessionToken: string,
-    teacherData: IAddTeacherData
+    teacherData: IUpdateTeacherData
   ): Promise<boolean> => {
     if (!sessionToken) {
       console.error('Session token is not found. Please log in.');

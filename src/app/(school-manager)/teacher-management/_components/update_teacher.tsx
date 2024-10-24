@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  Button,
   Dialog,
   DialogContent,
   TextField,
@@ -12,42 +11,64 @@ import {
   Typography,
   Select,
   MenuItem,
-  Grid2,
+  IconButton,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
 import dayjs from "dayjs";
 import ContainedButton from "@/commons/button-contained";
-import { TeacherFormData } from "./add_teacher";
+import CloseIcon from "@mui/icons-material/Close";
+import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
+import { IUpdateTeacherData } from "../_libs/apiTeacher";
 
-interface EditTeacherFormProps {
+interface UpdateTeacherFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (teacherData: TeacherFormData) => void;
-  initialData: TeacherFormData;
+  teacherId: number;
+  initialData: IUpdateTeacherData;
 }
 
-const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
+const UpdateTeacherModal: React.FC<UpdateTeacherFormProps> = ({
   open,
   onClose,
-  onSubmit,
+  teacherId,
   initialData,
 }) => {
+  const { editTeacher, isUpdating } = useUpdateTeacher();
+
   const formik = useFormik({
     initialValues: {
       ...initialData,
-      dateOfBirth: dayjs(initialData.dateOfBirth).format("YYYY-MM-DD"),
+      dateOfBirth: dayjs(initialData["date-of-birth"]).format("YYYY-MM-DD"),
     },
     validationSchema: teacherSchema,
-    onSubmit: (values) => {
-      const formattedValues = {
-        ...values,
-        dateOfBirth: dayjs(values.dateOfBirth).format("YYYY-MM-DD"),
+    onSubmit: async (values) => {
+      const formattedValues: IUpdateTeacherData = {
+        "first-name": values["first-name"],
+        "last-name": values["last-name"],
+        abbreviation: values.abbreviation,
+        email: values.email,
+        gender: values.gender,
+        "department-id": values["department-id"],
+        "date-of-birth": dayjs(values.dateOfBirth).format("YYYY-MM-DD"),
+        "school-id": 2555,
+        "teacher-role": values["teacher-role"],
+        status: values.status,
+        phone: values.phone,
+        "is-deleted": values["is-deleted"],
       };
-      onSubmit(formattedValues);
-      onClose();
+
+      const success = await editTeacher(teacherId, formattedValues);
+      if (success) {
+        onClose();
+      }
     },
   });
+
+  const handleClose = () => {
+    formik.handleReset;
+    onClose();
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -58,14 +79,17 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
         <Typography
           variant="h6"
           component="h2"
-          className="text-title-medium-strong font-semibold opacity-60"
+          className="text-title-medium-strong font-normal opacity-60"
         >
           Chỉnh sửa giáo viên
         </Typography>
+        <IconButton onClick={handleClose}>
+          <CloseIcon />
+        </IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
-          <Grid2 container spacing={2}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
@@ -79,15 +103,15 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
                     fullWidth
                     placeholder="Nhập Họ"
                     name="firstName"
-                    value={formik.values.firstName}
+                    value={formik.values["first-name"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.firstName &&
-                      Boolean(formik.errors.firstName)
+                      formik.touched["first-name"] &&
+                      Boolean(formik.errors["first-name"])
                     }
                     helperText={
-                      formik.touched.firstName && formik.errors.firstName
+                      formik.touched["first-name"] && formik.errors["first-name"]
                     }
                   />
                 </Grid>
@@ -97,14 +121,14 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
                     fullWidth
                     placeholder="Nhập Tên"
                     name="lastName"
-                    value={formik.values.lastName}
+                    value={formik.values["last-name"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.lastName && Boolean(formik.errors.lastName)
+                      formik.touched["last-name"] && Boolean(formik.errors["last-name"])
                     }
                     helperText={
-                      formik.touched.lastName && formik.errors.lastName
+                      formik.touched["last-name"] && formik.errors["last-name"]
                     }
                   />
                 </Grid>
@@ -207,18 +231,18 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
                     variant="standard"
                     fullWidth
                     placeholder="Nhập môn đảm nhiệm"
-                    name="departmentCode"
+                    name="departmentId"
                     type="text"
-                    value={formik.values.departmentCode}
+                    value={formik.values["department-id"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.departmentCode &&
-                      Boolean(formik.errors.departmentCode)
+                      formik.touched["department-id"] &&
+                      Boolean(formik.errors["department-id"])
                     }
                     helperText={
-                      formik.touched.departmentCode &&
-                      formik.errors.departmentCode
+                      formik.touched["department-id"] &&
+                      formik.errors["department-id"]
                     }
                   />
                 </Grid>
@@ -267,7 +291,7 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
                       variant="standard"
                       label="Vai trò"
                       name="teacherRole"
-                      value={formik.values.teacherRole}
+                      value={formik.values["teacher-role"]}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     >
@@ -326,14 +350,14 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
                 </Grid>
               </Grid>
             </Grid>
-          </Grid2>
+          </Grid>
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
             title="Lưu thay đổi"
             disableRipple
             type="submit"
-            disabled={!formik.isValid}
+            disabled={!formik.isValid || isUpdating}
             styles="bg-primary-300 text-white !py-1 px-4"
           />
           <ContainedButton
@@ -348,4 +372,4 @@ const EditTeacherForm: React.FC<EditTeacherFormProps> = ({
   );
 };
 
-export default EditTeacherForm;
+export default UpdateTeacherModal;
