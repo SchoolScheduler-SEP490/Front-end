@@ -33,7 +33,7 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	try {
 		// Sử dụng mutate với POST request
 		response = await mutate(
-			`${api}/api/subjects$/{schoolId}/subjects`,
+			`${api}/api/subjects/${schoolId}/subjects`,
 			createSubject(`${api}/api/subjects/${schoolId}/subjects`),
 			{
 				revalidate: true,

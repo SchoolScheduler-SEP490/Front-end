@@ -119,6 +119,16 @@ export interface IAddSubjectRequestBody {
 	'subject-group-type': string;
 }
 
+export interface IUpdateSubjectRequestBody {
+	'subject-name': string;
+	abbreviation: string;
+	description: string;
+	'is-required': boolean;
+	'total-slot-in-year'?: number;
+	'slot-specialized'?: number;
+	'subject-group-type': string;
+}
+
 export interface IRoomTableData {
 	id: number;
 	roomName: string;
