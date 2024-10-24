@@ -21,9 +21,9 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
 import {
-  addTeacher,
   IAddTeacherData,
   ITeacherTableData,
+  IUpdateTeacherData,
 } from "../_libs/apiTeacher";
 import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
 import DeleteConfirmationModal from "./delete_teacher";
@@ -33,8 +33,8 @@ import useNotify from "@/hooks/useNotify";
 import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
-import { useEditTeacher } from "../_hooks/useEditTeacher";
-
+import UpdateTeacherModal from "./update_teacher";
+import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
 //Teacher's data table
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
@@ -67,7 +67,7 @@ function getComparator<Key extends keyof any>(
 }
 
 const headCells = [
-  { id: "teacherCode", label: "STT", centered: false },
+  { id: "id", label: "STT", centered: false },
   { id: "teacherName", label: "Họ và tên", centered: false },
   { id: "nameAbbreviation", label: "Tên viết tắt", centered: false },
   { id: "subjectDepartment", label: "Chuyên môn", centered: false },
@@ -213,6 +213,9 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [selectedRow, setSelectedRow] = React.useState<number | null>(null);
+  const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
+  const [currentTeacherData, setCurrentTeacherData] =
+    React.useState<IUpdateTeacherData | null>(null);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -232,45 +235,50 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
     setSelected([]);
   };
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>, row: ITeacherTableData) => {
-		setAnchorEl(event.currentTarget);
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    row: ITeacherTableData
+  ) => {
+    setAnchorEl(event.currentTarget);
     setSelectedRow(row.id);
     console.log("Selected row:", row.id);
-	};
+  };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
   const handleDeleteTeacher = async () => {
-    if (selectedRow !== null) { 
-        try {
-            const isDeleted = await deleteTeacher(selectedRow); 
-            if (isDeleted) {
-                fetchTeachers(); 
-                notify({
-                    message: `Xóa thông tin giáo viên thành công.`,
-                    type: "success",
-                });
-                console.log(`Teacher with ID: ${selectedRow} has been deleted successfully.`);
-            } else {
-                notify({
-                    message: `Xóa thông tin giáo viên thất bại. Vui lòng thử lại!`,
-                    type: "error",
-                });
-                console.warn(`Failed to delete teacher with ID: ${selectedRow}.`);
-            }
-        } catch (error) {
-            console.error(`Error deleting teacher with ID: ${selectedRow}`, error);
-            notify({
-                message: `Lỗi khi xóa giáo viên có ID: ${selectedRow}. Vui lòng thử lại.`,
-                type: "error",
-            });
+    if (selectedRow !== null) {
+      try {
+        const isDeleted = await deleteTeacher(selectedRow);
+        if (isDeleted) {
+          fetchTeachers();
+          notify({
+            message: `Xóa thông tin giáo viên thành công.`,
+            type: "success",
+          });
+          console.log(
+            `Teacher with ID: ${selectedRow} has been deleted successfully.`
+          );
+        } else {
+          notify({
+            message: `Xóa thông tin giáo viên thất bại. Vui lòng thử lại!`,
+            type: "error",
+          });
+          console.warn(`Failed to delete teacher with ID: ${selectedRow}.`);
         }
+      } catch (error) {
+        console.error(`Error deleting teacher with ID: ${selectedRow}`, error);
+        notify({
+          message: `Lỗi khi xóa giáo viên có ID: ${selectedRow}. Vui lòng thử lại.`,
+          type: "error",
+        });
+      }
     }
     setSelectedRow(null);
     setOpenDeleteModal(false);
-};
+  };
 
   const handleAddTeacher = async (teacherData: TeacherFormData) => {
     const schoolId = 2555;
@@ -313,16 +321,42 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
     }
   };
 
+  const handleOpenUpdateModal = (teacher: ITeacherTableData) => {
+    const teacherData: IUpdateTeacherData = {
+      "first-name": teacher.teacherName.split(" ")[0],
+      "last-name": teacher.teacherName.split(" ")[1] || "",
+      abbreviation: teacher.nameAbbreviation,
+      email: teacher.email,
+      gender: "Male",
+      "department-id": 0,
+      "date-of-birth": "2024-10-24",
+      "school-id": 0,
+      "teacher-role": "Role1",
+      status: teacher.status === "Hoạt động" ? "Active" : "Inactive",
+      phone: teacher.phoneNumber,
+      "is-deleted": false,
+    };
+
+    setCurrentTeacherData(teacherData);
+    setOpenUpdateModal(true);
+  };
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    setCurrentTeacherData(null);
+  };
+
   const handleMenuItemClick = (event: any, id: number, optionTitle: string) => {
+    setSelectedRow(id);
+    const selectedTeacher = teachers.find((t) => t.id === id);
+
     if (optionTitle === "Xóa giáo viên") {
-        setSelectedRow(id); 
-        handleOpenDeleteModal();
-    } else if (optionTitle === "Chỉnh sửa thông tin" && selectedRow) {;
+      handleOpenDeleteModal();
+    } else if (optionTitle === "Chỉnh sửa thông tin" && selectedTeacher) {
+      handleOpenUpdateModal(selectedTeacher);
     }
     handleMenuClose();
     console.log("Selected Teacher ID:", id);
-};
-  
+  };
 
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
 
@@ -396,7 +430,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                       scope="row"
                       align="left"
                     >
-                      {row.teacherCode}
+                      {index + 1 + page * rowsPerPage}
                     </TableCell>
                     <TableCell align="left">{row.teacherName}</TableCell>
                     <TableCell align="left">{row.nameAbbreviation}</TableCell>
@@ -426,7 +460,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                         aria-controls={open ? `basic-menu${index}` : undefined}
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
-                        onClick={((event) => handleClick(event, row))}
+                        onClick={(event) => handleClick(event, row)}
                       >
                         <Image
                           src="/images/icons/menu.png"
@@ -506,9 +540,15 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
         onClose={handleCloseAddForm}
         onSubmit={handleAddTeacher}
       />
-
+      {currentTeacherData && (
+        <UpdateTeacherModal
+          open={openUpdateModal}
+          onClose={handleCloseUpdateModal}
+          teacherId={selectedRow || 0}
+          initialData={currentTeacherData}
+        />
+      )}
     </Box>
   );
 };
-
 export default TeacherTable;
