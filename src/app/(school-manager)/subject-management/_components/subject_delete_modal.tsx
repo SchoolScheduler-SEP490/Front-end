@@ -48,12 +48,12 @@ const DeleteSubjectModal = (props: ISubjectDeleteModalProps) => {
 			<Box sx={style}>
 				<div
 					id='modal-header'
-					className='w-full h-fit flex flex-row justify-between items-center bg-basic-negative-hover p-2 pl-5'
+					className='w-full h-fit flex flex-row justify-between items-center p-2 pl-5'
 				>
 					<Typography
 						variant='h6'
 						component='h2'
-						className='text-title-small-strong text-basic-negative font-medium'
+						className='text-title-large-strong font-semibold'
 					>
 						Xóa môn học
 					</Typography>

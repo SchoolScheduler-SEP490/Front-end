@@ -63,10 +63,10 @@ export default function AppProvider({
 	};
 
 	const { data, error } = useSWR(
-		refreshToken.length > 0 && userRole.length > 0
-			? [`${serverApi}/api/refresh`, refreshToken]
+		refreshToken?.length > 0 && userRole.length > 0
+			? [`${serverApi}/api/refresh`, refreshToken, userRole]
 			: null,
-		([url, token]) => fetchWithToken(url, token),
+		([url, token, userRole]) => fetchWithToken(url, token, userRole),
 		{
 			revalidateOnReconnect: true,
 			revalidateOnMount: true,
@@ -79,15 +79,16 @@ export default function AppProvider({
 		if (data && sessionToken.length > 0 && userRole.length > 0) {
 			setSessionToken(data['jwt-token']);
 			setRefreshToken(data['jwt-refresh-token']);
-			setUserRole(userRole);
-		} else if (userRole.length === 0 || refreshToken.length === 0) {
+			setUserRole(data.userRole);
+		} else if (userRole?.length === 0) {
 			handleLogout();
 		}
 		if (error) {
 			useNotify({
-				message: error.message,
+				message: error?.message ?? 'Lỗi không xác định',
 				type: 'error',
 			});
+			handleLogout();
 		}
 	}, [data]);
 

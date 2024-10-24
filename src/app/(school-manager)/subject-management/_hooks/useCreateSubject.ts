@@ -1,5 +1,7 @@
 import useSWR, { mutate } from 'swr';
 import { IAddSubjectRequestBody } from '../../_utils/contants';
+import useNotify from '@/hooks/useNotify';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 interface ICreateSubjectProps {
 	schoolId: string;
@@ -31,15 +33,22 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	try {
 		// Sử dụng mutate với POST request
 		response = await mutate(
-			`${api}/api/subjects$/{schoolId}/subjects`,
+			`${api}/api/subjects/${schoolId}/subjects`,
 			createSubject(`${api}/api/subjects/${schoolId}/subjects`),
 			{
 				revalidate: true,
 			}
 		);
+		useNotify({
+			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
+			type: response?.status === 201 ? 'success' : 'error',
+		});
 		return response;
-	} catch (err) {
-		console.error('Lỗi khi gửi dữ liệu:', err);
+	} catch (err: any) {
+		useNotify({
+			message: TRANSLATOR[err.message ?? ''] ?? 'Có lỗi xảy ra',
+			type: 'error',
+		});
 	}
 };
 

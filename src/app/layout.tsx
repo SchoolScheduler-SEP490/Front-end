@@ -38,11 +38,11 @@ export default function RootLayout({
 				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
 			>
 				<AppProvider
-					inititalSessionToken={sessionToken?.value}
-					inititalRefreshToken={refreshToken?.value}
-					initUserRole={userRole?.value}
-					initSchoolId={userData.schoolId ?? 'Unknown'}
-					initSchoolName={userData.schoolName ?? 'Unknown'}
+					inititalSessionToken={sessionToken?.value ?? ''}
+					inititalRefreshToken={refreshToken?.value ?? ''}
+					initUserRole={userRole?.value ?? ''}
+					initSchoolId={userData.schoolId ?? ''}
+					initSchoolName={userData.schoolName ?? ''}
 				>
 					{children}
 				</AppProvider>
