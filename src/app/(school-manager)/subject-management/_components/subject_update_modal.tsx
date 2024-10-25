@@ -22,12 +22,12 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import {
-	IAddSubjectRequestBody,
+	IUpdateSubjectRequestBody,
 	ICreateSubjectResponse,
 	ISubject,
 } from '../_libs/constants';
 import useUpdateSubject from '../_hooks/useUpdateSubject';
-import { addSubjectSchema } from '../_libs/subject_schema';
+import { updateSubjectSchema } from '../_libs/subject_schema';
 
 const style = {
 	position: 'absolute',
@@ -54,8 +54,8 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
 		undefined
 	);
-	const [oldData, setOldData] = useState<IAddSubjectRequestBody>(
-		{} as IAddSubjectRequestBody
+	const [oldData, setOldData] = useState<IUpdateSubjectRequestBody>(
+		{} as IUpdateSubjectRequestBody
 	);
 
 	const handleClose = () => {
@@ -102,7 +102,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 		});
 	}, [oldData]);
 
-	const handleFormSubmit = async (body: IAddSubjectRequestBody) => {
+	const handleFormSubmit = async (body: IUpdateSubjectRequestBody) => {
 		setResponse(
 			await useUpdateSubject({
 				formData: {
@@ -126,7 +126,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 			'is-required': false,
 			'subject-group-type': '',
 		},
-		validationSchema: addSubjectSchema,
+		validationSchema: updateSubjectSchema,
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},

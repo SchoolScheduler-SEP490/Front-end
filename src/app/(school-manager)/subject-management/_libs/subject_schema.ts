@@ -48,11 +48,9 @@ export const updateSubjectSchema = yup.object().shape({
 	'is-required': yup.boolean().required('Trường này là bắt buộc'),
 	'total-slot-in-year': yup
 		.number()
-		.required('Tổng số tiết trong năm là bắt buộc')
 		.min(0, 'Tổng số tiết trong năm phải lớn hơn hoặc bằng 0'),
 	'slot-specialized': yup
 		.number()
-		.required('Số tiết chuyên ngành là bắt buộc')
 		.min(0, 'Số tiết chuyên ngành phải lớn hơn hoặc bằng 0'),
 	'subject-group-type': yup
 		.string()

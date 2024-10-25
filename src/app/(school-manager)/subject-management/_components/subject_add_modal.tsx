@@ -250,13 +250,13 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 							</RadioGroup>
 						</FormControl>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start '>Mô tả</h3>
+							<h3 className=' h-full flex justify-start '>Loại Tổ hợp</h3>
 							<TextField
 								select
 								className='w-[70%]'
 								id='subject-group-type'
 								name='subject-group-type'
-								label='Nhập loại môn học'
+								label='Nhập loại Tổ hợp'
 								value={formik.values['subject-group-type']}
 								onChange={formik.handleChange('subject-group-type')}
 								onBlur={formik.handleBlur}
