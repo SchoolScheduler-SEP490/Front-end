@@ -413,9 +413,9 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                         <div
                           className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
                             ${
-                              row.status === "Hoạt động"
-                                ? "bg-basic-positive-hover text-basic-positive"
-                                : "bg-basic-negative-hover text-basic-negative"
+                              row.status === 1
+                                ? "bg-basic-negative-hover text-basic-negative"
+                                : "bg-basic-positive-hover text-basic-positive"
                             }`}
                           style={{ whiteSpace: "nowrap" }}
                         >

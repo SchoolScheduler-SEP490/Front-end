@@ -28,9 +28,9 @@ export const teacherSchema = yup.object().shape({
 });
 
 export const updateTeacherSchema = yup.object().shape({
-  firstName: yup.string().required('Vui lòng nhập họ giáo viên.'),
+  ['first-name']: yup.string().required('Vui lòng nhập họ giáo viên.'),
 
-  lastName: yup.string().required('Vui lòng nhập tên giáo viên.'),
+  ['last-name']: yup.string().required('Vui lòng nhập tên giáo viên.'),
 
   abbreviation: yup.string().required('Vui lòng nhập tên viết tắt giáo viên.'),
 
@@ -38,11 +38,11 @@ export const updateTeacherSchema = yup.object().shape({
 
   gender: yup.string().required('Vui lòng chọn giới tính.'),
 
-  departmentCode: yup.string().required('Vui lòng chọn mã tổ bộ môn.'),
+  ['department-id']: yup.string().required('Vui lòng chọn mã tổ bộ môn.'),
 
-  dateOfBirth: yup.string().required('Vui lòng nhập ngày sinh.'),
+  ['date-of-birth']: yup.string().required('Vui lòng nhập ngày sinh.'),
 
-  teacherRole: yup.string().required('Vui lòng chọn vai trò.'),
+  ['teacher-role']: yup.string().required('Vui lòng chọn vai trò.'),
 
   status: yup.string().required('Vui lòng chọn trạng thái.'),
 
