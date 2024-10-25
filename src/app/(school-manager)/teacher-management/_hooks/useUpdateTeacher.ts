@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { updateTeacher, IUpdateTeacherData } from "../_libs/apiTeacher";
+import { updateTeacher} from "../_libs/apiTeacher";
 import { useAppContext } from "@/context/app_provider";
+import { IUpdateTeacherRequestBody } from "../_libs/contants";  
 
 export function useUpdateTeacher() {
   const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
@@ -8,7 +9,7 @@ export function useUpdateTeacher() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
-  const editTeacher = async (teacherId: number, teacherData: IUpdateTeacherData) => {
+  const editTeacher = async (teacherId: number, teacherData: IUpdateTeacherRequestBody) => {
     setIsUpdating(true);
     setUpdateError(null);
 
