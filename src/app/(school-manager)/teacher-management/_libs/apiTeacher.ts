@@ -1,3 +1,5 @@
+import { ITeacher,IUpdateTeacherRequestBody  } from "./contants";
+
 export interface ITeacherTableData {
     id: number;
     teacherName: string;
@@ -21,21 +23,6 @@ export interface ITeacherTableData {
     phone: string;
   }
 
-  export interface IUpdateTeacherData {
-    "first-name": string;
-    "last-name": string;
-    abbreviation: string;
-    email: string;
-    gender: string;
-    "department-id": number;
-    "date-of-birth": string;
-    "school-id": number;
-    "teacher-role": string;
-    status: string;
-    phone: string;
-    "is-deleted": boolean;
-  }
-  
   export const getTeachers = async (
     api: string, 
     schoolId: number, 
@@ -70,7 +57,7 @@ export interface ITeacherTableData {
     if (data.result && Array.isArray(data.result.items)) {
       return data.result.items.map((item: any) => ({
         id: item.id,
-        teacherCode: item.id.toString(),
+        // teacherCode: item.id.toString(),
         teacherName: `${item['first-name']} ${item['last-name']}`,
         nameAbbreviation: item.abbreviation,
         subjectDepartment: item['department-name'],
@@ -147,7 +134,7 @@ export interface ITeacherTableData {
     api: string,
     id: number,
     sessionToken: string,
-    teacherData: IUpdateTeacherData
+    teacherData: IUpdateTeacherRequestBody,
   ): Promise<boolean> => {
     if (!sessionToken) {
       console.error('Session token is not found. Please log in.');

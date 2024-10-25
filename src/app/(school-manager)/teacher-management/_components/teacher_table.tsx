@@ -18,13 +18,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { alpha } from "@mui/material/styles";
 import { visuallyHidden } from "@mui/utils";
-import {
-  IAddTeacherData,
-  ITeacherTableData,
-  IUpdateTeacherData,
-} from "../_libs/apiTeacher";
+import { IAddTeacherData, ITeacherTableData } from "../_libs/apiTeacher";
 import { useDeleteTeacher } from "../_hooks/useDeleteTeacher";
 import DeleteConfirmationModal from "./delete_teacher";
 import AddTeacherForm, { TeacherFormData } from "./add_teacher";
@@ -34,7 +29,8 @@ import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
 import UpdateTeacherModal from "./update_teacher";
-import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
+import { mutate } from "swr";
+
 //Teacher's data table
 interface TeacherTableProps {
   teachers: ITeacherTableData[];
@@ -214,8 +210,6 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
   const open = Boolean(anchorEl);
   const [selectedRow, setSelectedRow] = React.useState<number | null>(null);
   const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
-  const [currentTeacherData, setCurrentTeacherData] =
-    React.useState<IUpdateTeacherData | null>(null);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -321,41 +315,18 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
     }
   };
 
-  const handleOpenUpdateModal = (teacher: ITeacherTableData) => {
-    const teacherData: IUpdateTeacherData = {
-      "first-name": teacher.teacherName.split(" ")[0],
-      "last-name": teacher.teacherName.split(" ")[1] || "",
-      abbreviation: teacher.nameAbbreviation,
-      email: teacher.email,
-      gender: "Male",
-      "department-id": 0,
-      "date-of-birth": "2024-10-24",
-      "school-id": 0,
-      "teacher-role": "Role1",
-      status: teacher.status === "Hoạt động" ? "Active" : "Inactive",
-      phone: teacher.phoneNumber,
-      "is-deleted": false,
-    };
-
-    setCurrentTeacherData(teacherData);
-    setOpenUpdateModal(true);
-  };
-  const handleCloseUpdateModal = () => {
-    setOpenUpdateModal(false);
-    setCurrentTeacherData(null);
-  };
-
-  const handleMenuItemClick = (event: any, id: number, optionTitle: string) => {
-    setSelectedRow(id);
-    const selectedTeacher = teachers.find((t) => t.id === id);
-
-    if (optionTitle === "Xóa giáo viên") {
-      handleOpenDeleteModal();
-    } else if (optionTitle === "Chỉnh sửa thông tin" && selectedTeacher) {
-      handleOpenUpdateModal(selectedTeacher);
+  const handleMenuItemClick = (index: number) => {
+    switch (index) {
+      case 0:
+        setOpenUpdateModal(true);
+        break;
+      case 1:
+        setOpenDeleteModal(true);
+        break;
+      default:
+        break;
     }
-    handleMenuClose();
-    console.log("Selected Teacher ID:", id);
+    setAnchorEl(null);
   };
 
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
@@ -484,9 +455,7 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
                         {dropdownOptions.map((option, index) => (
                           <MenuItem
                             key={option.title}
-                            onClick={(event: any) =>
-                              handleMenuItemClick(event, row.id, option.title)
-                            }
+                            onClick={() => handleMenuItemClick(index)}
                             className={`flex flex-row items-center ${
                               index === dropdownOptions.length - 1 &&
                               "hover:bg-basic-negative-hover hover:text-basic-negative"
@@ -540,14 +509,12 @@ const TeacherTable: React.FC<TeacherTableProps> = ({
         onClose={handleCloseAddForm}
         onSubmit={handleAddTeacher}
       />
-      {currentTeacherData && (
-        <UpdateTeacherModal
-          open={openUpdateModal}
-          onClose={handleCloseUpdateModal}
-          teacherId={selectedRow || 0}
-          initialData={currentTeacherData}
-        />
-      )}
+      <UpdateTeacherModal
+        open={openUpdateModal}
+        onClose={setOpenUpdateModal}
+        teacherId={selectedRow || 0}
+        mutate={mutate}
+      />
     </Box>
   );
 };

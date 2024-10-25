@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Button,
   Dialog,
   DialogContent,
   TextField,
@@ -322,17 +321,15 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                 </Grid>
                 <Grid item xs={9}>
                   <FormControl fullWidth>
-                    <Select
-                      variant="standard"
-                      label="Vai trò"
+                    <RadioGroup
+                      row
                       name="teacherRole"
                       value={formik.values.teacherRole}
                       onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
                     >
-                      <MenuItem value="Role1">Giáo viên</MenuItem>
-                      <MenuItem value="Role2">Trưởng bộ môn</MenuItem>
-                    </Select>
+                      <FormControlLabel value="Role1" control={<Radio/>} label="Giáo viên"/>
+                      <FormControlLabel value="Role2" control={<Radio/>} label="Trưởng bộ môn"/>
+                    </RadioGroup>
                   </FormControl>
                 </Grid>
               </Grid>

@@ -1,4 +1,5 @@
 import { INavigation } from '@/utils/constants';
+import { boolean } from 'yup';
 
 export interface ISMSidenav {
 	category: string;
