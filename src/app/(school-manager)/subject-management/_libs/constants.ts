@@ -25,6 +25,8 @@ export interface IAddSubjectRequestBody {
 	description: string;
 	'is-required': boolean;
 	'subject-group-type': string;
+	'total-slot-in-year'?: number;
+	'slot-specialized'?: number;
 }
 // Create Subject Response
 export interface ICreateSubjectResponse {

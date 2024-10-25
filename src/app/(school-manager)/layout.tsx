@@ -10,10 +10,10 @@ export default function SMLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { sessionToken, userRole } = useAppContext();
+	const { userRole } = useAppContext();
 
 	useEffect(() => {
-		if (!sessionToken || userRole.toLowerCase() !== 'schoolmanager') {
+		if (userRole.toLowerCase() !== 'schoolmanager') {
 			notFound();
 		}
 	}, [userRole]);
