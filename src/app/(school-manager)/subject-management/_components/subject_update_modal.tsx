@@ -280,7 +280,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 							<RadioGroup
 								className='w-[70%] flex flex-row justify-start items-center'
 								aria-labelledby='subject-radio-buttons-group-label'
-								defaultValue={formik.values['is-required']}
+								value={formik.values['is-required']}
 								name='is-required'
 								id='is-required'
 								onChange={formik.handleChange('is-required')}

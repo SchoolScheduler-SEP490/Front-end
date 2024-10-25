@@ -177,7 +177,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('id');
+	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('subjectName');
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
@@ -234,7 +234,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const emptyRows =
-		subjectTableData.length < rowsPerPage
+		subjectTableData.length < rowsPerPage && rowsPerPage < 10
 			? rowsPerPage - subjectTableData.length + 1
 			: 0;
 
