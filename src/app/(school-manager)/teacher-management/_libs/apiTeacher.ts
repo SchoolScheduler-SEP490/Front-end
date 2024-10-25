@@ -7,7 +7,7 @@ export interface ITeacherTableData {
     subjectDepartment: string;
     email: string;
     phoneNumber: string;
-    status: string;
+    status: number;
   }
 
   export interface IAddTeacherData {
@@ -64,8 +64,7 @@ export interface ITeacherTableData {
         email: item.email,
         phoneNumber: item.phone || 'N/A',
         status: item.status === 1 ? 'Hoạt động' : 'Vô hiệu'
-      }));
-    }
+      }));    }
     return [];
   };
   

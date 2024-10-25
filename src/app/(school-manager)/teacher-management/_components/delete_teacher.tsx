@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import ContainedButton from '@/commons/button-contained';
 
 interface DeleteConfirmationModalProps {
   open: boolean;
@@ -18,18 +19,18 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({ open,
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => {
-          console.log("Cancel deletion");
-          onClose();
-        }} color="primary">
-          Hủy
-        </Button>
-        <Button className='bg-primary-600' onClick={() => {
-          console.log("Confirming deletion");
-          onConfirm();
-        }} variant="contained">
-          Xác nhận
-        </Button>
+      <ContainedButton
+            title="Huỷ"
+            onClick={onClose}
+            disableRipple
+            styles="!bg-basic-gray-active text-basic-gray !py-1 px-4"
+          />
+          <ContainedButton
+            title="Xác nhận"
+            disableRipple
+            onClick={onConfirm}
+            styles="bg-primary-300 text-white !py-1 px-4"
+          />
       </DialogActions>
     </Dialog>
   );
