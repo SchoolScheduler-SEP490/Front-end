@@ -9,9 +9,9 @@ export default function TeacherLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { sessionToken, userRole } = useAppContext();
+	const { userRole } = useAppContext();
 	useMemo(() => {
-		if (!sessionToken || userRole.toLowerCase() !== 'teacher') {
+		if (userRole.toLowerCase() !== 'teacher') {
 			notFound();
 		}
 	}, [userRole]);

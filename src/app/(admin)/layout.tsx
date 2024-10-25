@@ -8,10 +8,10 @@ export default function AdminLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { sessionToken, userRole } = useAppContext();
+	const { userRole } = useAppContext();
 
 	useMemo(() => {
-		if (!sessionToken || userRole.toLowerCase() !== 'admin') {
+		if (userRole.toLowerCase() !== 'admin') {
 			notFound();
 		}
 	}, [userRole]);
