@@ -5,7 +5,7 @@ import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import * as React from 'react';
-import { ISubject, ISubjectTableData } from '../_utils/contants';
+import { ISubject, ISubjectTableData } from './_libs/constants';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
 

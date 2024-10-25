@@ -25,7 +25,7 @@ import {
 	IAddSubjectRequestBody,
 	ICreateSubjectResponse,
 	ISubject,
-} from '../../_utils/contants';
+} from '../_libs/constants';
 import useUpdateSubject from '../_hooks/useUpdateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
 

@@ -20,10 +20,7 @@ import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
-import { ISubjectTableData } from '../_libs/constants';
-import AddSubjectModal from './subject_add_modal';
-import DeleteSubjectModal from './subject_delete_modal';
-import UpdateSubjectModal from './subject_update_modal';
+import { ISubjectGroupTableData } from '../_libs/constants';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -51,41 +48,35 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
 	disablePadding: boolean;
-	id: keyof ISubjectTableData;
+	id: keyof ISubjectGroupTableData;
 	label: string;
 	centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
 	{
-		id: 'id' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
+		id: 'id' as keyof ISubjectGroupTableData,
+		centered: true,
+		disablePadding: true,
 		label: 'STT',
 	},
 	{
-		id: 'subjectName' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Tên môn học',
-	},
-	{
-		id: 'subjectCode' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Mã môn',
-	},
-	{
-		id: 'subjectGroup' as keyof ISubjectTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Tổ bộ môn',
-	},
-	{
-		id: 'subjectType' as keyof ISubjectTableData,
+		id: 'subjectGroupName' as keyof ISubjectGroupTableData,
 		centered: true,
 		disablePadding: true,
-		label: 'Loại môn học',
+		label: 'Tên khối',
+	},
+	{
+		id: 'subjectGroupCode' as keyof ISubjectGroupTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Mã tổ hợp',
+	},
+	{
+		id: 'subjectGroupTypeName' as keyof ISubjectGroupTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Loại tổ hợp',
 	},
 ];
 
@@ -93,7 +84,7 @@ const headCells: readonly HeadCell[] = [
 interface EnhancedTableProps {
 	onRequestSort: (
 		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectTableData
+		property: keyof ISubjectGroupTableData
 	) => void;
 	order: Order;
 	orderBy: string;
@@ -102,7 +93,8 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { order, orderBy, rowCount, onRequestSort } = props;
 	const createSortHandler =
-		(property: keyof ISubjectTableData) => (event: React.MouseEvent<unknown>) => {
+		(property: keyof ISubjectGroupTableData) =>
+		(event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -150,8 +142,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 	);
 }
 
-interface ISubjectTableProps {
-	subjectTableData: ISubjectTableData[];
+interface ISubjectGroupTableProps {
+	subjectGroupTableData: ISubjectGroupTableData[];
 	page: number;
 	setPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
@@ -165,9 +157,9 @@ const dropdownOptions: ICommonOption[] = [
 	{ img: '/images/icons/delete.png', title: 'Xóa môn học' },
 ];
 
-const SubjectTable = (props: ISubjectTableProps) => {
+const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	const {
-		subjectTableData,
+		subjectGroupTableData,
 		page,
 		rowsPerPage,
 		setPage,
@@ -177,18 +169,21 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('subjectName');
+	const [orderBy, setOrderBy] =
+		React.useState<keyof ISubjectGroupTableData>('subjectGroupName');
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
-	const [selectedRow, setSelectedRow] = React.useState<ISubjectTableData | undefined>();
+	const [selectedRow, setSelectedRow] = React.useState<
+		ISubjectGroupTableData | undefined
+	>();
 
 	const open = Boolean(anchorEl);
 
 	const handleClick = (
 		event: React.MouseEvent<HTMLButtonElement>,
-		row: ISubjectTableData
+		row: ISubjectGroupTableData
 	) => {
 		setAnchorEl((event.target as HTMLElement) ?? null);
 		setSelectedRow(row);
@@ -218,7 +213,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectTableData
+		property: keyof ISubjectGroupTableData
 	) => {
 		const isAsc = orderBy === property && order === 'asc';
 		setOrder(isAsc ? 'desc' : 'asc');
@@ -234,12 +229,12 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	};
 
 	const emptyRows =
-		subjectTableData.length < rowsPerPage && rowsPerPage < 10
-			? rowsPerPage - subjectTableData.length + 1
+		subjectGroupTableData.length < rowsPerPage && rowsPerPage < 10
+			? rowsPerPage - subjectGroupTableData.length + 1
 			: 0;
 
 	const visibleRows = React.useMemo(
-		() => [...subjectTableData].sort(getComparator(order, orderBy)),
+		() => [...subjectGroupTableData].sort(getComparator(order, orderBy)),
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
@@ -279,7 +274,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 								order={order}
 								orderBy={orderBy}
 								onRequestSort={handleRequestSort}
-								rowCount={subjectTableData.length}
+								rowCount={subjectGroupTableData.length}
 							/>
 							<TableBody>
 								{visibleRows.map((row, index) => {
@@ -311,31 +306,24 @@ const SubjectTable = (props: ISubjectTableProps) => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												{row.subjectName}
+												{row.subjectGroupName}
 											</TableCell>
 											<TableCell align='left'>
-												{row.subjectCode}
+												{row.subjectGroupCode
+													? row.subjectGroupCode
+													: '- - - - -'}
 											</TableCell>
-											<TableCell align='left' width={130}>
-												{row.subjectGroup}
-											</TableCell>
-											<TableCell align='center' width={150}>
-												<h2
-													className={`font-semibold ${
-														row.subjectType === 'Bắt buộc'
-															? 'text-tertiary-normal'
-															: 'text-primary-400'
-													}`}
-												>
-													{row.subjectType}
-												</h2>
+											<TableCell align='left'>
+												{row.subjectGroupTypeName
+													? row.subjectGroupTypeName
+													: '- - - - -'}
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton
 													color='success'
 													sx={{ zIndex: 10 }}
 													id={`basic-button${
-														row.subjectCode + index
+														row.subjectGroupCode + index
 													}`}
 													aria-controls={
 														open
@@ -359,14 +347,18 @@ const SubjectTable = (props: ISubjectTableProps) => {
 													/>
 												</IconButton>
 												<Menu
-													id={row.subjectCode + 'menu' + index}
+													id={
+														row.subjectGroupCode +
+														'menu' +
+														index
+													}
 													anchorEl={anchorEl}
 													elevation={1}
 													open={open}
 													onClose={() => setAnchorEl(null)}
 													MenuListProps={{
 														'aria-labelledby': `${
-															row.subjectCode +
+															row.subjectGroupCode +
 															'menu' +
 															index
 														}`,
@@ -417,7 +409,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					<TablePagination
 						rowsPerPageOptions={[5, 10, 25]}
 						component='div'
-						count={totalRows ?? subjectTableData.length}
+						count={totalRows ?? subjectGroupTableData.length}
 						rowsPerPage={rowsPerPage}
 						page={page}
 						onPageChange={handleChangePage}
@@ -425,7 +417,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			<AddSubjectModal
+			{/* <AddSubjectModal
 				open={isAddModalOpen}
 				setOpen={setIsAddModalOpen}
 				mutate={mutate}
@@ -442,9 +434,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 				setOpen={setIUpdateModalOpen}
 				subjectId={selectedRow?.subjectKey ?? 0}
 				mutate={mutate}
-			/>
+			/> */}
 		</div>
 	);
 };
 
-export default SubjectTable;
+export default SubjectGroupTable;
