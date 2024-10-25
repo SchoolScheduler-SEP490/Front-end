@@ -1,7 +1,7 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { IAddSubjectRequestBody } from '../../_utils/contants';
+import { IAddSubjectRequestBody } from '../_libs/constants';
 
 interface ICreateSubjectProps {
 	schoolId: string;

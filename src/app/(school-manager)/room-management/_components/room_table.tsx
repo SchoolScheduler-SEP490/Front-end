@@ -16,7 +16,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
-import { IRoomTableData } from '../../_utils/contants';
+import { IRoomTableData } from '../_libs/constants';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {

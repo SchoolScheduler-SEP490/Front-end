@@ -1,5 +1,5 @@
 import { mutate } from 'swr';
-import { IUpdateSubjectRequestBody } from '../../_utils/contants';
+import { IUpdateSubjectRequestBody } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 

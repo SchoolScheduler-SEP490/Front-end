@@ -2,7 +2,7 @@
 
 import SMHeader from '@/commons/school_manager/header';
 import * as React from 'react';
-import { IRoomTableData } from '../_utils/contants';
+import { IRoomTableData } from './_libs/constants';
 import RoomTable from './_components/room_table';
 
 export default function SMRoom() {

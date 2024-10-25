@@ -20,7 +20,7 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useState } from 'react';
 import { KeyedMutator } from 'swr';
-import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../../_utils/contants';
+import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../_libs/constants';
 import useCreateSubject from '../_hooks/useCreateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
 
