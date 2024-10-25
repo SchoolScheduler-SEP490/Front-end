@@ -24,6 +24,11 @@ export default function SMSubject() {
 		[]
 	);
 
+	const getMaxPage = () => {
+		if (totalRows === 0) return 1;
+		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
+	};
+
 	React.useEffect(() => {
 		mutate();
 		if (data?.status === 200) {
@@ -43,17 +48,14 @@ export default function SMSubject() {
 		}
 	}, [data]);
 
-	const getMaxPage = () => {
-		if (totalRows === 0) return 1;
-		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
-	};
-
 	React.useEffect(() => {
 		setPage((prev: number) => Math.min(prev, getMaxPage() - 1));
-		mutate({
-			pageSize: rowsPerPage,
-			pageIndex: page,
-		});
+		if (page <= getMaxPage()) {
+			mutate({
+				pageSize: rowsPerPage,
+				pageIndex: page,
+			});
+		}
 	}, [page, rowsPerPage]);
 
 	if (isValidating) {
