@@ -1,12 +1,11 @@
-import { Box, IconButton, Modal, Typography } from '@mui/material';
-import { ISubjectTableData } from '../../_utils/contants';
-import CloseIcon from '@mui/icons-material/Close';
 import ContainedButton from '@/commons/button-contained';
+import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import { ICommonResponse } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
-import { useAppContext } from '@/context/app_provider';
-import { KeyedMutator, mutate } from 'swr';
+import CloseIcon from '@mui/icons-material/Close';
+import { Box, IconButton, Modal, Typography } from '@mui/material';
+import { KeyedMutator } from 'swr';
 
 const style = {
 	position: 'absolute',
@@ -29,7 +28,7 @@ interface ISubjectDeleteModalProps {
 const DeleteSubjectModal = (props: ISubjectDeleteModalProps) => {
 	const { open, setOpen, subjectName, subjectId, mutate } = props;
 	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-	const { sessionToken, schoolId } = useAppContext();
+	const { sessionToken } = useAppContext();
 
 	const handleClose = () => {
 		setOpen(false);

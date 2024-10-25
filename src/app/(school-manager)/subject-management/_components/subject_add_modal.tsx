@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { KeyedMutator } from 'swr';
 import { IAddSubjectRequestBody, ICreateSubjectResponse } from '../../_utils/contants';
 import useCreateSubject from '../_hooks/useCreateSubject';
