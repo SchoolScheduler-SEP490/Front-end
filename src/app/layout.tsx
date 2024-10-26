@@ -1,13 +1,12 @@
 import '@/commons/styles/globals.css';
 import AppProvider from '@/context/app_provider';
 import { inter } from '@/utils/fonts';
-import type { Metadata } from 'next';
-import { cookies, headers } from 'next/headers';
-import { IJWTTokenPayload } from './(auth)/_utils/constants';
 import { jwtDecode } from 'jwt-decode';
+import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Script from 'next/script';
+import { IJWTTokenPayload } from './(auth)/_utils/constants';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -33,17 +32,8 @@ export default function RootLayout({
 		userData = jwtDecode(sessionToken.value);
 	}
 
-	const nonce = headers().get('x-nonce') ?? undefined;
-
 	return (
 		<html lang='vi'>
-			<head>
-				<Script
-					src='https://www.googletagmanager.com/gtag/js'
-					strategy='afterInteractive'
-					nonce={nonce}
-				/>
-			</head>
 			<body
 				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
 			>
