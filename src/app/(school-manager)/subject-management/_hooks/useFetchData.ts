@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import { getFetchSubjectApi } from '../_libs/apis';
 
 interface IFetcherProps {
 	sessionToken: string;
@@ -20,7 +21,14 @@ const useFetchData = (props: IFetcherProps) => {
 		isRequired,
 		deletedIncluded,
 	} = props;
-	const api = process.env.NEXT_PUBLIC_API_URL;
+	const endpoint = getFetchSubjectApi({
+		schoolId,
+		pageSize,
+		pageIndex,
+		subjectName,
+		isRequired,
+		deletedIncluded,
+	});
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -35,25 +43,11 @@ const useFetchData = (props: IFetcherProps) => {
 		return data;
 	}
 
-	const queryString = new URLSearchParams({
-		pageSize: pageSize.toString(),
-		pageIndex: pageIndex.toString(),
-		...(subjectName && { subjectName: subjectName }),
-		...(isRequired !== undefined && { isRequired: isRequired.toString() }),
-		...(deletedIncluded !== undefined && {
-			includeDeleted: deletedIncluded.toString(),
-		}),
-	}).toString();
-
-	const { data, error, isLoading, isValidating, mutate } = useSWR(
-		`${api}/api/subjects/${schoolId}/subjects?${queryString}`,
-		fetcher,
-		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
-			revalidateIfStale: true,
-		}
-	);
+	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: true,
+		revalidateIfStale: true,
+	});
 
 	return { data, error, isLoading, isValidating, mutate };
 };

@@ -23,7 +23,7 @@ import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import {
 	IUpdateSubjectRequestBody,
-	ICreateSubjectResponse,
+	ICreateSubjectResponseBody,
 	ISubject,
 } from '../_libs/constants';
 import useUpdateSubject from '../_hooks/useUpdateSubject';
@@ -51,7 +51,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	const { sessionToken } = useAppContext();
 	const api = process.env.NEXT_PUBLIC_API_URL;
 
-	const [response, setResponse] = useState<ICreateSubjectResponse | undefined>(
+	const [response, setResponse] = useState<ICreateSubjectResponseBody | undefined>(
 		undefined
 	);
 	const [oldData, setOldData] = useState<IUpdateSubjectRequestBody>(

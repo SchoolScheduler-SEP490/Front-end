@@ -8,6 +8,7 @@ import * as React from 'react';
 import { ISubject, ISubjectTableData } from './_libs/constants';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
+import SubjectTableSkeleton from './_components/table_skeleton';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -69,15 +70,7 @@ export default function SMSubject() {
 						</h3>
 					</div>
 				</SMHeader>
-				<SubjectTable
-					subjectTableData={subjectTableData ?? []}
-					page={page}
-					setPage={setPage}
-					rowsPerPage={rowsPerPage}
-					setRowsPerPage={setRowsPerPage}
-					totalRows={totalRows}
-					mutate={mutate}
-				/>
+				<SubjectTableSkeleton />
 			</div>
 		);
 	}

@@ -2,6 +2,7 @@ import { mutate } from 'swr';
 import { IUpdateSubjectRequestBody } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
+import { getUpdateSubjectApi } from '../_libs/apis';
 
 interface ICreateSubjectProps {
 	subjectId: number;
@@ -36,8 +37,9 @@ const useUpdateSubject = async (props: ICreateSubjectProps) => {
 
 	try {
 		// Sử dụng mutate với POST request
+		const endpoint = getUpdateSubjectApi({ subjectId });
 		response = await mutate(
-			`${apiUrl}/api/subjects/${subjectId}`,
+			endpoint,
 			updateSubject(`${apiUrl}/api/subjects/${subjectId}`),
 			{
 				revalidate: true,
