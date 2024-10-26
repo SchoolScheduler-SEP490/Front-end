@@ -136,7 +136,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 								>
 									{order === 'desc'
 										? 'sorted descending'
-										: 'sorted 1ascending'}
+										: 'sorted ascending'}
 								</Box>
 							) : null}
 						</TableSortLabel>

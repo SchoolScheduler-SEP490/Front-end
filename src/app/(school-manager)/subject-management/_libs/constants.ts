@@ -19,7 +19,7 @@ export interface ISubjectTableData {
 	subjectKey: number;
 }
 //Create Subject Data
-export interface IAddSubjectRequestBody {
+export interface ICreateSubjectRequestBody {
 	'subject-name': string;
 	abbreviation: string;
 	description: string;
@@ -29,7 +29,7 @@ export interface IAddSubjectRequestBody {
 	'slot-specialized'?: number;
 }
 // Create Subject Response
-export interface ICreateSubjectResponse {
+export interface ICreateSubjectResponseBody {
 	message: string;
 	result: {
 		'added-subjects': string[];
