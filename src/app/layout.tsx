@@ -7,6 +7,8 @@ import { cookies } from 'next/headers';
 import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IJWTTokenPayload } from './(auth)/_utils/constants';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -59,6 +61,8 @@ export default function RootLayout({
 					theme='light'
 					transition={Bounce}
 				/>
+				<Analytics />
+				<SpeedInsights />
 			</body>
 		</html>
 	);

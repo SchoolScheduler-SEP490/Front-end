@@ -1,9 +1,8 @@
 'use client';
-import LoadingComponent from '@/commons/loading';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import { useAppContext } from '@/context/app_provider';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export default function SMLayout({
 	children,
