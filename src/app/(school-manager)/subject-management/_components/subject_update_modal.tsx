@@ -270,7 +270,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 								}}
 							/>
 						</div>
-						<FormControl className='w-full flex flex-row justify-between items-center'>
+						<FormControl className='w-full flex !flex-row justify-between items-center'>
 							<FormLabel
 								id='subject-radio-buttons-group-label'
 								className='!text-black'
@@ -278,7 +278,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 								Loại môn học
 							</FormLabel>
 							<RadioGroup
-								className='w-[70%] flex flex-row justify-start items-center'
+								className='w-[70%] flex !flex-row justify-start items-center'
 								aria-labelledby='subject-radio-buttons-group-label'
 								value={formik.values['is-required']}
 								name='is-required'
@@ -343,7 +343,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 							title='Huỷ'
 							onClick={handleClose}
 							disableRipple
-							styles='!bg-basic-gray-active text-basic-gray !py-1 px-4'
+							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 						/>
 					</div>
 				</form>
