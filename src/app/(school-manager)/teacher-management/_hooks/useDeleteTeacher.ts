@@ -1,34 +1,30 @@
-import { useState } from 'react';
+import useNotify from '@/hooks/useNotify';
 import { deleteTeacherById } from '../_libs/apiTeacher';
-import { useAppContext } from '@/context/app_provider';
 
-export function useDeleteTeacher() {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-  const { sessionToken } = useAppContext(); 
-
-  const deleteTeacher = async (teacherId: number) => {
-    setIsDeleting(true);
-    setDeleteError(null);
-
-    try {
-      if (!sessionToken) {
-        throw new Error('Session token not found. Please log in.');
-      }
-
-      console.log(`Attempting to delete teacher with ID: ${teacherId}`);
-      await deleteTeacherById(api, teacherId, sessionToken);
-      console.log(`Successfully deleted teacher with ID: ${teacherId}`);
-      setIsDeleting(false);
-      return true;
-    } catch (err) {
-      console.error(`Failed to delete teacher with ID: ${teacherId}`, err);
-      setDeleteError('Failed to delete teacher.');
-      setIsDeleting(false);
-      return false;
-    }
-  };
-
-  return { deleteTeacher, isDeleting, deleteError };
+interface IDeleteTeacherProps {
+  teacherId: number;
+  sessionToken: string;
 }
+
+const useDeleteTeacher = async (props: IDeleteTeacherProps) => {
+  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
+  const { teacherId, sessionToken } = props;
+
+  try {
+    const response = await deleteTeacherById(api, teacherId, sessionToken);
+    console.log(`Successfully deleted teacher with ID: ${teacherId}`);
+    useNotify({
+      message: 'Xóa giáo viên thành công',
+      type: 'success',
+    });
+    return response;
+  } catch (err) {
+    console.error(`Failed to delete teacher with ID: ${teacherId}`, err);
+    useNotify({
+      message: 'Xóa giáo viên thất bại. Vui lòng thử lại.',
+      type: 'error',
+    });
+  }
+};
+
+export default useDeleteTeacher;

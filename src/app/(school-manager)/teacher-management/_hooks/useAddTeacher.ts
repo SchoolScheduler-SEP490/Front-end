@@ -1,33 +1,30 @@
-import { useState } from "react";
-import { addTeacher, IAddTeacherData } from "../_libs/apiTeacher";
-import { useAppContext } from "@/context/app_provider";
+import useNotify from '@/hooks/useNotify';
+import { IAddTeacherData } from '../_libs/contants';
+import { addTeacher } from '../_libs/apiTeacher';
 
-export function useAddTeacher() {
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-  const { sessionToken } = useAppContext();
-  const [isAdding, setIsAdding] = useState(false);
-  const [addError, setAddError] = useState<string | null>(null);
-
-  const addNewTeacher = async (schoolId: number, teacherData: IAddTeacherData) => {
-    setIsAdding(true);
-    setAddError(null);
-
-    try {
-      if (!sessionToken) {
-        throw new Error('Session token not found. Please log in.');
-      }
-
-      await addTeacher(api, schoolId, sessionToken, teacherData);
-      console.log(`Successfully added teacher:`, teacherData);
-      setIsAdding(false);
-      return true;
-    } catch (err) {
-      setAddError('Failed to add new teacher.');
-      console.error('Error adding teacher:', err);
-      setIsAdding(false);
-      return false;
-    }
-  };  
-
-  return { addNewTeacher, isAdding, addError };
+interface IAddTeacherProps {
+  schoolId: string;
+  sessionToken: string;
+  formData: IAddTeacherData[];
 }
+
+const useAddTeacher = async (props: IAddTeacherProps) => {
+  const { schoolId, formData, sessionToken } = props;
+  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
+
+  try {
+    const response = await addTeacher(api, schoolId, sessionToken, formData[0]);
+    useNotify({
+      message: 'Thêm giáo viên thành công',
+      type: response ? 'success' : 'error',
+    });
+    return response;
+  } catch (err: any) {
+    useNotify({
+      message: 'Thêm giáo viên thất bại. Vui lòng thử lại.',
+      type: 'error',
+    });
+  }
+};
+
+export default useAddTeacher;

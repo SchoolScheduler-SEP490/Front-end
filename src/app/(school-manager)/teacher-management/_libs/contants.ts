@@ -1,3 +1,13 @@
+// Display data table teacher
+export interface ITeacherTableData {
+	id: number;
+	teacherName: string;
+	nameAbbreviation: string;
+	subjectDepartment: string;
+	email: string;
+	phoneNumber: string;
+	status: string;
+}
 //Teacher response data
 export interface ITeacher {
   id: number;
@@ -10,7 +20,7 @@ export interface ITeacher {
   "department-name": string;
   "date-of-birth": string;
   "teacher-role": string;
-  status: string;
+  status: number;
   "is-deleted": boolean;
   phone: string;
 }
@@ -29,4 +39,17 @@ export interface IUpdateTeacherRequestBody {
   status: string;
   phone: string;
   "is-deleted": boolean;
+}
+//Create new teacher request data
+export interface IAddTeacherData {
+  "first-name": string;
+  "last-name": string;
+  abbreviation: string;
+  email: string;
+  gender: string;
+  "department-code": string;
+  "date-of-birth": string;
+  "teacher-role": string;
+  status: string;
+  phone: string;
 }
