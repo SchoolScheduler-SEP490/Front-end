@@ -1,35 +1,4 @@
-import { IAddTeacherData, ITeacherTableData,IUpdateTeacherRequestBody  } from "./contants";
-
-  export const getTeachers = async (
-    api: string, 
-    schoolId: string, 
-    includeDeleted: boolean, 
-    pageSize: number, 
-    pageIndex: number, 
-    sessionToken: string
-  ): Promise<ITeacherTableData[]> => {
-    
-    if (!sessionToken) {
-      throw new Error('Session token not found. Please log in.');
-    }
-  
-    const url = `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=${includeDeleted}&pageSize=${pageSize}&pageIndex=${pageIndex}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`,
-      }
-    });
-  
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  
-    const data = await response.json();
-    return data;
-  };
-  
+import { IAddTeacherData, ITeacherTableData,IUpdateTeacherRequestBody  } from "./constants";
   
   export const deleteTeacherById = async (
     api: string,

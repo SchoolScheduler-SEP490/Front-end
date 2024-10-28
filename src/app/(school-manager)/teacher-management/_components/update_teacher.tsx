@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
-import { IUpdateTeacherRequestBody } from "../_libs/contants";
+import { IUpdateTeacherRequestBody } from "../_libs/constants";
 import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
 import { updateTeacherSchema } from "../_libs/teacher_schema";
 import { useEffect, useState } from "react";

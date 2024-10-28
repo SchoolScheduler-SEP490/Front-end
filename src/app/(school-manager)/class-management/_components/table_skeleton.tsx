@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Box,
   IconButton,
@@ -16,53 +14,48 @@ import {
   Toolbar,
   Tooltip,
 } from "@mui/material";
-import { ITeacherTableData } from "../_libs/constants";
 import { visuallyHidden } from "@mui/utils";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import { IClassTableData } from "../_libs/constants";
 import Image from "next/image";
 
 interface HeadCell {
-  id: keyof ITeacherTableData;
+  id: keyof IClassTableData;
   label: string;
   centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "id" as keyof ITeacherTableData,
-    centered: false,
+    id: "id" as keyof IClassTableData,
     label: "STT",
+    centered: false,
   },
   {
-    id: "teacherName" as keyof ITeacherTableData,
+    id: "className" as keyof IClassTableData,
+    label: "Tên lớp",
     centered: false,
-    label: "Tên giáo viên",
   },
   {
-    id: "nameAbbreviation" as keyof ITeacherTableData,
+    id: "grade" as keyof IClassTableData,
+    label: "Tên khối",
     centered: false,
-    label: "Tên viết tắt",
   },
   {
-    id: "subjectDepartment" as keyof ITeacherTableData,
+    id: "homeroomTeacherName" as keyof IClassTableData,
+    label: "GVCN",
     centered: false,
-    label: "Tên bộ môn",
   },
   {
-    id: "email" as keyof ITeacherTableData,
+    id: "schoolYear" as keyof IClassTableData,
+    label: "Năm học",
     centered: false,
-    label: "Email",
   },
   {
-    id: "phoneNumber" as keyof ITeacherTableData,
+    id: "mainSession" as keyof IClassTableData,
+    label: "Buổi chính khóa",
     centered: false,
-    label: "Số điện thoại",
-  },
-  {
-    id: "status" as keyof ITeacherTableData,
-    centered: false,
-    label: "Trạng thái",
   },
 ];
 function EnhancedTableHead() {
@@ -96,8 +89,10 @@ function EnhancedTableHead() {
     </TableHead>
   );
 }
-const TeacherTableSkeleton = () => {
+
+const ClassTableSkeleton = () => {
   return (
+    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <Toolbar
@@ -110,9 +105,9 @@ const TeacherTableSkeleton = () => {
             ]}
           >
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
-              Danh sách giáo viên
+              Lớp học
             </h2>
-            <Tooltip title="Thêm Môn học">
+            <Tooltip title="Thêm lớp học">
               <IconButton>
                 <AddIcon />
               </IconButton>
@@ -132,7 +127,7 @@ const TeacherTableSkeleton = () => {
             >
               <EnhancedTableHead />
               <TableBody>
-                {[1, 2, 3, 4, 5, 6, 7].map((row, index) => {
+                {[1, 2, 3, 4, 5, 6].map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
@@ -165,26 +160,23 @@ const TeacherTableSkeleton = () => {
                       <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
-                      <TableCell align="left">
-                        <Skeleton animation="wave" variant="text" />
-                      </TableCell>
                       <TableCell width={80}>
-												<IconButton
-													color='success'
-													sx={{ zIndex: 10 }}
-													id={`basic-button${index}`}
-													aria-controls={`basic-menu${index}`}
-													aria-haspopup='true'
-												>
-													<Image
-														src='/images/icons/menu.png'
-														alt='notification-icon'
-														unoptimized={true}
-														width={20}
-														height={20}
-													/>
-												</IconButton>
-											</TableCell>
+                        <IconButton
+                          color="success"
+                          sx={{ zIndex: 10 }}
+                          id={`basic-button${index}`}
+                          aria-controls={`basic-menu${index}`}
+                          aria-haspopup="true"
+                        >
+                          <Image
+                            src="/images/icons/menu.png"
+                            alt="notification-icon"
+                            unoptimized={true}
+                            width={20}
+                            height={20}
+                          />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -199,9 +191,11 @@ const TeacherTableSkeleton = () => {
             page={1}
             onPageChange={() => {}}
             onRowsPerPageChange={() => {}}
-					/>
+          />
         </Paper>
       </Box>
+    </div>
   );
 };
-export default TeacherTableSkeleton;
+
+export default ClassTableSkeleton;
