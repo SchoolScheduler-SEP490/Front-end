@@ -23,6 +23,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IClassTableData } from "../_libs/constants";
+import AddClassModal from "./add_class";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -150,7 +151,7 @@ interface IClassTableProps {
 
 const dropdownOptions: ICommonOption[] = [
   { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
-  { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
+  { img: "/images/icons/delete.png", title: "Xóa lớp học" },
 ];
 
 const ClassTable = (props: IClassTableProps) => {
@@ -371,6 +372,11 @@ const ClassTable = (props: IClassTableProps) => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <AddClassModal 
+        open={openAddForm}
+        onClose={setOpenAddForm}
+        mutate={mutate}      
         />
       </Paper>
     </Box>

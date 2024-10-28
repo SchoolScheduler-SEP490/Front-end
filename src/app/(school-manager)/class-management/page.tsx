@@ -8,6 +8,7 @@ import ClassTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
 import { IClass, IClassTableData, ISchoolYear } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
+import { fetchSchoolYear } from "./_libs/apiClass";
 
 export default function SMClass() {
   const [page, setPage] = React.useState<number>(0);
@@ -35,25 +36,17 @@ export default function SMClass() {
   };
 
   React.useEffect(() => {
-	const fetchSchoolYear = async () => {
-		try {
-			const response = await fetch (`${api}/api/school-years`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${sessionToken}`
-				}
-
-			})
-			const data = await response.json();
-			if (data.result && data.result.length > 0) {
-			  setCurrentSchoolYear(data.result[0]["school-year-code"]);
-			}
-		} catch (error) {
-			console.error('Error fetching school year:', error);
-		}
-	}
-	fetchSchoolYear();
+    const getSchoolYear = async () => {
+      try {
+        const data = await fetchSchoolYear(sessionToken);
+        if (data.result && data.result.length > 0) {
+          setCurrentSchoolYear(data.result[0]["school-year-code"]);
+        }
+      } catch (error) {
+        console.error('Error fetching school year:', error);
+      }
+    };
+    getSchoolYear();
   }, [sessionToken]);
 
   React.useEffect(() => {
