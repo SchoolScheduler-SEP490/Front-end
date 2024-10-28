@@ -163,7 +163,6 @@ interface ITeacherTableProps {
   mutate: KeyedMutator<any>;
 }
 
-
 const dropdownOptions: ICommonOption[] = [
   { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
   { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
@@ -181,12 +180,15 @@ const TeacherTable = (props: ITeacherTableProps) => {
   } = props;
 
   const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof ITeacherTableData>("teacherName");
+  const [orderBy, setOrderBy] =
+    React.useState<keyof ITeacherTableData>("teacherName");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
-  const [selectedRow, setSelectedRow] = React.useState<ITeacherTableData | undefined>();
+  const [selectedRow, setSelectedRow] = React.useState<
+    ITeacherTableData | undefined
+  >();
   const open = Boolean(anchorEl);
 
   const handleClick = (
@@ -234,6 +236,11 @@ const TeacherTable = (props: ITeacherTableProps) => {
     () => [...teacherTableData].sort(getComparator(order, orderBy)),
     [order, orderBy, page, rowsPerPage, teacherTableData]
   );
+
+  const emptyRows =
+    teacherTableData.length < rowsPerPage && rowsPerPage < 10
+      ? rowsPerPage - teacherTableData.length + 1
+      : 0;
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -371,6 +378,15 @@ const TeacherTable = (props: ITeacherTableProps) => {
                   </TableRow>
                 );
               })}
+              {emptyRows > 0 && (
+                <TableRow
+                  style={{
+                    height: 50 * emptyRows,
+                  }}
+                >
+                  <TableCell colSpan={8} />
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

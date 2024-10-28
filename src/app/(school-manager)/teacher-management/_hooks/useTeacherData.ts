@@ -25,7 +25,7 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
 
   const endpoint = `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR(
+  const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,
     fetcher,
     {
@@ -35,7 +35,7 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
     }
   );
 
-  return { data, error, isLoading, isValidating, mutate };
+  return { data, error, isValidating, mutate };
 };
 
 export default useTeacherData;
