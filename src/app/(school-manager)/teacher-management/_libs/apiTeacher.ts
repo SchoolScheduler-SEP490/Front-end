@@ -1,31 +1,8 @@
-import { ITeacher,IUpdateTeacherRequestBody  } from "./contants";
-
-export interface ITeacherTableData {
-    id: number;
-    teacherName: string;
-    nameAbbreviation: string;
-    subjectDepartment: string;
-    email: string;
-    phoneNumber: string;
-    status: number;
-  }
-
-  export interface IAddTeacherData {
-    "first-name": string;
-    "last-name": string;
-    abbreviation: string;
-    email: string;
-    gender: string;
-    "department-code": string;
-    "date-of-birth": string;
-    "teacher-role": string;
-    status: string;
-    phone: string;
-  }
+import { IAddTeacherData, ITeacherTableData,IUpdateTeacherRequestBody  } from "./contants";
 
   export const getTeachers = async (
     api: string, 
-    schoolId: number, 
+    schoolId: string, 
     includeDeleted: boolean, 
     pageSize: number, 
     pageIndex: number, 
@@ -50,23 +27,9 @@ export interface ITeacherTableData {
     }
   
     const data = await response.json();
-    return mapTeacherData(data);
+    return data;
   };
   
-  const mapTeacherData = (data: any): ITeacherTableData[] => {
-    if (data.result && Array.isArray(data.result.items)) {
-      return data.result.items.map((item: any) => ({
-        id: item.id,
-        // teacherCode: item.id.toString(),
-        teacherName: `${item['first-name']} ${item['last-name']}`,
-        nameAbbreviation: item.abbreviation,
-        subjectDepartment: item['department-name'],
-        email: item.email,
-        phoneNumber: item.phone || 'N/A',
-        status: item.status === 1 ? 'Hoạt động' : 'Vô hiệu'
-      }));    }
-    return [];
-  };
   
   export const deleteTeacherById = async (
     api: string,
@@ -94,10 +57,10 @@ export interface ITeacherTableData {
 
   export const addTeacher = async (
     api: string,
-    schoolId: number,
+    schoolId: string,
     sessionToken: string,
     teacherData: IAddTeacherData
-  ): Promise<boolean> => {
+  ): Promise<any> => {
     if (!sessionToken) {
       console.error('Session token is not found. Please log in.');
       return false;
@@ -107,7 +70,6 @@ export interface ITeacherTableData {
     const requestBody = [teacherData];
     console.log('Request Body:', requestBody);
   
-    try {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -117,16 +79,11 @@ export interface ITeacherTableData {
         body: JSON.stringify(requestBody),
       });
   
+      const data = await response.json();
       if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}`);
-        return false;
+        throw new Error(data.message);
       }
-  
-      return true;
-    } catch (error) {
-      console.error("Error occurred while sending request:", error);
-      return false;
-    }
+      return data;
   };  
 
   export const updateTeacher = async (

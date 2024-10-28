@@ -18,63 +18,59 @@ import { teacherSchema } from "../_libs/teacher_schema";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
+import { KeyedMutator } from "swr";
+import { useAppContext } from "@/context/app_provider";
+import { IAddTeacherData } from "../_libs/contants";
+import useAddTeacher from "../_hooks/useAddTeacher";
 
 //Add new teacher form
-
 interface AddTeacherFormProps {
   open: boolean;
-  onClose: () => void;
-  onSubmit: (teacherData: TeacherFormData) => void;
-  initialValues?: TeacherFormData | null;
+  onClose: (close: boolean) => void;
+  mutate: KeyedMutator<any>;
 }
 
-export interface TeacherFormData {
-  firstName: string;
-  lastName: string;
-  abbreviation: string;
-  email: string;
-  gender: string;
-  departmentCode: string;
-  dateOfBirth: string;
-  teacherRole: string;
-  status: string;
-  phone: string;
-}
+const AddTeacherModal = (props: AddTeacherFormProps) => {
+  const { open, onClose, mutate } = props;
+  const { schoolId, sessionToken } = useAppContext();
 
-const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
-  open,
-  onClose,
-  onSubmit,
-}) => {
+  const handleClose = () => {
+    formik.handleReset;
+    onClose(false);
+  };
+
+  const handleFormSubmit = async (body: IAddTeacherData) => {
+    const formattedData = {
+      ...body,
+      "date-of-birth": dayjs(body["date-of-birth"]).format("YYYY-MM-DD"),
+    };
+    await useAddTeacher({
+      formData: [formattedData],
+      schoolId: schoolId,
+      sessionToken: sessionToken,
+    });
+    mutate();
+    handleClose();
+  };
+
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
+      "first-name": "",
+      "last-name": "",
       abbreviation: "",
       email: "",
       gender: "Male",
-      departmentCode: "",
-      dateOfBirth: "",
-      teacherRole: "Role1",
+      "department-code": "",
+      "date-of-birth": "",
+      "teacher-role": "Role1",
       status: "Active",
       phone: "",
     },
     validationSchema: teacherSchema,
-    enableReinitialize: true,
-    onSubmit: (values) => {
-      const formattedValues = {
-        ...values,
-        dateOfBirth: dayjs(values.dateOfBirth).format("YYYY-MM-DD"),
-      };
-      onSubmit(formattedValues);
-      onClose();
+    onSubmit: async (formData) => {
+      handleFormSubmit(formData);
     },
   });
-
-  const handleClose = () => {
-		formik.handleReset;
-		onClose();
-	};
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -90,8 +86,8 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
           Thêm giáo viên
         </Typography>
         <IconButton onClick={handleClose}>
-						<CloseIcon />
-					</IconButton>
+          <CloseIcon />
+        </IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
@@ -112,16 +108,17 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                     variant="standard"
                     fullWidth
                     placeholder="Nhập Họ"
-                    name="firstName"
-                    value={formik.values.firstName}
+                    name="first-name"
+                    value={formik.values["first-name"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.firstName &&
-                      Boolean(formik.errors.firstName)
+                      formik.touched["first-name"] &&
+                      Boolean(formik.errors["first-name"])
                     }
                     helperText={
-                      formik.touched.firstName && formik.errors.firstName
+                      formik.touched["first-name"] &&
+                      formik.errors["first-name"]
                     }
                   />
                 </Grid>
@@ -130,15 +127,16 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                     variant="standard"
                     fullWidth
                     placeholder="Nhập Tên"
-                    name="lastName"
-                    value={formik.values.lastName}
+                    name="last-name"
+                    value={formik.values["last-name"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.lastName && Boolean(formik.errors.lastName)
+                      formik.touched["last-name"] &&
+                      Boolean(formik.errors["last-name"])
                     }
                     helperText={
-                      formik.touched.lastName && formik.errors.lastName
+                      formik.touched["last-name"] && formik.errors["last-name"]
                     }
                   />
                 </Grid>
@@ -257,18 +255,18 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                     variant="standard"
                     fullWidth
                     placeholder="Nhập môn đảm nhiệm"
-                    name="departmentCode"
+                    name="department-code"
                     type="text"
-                    value={formik.values.departmentCode}
+                    value={formik.values["department-code"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.departmentCode &&
-                      Boolean(formik.errors.departmentCode)
+                      formik.touched["department-code"] &&
+                      Boolean(formik.errors["department-code"])
                     }
                     helperText={
-                      formik.touched.departmentCode &&
-                      formik.errors.departmentCode
+                      formik.touched["department-code"] &&
+                      formik.errors["department-code"]
                     }
                   />
                 </Grid>
@@ -290,18 +288,19 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                   <TextField
                     variant="standard"
                     fullWidth
-                    name="dateOfBirth"
+                    name="date-of-birth"
                     type="date"
                     InputLabelProps={{ shrink: true }}
-                    value={formik.values.dateOfBirth}
+                    value={formik.values["date-of-birth"]}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.dateOfBirth &&
-                      Boolean(formik.errors.dateOfBirth)
+                      formik.touched["date-of-birth"] &&
+                      Boolean(formik.errors["date-of-birth"])
                     }
                     helperText={
-                      formik.touched.dateOfBirth && formik.errors.dateOfBirth
+                      formik.touched["date-of-birth"] &&
+                      formik.errors["date-of-birth"]
                     }
                   />
                 </Grid>
@@ -323,12 +322,20 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
                   <FormControl fullWidth>
                     <RadioGroup
                       row
-                      name="teacherRole"
-                      value={formik.values.teacherRole}
+                      name="teacher-role"
+                      value={formik.values["teacher-role"]}
                       onChange={formik.handleChange}
                     >
-                      <FormControlLabel value="Role1" control={<Radio/>} label="Giáo viên"/>
-                      <FormControlLabel value="Role2" control={<Radio/>} label="Trưởng bộ môn"/>
+                      <FormControlLabel
+                        value="Role1"
+                        control={<Radio />}
+                        label="Giáo viên"
+                      />
+                      <FormControlLabel
+                        value="Role2"
+                        control={<Radio />}
+                        label="Trưởng bộ môn"
+                      />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -402,7 +409,7 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
           />
           <ContainedButton
             title="Huỷ"
-            onClick={onClose}
+            onClick={handleClose}
             disableRipple
             styles="!bg-basic-gray-active text-basic-gray !py-1 px-4"
           />
@@ -412,4 +419,4 @@ const AddTeacherForm: React.FC<AddTeacherFormProps> = ({
   );
 };
 
-export default AddTeacherForm;
+export default AddTeacherModal;
