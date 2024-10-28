@@ -1,45 +1,51 @@
-import Error from "next/error";
 import { IAddClassData } from "./constants";
 
+const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
+
 //get school year code to display on table
-const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-
 export const fetchSchoolYear = async (sessionToken: string) => {
-    const response = await fetch(`${api}/api/school-years`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`
-      }
-    });
-    const data = await response.json();
-    return data;
-  };
+  const response = await fetch(`${api}/api/school-years`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+};
 
-  export const getTeacherName = async (sessionToken: string, schoolId: string) => {
-    const initialResponse = await fetch(`${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=1&pageIndex=1`, {
-      method: 'GET',
+export const getTeacherName = async (
+  sessionToken: string,
+  schoolId: string
+) => {
+  const initialResponse = await fetch(
+    `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=1&pageIndex=1`,
+    {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`
-      }
-    });
-    const initialData = await initialResponse.json();
-    const totalCount = initialData.result["total-item-count"];
-  
-    //dynamic fetching total count of teacher
-    const response = await fetch(`${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${totalCount}&pageIndex=1`, {
-      method: 'GET',
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  //dynamic fetching total count of teacher
+  const response = await fetch(
+    `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
+    {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`
-      }
-    });
-    const data = await response.json();
-    return data;
-  }
-  
-  
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+};
 
 export const addClass = async (
   schoolId: string,
@@ -47,18 +53,18 @@ export const addClass = async (
   classData: IAddClassData
 ): Promise<any> => {
   if (!sessionToken) {
-    console.error('Session token is not found. Please log in.');
+    console.error("Session token is not found. Please log in.");
     return false;
   }
   const url = `${api}/api/student-classes?schoolId=${schoolId}&schoolYearId=1`;
   const requestBody = [classData];
-  console.log('Request Body:', requestBody);  
+  console.log("Request Body:", requestBody);
 
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionToken}`,
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
     },
     body: JSON.stringify(requestBody),
   });
@@ -67,4 +73,25 @@ export const addClass = async (
     throw new Error(data.message);
   }
   return data;
+};
+
+export const deleteClassById = async (
+  id: number,
+  sessionToken: string
+): Promise<void> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/student-classes/${id}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 };

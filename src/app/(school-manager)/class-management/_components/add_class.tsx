@@ -38,19 +38,15 @@ const AddClassModal = (props: AddClassFormProps) => {
 
   React.useEffect(() => {
     const loadTeachers = async () => {
-      console.log("Fetching teachers...");
       const data = await getTeacherName(sessionToken, schoolId);
-      console.log("API Response:", data);
 
       if (data.result?.items) {
-        console.log("Teachers data:", data.result.items);
         setTeachers(data.result.items);
       }
     };
     loadTeachers();
   }, [sessionToken]);
 
-  console.log("Current teachers state:", teachers);
 
   const handleFormSubmit = async (body: IAddClassData) => {
     await useAddClass({
@@ -87,9 +83,6 @@ const AddClassModal = (props: AddClassFormProps) => {
     },
   });
 
-  console.log("Formik values:", formik.values);
-  console.log("Formik errors:", formik.errors);
-  console.log("Formik isValid:", formik.isValid);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

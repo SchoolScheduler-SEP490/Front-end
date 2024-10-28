@@ -1,4 +1,4 @@
-import { IAddTeacherData, ITeacherTableData,IUpdateTeacherRequestBody  } from "./constants";
+import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
   
   export const deleteTeacherById = async (
     api: string,

@@ -24,6 +24,7 @@ import { ICommonOption } from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IClassTableData } from "../_libs/constants";
 import AddClassModal from "./add_class";
+import DeleteClassModal from "./delete_class";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -377,6 +378,13 @@ const ClassTable = (props: IClassTableProps) => {
         open={openAddForm}
         onClose={setOpenAddForm}
         mutate={mutate}      
+        />
+        <DeleteClassModal 
+        open={openDeleteModal}
+        onClose={setOpenDeleteModal}
+        className={selectedRow?.className ?? "Không xác định"}
+        classId={selectedRow?.id ?? 0}
+        mutate={mutate}       
         />
       </Paper>
     </Box>
