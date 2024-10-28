@@ -1,5 +1,5 @@
 import useNotify from '@/hooks/useNotify';
-import { IAddTeacherData } from '../_libs/contants';
+import { IAddTeacherData } from '../_libs/constants';
 import { addTeacher } from '../_libs/apiTeacher';
 
 interface IAddTeacherProps {

@@ -6,7 +6,7 @@ import TeacherTable from "./_components/teacher_table";
 import useTeacherData from "./_hooks/useTeacherData";
 import TeacherTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
-import { ITeacher, ITeacherTableData } from "./_libs/contants";
+import { ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 
 export default function SMTeacher() {
