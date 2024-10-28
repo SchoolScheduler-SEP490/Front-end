@@ -38,13 +38,9 @@ const useUpdateSubject = async (props: ICreateSubjectProps) => {
 	try {
 		// Sử dụng mutate với POST request
 		const endpoint = getUpdateSubjectApi({ subjectId });
-		response = await mutate(
-			endpoint,
-			updateSubject(`${apiUrl}/api/subjects/${subjectId}`),
-			{
-				revalidate: true,
-			}
-		);
+		response = await mutate(endpoint, updateSubject(endpoint), {
+			revalidate: true,
+		});
 		useNotify({
 			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
 			type: response?.status === 200 ? 'success' : 'error',

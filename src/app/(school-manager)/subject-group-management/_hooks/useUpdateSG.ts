@@ -1,27 +1,32 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { ICreateSubjectRequestBody } from '../_libs/constants';
-import { getCreateSubjectApi } from '../_libs/apis';
+import { getUpdateSubjectGroupApi } from '../_libs/apis';
+import { IUpdateSubjectGroupRequest } from '../_libs/constants';
 
 interface ICreateSubjectProps {
-	schoolId: string;
+	subjectGroupId: number;
 	sessionToken: string;
-	formData: ICreateSubjectRequestBody[];
+	formData: IUpdateSubjectGroupRequest;
 }
 
-const useCreateSubject = async (props: ICreateSubjectProps) => {
-	const { schoolId, formData, sessionToken } = props;
+const useUpdateSubjectGroup = async (props: ICreateSubjectProps) => {
+	const { subjectGroupId, formData, sessionToken } = props;
+	const endpoint = getUpdateSubjectGroupApi({ subjectGroupId });
 	let response;
 
-	async function createSubject(url: string) {
+	async function updateSubject(url: string) {
 		const response = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
-			method: 'POST',
-			body: JSON.stringify(formData),
+			method: 'PUT',
+			body: JSON.stringify({
+				...formData,
+				'total-slot-in-year': 0,
+				'slot-specialized': 0,
+			}),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -31,14 +36,13 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	}
 
 	try {
-		const endpoint = getCreateSubjectApi({ schoolId: schoolId });
 		// Sử dụng mutate với POST request
-		response = await mutate(endpoint, createSubject(endpoint), {
+		response = await mutate(endpoint, updateSubject(endpoint), {
 			revalidate: true,
 		});
 		useNotify({
 			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-			type: response?.status === 201 ? 'success' : 'error',
+			type: response?.status === 200 ? 'success' : 'error',
 		});
 		return response;
 	} catch (err: any) {
@@ -49,4 +53,4 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	}
 };
 
-export default useCreateSubject;
+export default useUpdateSubjectGroup;

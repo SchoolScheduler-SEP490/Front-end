@@ -7,16 +7,59 @@ import {
 } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import { Typography } from '@mui/material';
+import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+import MuiAccordionSummary, {
+	AccordionSummaryProps,
+} from '@mui/material/AccordionSummary';
+import { styled } from '@mui/material/styles';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import '../styles/sm_sidenav.css';
 
+const Accordion = styled((props: AccordionProps) => (
+	<MuiAccordion disableGutters elevation={0} square {...props} />
+))(({ theme }) => ({
+	border: `1px solid ${theme.palette.divider}`,
+	'&:not(:last-child)': {
+		borderBottom: 0,
+	},
+	'&::before': {
+		display: 'none',
+	},
+}));
+
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+	<MuiAccordionSummary
+		expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.9rem' }} />}
+		{...props}
+	/>
+))(({ theme }) => ({
+	flexDirection: 'row-reverse',
+	'& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+		transform: 'rotate(90deg)',
+	},
+	'& .MuiAccordionSummary-content': {
+		marginLeft: theme.spacing(1.5),
+	},
+	...theme.applyStyles('dark', {
+		backgroundColor: 'rgba(255, 255, 255, .05)',
+	}),
+}));
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+	width: '100%',
+	borderTop: '1px solid rgba(0, 0, 0, .125)',
+}));
+
 const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
-	const [showDropdowns, setShowDropdowns] = useState<string[]>([]);
+	const [expanded, setExpanded] = useState<string[]>(['panel0']);
 	const { sessionToken, setSessionToken, setRefreshToken, setUserRole, setSchoolId } =
 		useAppContext();
 	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
@@ -53,7 +96,14 @@ const SMSidenav = () => {
 
 	useEffect(() => {}, []);
 
-	const toggleDropdown = (category: string) => {};
+	const toggleDropdown =
+		(panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+			if (newExpanded) {
+				setExpanded((prev: string[]) => [...prev, panel]);
+			} else {
+				setExpanded((prev: string[]) => prev.filter((item) => item !== panel));
+			}
+		};
 
 	return (
 		<div className='relative w-[16%] h-screen flex flex-col justify-start items-start gap-5 bg-white border-r-1 border-gray-400'>
@@ -65,50 +115,48 @@ const SMSidenav = () => {
 					Schedulify
 				</Link>
 			</div>
-			<div className='w-full h-fit py-[70px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
-				{SM_SIDENAV.map((category: ISMSidenav) => (
-					<div
-						key={`${category.category}-${Math.random}`}
-						className='w-full flex flex-col justify-start items-center'
+			<div className='w-full h-fit pb-[70px] pt-[50px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
+				{SM_SIDENAV.map((item: ISMSidenav, index: number) => (
+					<Accordion
+						expanded={expanded.includes(`panel${index}`)}
+						onChange={toggleDropdown(`panel${index}`)}
 					>
-						<div className='w-full h-fit pl-2 pr-5 py-2 flex flex-row justify-between items-center hover:bg-basic-gray-hover hover:cursor-pointer'>
-							<h3 className='text-primary-400 text-title-small-strong'>
-								{category.category}
-							</h3>
-							<Image
-								className='opacity-30'
-								src={'/images/icons/drop-arrow.png'}
-								alt='drop-arrow'
-								unoptimized={true}
-								width={13}
-								height={13}
-							/>
-						</div>
-						{category.items.map((item: ISMNavigation) => (
-							<div
-								key={item.name}
-								className={`w-[94%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 mx[2%] rounded-[5px] hover:cursor-pointer 
-									${currentPath === item.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
-								onClick={() => handleNavigate(item.url)}
-							>
-								<Image
-									className='opacity-60'
-									src={item.icon}
-									alt='sidebar-icon'
-									unoptimized={true}
-									width={23}
-									height={23}
-								/>
-								<p
-									className={`text-body-medium font-normal ${
-										currentPath === item.url ? ' !font-semibold' : ''
-									}`}
+						<AccordionSummary
+							aria-controls={`panel${index}d-content`}
+							id={`panel${index}d-header`}
+							className='!text-primary-500 !bg-basic-gray-hover'
+						>
+							<Typography>{item.category}</Typography>
+						</AccordionSummary>
+						<AccordionDetails>
+							{item.items.map((subItem: ISMNavigation) => (
+								<div
+									key={subItem.name}
+									className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 rounded-[3px] hover:cursor-pointer 
+									${currentPath === subItem.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
+									onClick={() => handleNavigate(subItem.url)}
 								>
-									{item.name}
-								</p>
-							</div>
-						))}
-					</div>
+									<Image
+										className='opacity-60'
+										src={subItem.icon}
+										alt='sidebar-icon'
+										unoptimized={true}
+										width={23}
+										height={23}
+									/>
+									<p
+										className={`text-body-medium font-normal ${
+											currentPath === subItem.url
+												? ' !font-semibold'
+												: ''
+										}`}
+									>
+										{subItem.name}
+									</p>
+								</div>
+							))}
+						</AccordionDetails>
+					</Accordion>
 				))}
 			</div>
 			<div className='absolute bottom-0 right-0 w-full h-fit flex justify-center items-center bg-white py-3'>

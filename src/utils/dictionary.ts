@@ -95,6 +95,9 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Refresh token invalid or expired time': 'Refresh token không hợp lệ hoặc đã hết hạn',
 	'Get account detail success.': 'Lấy thông tin tài khoản thành công',
 	'Update account detail success.': 'Cập nhật thông tin tài khoản thành công',
+
+	//Subject group messages
+	'The school year does not exist.': 'Không tìm thấy năm học',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

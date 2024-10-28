@@ -5,30 +5,40 @@ import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import * as React from 'react';
-import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
 import SubjectGroupTable from './_components/subject_group_table';
+import SubjectGroupTableSkeleton from './_components/table_skeleton';
 import useFetchSGData from './_hooks/useFetchSGData';
+import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
+import SubjectGroupFilterable from './_components/subject_group_filterable';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 	const { schoolId, sessionToken } = useAppContext();
+	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
+	const [subjectGroupTableData, setSubjectGroupTableData] = React.useState<
+		ISubjectGroupTableData[]
+	>([]);
+	const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
+	const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
+
 	const { data, error, isLoading, isValidating, mutate } = useFetchSGData({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		pageSize: rowsPerPage,
 		pageIndex: page + 1,
-		schoolYearId: 1, //Change this
+		schoolYearId: selectedYearId, //Change this
 	});
-	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
-	const [subjectGroupTableData, setSubjectGroupTableData] = React.useState<
-		ISubjectGroupTableData[]
-	>([]);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
 		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
 	};
+
+	React.useEffect(() => {
+		mutate({ schoolYearId: selectedYearId });
+	}, [selectedYearId]);
 
 	React.useEffect(() => {
 		mutate();
@@ -62,7 +72,6 @@ export default function SMSubject() {
 	if (isValidating) {
 		return (
 			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
-				<LoadingComponent loadingStatus={isLoading} />
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -70,15 +79,7 @@ export default function SMSubject() {
 						</h3>
 					</div>
 				</SMHeader>
-				<SubjectGroupTable
-					subjectGroupTableData={subjectGroupTableData ?? []}
-					page={page}
-					setPage={setPage}
-					rowsPerPage={rowsPerPage}
-					setRowsPerPage={setRowsPerPage}
-					totalRows={totalRows}
-					mutate={mutate}
-				/>
+				<SubjectGroupTableSkeleton />
 			</div>
 		);
 	}
@@ -86,7 +87,7 @@ export default function SMSubject() {
 	if (error) {
 		useNotify({
 			type: 'error',
-			message: error.message ?? 'Có lỗi xảy ra',
+			message: TRANSLATOR[error.Message] ?? 'Có lỗi xảy ra',
 		});
 	}
 
@@ -99,15 +100,31 @@ export default function SMSubject() {
 					</h3>
 				</div>
 			</SMHeader>
-			<SubjectGroupTable
-				subjectGroupTableData={subjectGroupTableData ?? []}
-				page={page}
-				setPage={setPage}
-				rowsPerPage={rowsPerPage}
-				setRowsPerPage={setRowsPerPage}
-				totalRows={totalRows}
-				mutate={mutate}
-			/>
+			<div
+				className={`w-full h-auto flex flex-row ${
+					isFilterable
+						? 'justify-start items-start'
+						: 'justify-center items-center'
+				} pt-5 px-[1.5vw] gap-[1vw]`}
+			>
+				<SubjectGroupTable
+					isFilterable={isFilterable}
+					setIsFilterable={setIsFilterable}
+					subjectGroupTableData={subjectGroupTableData ?? []}
+					page={page}
+					setPage={setPage}
+					rowsPerPage={rowsPerPage}
+					setRowsPerPage={setRowsPerPage}
+					totalRows={totalRows}
+					mutate={mutate}
+				/>
+				<SubjectGroupFilterable
+					open={isFilterable}
+					setOpen={setIsFilterable}
+					selectedYearId={selectedYearId}
+					setSelectedYearId={setSelectedYearId}
+				/>
+			</div>
 		</div>
 	);
 }

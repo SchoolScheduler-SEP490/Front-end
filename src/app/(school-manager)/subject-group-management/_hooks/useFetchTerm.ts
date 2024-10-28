@@ -1,10 +1,14 @@
 import useSWR from 'swr';
-import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
-import { getFetchSubjectGroupApi } from '../_libs/apis';
+import { getFetchSubjectGroupApi, getFetchTermApi } from '../_libs/apis';
 
-const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
-	const { sessionToken } = props;
-	const endpoint = getFetchSubjectGroupApi(props);
+interface IFetchTermProps {
+	sessionToken: string;
+	schoolId: string;
+}
+
+const useFetchTerm = (props: IFetchTermProps) => {
+	const { sessionToken, schoolId } = props;
+	const endpoint = getFetchTermApi({ schoolId });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -14,7 +18,7 @@ const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
 		});
 		const data = await response.json();
 		if (!response.ok) {
-			throw new Error(data);
+			throw new Error(data.message);
 		}
 		return data;
 	}
@@ -28,4 +32,4 @@ const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
 	return { data, error, isLoading, isValidating, mutate };
 };
 
-export default useFetchSGData;
+export default useFetchTerm;

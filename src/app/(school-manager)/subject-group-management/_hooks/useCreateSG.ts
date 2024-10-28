@@ -1,17 +1,18 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { ICreateSubjectRequestBody } from '../_libs/constants';
-import { getCreateSubjectApi } from '../_libs/apis';
+import { getCreateSubjectGroupApi } from '../_libs/apis';
+import { ICreateSubjectGroupRequest } from '../_libs/constants';
 
 interface ICreateSubjectProps {
 	schoolId: string;
 	sessionToken: string;
-	formData: ICreateSubjectRequestBody[];
+	formData: ICreateSubjectGroupRequest[];
 }
 
-const useCreateSubject = async (props: ICreateSubjectProps) => {
+const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {
 	const { schoolId, formData, sessionToken } = props;
+	const endpoint = getCreateSubjectGroupApi({ schoolId });
 	let response;
 
 	async function createSubject(url: string) {
@@ -31,7 +32,6 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	}
 
 	try {
-		const endpoint = getCreateSubjectApi({ schoolId: schoolId });
 		// Sử dụng mutate với POST request
 		response = await mutate(endpoint, createSubject(endpoint), {
 			revalidate: true,
@@ -49,4 +49,4 @@ const useCreateSubject = async (props: ICreateSubjectProps) => {
 	}
 };
 
-export default useCreateSubject;
+export default useCreateSubjectGroup;
