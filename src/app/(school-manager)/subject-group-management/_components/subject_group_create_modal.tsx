@@ -3,22 +3,37 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
-import { SUBJECT_GROUP_TYPE, IPaginatedResponse } from '@/utils/constants';
+import { CLASSGROUP_STRING_TYPE, SUBJECT_GROUP_TYPE } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, IconButton, Modal, TextField, Typography } from '@mui/material';
+import {
+	Box,
+	FormControl,
+	FormHelperText,
+	IconButton,
+	InputLabel,
+	MenuItem,
+	Modal,
+	Select,
+	TextField,
+	Typography,
+} from '@mui/material';
+import { Theme, useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { KeyedMutator, mutate } from 'swr';
-import { getFetchSubjectApi } from '../../subject-management/_libs/apis';
+import { KeyedMutator } from 'swr';
 import useCreateSubjectGroup from '../_hooks/useCreateSG';
+import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import {
 	ICreateSubjectGroupRequest,
 	ICreateSubjectGroupResponse,
 	IDropdownOption,
+	ISchoolYearResponse,
 	ISubjectOptionResponse,
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
+import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 
 const style = {
 	position: 'absolute',
@@ -36,32 +51,69 @@ interface IAddSubjectModalProps {
 	subjectGroupMutator: KeyedMutator<any>;
 }
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+			scrollbars: 'none',
+		},
+	},
+};
+function getStyles(
+	selected: IDropdownOption<number>,
+	personName: IDropdownOption<number>[],
+	theme: Theme
+) {
+	return {
+		fontWeight: personName.includes(selected)
+			? theme.typography.fontWeightMedium
+			: theme.typography.fontWeightRegular,
+	};
+}
+
 const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupMutator } = props;
+	const theme = useTheme();
 	const { schoolId, sessionToken } = useAppContext();
 	const [response, setResponse] = useState<ICreateSubjectGroupResponse | undefined>(
 		undefined
 	);
-	const [requiredSubjects, setRequiredSubjects] = useState<IDropdownOption<number>[]>(
-		[]
-	);
+	const [specialisedSubjects, setSpecialisedSubjects] = useState<
+		IDropdownOption<number>[]
+	>([]);
 	const [optionalSubjects, setOptionalSubjects] = useState<IDropdownOption<number>[]>(
 		[]
 	);
+	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>(
+		[]
+	);
+
+	const { data: requiredSubjectsData, error: requiredError } = useFetchSubjectOptions({
+		sessionToken: sessionToken,
+		schoolId: schoolId,
+		isRequired: true,
+	});
+	const { data: optionalSubjectsData, error: optionalError } = useFetchSubjectOptions({
+		sessionToken: sessionToken,
+		schoolId: schoolId,
+		isRequired: false,
+	});
+	const { data: schoolYearData, error: schoolYearError } = useFetchSchoolYear();
 
 	const handleClose = () => {
-		formik.handleReset;
+		formik.handleReset(formik.initialValues);
 		setOpen(false);
 	};
 
 	const handleFormSubmit = async (body: ICreateSubjectGroupRequest) => {
 		setResponse(
 			await useCreateSubjectGroup({
-				formData: [
-					{
-						...body,
-					} as ICreateSubjectGroupRequest,
-				],
+				formData: {
+					...body,
+				} as ICreateSubjectGroupRequest,
 				schoolId: schoolId,
 				sessionToken: sessionToken,
 			})
@@ -86,57 +138,63 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		},
 	});
 
-	const fetchRequiredData = async () => {
-		const endpoint = getFetchSubjectApi({
-			schoolId,
-			pageIndex: 1,
-			pageSize: 1000,
-			isRequired: true,
-		});
-		const response = await mutate(endpoint);
-		if (response.status !== 200) {
+	useEffect(() => {
+		if (optionalError || requiredError || schoolYearError) {
 			useNotify({
-				message: 'Lấy thông tin môn học thất bại',
 				type: 'error',
+				message:
+					TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
+					'Có lỗi xảy ra khi tải dữ liệu môn học',
 			});
-		} else {
-			const data: IPaginatedResponse<ISubjectOptionResponse> =
-				await response.json();
-			const requiredSubjects = data.result.items.map((subject) => ({
-				value: subject.id,
-				label: subject['subject-name'],
-			}));
-			alert(JSON.stringify(data));
-			setRequiredSubjects(requiredSubjects);
 		}
-	};
-
-	const fetchOptionalData = async () => {
-		const endpoint = getFetchSubjectApi({
-			schoolId,
-			pageIndex: 1,
-			pageSize: 1000,
-			isRequired: false,
-		});
-		const response = await mutate(endpoint);
-		if (response.status !== 200) {
-			useNotify({
-				message: 'Lấy thông tin môn học thất bại',
-				type: 'error',
-			});
-		} else {
-			const data: IPaginatedResponse<ISubjectOptionResponse> =
-				await response.json();
-			const optionalSubjects = data.result.items.map((subject) => ({
-				value: subject.id,
-				label: subject['subject-name'],
-			}));
-			alert(JSON.stringify(data));
+		if (requiredSubjectsData?.status === 200) {
+			const requiredSubjects: IDropdownOption<number>[] =
+				requiredSubjectsData.result.items.map(
+					(subject: ISubjectOptionResponse) => ({
+						label: subject['subject-name'],
+						value: subject.id,
+					})
+				);
+			setSpecialisedSubjects(requiredSubjects);
+		}
+		if (optionalSubjectsData?.status === 200) {
+			const optionalSubjects: IDropdownOption<number>[] =
+				optionalSubjectsData.result.items.map(
+					(subject: ISubjectOptionResponse) => ({
+						label: subject['subject-name'],
+						value: subject.id,
+					})
+				);
 			setOptionalSubjects(optionalSubjects);
 		}
-	};
+		if (schoolYearData?.status === 200) {
+			const schoolYears: IDropdownOption<number>[] = schoolYearData.result.map(
+				(year: ISchoolYearResponse) => ({
+					label: `${year['start-year']} - ${year['end-year']}`,
+					value: year.id,
+				})
+			);
+			setSchoolYearOptions(schoolYears);
+		}
+	}, [requiredSubjectsData, optionalSubjectsData]);
 
-	useEffect(() => {});
+	useEffect(() => {
+		if (formik.values['elective-subject-ids'].length > 0) {
+			const selectedSubjects: IDropdownOption<number>[] = optionalSubjects.filter(
+				(subject) => formik.values['elective-subject-ids'].includes(subject.value)
+			);
+			if (requiredSubjectsData?.result.items ?? false) {
+				const initialData: IDropdownOption<number>[] =
+					requiredSubjectsData.result.items.map(
+						(subject: ISubjectOptionResponse) => ({
+							label: subject['subject-name'],
+							value: subject.id,
+						})
+					);
+				setSpecialisedSubjects([...initialData, ...selectedSubjects]);
+			}
+		}
+	}, [formik.values['elective-subject-ids']]);
 
 	return (
 		<Modal
@@ -149,14 +207,14 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			<Box sx={style}>
 				<div
 					id='modal-header'
-					className='w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3'
+					className='w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3 py-2'
 				>
 					<Typography
 						variant='h6'
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Thêm môn học
+						Thêm tổ hợp môn
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -276,133 +334,190 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
 							<h3 className=' h-full flex justify-start '>Môn tự chọn</h3>
-							<TextField
-								select
-								className='w-[70%]'
-								id='elective-subject-ids'
-								name='elective-subject-ids'
-								label='Chọn môn tự chọn'
-								value={formik.values['elective-subject-ids']}
-								onChange={formik.handleChange('elective-subject-ids')}
-								onBlur={formik.handleBlur}
-								slotProps={{
-									select: {
-										native: true,
-									},
-								}}
-								error={
-									formik.touched['elective-subject-ids'] &&
-									Boolean(formik.errors['elective-subject-ids'])
-								}
-								helperText={
-									formik.touched['elective-subject-ids'] &&
-									formik.errors['elective-subject-ids']
-								}
-								variant='standard'
-							>
-								{optionalSubjects.map((option) => (
-									<option key={option.value} value={option.label}>
-										{option.label}
-									</option>
-								))}
-							</TextField>
+							<FormControl sx={{ width: '70%' }}>
+								<InputLabel id='elective-label' variant='standard'>
+									Thêm môn tự chọn
+								</InputLabel>
+								<Select
+									labelId='elective-label'
+									id='elective'
+									multiple
+									variant='standard'
+									value={formik.values['elective-subject-ids']}
+									onChange={(event) =>
+										formik.setFieldValue(
+											'elective-subject-ids',
+											event.target.value
+										)
+									}
+									onBlur={formik.handleBlur('elective-subject-ids')}
+									error={
+										formik.touched['elective-subject-ids'] &&
+										Boolean(formik.errors['elective-subject-ids'])
+									}
+									MenuProps={MenuProps}
+									sx={{ width: '100%' }}
+								>
+									{optionalSubjects.map((item, index) => (
+										<MenuItem
+											key={item.label + index}
+											value={item.value}
+											style={getStyles(
+												item,
+												optionalSubjects,
+												theme
+											)}
+										>
+											{item.label}
+										</MenuItem>
+									))}
+								</Select>
+								{formik.touched['elective-subject-ids'] &&
+									formik.errors['elective-subject-ids'] && (
+										<FormHelperText error variant='standard'>
+											{formik.errors['elective-subject-ids']}
+										</FormHelperText>
+									)}
+							</FormControl>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
 							<h3 className=' h-full flex justify-start '>Môn chuyên đề</h3>
-							<TextField
-								select
-								className='w-[70%]'
-								id='specialized-subject-ids'
-								name='specialized-subject-ids'
-								label='Chọn chuyên đề'
-								value={formik.values['specialized-subject-ids']}
-								onChange={formik.handleChange('specialized-subject-ids')}
-								onBlur={formik.handleBlur}
-								slotProps={{
-									select: {
-										native: true,
-									},
-								}}
-								error={
-									formik.touched['specialized-subject-ids'] &&
-									Boolean(formik.errors['specialized-subject-ids'])
-								}
-								helperText={
-									formik.touched['specialized-subject-ids'] &&
-									formik.errors['specialized-subject-ids']
-								}
-								variant='standard'
-							>
-								{optionalSubjects.map((option) => (
-									<option key={option.value} value={option.label}>
-										{option.label}
-									</option>
-								))}
-							</TextField>
+							<FormControl sx={{ width: '70%' }}>
+								<InputLabel id='specialised-label' variant='standard'>
+									Thêm môn chuyên đề
+								</InputLabel>
+								<Select
+									labelId='specialised-label'
+									id='specialised'
+									multiple
+									variant='standard'
+									value={formik.values['specialized-subject-ids']}
+									onChange={(event) =>
+										formik.setFieldValue(
+											'specialized-subject-ids',
+											event.target.value
+										)
+									}
+									onBlur={formik.handleBlur('specialized-subject-ids')}
+									error={
+										formik.touched['specialized-subject-ids'] &&
+										Boolean(formik.errors['specialized-subject-ids'])
+									}
+									MenuProps={MenuProps}
+									sx={{ width: '100%' }}
+								>
+									{specialisedSubjects.map((item, index) => (
+										<MenuItem
+											key={item.label + index}
+											value={item.value}
+											style={getStyles(
+												item,
+												optionalSubjects,
+												theme
+											)}
+										>
+											{item.label}
+										</MenuItem>
+									))}
+								</Select>
+								{formik.touched['specialized-subject-ids'] &&
+									formik.errors['specialized-subject-ids'] && (
+										<FormHelperText error variant='standard'>
+											{formik.errors['specialized-subject-ids']}
+										</FormHelperText>
+									)}
+							</FormControl>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
 							<h3 className=' h-full flex justify-start '>Khối áp dụng</h3>
-							<TextField
-								select
-								className='w-[70%]'
-								id='grade'
-								name='grade'
-								label='Chọn khối áp dụng'
-								value={formik.values.grade}
-								onChange={formik.handleChange('grade')}
-								onBlur={formik.handleBlur}
-								slotProps={{
-									select: {
-										native: true,
-									},
-								}}
-								error={
-									formik.touched.grade && Boolean(formik.errors.grade)
-								}
-								helperText={formik.touched.grade && formik.errors.grade}
-								variant='standard'
-							>
-								{SUBJECT_GROUP_TYPE.map((option) => (
-									<option key={option.value} value={option.key}>
-										{option.key}
-									</option>
-								))}
-							</TextField>
+							<FormControl sx={{ width: '70%' }}>
+								<InputLabel id='grade-label' variant='standard'>
+									Thêm khối áp dụng
+								</InputLabel>
+								<Select
+									labelId='grade-label'
+									id='grade'
+									variant='standard'
+									value={formik.values.grade}
+									onChange={(event) =>
+										formik.setFieldValue('grade', event.target.value)
+									}
+									onBlur={formik.handleBlur('grade')}
+									error={
+										formik.touched.grade &&
+										Boolean(formik.errors.grade)
+									}
+									MenuProps={MenuProps}
+									sx={{ width: '100%' }}
+								>
+									{CLASSGROUP_STRING_TYPE.map((item, index) => (
+										<MenuItem
+											key={item.key + index}
+											value={item.value}
+										>
+											{item.key}
+										</MenuItem>
+									))}
+								</Select>
+								{formik.touched.grade && formik.errors.grade && (
+									<FormHelperText error variant='standard'>
+										{formik.errors.grade}
+									</FormHelperText>
+								)}
+							</FormControl>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
 							<h3 className=' h-full flex justify-start '>
 								Năm học áp dụng
 							</h3>
-							<TextField
-								select
-								className='w-[70%]'
-								id='school-year-id'
-								name='school-year-id'
-								label='Chọn năm học áp dụng'
-								value={formik.values['school-year-id']}
-								onChange={formik.handleChange('school-year-id')}
-								onBlur={formik.handleBlur}
-								slotProps={{
-									select: {
-										native: true,
-									},
-								}}
-								error={
-									formik.touched['school-year-id'] &&
-									Boolean(formik.errors['school-year-id'])
-								}
-								helperText={
-									formik.touched['school-year-id'] &&
-									formik.errors['school-year-id']
-								}
-								variant='standard'
-							>
-								{SUBJECT_GROUP_TYPE.map((option) => (
-									<option key={option.value} value={option.key}>
-										{option.key}
-									</option>
-								))}
-							</TextField>
+							<FormControl sx={{ width: '70%' }}>
+								<InputLabel id='school-year-label' variant='standard'>
+									Thêm năm học áp dụng
+								</InputLabel>
+								<Select
+									labelId='school-year-label'
+									id='school-year'
+									variant='standard'
+									value={
+										formik.values['school-year-id'] === 0
+											? ''
+											: formik.values['school-year-id']
+									}
+									onChange={(event) =>
+										formik.setFieldValue(
+											'school-year-id',
+											event.target.value
+										)
+									}
+									onBlur={formik.handleBlur('school-year-id')}
+									error={
+										formik.touched['school-year-id'] &&
+										Boolean(formik.errors['school-year-id'])
+									}
+									MenuProps={MenuProps}
+									sx={{ width: '100%' }}
+								>
+									{schoolYearOptions.map((item, index) => (
+										<MenuItem
+											key={item.label + index}
+											value={item.value}
+											style={getStyles(
+												item,
+												optionalSubjects,
+												theme
+											)}
+										>
+											{item.label}
+										</MenuItem>
+									))}
+								</Select>
+								{formik.touched['school-year-id'] &&
+									formik.errors['school-year-id'] && (
+										<FormHelperText error variant='standard'>
+											{formik.errors['school-year-id']}
+										</FormHelperText>
+									)}
+							</FormControl>
 						</div>
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>

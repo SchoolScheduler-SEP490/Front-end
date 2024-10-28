@@ -76,3 +76,37 @@ export const getDeleteSubjectGroupApi = ({
 }) => {
 	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
 };
+
+// Fetch Subject Option API
+export const getFetchSubjectOptionsApi = ({
+	localApi,
+	schoolId,
+	pageSize,
+	pageIndex,
+	subjectName,
+	isRequired,
+	deletedIncluded,
+}: {
+	localApi?: string;
+	schoolId: string;
+	pageSize?: number;
+	pageIndex?: number;
+	subjectName?: string;
+	isRequired: boolean;
+	deletedIncluded?: boolean;
+}): string => {
+	const queryString = new URLSearchParams({
+		pageSize: pageSize ? pageSize.toString() : '100',
+		pageIndex: pageIndex ? pageIndex.toString() : '1',
+		...(subjectName && { subjectName: subjectName }),
+		...(isRequired !== undefined && { isRequired: isRequired.toString() }),
+		...(deletedIncluded !== undefined && {
+			includeDeleted: deletedIncluded.toString(),
+		}),
+	}).toString();
+	return `${localApi ?? api}/api/subjects/${schoolId}/subjects?${queryString}`;
+};
+
+export const getFetchSchoolYearApi = (localApi?: string) => {
+	return `${localApi ?? api}/api/school-years`;
+};

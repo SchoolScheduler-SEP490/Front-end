@@ -51,7 +51,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 	);
 
 	const handleClose = () => {
-		formik.handleReset;
+		formik.handleReset(formik.initialValues);
 		setOpen(false);
 	};
 
