@@ -7,7 +7,7 @@ import { ICreateSubjectGroupRequest } from '../_libs/constants';
 interface ICreateSubjectProps {
 	schoolId: string;
 	sessionToken: string;
-	formData: ICreateSubjectGroupRequest[];
+	formData: ICreateSubjectGroupRequest;
 }
 
 const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {

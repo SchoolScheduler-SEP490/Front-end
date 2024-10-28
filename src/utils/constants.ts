@@ -73,3 +73,9 @@ export const SUBJECT_GROUP_TYPE: { key: string; value: number }[] = [
 	{ key: 'BAT_BUOC', value: 3 },
 	{ key: 'TU_CHON', value: 4 },
 ];
+
+export const CLASSGROUP_STRING_TYPE: { key: string; value: string }[] = [
+	{ key: 'Khối 10', value: 'KHOI_10' },
+	{ key: 'Khối 11', value: 'KHOI_11' },
+	{ key: 'Khối 12', value: 'KHOI_12' },
+];

@@ -21,12 +21,12 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
+import useUpdateSubject from '../_hooks/useUpdateSubject';
 import {
-	IUpdateSubjectRequestBody,
 	ICreateSubjectResponseBody,
 	ISubject,
+	IUpdateSubjectRequestBody,
 } from '../_libs/constants';
-import useUpdateSubject from '../_hooks/useUpdateSubject';
 import { updateSubjectSchema } from '../_libs/subject_schema';
 
 const style = {
@@ -59,7 +59,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	);
 
 	const handleClose = () => {
-		formik.handleReset;
+		formik.handleReset(formik.initialValues);
 		setOpen(false);
 	};
 

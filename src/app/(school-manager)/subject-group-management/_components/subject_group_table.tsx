@@ -250,7 +250,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
-		<div className='w-[80%] h-fit flex flex-row justify-center items-center gap-6'>
+		<div className='w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar

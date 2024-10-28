@@ -86,3 +86,10 @@ export interface ISubjectOptionResponse {
 	'is-deleted': boolean;
 	'subject-group-type': string;
 }
+
+export interface ISchoolYearResponse {
+	id: number;
+	'start-year': string;
+	'end-year': string;
+	'school-year-code': string;
+}

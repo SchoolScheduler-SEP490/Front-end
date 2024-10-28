@@ -98,6 +98,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	//Subject group messages
 	'The school year does not exist.': 'Không tìm thấy năm học',
+	'Add subject group success.': 'Thêm Tổ hợp môn thành công',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};
