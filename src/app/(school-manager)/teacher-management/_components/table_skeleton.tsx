@@ -10,6 +10,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TableSortLabel,
   Toolbar,
@@ -19,6 +20,7 @@ import { ITeacherTableData } from "../_libs/contants";
 import { visuallyHidden } from "@mui/utils";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import Image from "next/image";
 
 interface HeadCell {
   id: keyof ITeacherTableData;
@@ -166,12 +168,38 @@ const TeacherTableSkeleton = () => {
                       <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
+                      <TableCell width={80}>
+												<IconButton
+													color='success'
+													sx={{ zIndex: 10 }}
+													id={`basic-button${index}`}
+													aria-controls={`basic-menu${index}`}
+													aria-haspopup='true'
+												>
+													<Image
+														src='/images/icons/menu.png'
+														alt='notification-icon'
+														unoptimized={true}
+														width={20}
+														height={20}
+													/>
+												</IconButton>
+											</TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={10}
+            rowsPerPage={5}
+            page={1}
+            onPageChange={() => {}}
+            onRowsPerPageChange={() => {}}
+					/>
         </Paper>
       </Box>
   );
