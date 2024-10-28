@@ -1,7 +1,6 @@
 'use client';
 
 import { useAppContext } from '@/context/app_provider';
-import { ICommonResponse } from '@/utils/constants';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	FormControl,
@@ -15,8 +14,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
-import useFetchTerm from '../_hooks/useFetchTerm';
-import { IDropdownOption, IFetchTermResponse } from '../_libs/constants';
+import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
+import { IDropdownOption, ISchoolYearResponse } from '../_libs/constants';
 
 interface ISubjectGroupFilterableProps {
 	open: boolean;
@@ -30,21 +29,17 @@ interface ISubjectGroupFilterableProps {
 const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
 	const { open, setOpen, onFilter, selectedYearId, setSelectedYearId } = props;
 	const { sessionToken, schoolId } = useAppContext();
-	const { data, mutate } = useFetchTerm({
-		sessionToken: sessionToken,
-		schoolId: schoolId,
-	});
+	const { data, error } = useFetchSchoolYear();
 	const [yearStudyOptions, setYearStudyOptions] = useState<IDropdownOption<number>[]>(
 		[]
 	);
 
 	useEffect(() => {
 		if (data?.status === 200) {
-			const response: ICommonResponse<IFetchTermResponse[]> = { ...data };
-			const yearStudyOptions: IDropdownOption<number>[] = response.result.map(
-				(item) => ({
+			const yearStudyOptions: IDropdownOption<number>[] = data.result.map(
+				(item: ISchoolYearResponse) => ({
 					value: item.id,
-					label: `${item.name} | ${item['school-year-start']} - ${item['school-year-end']}`,
+					label: `${item['start-year']} - ${item['end-year']}`,
 				})
 			);
 			setYearStudyOptions(yearStudyOptions);

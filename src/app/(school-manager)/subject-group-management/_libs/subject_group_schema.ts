@@ -12,10 +12,7 @@ export const createSubjectGroupSchema = yup.object().shape({
 		.matches(/^[A-Z0-9À-ỹ]+$/, 'Mã Tổ hợp môn phải là chữ cái in hoa và số')
 		.max(10, 'Mã Tổ hợp môn tối đa 10 ký tự'),
 
-	'group-description': yup
-		.string()
-		.required('Mô tả Tổ hợp môn là bắt buộc')
-		.max(255, 'Mô tả Tổ hợp môn tối đa 255 ký tự'),
+	'group-description': yup.string().max(255, 'Mô tả Tổ hợp môn tối đa 255 ký tự'),
 
 	grade: yup.string().required('Khối lớp là bắt buộc'),
 

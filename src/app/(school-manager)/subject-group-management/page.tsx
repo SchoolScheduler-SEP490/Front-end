@@ -1,16 +1,15 @@
 'use client';
 
-import LoadingComponent from '@/commons/loading';
 import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
+import { TRANSLATOR } from '@/utils/dictionary';
 import * as React from 'react';
+import SubjectGroupFilterable from './_components/subject_group_filterable';
 import SubjectGroupTable from './_components/subject_group_table';
 import SubjectGroupTableSkeleton from './_components/table_skeleton';
 import useFetchSGData from './_hooks/useFetchSGData';
 import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
-import SubjectGroupFilterable from './_components/subject_group_filterable';
-import { TRANSLATOR } from '@/utils/dictionary';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -52,7 +51,7 @@ export default function SMSubject() {
 						subjectGroupName: record['group-name'],
 						subjectGroupCode: record['group-code'],
 						subjectGroupKey: record.id,
-						subjectGroupTypeName: record['subject-group-type-name'],
+						grade: record.grade,
 					} as ISubjectGroupTableData)
 			);
 			setSubjectGroupTableData(tableData);
