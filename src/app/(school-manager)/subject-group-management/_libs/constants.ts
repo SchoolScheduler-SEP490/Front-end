@@ -14,7 +14,7 @@ export interface ISubjectGroupTableData {
 	id: number;
 	subjectGroupName: string;
 	subjectGroupCode: string;
-	subjectGroupTypeName: string;
+	grade: string;
 	subjectGroupKey: number;
 }
 
@@ -55,19 +55,6 @@ export interface IUpdateSubjectGroupRequest {
 	'school-year-id': number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
-}
-
-// Fetch Term Data response
-export interface IFetchTermResponse {
-	id: number;
-	name: string;
-	'start-date': string;
-	'end-date': string;
-	'school-year-id': number;
-	'school-year-code': string;
-	'school-year-start': string;
-	'school-year-end': string;
-	'school-id': number;
 }
 
 export interface IDropdownOption<T> {

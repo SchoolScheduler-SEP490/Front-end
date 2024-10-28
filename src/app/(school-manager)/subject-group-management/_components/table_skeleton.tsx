@@ -44,10 +44,10 @@ const headCells: readonly HeadCell[] = [
 		label: 'Mã tổ hợp',
 	},
 	{
-		id: 'subjectGroupTypeName' as keyof ISubjectGroupTableData,
+		id: 'grade' as keyof ISubjectGroupTableData,
 		centered: false,
 		disablePadding: false,
-		label: 'Loại tổ hợp',
+		label: 'Khối áp dụng',
 	},
 ];
 
@@ -139,7 +139,7 @@ const SubjectGroupTableSkeleton = () => {
 											</TableCell>
 											<TableCell
 												align='left'
-												width={250}
+												width={300}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
@@ -157,7 +157,7 @@ const SubjectGroupTableSkeleton = () => {
 													variant='text'
 												/>
 											</TableCell>
-											<TableCell align='left'>
+											<TableCell align='left' width={200}>
 												<Skeleton
 													animation='wave'
 													variant='text'

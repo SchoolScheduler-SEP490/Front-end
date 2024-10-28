@@ -1,7 +1,7 @@
 'use client';
 
 import useNotify from '@/hooks/useNotify';
-import { ICommonOption } from '@/utils/constants';
+import { CLASSGROUP_STRING_TYPE, ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
@@ -21,7 +21,6 @@ import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ISubjectGroupTableData } from '../_libs/constants';
-import SubjectGroupFilterable from './subject_group_filterable';
 import CreateSubjectGroupModal from './subject_group_create_modal';
 import DeleteSubjectGroupModal from './subject_group_delete_modal';
 
@@ -76,10 +75,10 @@ const headCells: readonly HeadCell[] = [
 		label: 'Mã tổ hợp',
 	},
 	{
-		id: 'subjectGroupTypeName' as keyof ISubjectGroupTableData,
+		id: 'grade' as keyof ISubjectGroupTableData,
 		centered: false,
 		disablePadding: false,
-		label: 'Loại tổ hợp',
+		label: 'Khối áp dụng',
 	},
 ];
 
@@ -326,9 +325,13 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													: '- - - - -'}
 											</TableCell>
 											<TableCell align='left' width={200}>
-												{row.subjectGroupTypeName
-													? row.subjectGroupTypeName
-													: '- - - - -'}
+												{row.grade
+													? CLASSGROUP_STRING_TYPE.find(
+															(item) =>
+																item.value ===
+																row.grade.toLocaleLowerCase()
+													  )?.key
+													: '- - -'}
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton
