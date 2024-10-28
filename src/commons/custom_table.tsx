@@ -1,7 +1,5 @@
 'use client';
 
-import SMHeader from '@/commons/school_manager/header';
-import { inter } from '@/utils/fonts';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Box from '@mui/material/Box';
@@ -19,7 +17,6 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
 import * as React from 'react';
 

@@ -21,6 +21,9 @@ import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ISubjectGroupTableData } from '../_libs/constants';
+import SubjectGroupFilterable from './subject_group_filterable';
+import CreateSubjectGroupModal from './subject_group_create_modal';
+import DeleteSubjectGroupModal from './subject_group_delete_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -56,14 +59,14 @@ interface HeadCell {
 const headCells: readonly HeadCell[] = [
 	{
 		id: 'id' as keyof ISubjectGroupTableData,
-		centered: true,
-		disablePadding: true,
+		centered: false,
+		disablePadding: false,
 		label: 'STT',
 	},
 	{
 		id: 'subjectGroupName' as keyof ISubjectGroupTableData,
-		centered: true,
-		disablePadding: true,
+		centered: false,
+		disablePadding: false,
 		label: 'Tên khối',
 	},
 	{
@@ -128,7 +131,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 								>
 									{order === 'desc'
 										? 'sorted descending'
-										: 'sorted 1ascending'}
+										: 'sorted ascending'}
 								</Box>
 							) : null}
 						</TableSortLabel>
@@ -150,11 +153,14 @@ interface ISubjectGroupTableProps {
 	setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
 	totalRows?: number;
 	mutate: KeyedMutator<any>;
+	isFilterable: boolean;
+	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
 	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
-	{ img: '/images/icons/delete.png', title: 'Xóa môn học' },
+	// { img: '/images/icons/checklist.png', title: 'Áp dụng Tổ hợp môn' },
+	{ img: '/images/icons/delete.png', title: 'Xóa Tổ hợp môn' },
 ];
 
 const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
@@ -166,6 +172,8 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		setRowsPerPage,
 		totalRows,
 		mutate,
+		isFilterable,
+		setIsFilterable,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
@@ -180,6 +188,10 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	>();
 
 	const open = Boolean(anchorEl);
+
+	const handleFilterable = () => {
+		setIsFilterable(!isFilterable);
+	};
 
 	const handleClick = (
 		event: React.MouseEvent<HTMLButtonElement>,
@@ -238,7 +250,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
-		<div className='w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]'>
+		<div className='w-[80%] h-fit flex flex-row justify-center items-center gap-6'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
@@ -251,7 +263,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 						]}
 					>
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Môn học
+							Tổ hợp môn
 						</h2>
 						<Tooltip title='Thêm Môn học'>
 							<IconButton onClick={handleAddSubject}>
@@ -259,7 +271,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 							</IconButton>
 						</Tooltip>
 						<Tooltip title='Lọc danh sách'>
-							<IconButton>
+							<IconButton onClick={handleFilterable}>
 								<FilterListIcon />
 							</IconButton>
 						</Tooltip>
@@ -299,7 +311,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											</TableCell>
 											<TableCell
 												align='left'
-												width={250}
+												width={300}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
@@ -313,7 +325,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													? row.subjectGroupCode
 													: '- - - - -'}
 											</TableCell>
-											<TableCell align='left'>
+											<TableCell align='left' width={200}>
 												{row.subjectGroupTypeName
 													? row.subjectGroupTypeName
 													: '- - - - -'}
@@ -417,19 +429,19 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			{/* <AddSubjectModal
+			<CreateSubjectGroupModal
 				open={isAddModalOpen}
 				setOpen={setIsAddModalOpen}
-				mutate={mutate}
+				subjectGroupMutator={mutate}
 			/>
-			<DeleteSubjectModal
+			<DeleteSubjectGroupModal
 				open={isDeleteModalOpen}
 				setOpen={setIsDeleteModalOpen}
-				subjectName={selectedRow?.subjectName ?? 'Không xác định'}
-				subjectId={selectedRow?.subjectKey ?? 0}
+				subjectGroupName={selectedRow?.subjectGroupCode ?? 'Không xác định'}
+				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
 				mutate={mutate}
 			/>
-			<UpdateSubjectModal
+			{/*<UpdateSubjectModal
 				open={iUpdateModalOpen}
 				setOpen={setIUpdateModalOpen}
 				subjectId={selectedRow?.subjectKey ?? 0}
