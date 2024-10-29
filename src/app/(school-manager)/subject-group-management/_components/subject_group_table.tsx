@@ -330,7 +330,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													? CLASSGROUP_STRING_TYPE.find(
 															(item) =>
 																item.value ===
-																row.grade.toLocaleLowerCase()
+																row.grade?.toLocaleLowerCase()
 													  )?.key
 													: '- - -'}
 											</TableCell>
