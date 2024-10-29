@@ -84,9 +84,7 @@ export default function SMClass() {
             </h3>
           </div>
         </SMHeader>
-        <div className="w-full h-fit flex flex-col justify-center items-center px-[1vw] pt-[5vh]">
           <ClassTableSkeleton />
-        </div>
       </div>
     );
   }
