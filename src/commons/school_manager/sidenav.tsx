@@ -54,6 +54,8 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 	width: '100%',
 	borderTop: '1px solid rgba(0, 0, 0, .125)',
+	paddingLeft: theme.spacing(1.85),
+	paddingRight: theme.spacing(1.85),
 }));
 
 const SMSidenav = () => {
@@ -132,7 +134,7 @@ const SMSidenav = () => {
 							{item.items.map((subItem: ISMNavigation) => (
 								<div
 									key={subItem.name}
-									className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 rounded-[3px] hover:cursor-pointer 
+									className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-4 pr-3 gap-5 rounded-[3px] hover:cursor-pointer 
 									${currentPath === subItem.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 									onClick={() => handleNavigate(subItem.url)}
 								>
