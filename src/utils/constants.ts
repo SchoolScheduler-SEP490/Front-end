@@ -79,3 +79,9 @@ export const CLASSGROUP_STRING_TYPE: { key: string; value: number }[] = [
 	{ key: 'Khối 11', value: 11 },
 	{ key: 'Khối 12', value: 12 },
 ];
+
+export const CLASSGROUP_TRANSLATOR: { [key: string]: number } = {
+	GRADE_10: 10,
+	GRADE_11: 11,
+	GRADE_12: 12,
+};

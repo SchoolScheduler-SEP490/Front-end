@@ -20,10 +20,7 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useState } from 'react';
 import { KeyedMutator } from 'swr';
-import {
-	ICreateSubjectRequestBody,
-	ICreateSubjectResponseBody,
-} from '../_libs/constants';
+import { ICreateSubjectRequest, ICreateSubjectResponse } from '../_libs/constants';
 import useCreateSubject from '../_hooks/useCreateSubject';
 import { addSubjectSchema } from '../_libs/subject_schema';
 
@@ -52,7 +49,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 		setOpen(false);
 	};
 
-	const handleFormSubmit = async (body: ICreateSubjectRequestBody) => {
+	const handleFormSubmit = async (body: ICreateSubjectRequest) => {
 		await useCreateSubject({
 			formData: [
 				{

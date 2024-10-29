@@ -1,5 +1,5 @@
 import { mutate } from 'swr';
-import { IUpdateSubjectRequestBody } from '../_libs/constants';
+import { IUpdateSubjectRequest } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { getUpdateSubjectApi } from '../_libs/apis';
@@ -7,7 +7,7 @@ import { getUpdateSubjectApi } from '../_libs/apis';
 interface ICreateSubjectProps {
 	subjectId: number;
 	sessionToken: string;
-	formData: IUpdateSubjectRequestBody;
+	formData: IUpdateSubjectRequest;
 }
 
 const useUpdateSubject = async (props: ICreateSubjectProps) => {

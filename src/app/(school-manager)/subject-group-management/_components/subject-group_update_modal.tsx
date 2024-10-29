@@ -3,7 +3,7 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
-import { CLASSGROUP_STRING_TYPE } from '@/utils/constants';
+import { CLASSGROUP_STRING_TYPE, CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -92,6 +92,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const [oldData, setOldData] = useState<ISubjectGroupDetailResponse | undefined>(
 		undefined
 	);
+	const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
 
 	// Fetch data
 	const { data: requiredSubjectsData, error: requiredError } = useFetchSubjectOptions({
@@ -147,13 +148,18 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	});
 
 	useEffect(() => {
-		if (optionalError || requiredError || schoolYearError) {
+		if (
+			(optionalError || requiredError || schoolYearError) &&
+			!isErrorShown &&
+			open
+		) {
 			useNotify({
 				type: 'error',
 				message:
 					TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
 					'Có lỗi xảy ra khi tải dữ liệu Tổ hợp',
 			});
+			setIsErrorShown(true);
 		}
 		if (requiredSubjectsData?.status === 200) {
 			const requiredSubjects: IDropdownOption<number>[] =
@@ -187,6 +193,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		if (subjectGroupDetailData?.status === 200) {
 			setOldData({ ...subjectGroupDetailData?.result });
 		}
+		setIsErrorShown(false);
 	}, [
 		requiredSubjectsData,
 		optionalSubjectsData,
@@ -234,7 +241,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				'group-name': oldData['group-name'],
 				'group-code': oldData['group-code'],
 				'group-description': oldData['group-description'],
-				grade: oldData.grade,
+				grade: CLASSGROUP_TRANSLATOR[oldData.grade],
 				'school-year-id': oldData['school-year-id'],
 				'elective-subject-ids': Array.from(electiveSubjectIds),
 				'specialized-subject-ids': Array.from(specialisedSubjectIds),

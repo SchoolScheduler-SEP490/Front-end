@@ -87,6 +87,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>(
 		[]
 	);
+	const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
 
 	const { data: requiredSubjectsData, error: requiredError } = useFetchSubjectOptions({
 		sessionToken: sessionToken,
@@ -137,13 +138,18 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	});
 
 	useEffect(() => {
-		if (optionalError || requiredError || schoolYearError) {
+		if (
+			(optionalError || requiredError || schoolYearError) &&
+			!isErrorShown &&
+			open
+		) {
 			useNotify({
 				type: 'error',
 				message:
 					TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
 					'Có lỗi xảy ra khi tải dữ liệu môn học',
 			});
+			setIsErrorShown(true);
 		}
 		if (requiredSubjectsData?.status === 200) {
 			const requiredSubjects: IDropdownOption<number>[] =
@@ -174,6 +180,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			);
 			setSchoolYearOptions(schoolYears);
 		}
+		setIsErrorShown(false);
 	}, [requiredSubjectsData, optionalSubjectsData, schoolYearData]);
 
 	useEffect(() => {
@@ -436,7 +443,11 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									labelId='grade-label'
 									id='grade'
 									variant='standard'
-									value={formik.values.grade}
+									value={
+										formik.values.grade === 0
+											? ''
+											: formik.values.grade
+									}
 									onChange={(event) =>
 										formik.setFieldValue('grade', event.target.value)
 									}

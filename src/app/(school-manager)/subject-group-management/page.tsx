@@ -10,6 +10,7 @@ import SubjectGroupTable from './_components/subject_group_table';
 import SubjectGroupTableSkeleton from './_components/table_skeleton';
 import useFetchSGData from './_hooks/useFetchSGData';
 import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
+import { CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -21,6 +22,7 @@ export default function SMSubject() {
 	>([]);
 	const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
 	const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
+	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(true);
 
 	const { data, error, isLoading, isValidating, mutate } = useFetchSGData({
 		sessionToken: sessionToken,
@@ -51,7 +53,7 @@ export default function SMSubject() {
 						subjectGroupName: record['group-name'],
 						subjectGroupCode: record['group-code'],
 						subjectGroupKey: record.id,
-						grade: record.grade,
+						grade: CLASSGROUP_TRANSLATOR[record.grade],
 					} as ISubjectGroupTableData)
 			);
 			setSubjectGroupTableData(tableData);
@@ -83,11 +85,12 @@ export default function SMSubject() {
 		);
 	}
 
-	if (error) {
+	if (error && !isErrorShown) {
 		useNotify({
 			type: 'error',
-			message: TRANSLATOR[error.Message] ?? 'Có lỗi xảy ra',
+			message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
 		});
+		setIsErrorShown(true);
 	}
 
 	return (

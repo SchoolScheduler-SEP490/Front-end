@@ -23,9 +23,9 @@ import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useUpdateSubject from '../_hooks/useUpdateSubject';
 import {
-	ICreateSubjectResponseBody,
+	ICreateSubjectResponse,
 	ISubject,
-	IUpdateSubjectRequestBody,
+	IUpdateSubjectRequest,
 } from '../_libs/constants';
 import { updateSubjectSchema } from '../_libs/subject_schema';
 import { getSubjectDetailApi } from '../_libs/apis';
@@ -51,8 +51,8 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	const { open, setOpen, subjectId, mutate } = props;
 	const { sessionToken } = useAppContext();
 
-	const [oldData, setOldData] = useState<IUpdateSubjectRequestBody>(
-		{} as IUpdateSubjectRequestBody
+	const [oldData, setOldData] = useState<IUpdateSubjectRequest>(
+		{} as IUpdateSubjectRequest
 	);
 
 	const handleClose = () => {
@@ -100,7 +100,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 		});
 	}, [oldData]);
 
-	const handleFormSubmit = async (body: IUpdateSubjectRequestBody) => {
+	const handleFormSubmit = async (body: IUpdateSubjectRequest) => {
 		await useUpdateSubject({
 			formData: {
 				...body,
