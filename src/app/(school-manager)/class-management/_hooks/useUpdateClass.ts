@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAppContext } from "@/context/app_provider";
 import { updateClass } from "../_libs/apiClass";
 import { IUpdateClassData } from "../_libs/constants";
+import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 
 export function useUpdateClass (mutate: ()=> void ){
     const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
@@ -11,26 +12,28 @@ export function useUpdateClass (mutate: ()=> void ){
 
     const editClass = async (classId: number, classData: IUpdateClassData) => {
         setIsUpdating(true);
-        console.log("Attempting to update class with ID:", classId);
-        console.log("Class data being sent:", classData);
-
         try {
             if (!sessionToken) {
                 throw new Error('Session token not found. Please log in.');
             }
-            const success = await updateClass(classId, sessionToken, classData);
+            const formattedData = {
+                ...classData,
+                "school-id": classData["school-id"], // Use schoolId from classData
+                "school-year-id": 1, // Add schoolYearId
+                grade: Number(classData.grade)
+            };
+            const success = await updateClass(classId, sessionToken, formattedData);
             if (success) {
-              console.log(`Successfully updated teacher:`, classData);
-              mutate();
+                mutate();
             }
             setIsUpdating(false);
             return success;
         } catch (error) {
-            setUpdateError('Failed to update teacher.');
-            console.error('Error updating teacher:', error);
+            setUpdateError('Failed to update class.');
             setIsUpdating(false);
             return false;           
         }
-    }
+
+    }      
     return { editClass, isUpdating, updateError };
 }

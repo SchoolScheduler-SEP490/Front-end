@@ -42,6 +42,6 @@ export interface IUpdateClassData {
   "main-session": string;
   "is-full-day": boolean;
   "period-count": number;
-  grade: string;
+  grade: number;
   "subject-group-id": number;
 }

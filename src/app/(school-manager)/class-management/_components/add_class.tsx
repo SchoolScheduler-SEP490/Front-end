@@ -70,7 +70,7 @@ const AddClassModal = (props: AddClassFormProps) => {
   };
 
   const handleClose = () => {
-    formik.handleReset;
+    formik.handleReset(formik.initialValues);
     onClose(false);
   };
 
