@@ -22,7 +22,7 @@ export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) =
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
 		schoolYearId: schoolYearId.toString(),
-		...(grade !== undefined && { grade }),
+		...(grade !== undefined && { grade: grade.toString() }),
 		...(subjectGroupId !== undefined && {
 			subjectGroupId: subjectGroupId.toString(),
 		}),
