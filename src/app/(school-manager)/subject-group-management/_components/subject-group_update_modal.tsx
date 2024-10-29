@@ -26,6 +26,7 @@ import { KeyedMutator } from 'swr';
 import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import useFetchSGDetail from '../_hooks/useFetchSGDetail';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
+import useUpdateSubjectGroup from '../_hooks/useUpdateSG';
 import {
 	IDropdownOption,
 	ISchoolYearResponse,
@@ -34,7 +35,6 @@ import {
 	IUpdateSubjectGroupRequest,
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
-import useUpdateSubjectGroup from '../_hooks/useUpdateSG';
 
 const style = {
 	position: 'absolute',
@@ -80,7 +80,6 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupId, subjectGroupMutator } = props;
 	const theme = useTheme();
 	const { schoolId, sessionToken } = useAppContext();
-	const [response, setResponse] = useState<any>(undefined);
 	const [specialisedSubjects, setSpecialisedSubjects] = useState<
 		IDropdownOption<number>[]
 	>([]);
@@ -118,16 +117,14 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	};
 
 	const handleFormSubmit = async (body: IUpdateSubjectGroupRequest) => {
-		setResponse(
-			await useUpdateSubjectGroup({
-				formData: {
-					...body,
-					'is-deleted': false,
-				} as IUpdateSubjectGroupRequest,
-				sessionToken: sessionToken,
-				subjectGroupId: subjectGroupId,
-			})
-		);
+		await useUpdateSubjectGroup({
+			formData: {
+				...body,
+				'is-deleted': false,
+			} as IUpdateSubjectGroupRequest,
+			sessionToken: sessionToken,
+			subjectGroupId: subjectGroupId,
+		});
 		subjectGroupMutator();
 		handleClose();
 	};
@@ -137,7 +134,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			'group-name': '',
 			'group-code': '',
 			'group-description': '',
-			grade: '',
+			grade: 0,
 			'school-year-id': 0,
 			'elective-subject-ids': [],
 			'specialized-subject-ids': [],
@@ -146,6 +143,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
+		validateOnMount: true,
 	});
 
 	useEffect(() => {
@@ -236,7 +234,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				'group-name': oldData['group-name'],
 				'group-code': oldData['group-code'],
 				'group-description': oldData['group-description'],
-				grade: oldData.grade?.toLowerCase(),
+				grade: oldData.grade,
 				'school-year-id': oldData['school-year-id'],
 				'elective-subject-ids': Array.from(electiveSubjectIds),
 				'specialized-subject-ids': Array.from(specialisedSubjectIds),

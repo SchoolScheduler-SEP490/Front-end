@@ -14,7 +14,10 @@ export const createSubjectGroupSchema = yup.object().shape({
 
 	'group-description': yup.string().max(255, 'Mô tả Tổ hợp môn tối đa 255 ký tự'),
 
-	grade: yup.string().required('Khối lớp là bắt buộc'),
+	grade: yup
+		.number()
+		.oneOf([10, 11, 12], 'Khối lớp không hợp lệ')
+		.required('Khối lớp là bắt buộc'),
 
 	'school-year-id': yup
 		.number()

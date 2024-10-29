@@ -46,9 +46,6 @@ interface IAddSubjectModalProps {
 const AddSubjectModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, mutate } = props;
 	const { schoolId, sessionToken } = useAppContext();
-	const [response, setResponse] = useState<ICreateSubjectResponseBody | undefined>(
-		undefined
-	);
 
 	const handleClose = () => {
 		formik.handleReset(formik.initialValues);
@@ -56,19 +53,17 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 	};
 
 	const handleFormSubmit = async (body: ICreateSubjectRequestBody) => {
-		setResponse(
-			await useCreateSubject({
-				formData: [
-					{
-						...body,
-						'is-required':
-							body['is-required'].toString() === 'true' ? true : false,
-					},
-				],
-				schoolId: schoolId,
-				sessionToken: sessionToken,
-			})
-		);
+		await useCreateSubject({
+			formData: [
+				{
+					...body,
+					'is-required':
+						body['is-required'].toString() === 'true' ? true : false,
+				},
+			],
+			schoolId: schoolId,
+			sessionToken: sessionToken,
+		});
 		mutate();
 		handleClose();
 	};
@@ -85,6 +80,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
+		validateOnMount: true,
 	});
 
 	return (

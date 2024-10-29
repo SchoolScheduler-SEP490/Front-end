@@ -124,7 +124,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			'group-name': '',
 			'group-code': '',
 			'group-description': '',
-			grade: '',
+			grade: 0,
 			'school-year-id': 0,
 			'elective-subject-ids': [],
 			'specialized-subject-ids': [],
@@ -133,6 +133,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
+		validateOnMount: true, // This will trigger validation on mount
 	});
 
 	useEffect(() => {

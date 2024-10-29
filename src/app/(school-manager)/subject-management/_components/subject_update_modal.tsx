@@ -51,9 +51,6 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	const { open, setOpen, subjectId, mutate } = props;
 	const { sessionToken } = useAppContext();
 
-	const [response, setResponse] = useState<ICreateSubjectResponseBody | undefined>(
-		undefined
-	);
 	const [oldData, setOldData] = useState<IUpdateSubjectRequestBody>(
 		{} as IUpdateSubjectRequestBody
 	);
@@ -104,17 +101,14 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	}, [oldData]);
 
 	const handleFormSubmit = async (body: IUpdateSubjectRequestBody) => {
-		setResponse(
-			await useUpdateSubject({
-				formData: {
-					...body,
-					'is-required':
-						body['is-required'].toString() === 'true' ? true : false,
-				},
-				subjectId: subjectId,
-				sessionToken: sessionToken,
-			})
-		);
+		await useUpdateSubject({
+			formData: {
+				...body,
+				'is-required': body['is-required'].toString() === 'true' ? true : false,
+			},
+			subjectId: subjectId,
+			sessionToken: sessionToken,
+		});
 		mutate();
 		handleClose();
 	};
@@ -131,6 +125,7 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
+		validateOnMount: true,
 	});
 
 	return (
