@@ -124,7 +124,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
           component="h2"
           className="text-title-medium-strong font-normal opacity-60"
         >
-          Thêm giáo viên
+          Cập nhật thông tin giáo viên
         </Typography>
         <IconButton onClick={handleClose}>
           <CloseIcon />
