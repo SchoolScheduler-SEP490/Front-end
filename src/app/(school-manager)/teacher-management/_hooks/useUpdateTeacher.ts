@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { updateTeacher } from "../_libs/apiTeacher";
 import { useAppContext } from "@/context/app_provider";
-import { IUpdateTeacherRequestBody } from "../_libs/contants";
+import { IUpdateTeacherRequestBody } from "../_libs/constants";
 
 export function useUpdateTeacher(mutate: () => void) {
   const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';

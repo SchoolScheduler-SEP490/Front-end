@@ -4,10 +4,9 @@ import * as React from "react";
 import SMHeader from "@/commons/school_manager/header";
 import TeacherTable from "./_components/teacher_table";
 import useTeacherData from "./_hooks/useTeacherData";
-import LoadingComponent from "@/commons/loading";
 import TeacherTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
-import { ITeacher, ITeacherTableData } from "./_libs/contants";
+import { ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 
 export default function SMTeacher() {
@@ -15,7 +14,7 @@ export default function SMTeacher() {
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const { schoolId, sessionToken } = useAppContext();
 
-  const { data, error, isLoading, isValidating, mutate } = useTeacherData({
+  const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
     schoolId,
     pageSize: rowsPerPage,
@@ -63,7 +62,6 @@ export default function SMTeacher() {
   if (isValidating) {
     return (
       <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
-        <LoadingComponent loadingStatus={isLoading} />
         <SMHeader>
           <div>
             <h3 className="text-title-small text-white font-semibold tracking-wider">

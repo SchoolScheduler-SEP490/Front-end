@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
 import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
-import { IAddTeacherData } from "../_libs/contants";
+import { IAddTeacherData } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
 
 //Add new teacher form

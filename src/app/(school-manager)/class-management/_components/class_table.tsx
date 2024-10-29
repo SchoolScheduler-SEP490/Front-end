@@ -16,25 +16,21 @@ import {
   Toolbar,
   Tooltip,
 } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import { visuallyHidden } from "@mui/utils";
-import { ITeacherTableData } from "../_libs/constants";
-import DeleteConfirmationModal from "./delete_teacher";
 import Image from "next/image";
+import { visuallyHidden } from "@mui/utils";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
-import UpdateTeacherModal from "./update_teacher";
 import { KeyedMutator } from "swr";
-import AddTeacherModal from "./add_teacher";
-
-//Teacher's data table
+import { IClassTableData } from "../_libs/constants";
+import AddClassModal from "./add_class";
+import DeleteClassModal from "./delete_class";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
   if (b[orderBy] > a[orderBy]) return 1;
   return 0;
 }
-
 type Order = "asc" | "desc";
 
 function getComparator<Key extends keyof any>(
@@ -50,63 +46,55 @@ function getComparator<Key extends keyof any>(
 }
 
 interface HeadCell {
-  id: keyof ITeacherTableData;
+  id: keyof IClassTableData;
   label: string;
   centered: boolean;
 }
 const headCells: readonly HeadCell[] = [
   {
-    id: "id" as keyof ITeacherTableData,
-    centered: false,
+    id: "id" as keyof IClassTableData,
     label: "STT",
-  },
-  {
-    id: "teacherName" as keyof ITeacherTableData,
     centered: false,
-    label: "Tên giáo viên",
   },
   {
-    id: "nameAbbreviation" as keyof ITeacherTableData,
+    id: "className" as keyof IClassTableData,
+    label: "Tên lớp",
     centered: false,
-    label: "Tên viết tắt",
   },
   {
-    id: "subjectDepartment" as keyof ITeacherTableData,
-    centered: false,
-    label: "Tên bộ môn",
-  },
-  {
-    id: "email" as keyof ITeacherTableData,
-    centered: false,
-    label: "Email",
-  },
-  {
-    id: "phoneNumber" as keyof ITeacherTableData,
-    centered: false,
-    label: "Số điện thoại",
-  },
-  {
-    id: "status" as keyof ITeacherTableData,
+    id: "grade" as keyof IClassTableData,
+    label: "Tên khối",
     centered: true,
-    label: "Trạng thái",
+  },
+  {
+    id: "homeroomTeacherName" as keyof IClassTableData,
+    label: "GVCN",
+    centered: true,
+  },
+  {
+    id: "schoolYear" as keyof IClassTableData,
+    label: "Năm học",
+    centered: true,
+  },
+  {
+    id: "mainSession" as keyof IClassTableData,
+    label: "Buổi chính khóa",
+    centered: true,
   },
 ];
-
 interface EnhancedTableProps {
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof ITeacherTableData
+    property: keyof IClassTableData
   ) => void;
   order: Order;
   orderBy: string;
   rowCount: number;
 }
-
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, rowCount, onRequestSort } = props;
   const createSortHandler =
-    (property: keyof ITeacherTableData) =>
-    (event: React.MouseEvent<unknown>) => {
+    (property: keyof IClassTableData) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
   return (
@@ -123,14 +111,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
               overflow: "hidden",
             }}
           >
-            {headCell.id === "teacherName" ? (
+            {headCell.id === "className" ? (
               <span>{headCell.label}</span>
             ) : (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}
                 onClick={createSortHandler(
-                  headCell.id as keyof ITeacherTableData
+                  headCell.id as keyof IClassTableData
                 )}
               >
                 {headCell.label}
@@ -152,9 +140,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     </TableHead>
   );
 }
-
-interface ITeacherTableProps {
-  teacherTableData: ITeacherTableData[];
+interface IClassTableProps {
+  classTableData: IClassTableData[];
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
   rowsPerPage: number;
@@ -165,12 +152,12 @@ interface ITeacherTableProps {
 
 const dropdownOptions: ICommonOption[] = [
   { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
-  { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
+  { img: "/images/icons/delete.png", title: "Xóa lớp học" },
 ];
 
-const TeacherTable = (props: ITeacherTableProps) => {
+const ClassTable = (props: IClassTableProps) => {
   const {
-    teacherTableData,
+    classTableData,
     page,
     setPage,
     rowsPerPage,
@@ -178,22 +165,21 @@ const TeacherTable = (props: ITeacherTableProps) => {
     totalRows,
     mutate,
   } = props;
-
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
-    React.useState<keyof ITeacherTableData>("teacherName");
+    React.useState<keyof IClassTableData>("className");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [selectedRow, setSelectedRow] = React.useState<
-    ITeacherTableData | undefined
+    IClassTableData | undefined
   >();
   const open = Boolean(anchorEl);
 
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
-    row: ITeacherTableData
+    row: IClassTableData
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedRow(row);
@@ -201,7 +187,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof ITeacherTableData
+    property: keyof IClassTableData
   ) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -233,13 +219,13 @@ const TeacherTable = (props: ITeacherTableProps) => {
   };
 
   const visibleRows = React.useMemo(
-    () => [...teacherTableData].sort(getComparator(order, orderBy)),
-    [order, orderBy, page, rowsPerPage, teacherTableData]
+    () => [...classTableData].sort(getComparator(order, orderBy)),
+    [order, orderBy, page, rowsPerPage, classTableData]
   );
 
   const emptyRows =
-    teacherTableData.length < rowsPerPage && rowsPerPage < 10
-      ? rowsPerPage - teacherTableData.length + 1
+    classTableData.length < rowsPerPage && rowsPerPage < 10
+      ? rowsPerPage - classTableData.length + 1
       : 0;
 
   const handleMenuClose = () => {
@@ -249,6 +235,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
   const handleOpenAddForm = () => setOpenAddForm(true);
 
   return (
+    <div className='w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]'>
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
         <Toolbar
@@ -261,9 +248,9 @@ const TeacherTable = (props: ITeacherTableProps) => {
           ]}
         >
           <h2 className="text-title-medium-strong font-semibold w-full text-left">
-            Danh sách giáo viên
+            Lớp học
           </h2>
-          <Tooltip title="Thêm giáo viên">
+          <Tooltip title="Thêm lớp học">
             <IconButton onClick={handleOpenAddForm}>
               <AddIcon />
             </IconButton>
@@ -274,6 +261,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
             </IconButton>
           </Tooltip>
         </Toolbar>
+
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -284,7 +272,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
               order={order}
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
-              rowCount={teacherTableData.length}
+              rowCount={classTableData.length}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
@@ -305,26 +293,13 @@ const TeacherTable = (props: ITeacherTableProps) => {
                     >
                       {index + 1 + page * rowsPerPage}
                     </TableCell>
-                    <TableCell align="left">{row.teacherName}</TableCell>
-                    <TableCell align="left">{row.nameAbbreviation}</TableCell>
-                    <TableCell align="left">{row.subjectDepartment}</TableCell>
-                    <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.phoneNumber}</TableCell>
-                    <TableCell align="left">
-                      <div className="w-full h-full flex justify-center items-center">
-                        <div
-                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
-                            ${
-                              row.status === "Hoạt động"
-                                ? "bg-basic-positive-hover text-basic-positive"
-                                : "bg-basic-negative-hover text-basic-negative"
-                            }`}
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          {row.status}
-                        </div>
-                      </div>
+                    <TableCell align="left">{row.className}</TableCell>
+                    <TableCell align="center">{row.grade}</TableCell>
+                    <TableCell align="center">
+                      {row.homeroomTeacherName}
                     </TableCell>
+                    <TableCell align="center">{row.schoolYear}</TableCell>
+                    <TableCell align="center">{row.mainSession}</TableCell>
                     <TableCell width={80}>
                       <IconButton
                         color="success"
@@ -393,32 +368,27 @@ const TeacherTable = (props: ITeacherTableProps) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={totalRows ?? teacherTableData.length}
+          count={totalRows ?? classTableData.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-      </Paper>
-      <DeleteConfirmationModal
-        open={openDeleteModal}
-        onClose={setOpenDeleteModal}
-        teacherName={selectedRow?.teacherName ?? "Không xác định"}
-        teacherId={selectedRow?.id ?? 0}
-        mutate={mutate}
-      />
-      <AddTeacherModal
+        <AddClassModal 
         open={openAddForm}
         onClose={setOpenAddForm}
-        mutate={mutate}
-      />
-      <UpdateTeacherModal
-        open={openUpdateModal}
-        onClose={setOpenUpdateModal}
-        teacherId={selectedRow?.id ?? 0}
-        mutate={mutate}
-      />
+        mutate={mutate}      
+        />
+        <DeleteClassModal 
+        open={openDeleteModal}
+        onClose={setOpenDeleteModal}
+        className={selectedRow?.className ?? "Không xác định"}
+        classId={selectedRow?.id ?? 0}
+        mutate={mutate}       
+        />
+      </Paper>
     </Box>
+    </div>
   );
 };
-export default TeacherTable;
+export default ClassTable;

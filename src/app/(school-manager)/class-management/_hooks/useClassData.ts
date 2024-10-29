@@ -1,15 +1,18 @@
-import useSWR from 'swr';
+import useSWR from "swr";
 
-interface ITeacherDataProps {
+interface IClassDataProps {
   sessionToken: string;
   schoolId: string;
   pageSize: number;
   pageIndex: number;
 }
-
-const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeacherDataProps) => {
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-  
+const useClassData = ({
+  sessionToken,
+  schoolId,
+  pageSize,
+  pageIndex,
+}: IClassDataProps) => {
+  const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   const fetcher = async (url: string) => {
     const response = await fetch(url, {
       headers: {
@@ -23,8 +26,7 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
     return data;
   };
 
-  const endpoint = `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
-
+  const endpoint = `${api}/api/student-classes?schoolId=${schoolId}&schoolYearId=1&includeDeleted=false&pageIndex=${pageIndex}&pageSize=${pageSize}`;
   const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,
     fetcher,
@@ -34,8 +36,6 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
       revalidateIfStale: true,
     }
   );
-
   return { data, error, isValidating, mutate };
 };
-
-export default useTeacherData;
+export default useClassData;
