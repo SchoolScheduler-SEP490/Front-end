@@ -127,7 +127,7 @@ export const RegisterForm = () => {
 							endAdornment: (
 								<Image
 									className='opacity-30 mx-2 select-none'
-									src='/icons/email.png'
+									src='/images/icons/email.png'
 									alt='email'
 									width={20}
 									height={20}
@@ -152,7 +152,7 @@ export const RegisterForm = () => {
 							endAdornment: (
 								<Image
 									className='opacity-30 mx-2 select-none'
-									src='/icons/phone.png'
+									src='/images/icons/phone.png'
 									alt='phone'
 									width={20}
 									height={20}
@@ -184,8 +184,8 @@ export const RegisterForm = () => {
 									className='opacity-30'
 									src={
 										showPassword
-											? '/icons/hidden.png'
-											: '/icons/view.png'
+											? '/images/icons/hidden.png'
+											: '/images/icons/view.png'
 									}
 									alt='eye'
 									width={20}
@@ -218,8 +218,8 @@ export const RegisterForm = () => {
 									className='opacity-30'
 									src={
 										confirmPassword
-											? '/icons/hidden.png'
-											: '/icons/view.png'
+											? '/images/icons/hidden.png'
+											: '/images/icons/view.png'
 									}
 									alt='eye'
 									width={20}

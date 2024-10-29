@@ -35,7 +35,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
   const { schoolId, sessionToken } = useAppContext();
 
   const handleClose = () => {
-    formik.handleReset;
+    formik.handleReset(formik.initialValues);
     onClose(false);
   };
 
