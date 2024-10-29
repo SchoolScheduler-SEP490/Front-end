@@ -3,7 +3,7 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
-import { CLASSGROUP_STRING_TYPE, SUBJECT_GROUP_TYPE } from '@/utils/constants';
+import { CLASSGROUP_STRING_TYPE } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -24,16 +24,15 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useCreateSubjectGroup from '../_hooks/useCreateSG';
+import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import {
 	ICreateSubjectGroupRequest,
-	ICreateSubjectGroupResponse,
 	IDropdownOption,
 	ISchoolYearResponse,
 	ISubjectOptionResponse,
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 
 const style = {
 	position: 'absolute',
@@ -78,9 +77,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupMutator } = props;
 	const theme = useTheme();
 	const { schoolId, sessionToken } = useAppContext();
-	const [response, setResponse] = useState<ICreateSubjectGroupResponse | undefined>(
-		undefined
-	);
+	const [response, setResponse] = useState<any>(undefined);
 	const [specialisedSubjects, setSpecialisedSubjects] = useState<
 		IDropdownOption<number>[]
 	>([]);
@@ -176,7 +173,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			);
 			setSchoolYearOptions(schoolYears);
 		}
-	}, [requiredSubjectsData, optionalSubjectsData]);
+	}, [requiredSubjectsData, optionalSubjectsData, schoolYearData]);
 
 	useEffect(() => {
 		if (formik.values['elective-subject-ids'].length > 0) {
@@ -522,7 +519,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
-							title='Thêm môn học'
+							title='Thêm Tổ hợp'
 							disableRipple
 							type='submit'
 							disabled={!formik.isValid}

@@ -28,6 +28,7 @@ import {
 	IUpdateSubjectRequestBody,
 } from '../_libs/constants';
 import { updateSubjectSchema } from '../_libs/subject_schema';
+import { getSubjectDetailApi } from '../_libs/apis';
 
 const style = {
 	position: 'absolute',
@@ -49,7 +50,6 @@ interface IUpdateSubjectModalProps {
 const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 	const { open, setOpen, subjectId, mutate } = props;
 	const { sessionToken } = useAppContext();
-	const api = process.env.NEXT_PUBLIC_API_URL;
 
 	const [response, setResponse] = useState<ICreateSubjectResponseBody | undefined>(
 		undefined
@@ -65,7 +65,8 @@ const UpdateSubjectModal = (props: IUpdateSubjectModalProps) => {
 
 	useEffect(() => {
 		const fetchSubjectDetail = async () => {
-			const response = await fetch(`${api}/api/subjects/${subjectId}`, {
+			const endpoint = getSubjectDetailApi({ subjectId });
+			const response = await fetch(endpoint, {
 				method: 'GET',
 				headers: {
 					Authorization: `Bearer ${sessionToken}`,

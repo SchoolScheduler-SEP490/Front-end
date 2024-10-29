@@ -99,6 +99,17 @@ export const TRANSLATOR: { [key: string]: string } = {
 	//Subject group messages
 	'The school year does not exist.': 'Không tìm thấy năm học',
 	'Add subject group success.': 'Thêm Tổ hợp môn thành công',
+	'Subject group type not exist.': 'Loại tổ hợp môn không tồn tại',
+	'Subject group name or code already exist.': 'Tên hoặc mã tổ hợp môn đã tồn tại',
+	'Update subject group success.': 'Cập nhật Tổ hợp môn thành công',
+	'Delete subject group success.': 'Xóa Tổ hợp môn thành công',
+	'Subject group not exist.': 'Không tìm thấy Tổ hợp môn',
+	'Get subject group list has no items': 'Lấy danh sách Tổ hợp môn không có mục nào',
+	'Get subject group list successful': 'Lấy danh sách Tổ hợp môn thành công',
+	'Subject group has assign, can not update grade.':
+		'Tổ hợp môn đã được gán, không thể cập nhật khối lớp',
+	'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.':
+		'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

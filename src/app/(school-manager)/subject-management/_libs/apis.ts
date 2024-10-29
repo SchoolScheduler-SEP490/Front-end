@@ -51,3 +51,13 @@ export const getUpdateSubjectApi = ({
 }): string => {
 	return `${localApi ?? api}/api/subjects/${subjectId}`;
 };
+
+export const getSubjectDetailApi = ({
+	localApi,
+	subjectId,
+}: {
+	localApi?: string;
+	subjectId: number;
+}) => {
+	return `${localApi ?? api}/api/subjects/${subjectId}`;
+};

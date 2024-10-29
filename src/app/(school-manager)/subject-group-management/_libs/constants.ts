@@ -41,10 +41,6 @@ export interface ICreateSubjectGroupRequest {
 	'specialized-subject-ids': number[];
 }
 
-// Create SubjectGroup Response
-export interface ICreateSubjectGroupResponse {
-	// Add something here
-}
 // Update SubjectGroup Data
 export interface IUpdateSubjectGroupRequest {
 	'group-name': string;
@@ -79,4 +75,37 @@ export interface ISchoolYearResponse {
 	'start-year': string;
 	'end-year': string;
 	'school-year-code': string;
+}
+
+export interface ISubjectGroupDetailResponse {
+	id: number;
+	'group-code': string;
+	'group-name': string;
+	'school-id': number;
+	'group-description': string;
+	grade: string;
+	'subject-selective-views': ISelectiveSubject[];
+	'subject-specializedt-views': ISelectiveSubject[];
+	'subject-required-views': ISelectiveSubject[];
+	'student-class-views': any[];
+	'subject-group-type-name': string | null;
+	'school-year-id': number;
+	'school-year': string;
+}
+
+export interface ISelectiveSubject {
+	'subject-name': string;
+	abbreviation: string;
+	'is-required': boolean;
+	description: string;
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'tootal-slot-per-week': number;
+	'is-specialized': boolean;
+	'is-double-period': boolean;
+	'slot-per-term': number;
+	'term-id': number;
+	'total-slot-in-year': number;
+	'slot-specialized': number;
+	'subject-group-type': string;
 }

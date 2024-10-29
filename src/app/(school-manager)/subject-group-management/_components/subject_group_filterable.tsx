@@ -20,15 +20,13 @@ import { IDropdownOption, ISchoolYearResponse } from '../_libs/constants';
 interface ISubjectGroupFilterableProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
-	onFilter?: () => void;
 	selectedYearId: number;
 	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 	mutate?: KeyedMutator<any>;
 }
 
 const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
-	const { open, setOpen, onFilter, selectedYearId, setSelectedYearId } = props;
-	const { sessionToken, schoolId } = useAppContext();
+	const { open, setOpen, selectedYearId, setSelectedYearId } = props;
 	const { data, error } = useFetchSchoolYear();
 	const [yearStudyOptions, setYearStudyOptions] = useState<IDropdownOption<number>[]>(
 		[]
@@ -58,8 +56,8 @@ const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
 
 	return (
 		<div
-			className={`h-full w-[23%] flex flex-col justify-start items-center ${
-				open ? 'visible ' : 'hidden'
+			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] ${
+				open ? 'visible animate-fade-left animate-once' : 'hidden'
 			}`}
 		>
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
