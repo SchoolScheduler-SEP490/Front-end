@@ -1,97 +1,111 @@
-import React from "react";
+"use client";
+
+import ContainedButton from "@/commons/button-contained";
+import { useAppContext } from "@/context/app_provider";
+import useNotify from "@/hooks/useNotify";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Dialog,
-  DialogContent,
-  TextField,
+  FormControl,
+  FormControlLabel,
+  IconButton,
   Radio,
   RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Grid,
-  Typography,
   Select,
   MenuItem,
-  IconButton,
+  TextField,
+  Typography,
+  DialogContent,
+  Grid,
   Checkbox,
   FormHelperText,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import ContainedButton from "@/commons/button-contained";
 import { useFormik } from "formik";
-import { classSchema } from "../_libs/class_schema";
+import { IUpdateClassData } from "../_libs/constants";
+import { updateClassSchema } from "../_libs/class_schema";
+import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
-import { useAppContext } from "@/context/app_provider";
-import { IAddClassData, ITeacher } from "../_libs/constants";
-import useAddClass from "../_hooks/useAddClass";
-import { getTeacherName } from "../_libs/apiClass";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
+import { useUpdateClass } from "../_hooks/useUpdateClass";
 
-interface AddClassFormProps {
+interface UpdateClassFormProps {
   open: boolean;
   onClose: (close: boolean) => void;
+  classId: number;
   mutate: KeyedMutator<any>;
 }
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-	PaperProps: {
-		style: {
-			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-			width: 250,
-			scrollbars: 'none',
-		},
-	},
-};
-const AddClassModal = (props: AddClassFormProps) => {
-  const { open, onClose, mutate } = props;
-  const { schoolId, sessionToken } = useAppContext();
-  const [teachers, setTeachers] = React.useState<ITeacher[]>([]);
 
-  React.useEffect(() => {
-    const loadTeachers = async () => {
-      const data = await getTeacherName(sessionToken, schoolId);
-
-      if (data.result?.items) {
-        setTeachers(data.result.items);
-      }
-    };
-    loadTeachers();
-  }, [sessionToken]);
-
-
-  const handleFormSubmit = async (body: IAddClassData) => {
-    await useAddClass({
-      schoolId: schoolId,
-      sessionToken: sessionToken,
-      formData: [body],
-    });
-    mutate();
-    handleClose();
-  };
-
-  const handleClose = () => {
-    formik.handleReset;
-    onClose(false);
-  };
+const UpdateClassModal = (props: UpdateClassFormProps) => {
+  const { open, onClose, classId, mutate } = props;
+  const { sessionToken } = useAppContext();
+  const api = process.env.NEXT_PUBLIC_API_URL;
+  const { editClass, isUpdating } = useUpdateClass(mutate);
+  const [oldData, setOldData] = useState<IUpdateClassData>(
+    {} as IUpdateClassData
+  );
 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      "homeroom-teacher-abbreviation": "",
-      "main-session": "",
-      "is-full-day": true,
-      "period-count": "",
-      grade: '',
+      ...oldData,
     },
-    validationSchema: classSchema,
-    onSubmit: async (formData) => {
-      handleFormSubmit({
-        ...formData,
-        "main-session": Number(formData["main-session"]),
-        "period-count": Number(formData["period-count"]),
-      });
+    validationSchema: updateClassSchema,
+    onSubmit: async (values) => {
+      const success = await editClass(classId, values);
+      if (success) {
+        console.log("Class updated successfully");
+        useNotify({
+          message: "Cập nhật lớp học thành công.",
+          type: "success",
+        });
+        handleClose();
+      } else {
+        console.log("Failed to update teacher");
+        useNotify({
+          message: "Cập nhật lớp học thất bại.",
+          type: "error",
+        });
+      }
     },
+    enableReinitialize: true,
   });
+
+  useEffect(() => {
+    const fetchClassById = async () => {
+      const response = await fetch(`${api}/api/student-classes/${classId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      });
+      const data = await response.json();
+      if (data.status !== 200) {
+        useNotify({
+          type: "error",
+          message: data.message,
+        });
+      } else {
+        setOldData({
+          name: data.result.name,
+          "homeroom-teacher-id": data.result["homeroom-teacher-id"],
+          "school-id": data.result["school-id"],
+          "school-year-id": data.result["school-year-id"],
+          "main-session": data.result["main-session"],
+          "is-full-day": data.result["is-full-day"],
+          "period-count": data.result["period-count"],
+          grade: data.result.grade,
+          "subject-group-id": data.result["subject-group-id"],
+        });
+        console.log(oldData);
+      }
+    };
+    if (open) {
+      fetchClassById();
+    }
+  }, [open]);
+
+  const handleClose = () => {
+    formik.resetForm();
+    onClose(false);
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -99,19 +113,19 @@ const AddClassModal = (props: AddClassFormProps) => {
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
       >
-        <Typography
+                <Typography
           variant="h6"
           component="h2"
           className="text-title-medium-strong font-normal opacity-60"
         >
-          Thêm lớp học
+          Cập nhật thông tin lớp học
         </Typography>
         <IconButton onClick={handleClose}>
           <CloseIcon />
         </IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
-        <DialogContent>
+      <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
@@ -157,88 +171,24 @@ const AddClassModal = (props: AddClassFormProps) => {
                     fullWidth
                     error={formik.touched.grade && Boolean(formik.errors.grade)}
                   >
-								<Select
-									labelId='grade-label'
-									id='grade'
-									variant='standard'
-									value={formik.values.grade}
-									onChange={(event) =>
-                    formik.setFieldValue('grade', event.target.value)
-									}
-									onBlur={formik.handleBlur('grade')}
-									error={
-										formik.touched.grade &&
-										Boolean(formik.errors.grade)
-									}
-									MenuProps={MenuProps}
-									sx={{ width: '100%' }}
-								>
-									{CLASSGROUP_STRING_TYPE.map((item) => (
-										<MenuItem
-											key={item.key}
-                      value={item.value}
-										>
-											{item.key}
-										</MenuItem>
-									))}
-								</Select>
-								{formik.touched.grade && formik.errors.grade && (
-									<FormHelperText error variant='standard'>
-										{formik.errors.grade}
-									</FormHelperText>
-								)}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Giáo viên chủ nhiệm
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["homeroom-teacher-abbreviation"] &&
-                      Boolean(formik.errors["homeroom-teacher-abbreviation"])
-                    }
-                  >
                     <Select
                       variant="standard"
-                      name="homeroom-teacher-abbreviation"
-                      value={formik.values["homeroom-teacher-abbreviation"]}
+                      name="grade"
+                      value={formik.values.grade}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
-                          },
-                        },
-                      }}
+                      error={
+                        formik.touched.grade && Boolean(formik.errors.grade)
+                      }
                     >
-                      <MenuItem>--Chọn giáo viên--</MenuItem>
-                      {teachers.map((teacher) => (
-                        <MenuItem key={teacher.id} value={teacher.abbreviation}>
-                          {teacher.abbreviation}
-                        </MenuItem>
-                      ))}
+                      <MenuItem value={0}>0</MenuItem>
+                      <MenuItem value={1}>1</MenuItem>
                     </Select>
-                    {formik.touched["homeroom-teacher-abbreviation"] &&
-                      formik.errors["homeroom-teacher-abbreviation"] && (
-                        <FormHelperText className="m-0">
-                          {formik.errors["homeroom-teacher-abbreviation"]}
-                        </FormHelperText>
-                      )}
+                    {formik.touched.grade && formik.errors.grade && (
+                      <FormHelperText className="m-0">
+                        {formik.errors.grade}
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
               </Grid>
@@ -343,7 +293,7 @@ const AddClassModal = (props: AddClassFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Thêm lớp học"
+            title="Cập nhật"
             disableRipple
             type="submit"
             disabled={!formik.isValid}
@@ -360,4 +310,4 @@ const AddClassModal = (props: AddClassFormProps) => {
     </Dialog>
   );
 };
-export default AddClassModal;
+export default UpdateClassModal;

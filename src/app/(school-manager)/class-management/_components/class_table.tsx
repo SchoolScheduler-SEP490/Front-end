@@ -25,6 +25,7 @@ import { KeyedMutator } from "swr";
 import { IClassTableData } from "../_libs/constants";
 import AddClassModal from "./add_class";
 import DeleteClassModal from "./delete_class";
+import UpdateClassModal from "./update_class";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -235,159 +236,169 @@ const ClassTable = (props: IClassTableProps) => {
   const handleOpenAddForm = () => setOpenAddForm(true);
 
   return (
-    <div className='w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]'>
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <Toolbar
-          sx={[
-            {
-              pl: { sm: 2 },
-              pr: { xs: 1, sm: 1 },
-              width: "100%",
-            },
-          ]}
-        >
-          <h2 className="text-title-medium-strong font-semibold w-full text-left">
-            Lớp học
-          </h2>
-          <Tooltip title="Thêm lớp học">
-            <IconButton onClick={handleOpenAddForm}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Lọc danh sách">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size="medium"
+    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
+      <Box sx={{ width: "100%" }}>
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <Toolbar
+            sx={[
+              {
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                width: "100%",
+              },
+            ]}
           >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={classTableData.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const labelId = `enhanced-table-checkbox-${index}`;
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.id}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      align="left"
-                    >
-                      {index + 1 + page * rowsPerPage}
-                    </TableCell>
-                    <TableCell align="left">{row.className}</TableCell>
-                    <TableCell align="center">{row.grade}</TableCell>
-                    <TableCell align="center">
-                      {row.homeroomTeacherName}
-                    </TableCell>
-                    <TableCell align="center">{row.schoolYear}</TableCell>
-                    <TableCell align="center">{row.mainSession}</TableCell>
-                    <TableCell width={80}>
-                      <IconButton
-                        color="success"
-                        sx={{ zIndex: 10 }}
-                        id="basic-button"
-                        aria-controls={open ? `basic-menu${index}` : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) => handleClick(event, row)}
-                      >
-                        <Image
-                          src="/images/icons/menu.png"
-                          alt="notification-icon"
-                          unoptimized={true}
-                          width={20}
-                          height={20}
-                        />
-                      </IconButton>
+            <h2 className="text-title-medium-strong font-semibold w-full text-left">
+              Lớp học
+            </h2>
+            <Tooltip title="Thêm lớp học">
+              <IconButton onClick={handleOpenAddForm}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Lọc danh sách">
+              <IconButton>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
 
-                      <Menu
-                        id={`basic-menu${index}`}
-                        anchorEl={anchorEl}
-                        elevation={1}
-                        open={Boolean(anchorEl) && selectedRow === row}
-                        onClose={handleMenuClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size="medium"
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={classTableData.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.id}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
                       >
-                        {dropdownOptions.map((option, index) => (
-                          <MenuItem
-                            key={option.title}
-                            onClick={() => handleMenuItemClick(index)}
-                            className={`flex flex-row items-center ${
-                              index === dropdownOptions.length - 1 &&
-                              "hover:bg-basic-negative-hover hover:text-basic-negative"
-                            }`}
-                          >
-                            <Image
-                              className="mr-4"
-                              src={option.img}
-                              alt={option.title}
-                              width={15}
-                              height={15}
-                            />
-                            <h2 className="text-body-medium">{option.title}</h2>
-                          </MenuItem>
-                        ))}
-                      </Menu>
-                    </TableCell>
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
+                      <TableCell align="left">{row.className}</TableCell>
+                      <TableCell align="center">{row.grade}</TableCell>
+                      <TableCell align="center">
+                        {row.homeroomTeacherName}
+                      </TableCell>
+                      <TableCell align="center">{row.schoolYear}</TableCell>
+                      <TableCell align="center">{row.mainSession}</TableCell>
+                      <TableCell width={80}>
+                        <IconButton
+                          color="success"
+                          sx={{ zIndex: 10 }}
+                          id="basic-button"
+                          aria-controls={
+                            open ? `basic-menu${index}` : undefined
+                          }
+                          aria-haspopup="true"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(event) => handleClick(event, row)}
+                        >
+                          <Image
+                            src="/images/icons/menu.png"
+                            alt="notification-icon"
+                            unoptimized={true}
+                            width={20}
+                            height={20}
+                          />
+                        </IconButton>
+
+                        <Menu
+                          id={`basic-menu${index}`}
+                          anchorEl={anchorEl}
+                          elevation={1}
+                          open={Boolean(anchorEl) && selectedRow === row}
+                          onClose={handleMenuClose}
+                          MenuListProps={{
+                            "aria-labelledby": "basic-button",
+                          }}
+                        >
+                          {dropdownOptions.map((option, index) => (
+                            <MenuItem
+                              key={option.title}
+                              onClick={() => handleMenuItemClick(index)}
+                              className={`flex flex-row items-center ${
+                                index === dropdownOptions.length - 1 &&
+                                "hover:bg-basic-negative-hover hover:text-basic-negative"
+                              }`}
+                            >
+                              <Image
+                                className="mr-4"
+                                src={option.img}
+                                alt={option.title}
+                                width={15}
+                                height={15}
+                              />
+                              <h2 className="text-body-medium">
+                                {option.title}
+                              </h2>
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: 50 * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={8} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 50 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={8} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={totalRows ?? classTableData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-        <AddClassModal 
-        open={openAddForm}
-        onClose={setOpenAddForm}
-        mutate={mutate}      
-        />
-        <DeleteClassModal 
-        open={openDeleteModal}
-        onClose={setOpenDeleteModal}
-        className={selectedRow?.className ?? "Không xác định"}
-        classId={selectedRow?.id ?? 0}
-        mutate={mutate}       
-        />
-      </Paper>
-    </Box>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalRows ?? classTableData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+          <AddClassModal
+            open={openAddForm}
+            onClose={setOpenAddForm}
+            mutate={mutate}
+          />
+          <DeleteClassModal
+            open={openDeleteModal}
+            onClose={setOpenDeleteModal}
+            className={selectedRow?.className ?? "Không xác định"}
+            classId={selectedRow?.id ?? 0}
+            mutate={mutate}
+          />
+          <UpdateClassModal
+            open={openUpdateModal}
+            onClose={setOpenUpdateModal}
+            classId={selectedRow?.id ?? 0}
+            mutate={mutate}
+          />
+        </Paper>
+      </Box>
     </div>
   );
 };
