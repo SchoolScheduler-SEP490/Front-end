@@ -74,8 +74,8 @@ export const SUBJECT_GROUP_TYPE: { key: string; value: number }[] = [
 	{ key: 'TU_CHON', value: 4 },
 ];
 
-export const CLASSGROUP_STRING_TYPE: { key: string; value: string }[] = [
-	{ key: 'Khối 10', value: 'khoi_10' },
-	{ key: 'Khối 11', value: 'khoi_11' },
-	{ key: 'Khối 12', value: 'khoi_12' },
+export const CLASSGROUP_STRING_TYPE: { key: string; value: number }[] = [
+	{ key: 'Khối 10', value: 10 },
+	{ key: 'Khối 11', value: 11 },
+	{ key: 'Khối 12', value: 12 },
 ];
