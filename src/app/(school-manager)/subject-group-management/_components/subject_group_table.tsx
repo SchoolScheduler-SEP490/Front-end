@@ -163,6 +163,11 @@ const dropdownOptions: ICommonOption[] = [
 	{ img: '/images/icons/delete.png', title: 'Xóa Tổ hợp môn' },
 ];
 
+const GRADE_COLOR: { [key: number]: string } = {
+	10: 'tertiary-normal',
+	11: 'black',
+	12: 'primary-500',
+};
 const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	const {
 		subjectGroupTableData,
@@ -177,8 +182,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] =
-		React.useState<keyof ISubjectGroupTableData>('subjectGroupName');
+	const [orderBy, setOrderBy] = React.useState<keyof ISubjectGroupTableData>('grade');
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
@@ -325,7 +329,13 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													? row.subjectGroupCode
 													: '- - - - -'}
 											</TableCell>
-											<TableCell align='left' width={200}>
+											<TableCell
+												align='left'
+												width={200}
+												className={`text-${
+													GRADE_COLOR[row.grade]
+												} font-semibold`}
+											>
 												{row.grade > 0
 													? CLASSGROUP_STRING_TYPE.find(
 															(item) =>

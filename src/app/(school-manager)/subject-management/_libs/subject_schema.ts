@@ -41,7 +41,7 @@ export const updateSubjectSchema = yup.object().shape({
 		.string()
 		.required('Tên tắt TKB là bắt buộc')
 		.matches(
-			RegExp('^[a-zA-Z0-9À-ỹ]+$'),
+			RegExp('^[a-zA-Z0-9À-ỹ-]+$'),
 			'Tên tắt TKB không được chứa các ký tự đặc biệt'
 		),
 	description: yup.string().required('Tổ bộ môn là bắt buộc'),

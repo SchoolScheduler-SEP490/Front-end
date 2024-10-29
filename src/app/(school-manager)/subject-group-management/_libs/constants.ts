@@ -26,7 +26,7 @@ export interface IFetchSubjectGroupBodyProps {
 	schoolId: string;
 	schoolYearId: number;
 	subjectGroupId?: number;
-	grade?: string;
+	grade?: number;
 	deletedIncluded?: boolean;
 }
 
@@ -35,7 +35,7 @@ export interface ICreateSubjectGroupRequest {
 	'group-name': string;
 	'group-code': string;
 	'group-description': string;
-	grade: string;
+	grade: number;
 	'school-year-id': number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
@@ -46,7 +46,7 @@ export interface IUpdateSubjectGroupRequest {
 	'group-name': string;
 	'group-code': string;
 	'group-description': string;
-	grade: string;
+	grade: number;
 	'is-deleted'?: boolean;
 	'school-year-id': number;
 	'elective-subject-ids': number[];
@@ -83,7 +83,7 @@ export interface ISubjectGroupDetailResponse {
 	'group-name': string;
 	'school-id': number;
 	'group-description': string;
-	grade: string;
+	grade: number;
 	'subject-selective-views': ISelectiveSubject[];
 	'subject-specializedt-views': ISelectiveSubject[];
 	'subject-required-views': ISelectiveSubject[];
