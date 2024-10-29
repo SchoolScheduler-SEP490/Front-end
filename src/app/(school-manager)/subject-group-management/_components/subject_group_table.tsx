@@ -23,6 +23,7 @@ import { KeyedMutator } from 'swr';
 import { ISubjectGroupTableData } from '../_libs/constants';
 import CreateSubjectGroupModal from './subject_group_create_modal';
 import DeleteSubjectGroupModal from './subject_group_delete_modal';
+import UpdateSubjectGroupModal from './subject-group_update_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -444,12 +445,12 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
 				mutate={mutate}
 			/>
-			{/*<UpdateSubjectModal
+			<UpdateSubjectGroupModal
 				open={iUpdateModalOpen}
 				setOpen={setIUpdateModalOpen}
-				subjectId={selectedRow?.subjectKey ?? 0}
-				mutate={mutate}
-			/> */}
+				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
+				subjectGroupMutator={mutate}
+			/>
 		</div>
 	);
 };
