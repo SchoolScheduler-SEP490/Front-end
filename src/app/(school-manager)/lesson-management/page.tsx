@@ -577,7 +577,7 @@ export default function SMLesson() {
 	);
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
