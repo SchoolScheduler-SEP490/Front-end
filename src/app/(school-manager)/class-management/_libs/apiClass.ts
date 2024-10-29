@@ -1,4 +1,4 @@
-import { IAddClassData } from "./constants";
+import { IAddClassData, IUpdateClassData } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
@@ -93,5 +93,38 @@ export const deleteClassById = async (
   });
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
+  }
+};
+
+export const updateClass = async (
+  id: number,
+  sessionToken: string,
+  classData: IUpdateClassData
+): Promise<boolean> => {
+  if (!sessionToken) {
+    console.error("Session token is not found. Please log in.");
+    return false;
+  }
+  const url = `${api}/api/student-classes/${id}`;
+  const requestBody = classData;
+  console.log("Request Body:", requestBody);
+
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Error occurred while sending request:", error);
+    return false;
   }
 };
