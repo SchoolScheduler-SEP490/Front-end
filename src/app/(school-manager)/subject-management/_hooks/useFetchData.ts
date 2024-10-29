@@ -1,5 +1,8 @@
 import useSWR from 'swr';
 import { getFetchSubjectApi } from '../_libs/apis';
+import { revalidateEvents } from 'swr/_internal';
+import useNotify from '@/hooks/useNotify';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 interface IFetcherProps {
 	sessionToken: string;
@@ -44,9 +47,10 @@ const useFetchData = (props: IFetcherProps) => {
 	}
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
+		revalidateIfStale: false,
 		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateOnReconnect: false,
+		shouldRetryOnError: false,
 	});
 
 	return { data, error, isLoading, isValidating, mutate };

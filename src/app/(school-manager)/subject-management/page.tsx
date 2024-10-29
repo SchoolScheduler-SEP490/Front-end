@@ -9,6 +9,7 @@ import { ISubject, ISubjectTableData } from './_libs/constants';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
 import SubjectTableSkeleton from './_components/table_skeleton';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -24,6 +25,7 @@ export default function SMSubject() {
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>(
 		[]
 	);
+	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -32,6 +34,7 @@ export default function SMSubject() {
 
 	React.useEffect(() => {
 		mutate();
+		setIsErrorShown(false);
 		if (data?.status === 200) {
 			setTotalRows(data.result['total-item-count']);
 			let index = page * rowsPerPage + 1;
@@ -59,6 +62,14 @@ export default function SMSubject() {
 		}
 	}, [page, rowsPerPage]);
 
+	if (error && !isErrorShown) {
+		useNotify({
+			type: 'error',
+			message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
+		});
+		setIsErrorShown(true);
+	}
+
 	if (isValidating) {
 		return (
 			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
@@ -72,13 +83,6 @@ export default function SMSubject() {
 				<SubjectTableSkeleton />
 			</div>
 		);
-	}
-
-	if (error) {
-		useNotify({
-			type: 'error',
-			message: error.message ?? 'Có lỗi xảy ra',
-		});
 	}
 
 	return (

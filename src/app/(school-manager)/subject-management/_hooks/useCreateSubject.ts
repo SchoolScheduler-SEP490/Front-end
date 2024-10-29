@@ -1,13 +1,13 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { ICreateSubjectRequestBody } from '../_libs/constants';
+import { ICreateSubjectRequest } from '../_libs/constants';
 import { getCreateSubjectApi } from '../_libs/apis';
 
 interface ICreateSubjectProps {
 	schoolId: string;
 	sessionToken: string;
-	formData: ICreateSubjectRequestBody[];
+	formData: ICreateSubjectRequest[];
 }
 
 const useCreateSubject = async (props: ICreateSubjectProps) => {

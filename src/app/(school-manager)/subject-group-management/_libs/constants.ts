@@ -83,7 +83,7 @@ export interface ISubjectGroupDetailResponse {
 	'group-name': string;
 	'school-id': number;
 	'group-description': string;
-	grade: number;
+	grade: string;
 	'subject-selective-views': ISelectiveSubject[];
 	'subject-specializedt-views': ISelectiveSubject[];
 	'subject-required-views': ISelectiveSubject[];
