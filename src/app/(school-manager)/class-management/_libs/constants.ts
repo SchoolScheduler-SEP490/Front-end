@@ -27,10 +27,21 @@ export interface IAddClassData {
   "main-session": number;
   "is-full-day": boolean;
   "period-count": number;
-  grade: number;
+  grade: string;
 }
 export interface ITeacher {
-    id: number;
-    abbreviation: string;
-  }
-  
+  id: number;
+  abbreviation: string;
+}
+
+export interface IUpdateClassData {
+  name: string;
+  "homeroom-teacher-id": number;
+  "school-id": number;
+  "school-year-id": number;
+  "main-session": string;
+  "is-full-day": boolean;
+  "period-count": number;
+  grade: string;
+  "subject-group-id": number;
+}
