@@ -5,7 +5,7 @@ export interface ISubjectGroup {
 	'school-id': number;
 	'school-name': string;
 	'group-description': string;
-	grade: string;
+	grade: number;
 	'subject-group-type-name': string | null;
 	'school-year-id': number;
 }
@@ -14,7 +14,7 @@ export interface ISubjectGroupTableData {
 	id: number;
 	subjectGroupName: string;
 	subjectGroupCode: string;
-	grade: string;
+	grade: number;
 	subjectGroupKey: number;
 }
 
