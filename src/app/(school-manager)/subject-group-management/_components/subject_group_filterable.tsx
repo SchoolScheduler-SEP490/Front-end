@@ -58,7 +58,7 @@ const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
 		<div
 			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] ${
 				open
-					? 'visible animate-fade-left animate-once animate-duration-500'
+					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
 					: 'hidden'
 			}`}
 		>
