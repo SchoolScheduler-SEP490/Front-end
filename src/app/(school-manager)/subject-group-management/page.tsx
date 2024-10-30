@@ -22,7 +22,7 @@ export default function SMSubject() {
 	>([]);
 	const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
 	const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
-	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(true);
+	// const [isErrorShown, setIsErrorShown] = React.useState<boolean>(true);
 
 	const { data, error, isLoading, isValidating, mutate } = useFetchSGData({
 		sessionToken: sessionToken,
@@ -85,13 +85,13 @@ export default function SMSubject() {
 		);
 	}
 
-	if (error && !isErrorShown) {
-		useNotify({
-			type: 'error',
-			message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
-		});
-		setIsErrorShown(true);
-	}
+	// if (error && !isErrorShown) {
+	// 	useNotify({
+	// 		type: 'error',
+	// 		message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
+	// 	});
+	// 	setIsErrorShown(true);
+	// }
 
 	return (
 		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
