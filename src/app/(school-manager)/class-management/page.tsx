@@ -6,7 +6,7 @@ import useClassData from "./_hooks/useClassData";
 import ClassTable from "./_components/class_table";
 import ClassTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
-import { IClass, IClassTableData, ISchoolYear } from "./_libs/constants";
+import { IClass, IClassTableData} from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 import { fetchSchoolYear } from "./_libs/apiClass";
 
@@ -15,7 +15,6 @@ export default function SMClass() {
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const { schoolId, sessionToken } = useAppContext();
   const [currentSchoolYear, setCurrentSchoolYear] = React.useState<string>("");
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 
   const { data, error, isValidating, mutate } = useClassData({
     sessionToken,
