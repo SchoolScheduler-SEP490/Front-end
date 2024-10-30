@@ -1,3 +1,5 @@
+import { StyledString } from "next/dist/build/swc";
+
 export interface INavigation {
 	name: string;
 	url: string;
@@ -85,3 +87,13 @@ export const CLASSGROUP_TRANSLATOR: { [key: string]: number } = {
 	GRADE_11: 11,
 	GRADE_12: 12,
 };
+
+export enum ERoomType {
+	PRACTICE_ROOM = "PRACTICE_ROOM",
+	LECTURE_ROOM = "LECTURE_ROOM"
+  }
+  
+  export const ROOM_STRING_TYPE: { key: string; value: number }[] = [
+	{ key: 'PRACTICE_ROOM', value: 1 },
+	{ key: 'LECTURE_ROOM', value: 2 },
+  ];

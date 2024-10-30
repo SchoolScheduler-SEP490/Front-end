@@ -1,336 +1,406 @@
-'use client';
+"use client";
 
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Toolbar, Tooltip } from '@mui/material';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import { visuallyHidden } from '@mui/utils';
-import Image from 'next/image';
-import * as React from 'react';
-import { IRoomTableData } from '../_libs/constants';
+import * as React from "react";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableSortLabel,
+  Toolbar,
+  Tooltip,
+} from "@mui/material";
+import Image from "next/image";
+import { visuallyHidden } from "@mui/utils";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import AddIcon from "@mui/icons-material/Add";
+import { ICommonOption } from "@/utils/constants";
+import { KeyedMutator } from "swr";
+import { IRoomTableData } from "../_libs/constants";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-	if (b[orderBy] < a[orderBy]) {
-		return -1;
-	}
-	if (b[orderBy] > a[orderBy]) {
-		return 1;
-	}
-	return 0;
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
 }
 
-type Order = 'asc' | 'desc';
+type Order = "asc" | "desc";
 
 function getComparator<Key extends keyof any>(
-	order: Order,
-	orderBy: Key
+  order: Order,
+  orderBy: Key
 ): (
-	a: { [key in Key]: number | string },
-	b: { [key in Key]: number | string }
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string }
 ) => number {
-	return order === 'desc'
-		? (a, b) => descendingComparator(a, b, orderBy)
-		: (a, b) => -descendingComparator(a, b, orderBy);
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
 interface HeadCell {
-	disablePadding: boolean;
-	id: keyof IRoomTableData;
-	label: string;
-	centered: boolean;
+  id: keyof IRoomTableData;
+  label: string;
+  centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
-	{
-		id: 'id' as keyof IRoomTableData,
-		centered: true,
-		disablePadding: false,
-		label: 'STT',
-	},
-	{
-		id: 'roomName' as keyof IRoomTableData,
-		centered: false,
-		disablePadding: true,
-		label: 'Tên phòng',
-	},
-	{
-		id: 'buildingName' as keyof IRoomTableData,
-		centered: true,
-		disablePadding: true,
-		label: 'Toà nhà',
-	},
-	{
-		id: 'availableSubjects' as keyof IRoomTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Môn học sử dụng',
-	},
-	{
-		id: 'roomType' as keyof IRoomTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Loại phòng',
-	},
-	{
-		id: 'status' as keyof IRoomTableData,
-		centered: true,
-		disablePadding: true,
-		label: 'Trạng thái',
-	},
+  {
+    id: "id" as keyof IRoomTableData,
+    centered: false,
+    label: "STT",
+  },
+  {
+    id: "roomName" as keyof IRoomTableData,
+    centered: false,
+    label: "Tên phòng",
+  },
+  {
+    id: "buildingName" as keyof IRoomTableData,
+    centered: false,
+    label: "Toà nhà",
+  },
+  {
+    id: "availableSubjects" as keyof IRoomTableData,
+    centered: false,
+    label: "Môn học sử dụng",
+  },
+  {
+    id: "roomType" as keyof IRoomTableData,
+    centered: false,
+    label: "Loại phòng",
+  },
+  {
+    id: "status" as keyof IRoomTableData,
+    centered: false,
+    label: "Trạng thái",
+  },
 ];
 
-// For extrafunction of Table head (filter, sort, etc.)
 interface EnhancedTableProps {
-	onRequestSort: (
-		event: React.MouseEvent<unknown>,
-		property: keyof IRoomTableData
-	) => void;
-	order: Order;
-	orderBy: string;
-	rowCount: number;
+  onRequestSort: (
+    event: React.MouseEvent<unknown>,
+    property: keyof IRoomTableData
+  ) => void;
+  order: Order;
+  orderBy: string;
+  rowCount: number;
 }
 function EnhancedTableHead(props: EnhancedTableProps) {
-	const { order, orderBy, rowCount, onRequestSort } = props;
-	const createSortHandler =
-		(property: keyof IRoomTableData) => (event: React.MouseEvent<unknown>) => {
-			onRequestSort(event, property);
-		};
+  const { order, orderBy, rowCount, onRequestSort } = props;
+  const createSortHandler =
+    (property: keyof IRoomTableData) => (event: React.MouseEvent<unknown>) => {
+      onRequestSort(event, property);
+    };
 
-	return (
-		<TableHead>
-			<TableRow>
-				{headCells.map((headCell) => (
-					<TableCell
-						key={headCell.id}
-						align={headCell.centered ? 'center' : 'left'}
-						padding={headCell.disablePadding ? 'none' : 'normal'}
-						sortDirection={orderBy === headCell.id ? order : false}
-						sx={[
-							{ fontWeight: 'bold' },
-							headCell.centered ? { paddingLeft: '2%' } : {},
-						]}
-					>
-						<TableSortLabel
-							active={orderBy === headCell.id}
-							direction={orderBy === headCell.id ? order : 'asc'}
-							onClick={createSortHandler(headCell.id)}
-						>
-							{headCell.label}
-							{orderBy === headCell.id ? (
-								<Box
-									component='span'
-									sx={[
-										visuallyHidden,
-										{ position: 'absolute', zIndex: 10 },
-									]}
-								>
-									{order === 'desc'
-										? 'sorted descending'
-										: 'sorted ascending'}
-								</Box>
-							) : null}
-						</TableSortLabel>
-					</TableCell>
-				))}
-				<TableCell>
-					<h2 className='font-semibold text-white'>CN</h2>
-				</TableCell>
-			</TableRow>
-		</TableHead>
-	);
+  return (
+    <TableHead>
+      <TableRow>
+        {headCells.map((headCell) => (
+          <TableCell
+            key={headCell.id}
+            align={headCell.centered ? "center" : "left"}
+            sortDirection={orderBy === headCell.id ? order : false}
+            sx={{
+              fontWeight: "bold",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+            }}
+          >
+            {headCell.id === "roomName" ? (
+              <span>{headCell.label}</span>
+            ) : (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : "asc"}
+                onClick={createSortHandler(headCell.id as keyof IRoomTableData)}
+              >
+                {headCell.label}
+                {orderBy === headCell.id ? (
+                  <Box component="span" sx={visuallyHidden}>
+                    {order === "desc"
+                      ? "sorted descending"
+                      : "sorted ascending"}
+                  </Box>
+                ) : null}
+              </TableSortLabel>
+            )}
+          </TableCell>
+        ))}
+        <TableCell>
+          <h2 className="font-semibold text-white"></h2>
+        </TableCell>
+      </TableRow>
+    </TableHead>
+  );
 }
 
 interface IRoomTableProps {
-	roomTableData: IRoomTableData[];
-	serverPage: number;
-	setServerPage: React.Dispatch<React.SetStateAction<number>>;
-	rowsPerPage: number;
-	setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
-	totalRows?: number;
+  roomTableData: IRoomTableData[];
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  rowsPerPage: number;
+  setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  totalRows?: number;
+  mutate: KeyedMutator<any>;
 }
+const dropdownOptions: ICommonOption[] = [
+  { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
+  { img: "/images/icons/delete.png", title: "Xóa lớp học" },
+];
 
 const RoomTable = (props: IRoomTableProps) => {
-	const { roomTableData, rowsPerPage, serverPage, setRowsPerPage, setServerPage } =
-		props;
-	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof IRoomTableData>('id');
-	const [page, setPage] = React.useState<number>(serverPage);
-	const [maxCurrentPage, setMaxCurrentPage] = React.useState<number>(serverPage);
+  const {
+    roomTableData,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    totalRows,
+    mutate,
+  } = props;
+  const [order, setOrder] = React.useState<Order>("asc");
+  const [orderBy, setOrderBy] =
+    React.useState<keyof IRoomTableData>("roomName");
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
+  const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = React.useState<
+    IRoomTableData | undefined
+  >();
+  const open = Boolean(anchorEl);
 
-	const handleRequestSort = (
-		event: React.MouseEvent<unknown>,
-		property: keyof IRoomTableData
-	) => {
-		const isAsc = orderBy === property && order === 'asc';
-		setOrder(isAsc ? 'desc' : 'asc');
-		setOrderBy(property);
-	};
+  const handleClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    row: IRoomTableData
+  ) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedRow(row);
+  };
 
-	const handleChangePage = (event: unknown, newPage: number) => {
-		if (newPage > page && newPage > maxCurrentPage) {
-			setMaxCurrentPage(newPage);
-			setServerPage(newPage);
-		} else {
-			setPage(newPage);
-		}
-	};
+  const handleRequestSort = (
+    event: React.MouseEvent<unknown>,
+    property: keyof IRoomTableData
+  ) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
 
-	const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setRowsPerPage(parseInt(event.target.value, 10));
-		setPage(0);
-	};
+  const handleMenuItemClick = (index: number) => {
+    switch (index) {
+      case 0:
+        setOpenUpdateModal(true);
+        break;
+      case 1:
+        setOpenDeleteModal(true);
+        break;
+      default:
+        break;
+    }
+    setAnchorEl(null);
+  };
 
-	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - roomTableData.length) : 0;
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
-	const visibleRows = React.useMemo(
-		() =>
-			[...roomTableData]
-				.sort(getComparator(order, orderBy))
-				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-		[order, orderBy, page, rowsPerPage]
-	);
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value));
+  };
 
-	return (
-		<div className='w-full h-fit flex flex-col justify-center items-center px-[15vw] pt-[5vh]'>
-			<Box sx={{ width: '100%' }}>
-				<Paper sx={{ width: '100%', mb: 2 }}>
-					<Toolbar
-						sx={[
-							{
-								pl: { sm: 2 },
-								pr: { xs: 1, sm: 1 },
-								width: '100%',
-							},
-						]}
-					>
-						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Lớp học
-						</h2>
-						<Tooltip title='Filter list'>
-							<IconButton>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip>
-					</Toolbar>
-					<TableContainer>
-						<Table
-							sx={{ minWidth: 750 }}
-							aria-labelledby='tableTitle'
-							size='medium'
-						>
-							<EnhancedTableHead
-								order={order}
-								orderBy={orderBy}
-								onRequestSort={handleRequestSort}
-								rowCount={roomTableData.length}
-							/>
-							<TableBody>
-								{visibleRows.map((row, index) => {
-									const labelId = `enhanced-table-checkbox-${index}`;
+  const visibleRows = React.useMemo(
+    () => [...roomTableData].sort(getComparator(order, orderBy)),
+    [order, orderBy, page, rowsPerPage, roomTableData]
+  );
 
-									return (
-										<TableRow
-											hover
-											role='checkbox'
-											tabIndex={-1}
-											key={row.id}
-											sx={{ cursor: 'pointer' }}
-										>
-											<TableCell
-												component='th'
-												id={labelId}
-												scope='row'
-												padding='none'
-												align='center'
-											>
-												{row.id}
-											</TableCell>
-											<TableCell align='left'>
-												{row.roomName}
-											</TableCell>
-											<TableCell align='center'>
-												{row.buildingName}
-											</TableCell>
-											<TableCell align='left'>
-												{row.availableSubjects}
-											</TableCell>
-											<TableCell align='left'>
-												<h2
-													className={`font-semibold ${
-														row.roomType === 'Phòng học'
-															? 'text-primary-400'
-															: 'text-tertiary-normal'
-													}`}
-												>
-													{row.roomType}
-												</h2>
-											</TableCell>
-											<TableCell align='center'>
-												<div className='w-full h-full flex justify-center items-center'>
-													<div
-														className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
-														${
-															row.status === 'Hoạt động'
-																? 'bg-basic-positive-hover text-basic-positive'
-																: 'bg-basic-gray-hover text-basic-gray'
-														}`}
-													>
-														{row.status}
-													</div>
-												</div>
-											</TableCell>
-											<TableCell width={80}>
-												<IconButton
-													color='success'
-													sx={{ zIndex: 10 }}
-												>
-													<Image
-														src='/images/icons/menu.png'
-														alt='notification-icon'
-														unoptimized={true}
-														width={20}
-														height={20}
-													/>
-												</IconButton>
-											</TableCell>
-										</TableRow>
-									);
-								})}
-								{emptyRows > 0 && (
-									<TableRow
-										style={{
-											height: 40 * emptyRows,
-										}}
-									>
-										<TableCell colSpan={6} />
-									</TableRow>
-								)}
-							</TableBody>
-						</Table>
-					</TableContainer>
-					<TablePagination
-						rowsPerPageOptions={[5, 10, 25]}
-						component='div'
-						count={roomTableData.length}
-						rowsPerPage={rowsPerPage}
-						page={page}
-						onPageChange={handleChangePage}
-						onRowsPerPageChange={handleChangeRowsPerPage}
-					/>
-				</Paper>
-			</Box>
-		</div>
-	);
+  const emptyRows =
+    roomTableData.length < rowsPerPage && rowsPerPage < 10
+      ? rowsPerPage - roomTableData.length + 1
+      : 0;
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenAddForm = () => setOpenAddForm(true);
+
+  return (
+    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
+      <Box sx={{ width: "100%" }}>
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <Toolbar
+            sx={[
+              {
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                width: "100%",
+              },
+            ]}
+          >
+            <h2 className="text-title-medium-strong font-semibold w-full text-left">
+              Phòng học
+            </h2>
+            <Tooltip title="Thêm lớp học">
+              <IconButton onClick={handleOpenAddForm}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Lọc danh sách">
+              <IconButton>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
+
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size="medium"
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={roomTableData.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.id}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
+                      >
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
+                      <TableCell align="left">{row.roomName}</TableCell>
+                      <TableCell align="left">{row.buildingName}</TableCell>
+                      <TableCell align="left">
+                        {row.availableSubjects}
+                      </TableCell>
+                      <TableCell align="left">{row.roomType}</TableCell>
+                      <TableCell align="left">
+                      <div className="w-full h-full flex justify-left items-center">
+                        <div
+                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+                            ${
+                              row.status === "Hoạt động"
+                                ? "bg-basic-positive-hover text-basic-positive"
+                                : "bg-basic-negative-hover text-basic-negative"
+                            }`}
+                          style={{ whiteSpace: "nowrap" }}
+                        >
+                          {row.status}
+                        </div>
+                      </div>
+                    </TableCell>
+                      <TableCell width={80}>
+                        <IconButton
+                          color="success"
+                          sx={{ zIndex: 10 }}
+                          id="basic-button"
+                          aria-controls={
+                            open ? `basic-menu${index}` : undefined
+                          }
+                          aria-haspopup="true"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(event) => handleClick(event, row)}
+                        >
+                          <Image
+                            src="/images/icons/menu.png"
+                            alt="notification-icon"
+                            unoptimized={true}
+                            width={20}
+                            height={20}
+                          />
+                        </IconButton>
+
+                        <Menu
+                          id={`basic-menu${index}`}
+                          anchorEl={anchorEl}
+                          elevation={1}
+                          open={Boolean(anchorEl) && selectedRow === row}
+                          onClose={handleMenuClose}
+                          MenuListProps={{
+                            "aria-labelledby": "basic-button",
+                          }}
+                        >
+                          {dropdownOptions.map((option, index) => (
+                            <MenuItem
+                              key={option.title}
+                              onClick={() => handleMenuItemClick(index)}
+                              className={`flex flex-row items-center ${
+                                index === dropdownOptions.length - 1 &&
+                                "hover:bg-basic-negative-hover hover:text-basic-negative"
+                              }`}
+                            >
+                              <Image
+                                className="mr-4"
+                                src={option.img}
+                                alt={option.title}
+                                width={15}
+                                height={15}
+                              />
+                              <h2 className="text-body-medium">
+                                {option.title}
+                              </h2>
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: 50 * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={8} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={totalRows ?? roomTableData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      </Box>
+    </div>
+  );
 };
-
 export default RoomTable;
