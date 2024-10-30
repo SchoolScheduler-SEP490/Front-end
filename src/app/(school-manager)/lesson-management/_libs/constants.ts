@@ -1,24 +1,4 @@
-export interface ISubjectGroup {
-	id: number;
-	'group-code': string;
-	'group-name': string;
-	'school-id': number;
-	'school-name': string;
-	'group-description': string;
-	grade: number;
-	'subject-group-type-name': string | null;
-	'school-year-id': number;
-}
-// Table SubjectGroup Data
-export interface ISubjectGroupTableData {
-	id: number;
-	subjectGroupName: string;
-	subjectGroupCode: string;
-	grade: number;
-	subjectGroupKey: number;
-}
-
-// Fetcher Props
+// SubjectGroup Fetcher Props
 export interface IFetchSubjectGroupBodyProps {
 	sessionToken: string;
 	pageSize: number;
@@ -30,44 +10,27 @@ export interface IFetchSubjectGroupBodyProps {
 	deletedIncluded?: boolean;
 }
 
-//Create SubjectGroup Data
-export interface ICreateSubjectGroupRequest {
-	'group-name': string;
+//SubjectGroup Data response
+export interface ISubjectGroupObjectResponse {
+	id: number;
 	'group-code': string;
-	'group-description': string;
-	grade: number;
+	'group-name': string;
+	'school-id': number;
+	'school-name': string;
+	'group-description': string | null;
+	grade: string;
+	'subject-group-type-name': string | null;
 	'school-year-id': number;
-	'elective-subject-ids': number[];
-	'specialized-subject-ids': number[];
 }
 
-// Update SubjectGroup Data
-export interface IUpdateSubjectGroupRequest {
-	'group-name': string;
-	'group-code': string;
-	'group-description': string;
-	grade: number;
-	'is-deleted'?: boolean;
-	'school-year-id': number;
-	'elective-subject-ids': number[];
-	'specialized-subject-ids': number[];
+export interface ISubjectGroupSidenavData {
+	title: string;
+	items: { key: string; value: number }[];
 }
 
-export interface IDropdownOption<T> {
+export interface IYearDropdownOption<T> {
 	value: T;
 	label: string;
-}
-
-export interface ISubjectOptionResponse {
-	id: number;
-	'subject-name': string;
-	abbreviation: string;
-	'is-required': boolean;
-	description: string;
-	'create-date': string;
-	'update-date': string;
-	'is-deleted': boolean;
-	'subject-group-type': string;
 }
 
 export interface ISchoolYearResponse {
@@ -75,6 +38,16 @@ export interface ISchoolYearResponse {
 	'start-year': string;
 	'end-year': string;
 	'school-year-code': string;
+}
+
+export interface ILessonTableData {
+	id: number;
+	lessonName: string;
+	mainTotalSlotPerWeek: number;
+	isDouleSlot: boolean;
+	subTotalSlotPerWeek: number;
+	subIsDouleSlot: boolean;
+	isRequiredSubject: boolean;
 }
 
 export interface ISubjectGroupDetailResponse {

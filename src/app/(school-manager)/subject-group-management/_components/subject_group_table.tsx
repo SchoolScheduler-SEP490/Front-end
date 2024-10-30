@@ -4,7 +4,7 @@ import useNotify from '@/hooks/useNotify';
 import { CLASSGROUP_STRING_TYPE, ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
+import { Chip, Menu, MenuItem, Stack, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -269,16 +269,18 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 							Tổ hợp môn
 						</h2>
-						<Tooltip title='Thêm Môn học'>
-							<IconButton onClick={handleAddSubject}>
-								<AddIcon />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title='Lọc danh sách'>
-							<IconButton onClick={handleFilterable}>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip>
+						<div className='w-fit h-fit'>
+							<Tooltip title='Thêm Môn học'>
+								<IconButton onClick={handleAddSubject}>
+									<AddIcon />
+								</IconButton>
+							</Tooltip>
+							<Tooltip title='Lọc danh sách'>
+								<IconButton onClick={handleFilterable}>
+									<FilterListIcon />
+								</IconButton>
+							</Tooltip>
+						</div>
 					</Toolbar>
 					<TableContainer>
 						<Table

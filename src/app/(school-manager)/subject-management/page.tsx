@@ -25,7 +25,7 @@ export default function SMSubject() {
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>(
 		[]
 	);
-	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
+	// const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -34,7 +34,7 @@ export default function SMSubject() {
 
 	React.useEffect(() => {
 		mutate();
-		setIsErrorShown(false);
+		// setIsErrorShown(false);
 		if (data?.status === 200) {
 			setTotalRows(data.result['total-item-count']);
 			let index = page * rowsPerPage + 1;
@@ -62,13 +62,13 @@ export default function SMSubject() {
 		}
 	}, [page, rowsPerPage]);
 
-	if (error && !isErrorShown) {
-		useNotify({
-			type: 'error',
-			message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
-		});
-		setIsErrorShown(true);
-	}
+	// if (error && !isErrorShown) {
+	// 	useNotify({
+	// 		type: 'error',
+	// 		message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
+	// 	});
+	// 	setIsErrorShown(true);
+	// }
 
 	if (isValidating) {
 		return (
