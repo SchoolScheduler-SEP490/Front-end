@@ -15,6 +15,7 @@ import {
 } from './_libs/constants';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import useFetchSGTableData from './_hooks/useFetchSGTableData';
+import useFilterArray from '@/hooks/useFilterArray';
 
 export default function SMLesson() {
 	const { schoolId, sessionToken } = useAppContext();
@@ -59,24 +60,40 @@ export default function SMLesson() {
 	}, [subjectGroupData]);
 
 	useEffect(() => {
-		// updateSubjectGroupTable();
-		// if (subjectGroupTableResponse?.status === 200) {
-		// 	var index = 1;
-		// 	const tmpData: ILessonTableData[] = subjectGroupTableResponse.result[].map(
-		// 		(item: ISGSubject) => {
-		// 			return {
-		// 				id: index++,
-		// 				lessonName: item['subject-name'],
-		// 				mainTotalSlotPerWeek: item['main-slot-per-week'],
-		// 				isDouleSlot: item['is-double-period'],
-		// 				subTotalSlotPerWeek: item['sub-slot-per-week'],
-		// 				subIsDouleSlot: item['main-slot-per-week'],
-		// 				isRequiredSubject: item['is-required'],
-		// 			};
-		// 		}
-		// 	);
-		// 	setLessonTableData(tmpData);
-		// }
+		updateSubjectGroupTable();
+		if (subjectGroupTableResponse?.status === 200) {
+			const tmpSelectiveData: ILessonTableData[] = subjectGroupTableResponse.result[
+				'subject-selective-views'
+			].map((item: ISGSubject) => {
+				return {
+					id: item.abbreviation,
+					lessonName: item['subject-name'],
+					mainTotalSlotPerWeek: item['main-slot-per-week'],
+					isDouleSlot: item['is-double-period'],
+					subTotalSlotPerWeek: item['sub-slot-per-week'],
+					subIsDouleSlot: item['main-slot-per-week'],
+					isRequiredSubject: item['is-required'],
+				};
+			});
+			const tmpRequiredData: ILessonTableData[] = subjectGroupTableResponse.result[
+				'subject-required-views'
+			].map((item: ISGSubject) => {
+				return {
+					id: item.abbreviation,
+					lessonName: item['subject-name'],
+					mainTotalSlotPerWeek: item['main-slot-per-week'],
+					isDouleSlot: item['is-double-period'],
+					subTotalSlotPerWeek: item['sub-slot-per-week'],
+					subIsDouleSlot: item['is-double-period'],
+					isRequiredSubject: item['is-required'],
+				};
+			});
+			const optimizedData = useFilterArray(
+				[...tmpSelectiveData, ...tmpRequiredData],
+				'lessonName'
+			);
+			setLessonTableData(optimizedData);
+		}
 	}, [subjectGroupTableResponse]);
 
 	useEffect(() => {

@@ -10,6 +10,7 @@ import {
 	Select,
 	SelectChangeEvent,
 	TableHead,
+	TextField,
 	Toolbar,
 	Tooltip,
 } from '@mui/material';
@@ -386,13 +387,23 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											align='center'
 											width={50}
 										>
-											{row.id}
+											{index + 1}
 										</TableCell>
 										<TableCell align='left' width={150}>
 											{row.lessonName}
 										</TableCell>
 										<TableCell align='center' width={100}>
-											{row.mainTotalSlotPerWeek ?? '-----'}
+											<TextField
+												variant='standard'
+												type='number'
+												sx={{ width: '60%' }}
+												value={
+													row.mainTotalSlotPerWeek === 0
+														? row.mainTotalSlotPerWeek
+														: '-----'
+												}
+												id='fullWidth'
+											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
 											<Checkbox
@@ -405,7 +416,17 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
-											{row.subTotalSlotPerWeek ?? '-----'}
+											<TextField
+												variant='standard'
+												type='number'
+												sx={{ width: '60%' }}
+												value={
+													row.mainTotalSlotPerWeek === 0
+														? row.mainTotalSlotPerWeek
+														: '-----'
+												}
+												id='fullWidth'
+											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
 											<Checkbox
@@ -419,12 +440,8 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 										</TableCell>
 										<TableCell width={50} align='center'>
 											<Checkbox
-												color='default'
 												disabled
 												checked={row.isRequiredSubject}
-												inputProps={{
-													'aria-labelledby': labelId,
-												}}
 											/>
 										</TableCell>
 									</TableRow>
