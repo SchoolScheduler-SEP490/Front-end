@@ -259,7 +259,7 @@ const LessonTableSkeleton = () => {
 					>
 						<EnhancedTableHead />
 						<TableBody>
-							{[1, 2, 3, 4, 5].map((row, index) => {
+							{[1, 2, 3, 4, 5, 6, 7].map((row, index) => {
 								const labelId = `enhanced-table-checkbox-${index}`;
 
 								return (
@@ -310,15 +310,6 @@ const LessonTableSkeleton = () => {
 						</TableBody>
 					</Table>
 				</TableContainer>
-				<TablePagination
-					rowsPerPageOptions={[5, 10, 25]}
-					component='div'
-					count={15}
-					rowsPerPage={5}
-					page={1}
-					onPageChange={() => {}}
-					onRowsPerPageChange={() => {}}
-				/>
 			</Paper>
 		</Box>
 	);

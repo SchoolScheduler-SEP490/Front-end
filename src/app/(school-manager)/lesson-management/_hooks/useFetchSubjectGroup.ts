@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
 import { getFetchSubjectGroupApi } from '../_libs/apis';
 
-const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
+const useFetchSGSidenav = (props: IFetchSubjectGroupBodyProps) => {
 	const { sessionToken } = props;
 	const endpoint = getFetchSubjectGroupApi(props);
 
@@ -19,13 +19,13 @@ const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
 		return data;
 	}
 
-	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
+	const { data, mutate, error, isLoading, isValidating } = useSWR(endpoint, fetcher, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 		revalidateIfStale: true,
 	});
 
-	return { data, error, isLoading, isValidating, mutate };
+	return { data, mutate, isLoading, isValidating, error };
 };
 
-export default useFetchSGData;
+export default useFetchSGSidenav;

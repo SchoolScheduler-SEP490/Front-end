@@ -1,7 +1,18 @@
 'use client';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Checkbox, TableHead, Toolbar, Tooltip } from '@mui/material';
+import {
+	Checkbox,
+	FormControl,
+	InputLabel,
+	Menu,
+	MenuItem,
+	Select,
+	SelectChangeEvent,
+	TableHead,
+	Toolbar,
+	Tooltip,
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -12,16 +23,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
-
-interface ILessonTableData {
-	id: number;
-	lessonName: string;
-	mainTotalSlotPerWeek: number;
-	mainMinOfDouleSlot: number;
-	subTotalSlotPerWeek: number;
-	subMinOfDouleSlot: number;
-	doubleAvailability: boolean;
-}
+import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
+import {
+	ILessonTableData,
+	ISchoolYearResponse,
+	IYearDropdownOption,
+} from '../_libs/constants';
 
 interface IClassGroupData {
 	classGroupName: string;
@@ -232,13 +239,28 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface ILessonTableProps {
-	subjectTableData: any[];
+	subjectTableData: ILessonTableData[];
+	selectedYearId: number;
+	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 }
-const LessonTable: React.FC<ILessonTableProps> = (props) => {
-	const { subjectTableData } = props;
+const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
+	const { subjectTableData, selectedYearId, setSelectedYearId } = props;
+	const { data: yearData, error } = useFetchSchoolYear();
 
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
+	const [yearStudyOptions, setYearStudyOptions] = React.useState<
+		IYearDropdownOption<number>[]
+	>([]);
+
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const isFilterableOpen = Boolean(anchorEl);
+	const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -249,8 +271,24 @@ const LessonTable: React.FC<ILessonTableProps> = (props) => {
 		setPage(0);
 	};
 
-	const emptyRows =
-		page > 0 ? Math.max(0, (1 + page) * rowsPerPage - subjectTableData.length) : 0;
+	const handleYearSelect = (event: SelectChangeEvent<number>) => {
+		if (setSelectedYearId) {
+			setSelectedYearId(Number(event.target.value));
+		}
+	};
+
+	React.useEffect(() => {
+		if (yearData?.status === 200) {
+			const yearStudyOptions: IYearDropdownOption<number>[] = yearData.result.map(
+				(item: ISchoolYearResponse) => ({
+					value: item.id,
+					label: `${item['start-year']} - ${item['end-year']}`,
+				})
+			);
+			setYearStudyOptions(yearStudyOptions);
+		}
+	}, [yearData]);
+
 	return (
 		<Box
 			sx={{
@@ -276,10 +314,50 @@ const LessonTable: React.FC<ILessonTableProps> = (props) => {
 						Tiết học
 					</h2>
 					<Tooltip title='Filter list'>
-						<IconButton>
+						<IconButton
+							id='filter-btn'
+							aria-controls={isFilterableOpen ? 'basic-menu' : undefined}
+							aria-haspopup='true'
+							aria-expanded={isFilterableOpen ? 'true' : undefined}
+							onClick={handleFilterClick}
+						>
 							<FilterListIcon />
 						</IconButton>
 					</Tooltip>
+					<Menu
+						id='filter-menu'
+						anchorEl={anchorEl}
+						open={isFilterableOpen}
+						onClose={handleClose}
+						MenuListProps={{
+							'aria-labelledby': 'filter-btn',
+						}}
+					>
+						<FormControl
+							fullWidth
+							variant='filled'
+							sx={{ p: 1, minWidth: 200 }}
+						>
+							<InputLabel
+								id='demo-simple-select-filled-label'
+								className='!text-body-small font-normal'
+							>
+								Năm học
+							</InputLabel>
+							<Select
+								labelId='demo-simple-select-filled-label'
+								id='demo-simple-select-filled'
+								value={selectedYearId}
+								onChange={handleYearSelect}
+							>
+								{yearStudyOptions.map((item, index) => (
+									<MenuItem key={item.value + index} value={item.value}>
+										{item.label}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</Menu>
 				</Toolbar>
 				<TableContainer>
 					<Table
@@ -317,19 +395,33 @@ const LessonTable: React.FC<ILessonTableProps> = (props) => {
 											{row.mainTotalSlotPerWeek ?? '-----'}
 										</TableCell>
 										<TableCell align='center' width={100}>
-											{row.mainMinOfDouleSlot ?? '-----'}
+											<Checkbox
+												color='default'
+												disabled
+												checked={row.isDouleSlot}
+												inputProps={{
+													'aria-labelledby': labelId,
+												}}
+											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
 											{row.subTotalSlotPerWeek ?? '-----'}
 										</TableCell>
 										<TableCell align='center' width={100}>
-											{row.subMinOfDouleSlot ?? '-----'}
+											<Checkbox
+												color='default'
+												disabled
+												checked={row.subIsDouleSlot}
+												inputProps={{
+													'aria-labelledby': labelId,
+												}}
+											/>
 										</TableCell>
 										<TableCell width={50} align='center'>
 											<Checkbox
 												color='default'
 												disabled
-												checked={row.doubleAvailability}
+												checked={row.isRequiredSubject}
 												inputProps={{
 													'aria-labelledby': labelId,
 												}}
@@ -338,27 +430,9 @@ const LessonTable: React.FC<ILessonTableProps> = (props) => {
 									</TableRow>
 								);
 							})}
-							{emptyRows > 0 && (
-								<TableRow
-									style={{
-										height: 40 * emptyRows,
-									}}
-								>
-									<TableCell colSpan={6} />
-								</TableRow>
-							)}
 						</TableBody>
 					</Table>
 				</TableContainer>
-				<TablePagination
-					rowsPerPageOptions={[5, 10, 25]}
-					component='div'
-					count={subjectTableData.length}
-					rowsPerPage={rowsPerPage}
-					page={page}
-					onPageChange={handleChangePage}
-					onRowsPerPageChange={handleChangeRowsPerPage}
-				/>
 			</Paper>
 		</Box>
 	);

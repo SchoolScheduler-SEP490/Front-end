@@ -31,3 +31,17 @@ export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) =
 	}).toString();
 	return `${localApi ?? api}/api/subject-groups?${queryString}`;
 };
+
+export const getFetchSchoolYearApi = (localApi?: string) => {
+	return `${localApi ?? api}/api/school-years`;
+};
+
+export const getFetchSubjectGroupDetailApi = ({
+	localApi,
+	subjectGroupId,
+}: {
+	localApi?: string;
+	subjectGroupId: number;
+}) => {
+	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+};

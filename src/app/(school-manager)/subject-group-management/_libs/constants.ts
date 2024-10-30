@@ -84,16 +84,16 @@ export interface ISubjectGroupDetailResponse {
 	'school-id': number;
 	'group-description': string;
 	grade: string;
-	'subject-selective-views': ISelectiveSubject[];
-	'subject-specializedt-views': ISelectiveSubject[];
-	'subject-required-views': ISelectiveSubject[];
+	'subject-selective-views': ISGSubject[];
+	'subject-specializedt-views': ISGSubject[];
+	'subject-required-views': ISGSubject[];
 	'student-class-views': any[];
 	'subject-group-type-name': string | null;
 	'school-year-id': number;
 	'school-year': string;
 }
 
-export interface ISelectiveSubject {
+export interface ISGSubject {
 	'subject-name': string;
 	abbreviation: string;
 	'is-required': boolean;

@@ -13,9 +13,9 @@ import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
 import { CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 
 export default function SMSubject() {
+	const { schoolId, sessionToken } = useAppContext();
 	const [page, setPage] = React.useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-	const { schoolId, sessionToken } = useAppContext();
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
 	const [subjectGroupTableData, setSubjectGroupTableData] = React.useState<
 		ISubjectGroupTableData[]
