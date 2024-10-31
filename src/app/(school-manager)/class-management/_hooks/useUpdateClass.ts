@@ -18,8 +18,8 @@ export function useUpdateClass (mutate: ()=> void ){
             }
             const formattedData = {
                 ...classData,
-                "school-id": classData["school-id"], // Use schoolId from classData
-                "school-year-id": 1, // Add schoolYearId
+                "school-id": classData["school-id"], 
+                "school-year-id": 1, 
                 grade: Number(classData.grade)
             };
             const success = await updateClass(classId, sessionToken, formattedData);

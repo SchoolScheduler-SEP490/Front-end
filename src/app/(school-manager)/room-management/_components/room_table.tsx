@@ -26,6 +26,7 @@ import { ICommonOption } from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IRoomTableData } from "../_libs/constants";
 import DeleteRoomModal from "./delete_room";
+import AddRoomModal from "./add_room";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -404,6 +405,11 @@ const RoomTable = (props: IRoomTableProps) => {
             onClose={setOpenDeleteModal}
             roomName={selectedRow?.roomName ?? "Không xác định"}
             roomId={selectedRow?.id ?? 0}
+            mutate={mutate}
+          />
+          <AddRoomModal
+            open={openAddForm}
+            onClose={setOpenAddForm}
             mutate={mutate}
           />
         </Paper>
