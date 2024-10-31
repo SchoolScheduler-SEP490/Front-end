@@ -22,6 +22,27 @@ export const fetchBuildingName = async (props: IBuildingFetchProps) => {
       Authorization: `Bearer ${sessionToken}`,
     },
   });
-  
+
   return response.json();
+};
+
+export const deleteRoomById = async (
+  id: number,
+  sessionToken: string
+): Promise<void> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/rooms/${id}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
 };
