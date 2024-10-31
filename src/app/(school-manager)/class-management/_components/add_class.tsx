@@ -229,7 +229,7 @@ const AddClassModal = (props: AddClassFormProps) => {
                       <MenuItem>--Chọn giáo viên--</MenuItem>
                       {teachers.map((teacher) => (
                         <MenuItem key={teacher.id} value={teacher.abbreviation}>
-                          {teacher.abbreviation}
+                          {`${teacher["first-name"]} ${teacher["last-name"]} - ${teacher.abbreviation}`}
                         </MenuItem>
                       ))}
                     </Select>

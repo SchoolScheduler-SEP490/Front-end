@@ -31,6 +31,8 @@ export interface IAddClassData {
 }
 export interface ITeacher {
   id: number;
+  "first-name": string;
+  "last-name": string;
   abbreviation: string;
 }
 

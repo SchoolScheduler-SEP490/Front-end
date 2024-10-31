@@ -9,12 +9,18 @@ export interface IRoomTableData {
 	status: string;
 }
 
+export interface ISubject {
+	id: number;
+	"subject-name": string;
+	abbreviation: string;
+}
 export interface IRoom {
 	id: number;
 	name: string;
 	"building-id": number;
 	"room-type": ERoomType;
 	"availabilitye-status": string;
+	subjects: ISubject[];
   }
   
   export interface IBuilding {
@@ -22,4 +28,13 @@ export interface IRoom {
 	description: string;
 	floor: number;
 	"building-code": string;
+  }
+
+  export interface IAddRoomData {
+	name: string;
+	'room-code': string;
+	'max-class-per-time': number;
+	'building-code': string;
+	'room-type': 'PRACTICE_ROOM' | 'LECTURE_ROOM';
+	'subjects-abreviation': string[];
   }
