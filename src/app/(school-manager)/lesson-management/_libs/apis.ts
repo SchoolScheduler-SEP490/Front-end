@@ -45,3 +45,7 @@ export const getFetchSubjectGroupDetailApi = ({
 }) => {
 	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
 };
+
+export const getUpdateLessonApi = () => {
+	return `${api}/api/subject-in-groups`;
+};

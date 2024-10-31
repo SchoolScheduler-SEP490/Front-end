@@ -1,12 +1,7 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
-import useNotify from '@/hooks/useNotify';
-import { ICommonResponse } from '@/utils/constants';
-import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
-import { KeyedMutator } from 'swr';
-import { getDeleteSubjectGroupApi } from '../_libs/apis';
 
 const style = {
 	position: 'absolute',
@@ -21,43 +16,14 @@ const style = {
 interface ISubjectDeleteModalProps {
 	open: boolean;
 	setOpen: (status: boolean) => void;
-	subjectGroupName: string;
-	subjectGroupId: number;
-	mutate: KeyedMutator<any>;
+	handleApprove: () => void;
 }
 
-const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
-	const { open, setOpen, subjectGroupName, subjectGroupId, mutate } = props;
-	const { sessionToken } = useAppContext();
+const CancelUpdateLessonModal = (props: ISubjectDeleteModalProps) => {
+	const { open, setOpen, handleApprove } = props;
 
 	const handleClose = () => {
 		setOpen(false);
-	};
-
-	const handleDeleteSubject = async () => {
-		const endpoint = getDeleteSubjectGroupApi({ subjectGroupId });
-		// Neeeds updating
-		const response = await fetch(endpoint, {
-			method: 'DELETE',
-			headers: {
-				Authorization: `Bearer ${sessionToken}`,
-			},
-		});
-		const data: ICommonResponse<any> = await response.json();
-		if (data.status !== 200) {
-			useNotify({
-				message: TRANSLATOR[data.message ?? ''] ?? 'Có lỗi xảy ra',
-				type: 'error',
-			});
-			return;
-		} else {
-			await mutate();
-			useNotify({
-				message: TRANSLATOR[data.message ?? ''] ?? 'Xóa Tổ hợp môn thành công',
-				type: 'success',
-			});
-		}
-		handleClose();
 	};
 
 	return (
@@ -76,9 +42,9 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 					<Typography
 						variant='h6'
 						component='h2'
-						className='text-title-large-strong font-semibold'
+						className='text-title-large-strong font-semibold !opacity-80'
 					>
-						Xóa tổ hợp môn
+						Huỷ cập nhật
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -86,14 +52,17 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 				</div>
 				<div className='p-4 pl-5'>
 					<Typography className='text-title-small-strong'>
-						Bạn có chắc muốn xóa Tổ hợp <strong>{subjectGroupName}</strong>?
+						Bạn có chắc muốn huỷ thay đổi?
 					</Typography>
+					<p className='text-body-small italic opacity-80'>
+						Những dữ liệu mà bạn nhập sẽ không được lưu lại
+					</p>
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
-						title='Xóa tổ hợp'
+						title='Huỷ cập nhật'
 						disableRipple
-						onClick={handleDeleteSubject}
+						onClick={handleApprove}
 						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'
 					/>
 					<ContainedButton
@@ -108,4 +77,4 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 	);
 };
 
-export default DeleteSubjectGroupModal;
+export default CancelUpdateLessonModal;

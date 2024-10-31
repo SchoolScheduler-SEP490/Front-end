@@ -255,11 +255,11 @@ const LessonTableSkeleton = () => {
 					<Table
 						sx={{ minWidth: 750 }}
 						aria-labelledby='tableTitle'
-						size='medium'
+						size='small'
 					>
 						<EnhancedTableHead />
 						<TableBody>
-							{[1, 2, 3, 4, 5, 6, 7].map((row, index) => {
+							{[1, 2, 3, 4, 5].map((row, index) => {
 								const labelId = `enhanced-table-checkbox-${index}`;
 
 								return (

@@ -57,16 +57,17 @@ export interface ISubjectGroupDetailResponse {
 	'school-id': number;
 	'group-description': string;
 	grade: string;
-	'subject-selective-views': ISGSubject[];
-	'subject-specializedt-views': ISGSubject[];
-	'subject-required-views': ISGSubject[];
+	'subject-selective-views': ISubjectInGroup[];
+	'subject-specializedt-views': ISubjectInGroup[];
+	'subject-required-views': ISubjectInGroup[];
 	'student-class-views': any[];
 	'subject-group-type-name': string | null;
 	'school-year-id': number;
 	'school-year': string;
 }
 
-export interface ISGSubject {
+export interface ISubjectInGroup {
+	id: number;
 	'subject-name': string;
 	abbreviation: string;
 	'is-required': boolean;
@@ -81,4 +82,12 @@ export interface ISGSubject {
 	'total-slot-in-year': number;
 	'slot-specialized': number;
 	'subject-group-type': string;
+}
+
+export interface IUpdateSubjectInGroupRequest {
+	'subject-in-group-id': number;
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'slot-per-term'?: number;
+	'is-double-period': boolean;
 }
