@@ -25,6 +25,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { ICommonOption } from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IRoomTableData } from "../_libs/constants";
+import DeleteRoomModal from "./delete_room";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -306,20 +307,20 @@ const RoomTable = (props: IRoomTableProps) => {
                       </TableCell>
                       <TableCell align="left">{row.roomType}</TableCell>
                       <TableCell align="left">
-                      <div className="w-full h-full flex justify-left items-center">
-                        <div
-                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+                        <div className="w-full h-full flex justify-left items-center">
+                          <div
+                            className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
                             ${
                               row.status === "Hoạt động"
                                 ? "bg-basic-positive-hover text-basic-positive"
                                 : "bg-basic-negative-hover text-basic-negative"
                             }`}
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          {row.status}
+                            style={{ whiteSpace: "nowrap" }}
+                          >
+                            {row.status}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
+                      </TableCell>
                       <TableCell width={80}>
                         <IconButton
                           color="success"
@@ -397,6 +398,13 @@ const RoomTable = (props: IRoomTableProps) => {
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+          <DeleteRoomModal
+            open={openDeleteModal}
+            onClose={setOpenDeleteModal}
+            roomName={selectedRow?.roomName ?? "Không xác định"}
+            roomId={selectedRow?.id ?? 0}
+            mutate={mutate}
           />
         </Paper>
       </Box>

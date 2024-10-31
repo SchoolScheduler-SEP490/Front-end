@@ -64,7 +64,7 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
         </div>
         <div className="p-4 pl-5">
           <Typography className="text-title-small-strong">
-            Bạn có chắc muốn xóa giáo viên <strong>{className}</strong> không?
+            Bạn có chắc muốn xóa lớp học <strong>{className}</strong> không?
             Thao tác này không thể hoàn tác.
           </Typography>
         </div>

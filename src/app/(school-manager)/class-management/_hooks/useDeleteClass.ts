@@ -14,14 +14,14 @@ const useDeleteClass = async (props: IDeleteClassProps) => {
     const response = await deleteClassById(classId, sessionToken);
     console.log(`Successfully deleted class with ID: ${classId}`);
     useNotify({
-      message: "Xóa lớp thành công!",
+      message: "Xóa lớp học thành công!",
       type: "success",
     });
     return response;
   } catch (error) {
     console.error(`Failed to delete class with ID: ${classId}`, error);
     useNotify({
-      message: "Xóa lớp thất bại. Vui lòng thử lại!",
+      message: "Xóa lớp học thất bại. Vui lòng thử lại!",
       type: "error",
     });
   }
