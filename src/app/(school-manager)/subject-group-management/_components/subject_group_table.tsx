@@ -269,7 +269,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 							Tổ hợp môn
 						</h2>
-						<div className='w-fit h-fit'>
+						<div className='w-fit h-fit flex flex-row justify-center items-center'>
 							<Tooltip title='Thêm Môn học'>
 								<IconButton onClick={handleAddSubject}>
 									<AddIcon />
