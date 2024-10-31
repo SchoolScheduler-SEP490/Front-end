@@ -9,7 +9,7 @@ import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';
 import { useAppContext } from '@/context/app_provider';
 import {
 	ILessonTableData,
-	ISGSubject,
+	ISubjectInGroup,
 	ISubjectGroupObjectResponse,
 	ISubjectGroupSidenavData,
 } from './_libs/constants';
@@ -64,9 +64,9 @@ export default function SMLesson() {
 		if (subjectGroupTableResponse?.status === 200) {
 			const tmpSelectiveData: ILessonTableData[] = subjectGroupTableResponse.result[
 				'subject-selective-views'
-			].map((item: ISGSubject) => {
+			].map((item: ISubjectInGroup) => {
 				return {
-					id: item.abbreviation,
+					id: item.id,
 					lessonName: item['subject-name'],
 					mainTotalSlotPerWeek: item['main-slot-per-week'],
 					isDouleSlot: item['is-double-period'],
@@ -77,9 +77,9 @@ export default function SMLesson() {
 			});
 			const tmpRequiredData: ILessonTableData[] = subjectGroupTableResponse.result[
 				'subject-required-views'
-			].map((item: ISGSubject) => {
+			].map((item: ISubjectInGroup) => {
 				return {
-					id: item.abbreviation,
+					id: item.id,
 					lessonName: item['subject-name'],
 					mainTotalSlotPerWeek: item['main-slot-per-week'],
 					isDouleSlot: item['is-double-period'],
@@ -100,6 +100,7 @@ export default function SMLesson() {
 		updateSubjectGroup({ schoolYearId: selectedYearId });
 	}, [selectedYearId]);
 
+	// Loading components
 	if (isSubjectGroupValidating || isSubjectGroupTableValidating) {
 		return (
 			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
@@ -111,7 +112,15 @@ export default function SMLesson() {
 					</div>
 				</SMHeader>
 				<div className='w-full h-full flex flex-row justify-start items-start'>
-					<SubjectGroupSideNavSkeleton />
+					{isSubjectGroupValidating ? (
+						<SubjectGroupSideNavSkeleton />
+					) : (
+						<SubjectGroupSideNav
+							selectedSubjectGroup={selectedSubjectGroup}
+							setSelectedSubjectGroup={setSelectedSubjectGroup}
+							subjectGroup={subjectGroup}
+						/>
+					)}
 					<LessonTableSkeleton />
 				</div>
 			</div>
@@ -137,6 +146,7 @@ export default function SMLesson() {
 					subjectTableData={lessonTableData}
 					selectedYearId={selectedYearId}
 					setSelectedYearId={setSelectedYearId}
+					mutator={updateSubjectGroupTable}
 				/>
 			</div>
 		</div>

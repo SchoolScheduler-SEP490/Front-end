@@ -110,6 +110,9 @@ export const TRANSLATOR: { [key: string]: string } = {
 		'Tổ hợp môn đã được gán, không thể cập nhật khối lớp',
 	'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.':
 		'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.',
+
+	// Subject in group messages
+	'Update subject in group success.': 'Cập nhật Tiết học thành công',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

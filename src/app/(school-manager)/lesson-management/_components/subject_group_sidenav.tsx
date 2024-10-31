@@ -93,7 +93,7 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 							{item.title}
 						</Typography>
 					</AccordionSummary>
-					<AccordionDetails className='w-full p-0'>
+					<AccordionDetails className='!w-full !p-0'>
 						{item.items.map((subjectGroup, id: number) => (
 							<div
 								key={subjectGroup.key + id}

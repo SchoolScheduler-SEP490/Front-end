@@ -61,7 +61,7 @@ const SubjectGroupSideNavSkeleton = () => {
 
 	return (
 		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
-			<h1 className='text-title-small-strong w-full pl-5 py-3 text-center'>
+			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
 				Tổ hợp môn
 			</h1>
 			{[1, 2, 3].map((item) => (
