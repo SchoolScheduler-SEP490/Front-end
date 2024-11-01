@@ -2,7 +2,7 @@
 import SMHeader from '@/commons/school_manager/header';
 import LessonTable from './_components/lesson_table';
 import SubjectGroupSideNavSkeleton from './_components/skeleton_sidenav';
-import SubjectGroupSideNav from './_components/subject_group_sidenav';
+import SubjectGroupSideNav from './_components/lesson_sidenav';
 import LessonTableSkeleton from './_components/skeleton_table';
 import { useEffect, useState } from 'react';
 import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';

@@ -1,0 +1,19 @@
+import { Paper, Skeleton } from '@mui/material';
+
+const TeachingAssignmentFilterableSkeleton = () => {
+	return (
+		<div
+			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[4vh] gap-5`}
+		>
+			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
+				<Skeleton variant='text' sx={{ fontSize: '2rem', width: 210 }} />
+
+				{/* For other variants, adjust the size with `width` and `height` */}
+				<Skeleton variant='rectangular' width={210} height={60} />
+				<Skeleton variant='rounded' width={210} height={60} />
+			</Paper>
+		</div>
+	);
+};
+
+export default TeachingAssignmentFilterableSkeleton;
