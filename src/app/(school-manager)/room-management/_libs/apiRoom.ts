@@ -113,3 +113,36 @@ export const getSubjectName = async (
   const data = await response.json();
   return data;
 };
+
+export const updateRoom = async (
+  roomId: number,
+  sessionToken: string,
+  roomData: IAddRoomData
+): Promise<any> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/Room/${roomId}`;
+  const requestBody = roomData;
+  console.log("Request Body:", requestBody);
+  try {
+    
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
+    if (!response.ok) {
+      console.error(`HTTP error! status: ${response.status}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Error occurred while sending request:", error);
+    return false;
+  }
+
+}

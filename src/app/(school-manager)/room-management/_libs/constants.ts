@@ -24,6 +24,7 @@ export interface IRoom {
   }
   
   export interface IBuilding {
+	id:number;
 	name: string;
 	description: string;
 	floor: number;
@@ -35,6 +36,16 @@ export interface IRoom {
 	'room-code': string;
 	'max-class-per-time': number;
 	'building-code': string;
-	'room-type': 'PRACTICE_ROOM' | 'LECTURE_ROOM';
+	'room-type': string;
 	'subjects-abreviation': string[];
+  }
+
+  export interface IUpdateRoomData {
+	name: string;
+	"room-type": string;
+	"max-class-per-time": number;
+	"room-code": string;
+	"building-id": string;
+	"availabilitye-status": string;
+	"subject-ids": number[];
   }

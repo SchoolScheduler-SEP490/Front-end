@@ -27,6 +27,7 @@ import { KeyedMutator } from "swr";
 import { IRoomTableData } from "../_libs/constants";
 import DeleteRoomModal from "./delete_room";
 import AddRoomModal from "./add_room";
+import UpdateRoomModal from "./update_room";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -410,6 +411,12 @@ const RoomTable = (props: IRoomTableProps) => {
           <AddRoomModal
             open={openAddForm}
             onClose={setOpenAddForm}
+            mutate={mutate}
+          />
+          <UpdateRoomModal
+            open={openUpdateModal}
+            onClose={setOpenUpdateModal}
+            roomId={selectedRow?.id ?? 0}
             mutate={mutate}
           />
         </Paper>

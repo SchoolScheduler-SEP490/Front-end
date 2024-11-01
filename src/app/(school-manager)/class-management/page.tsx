@@ -9,6 +9,7 @@ import { useAppContext } from "@/context/app_provider";
 import { IClass, IClassTableData} from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 import { fetchSchoolYear } from "./_libs/apiClass";
+import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 
 export default function SMClass() {
   const [page, setPage] = React.useState<number>(0);
@@ -56,7 +57,7 @@ export default function SMClass() {
         (item: IClass) => ({
           id: item.id,
           className: item.name,
-          grade: item.grade,
+          grade: CLASSGROUP_TRANSLATOR[item.grade],
           homeroomTeacherName: item["homeroom-teacher-name"],
           schoolYear: currentSchoolYear,
           mainSession: item["main-session-text"],
