@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useAppContext } from "@/context/app_provider";
 import { updateClass } from "../_libs/apiClass";
 import { IUpdateClassData } from "../_libs/constants";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 
 export function useUpdateClass (mutate: ()=> void ){
     const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
