@@ -172,6 +172,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 			setClassOptions((prev: ISGClassResponse[]) =>
 				prev.filter((item) => !tmpSelectedClasses.includes(item))
 			);
+			``;
 			setTmpSelectedClasses([]);
 		}
 	};
@@ -181,7 +182,9 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 			prev.filter((selectedItem) => selectedItem !== item)
 		);
 		setClassOptions((prev: ISGClassResponse[]) =>
-			useFilterArray([...prev, item], 'name')
+			useFilterArray([...prev, item], 'name').sort((a, b) =>
+				a.name.localeCompare(b.name)
+			)
 		);
 	};
 

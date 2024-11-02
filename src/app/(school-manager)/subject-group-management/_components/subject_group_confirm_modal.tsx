@@ -54,8 +54,8 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 						<CloseIcon />
 					</IconButton>
 				</div>
-				<div className='w-full h-fit px-5 py-[5vh]'>
-					<h2 className='text-title-medium font-normal w-full text-center'>
+				<div className='w-full h-fit px-5 py-[3vh]'>
+					<h2 className='text-title-medium font-normal w-full text-left'>
 						Xác nhận lưu những thay đổi
 					</h2>
 					{vulnerableClasses.length > 0 && (
