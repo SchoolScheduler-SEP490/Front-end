@@ -110,3 +110,38 @@ export interface ISubjectInGroup {
 	'slot-specialized': number;
 	'subject-group-type': string;
 }
+
+export interface ISGClassResponse {
+	id: number;
+	name: string;
+	'homeroom-teacher-id': number;
+	'homeroom-teacher-name': string;
+	'homeroom-teacher-abbreviation': string;
+	'main-session': number;
+	'main-session-text': string;
+	grade: string;
+	'is-full-day': boolean;
+	'period-count': number;
+	'subject-group-id': number;
+	'subject-group-name': string;
+	'school-year-id': number;
+	'create-date': string;
+	'update-date': string;
+	'is-deleted': boolean;
+}
+
+export interface IClassApplyOption {
+	classId: string;
+	className: string;
+	existingSubjectGroup: string | null;
+}
+
+export interface IVulnerableClass {
+	className: string;
+	existingGroupName: string;
+}
+
+export interface IApplySubjectGroupRequest {
+	'class-ids': number[];
+	'subject-group-id': number;
+}

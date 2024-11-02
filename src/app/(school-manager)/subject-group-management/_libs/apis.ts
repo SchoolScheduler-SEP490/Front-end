@@ -63,7 +63,7 @@ export const getUpdateSubjectGroupApi = ({
 	localApi?: string;
 	subjectGroupId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+	return `${localApi ?? api}/api/subject-groups/helo/${subjectGroupId}`;
 };
 
 // Update Subject Group API
@@ -119,4 +119,37 @@ export const getFetchSubjectGroupDetailApi = ({
 	subjectGroupId: number;
 }) => {
 	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+};
+
+export const getFetchClassApi = ({
+	localApi,
+	schoolId,
+	schoolYearId,
+	includeDeleted,
+	pageIndex,
+	pageSize,
+	grade,
+}: {
+	localApi?: string;
+	schoolId: string;
+	schoolYearId: number;
+	includeDeleted: boolean;
+	pageIndex: number;
+	pageSize: number;
+	grade: string;
+}) => {
+	const queryString = new URLSearchParams({
+		pageSize: pageSize ? pageSize.toString() : '100',
+		pageIndex: pageIndex ? pageIndex.toString() : '1',
+		schoolId: schoolId,
+		schoolYearId: schoolYearId.toString(),
+		includeDeleted: includeDeleted.toString(),
+		grade: grade,
+	}).toString();
+
+	return `${localApi ?? api}/api/student-classes?${queryString}`;
+};
+
+export const getApplySubjectGroupApi = (localApi?: string) => {
+	return `${localApi ?? api}/api/student-classes/assign-subject-group`;
 };

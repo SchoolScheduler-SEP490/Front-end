@@ -95,23 +95,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		setIsFilterable(!isFilterable);
 	};
 
-	// const handleMouseDown = (rowIndex: number) => {
-	// 	setIsSelecting(true);
-	// 	const updatedSelectedRows = new Set(selectedRows);
-	// 	updatedSelectedRows.add(rowIndex);
-	// 	setSelectedRows(updatedSelectedRows);
-	// };
-	// const handleMouseUp = () => {
-	// 	setIsSelecting(false);
-	// };
-	// const handleMouseEnter = (rowIndex: number) => {
-	// 	if (isSelecting) {
-	// 		const updatedSelectedRows = new Set(selectedRows);
-	// 		updatedSelectedRows.add(rowIndex);
-	// 		setSelectedRows(updatedSelectedRows);
-	// 	}
-	// };
-
 	const handleConfirmCancelUpdate = () => {
 		setIsCancelUpdateModalOpen(true);
 	};

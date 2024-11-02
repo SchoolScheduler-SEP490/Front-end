@@ -1,6 +1,4 @@
-import AddTaskIcon from '@mui/icons-material/AddTask';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { Skeleton, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
