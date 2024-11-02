@@ -1,18 +1,17 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { getUpdateSubjectGroupApi } from '../_libs/apis';
-import { IUpdateSubjectGroupRequest } from '../_libs/constants';
+import { getApplySubjectGroupApi } from '../_libs/apis';
+import { IApplySubjectGroupRequest } from '../_libs/constants';
 
 interface IUpdateSubjectProps {
-	subjectGroupId: number;
 	sessionToken: string;
-	formData: IUpdateSubjectGroupRequest;
+	formData: IApplySubjectGroupRequest;
 }
 
-const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
-	const { subjectGroupId, formData, sessionToken } = props;
-	const endpoint = getUpdateSubjectGroupApi({ subjectGroupId });
+const useApplySubjectGroup = async (props: IUpdateSubjectProps) => {
+	const { formData, sessionToken } = props;
+	const endpoint = getApplySubjectGroupApi();
 	let response;
 
 	async function updateSubject(url: string) {
@@ -22,11 +21,7 @@ const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
 				'Content-Type': 'application/json',
 			},
 			method: 'PATCH',
-			body: JSON.stringify({
-				...formData,
-				'total-slot-in-year': 0,
-				'slot-specialized': 0,
-			}),
+			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -53,4 +48,4 @@ const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
 	}
 };
 
-export default useUpdateSubjectGroup;
+export default useApplySubjectGroup;

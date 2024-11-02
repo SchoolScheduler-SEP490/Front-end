@@ -119,6 +119,7 @@ export default function SMSubject() {
 					setRowsPerPage={setRowsPerPage}
 					totalRows={totalRows}
 					mutate={mutate}
+					selectedYearId={selectedYearId}
 				/>
 				<SubjectGroupFilterable
 					open={isFilterable}

@@ -8,10 +8,12 @@ import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Box,
+	Checkbox,
 	FormControl,
 	FormHelperText,
 	IconButton,
 	InputLabel,
+	ListItemText,
 	MenuItem,
 	Modal,
 	Select,
@@ -21,7 +23,7 @@ import {
 import { Theme, useTheme } from '@mui/material/styles';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useCreateSubjectGroup from '../_hooks/useCreateSG';
 import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
@@ -201,6 +203,22 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		}
 	}, [formik.values['elective-subject-ids']]);
 
+	const selectedElectiveLabels = useMemo(() => {
+		return optionalSubjects
+			.filter((item) => formik.values['elective-subject-ids'].includes(item.value))
+			.map((item) => item.label)
+			.join(', ');
+	}, [formik.values['elective-subject-ids'], optionalSubjects]);
+
+	const selectedSpecialisedLabels = useMemo(() => {
+		return specialisedSubjects
+			.filter((item) =>
+				formik.values['specialized-subject-ids'].includes(item.value)
+			)
+			.map((item) => item.label)
+			.join(', ');
+	}, [formik.values['specialized-subject-ids'], specialisedSubjects]);
+
 	return (
 		<Modal
 			keepMounted
@@ -362,6 +380,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									}
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
+									renderValue={() => selectedElectiveLabels}
 								>
 									{optionalSubjects.map((item, index) => (
 										<MenuItem
@@ -373,7 +392,14 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 												theme
 											)}
 										>
-											{item.label}
+											<Checkbox
+												checked={
+													formik.values[
+														'elective-subject-ids'
+													].indexOf(item.value) > -1
+												}
+											/>
+											<ListItemText primary={item.label} />
 										</MenuItem>
 									))}
 								</Select>
@@ -410,6 +436,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									}
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
+									renderValue={() => selectedSpecialisedLabels}
 								>
 									{specialisedSubjects.map((item, index) => (
 										<MenuItem
@@ -421,7 +448,14 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 												theme
 											)}
 										>
-											{item.label}
+											<Checkbox
+												checked={
+													formik.values[
+														'specialized-subject-ids'
+													].indexOf(item.value) > -1
+												}
+											/>
+											<ListItemText primary={item.label} />
 										</MenuItem>
 									))}
 								</Select>

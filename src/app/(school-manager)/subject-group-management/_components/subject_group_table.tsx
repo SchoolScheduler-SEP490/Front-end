@@ -24,6 +24,7 @@ import { ISubjectGroupTableData } from '../_libs/constants';
 import CreateSubjectGroupModal from './subject_group_create_modal';
 import DeleteSubjectGroupModal from './subject_group_delete_modal';
 import UpdateSubjectGroupModal from './subject-group_update_modal';
+import ApplySubjectGroupModal from './subject_group_apply_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -155,11 +156,12 @@ interface ISubjectGroupTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
+	selectedYearId: number;
 }
 
 const dropdownOptions: ICommonOption[] = [
 	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
-	// { img: '/images/icons/checklist.png', title: 'Áp dụng Tổ hợp môn' },
+	{ img: '/images/icons/checklist.png', title: 'Áp dụng Tổ hợp môn' },
 	{ img: '/images/icons/delete.png', title: 'Xóa Tổ hợp môn' },
 ];
 
@@ -179,6 +181,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		mutate,
 		isFilterable,
 		setIsFilterable,
+		selectedYearId,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
@@ -187,6 +190,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
+	const [iApplyModalOpen, setIApplyModalOpen] = React.useState<boolean>(false);
 	const [selectedRow, setSelectedRow] = React.useState<
 		ISubjectGroupTableData | undefined
 	>();
@@ -211,6 +215,9 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 				setIUpdateModalOpen(true);
 				break;
 			case 1:
+				setIApplyModalOpen(true);
+				break;
+			case 2:
 				setIsDeleteModalOpen(true);
 				break;
 			default:
@@ -461,6 +468,14 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 				setOpen={setIUpdateModalOpen}
 				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
 				subjectGroupMutator={mutate}
+			/>
+			<ApplySubjectGroupModal
+				open={iApplyModalOpen}
+				setOpen={setIApplyModalOpen}
+				grade={selectedRow?.grade.toString() ?? '0'}
+				schoolYearId={selectedYearId}
+				subjectGroupName={selectedRow?.subjectGroupName ?? 'Không xác định'}
+				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
 			/>
 		</div>
 	);
