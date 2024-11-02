@@ -6,22 +6,26 @@ import useClassData from "./_hooks/useClassData";
 import ClassTable from "./_components/class_table";
 import ClassTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
-import { IClass, IClassTableData} from "./_libs/constants";
+import { IClass, IClassTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 import { fetchSchoolYear } from "./_libs/apiClass";
 import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
+import ClassFilterable from "./_components/class_filterable";
 
 export default function SMClass() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const { schoolId, sessionToken } = useAppContext();
   const [currentSchoolYear, setCurrentSchoolYear] = React.useState<string>("");
+  const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
+  const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
 
   const { data, error, isValidating, mutate } = useClassData({
     sessionToken,
     schoolId,
     pageSize: rowsPerPage,
     pageIndex: page + 1,
+    schoolYearId: selectedYearId,
   });
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
     undefined
@@ -29,21 +33,25 @@ export default function SMClass() {
   const [classTableData, setClassTableData] = React.useState<IClassTableData[]>(
     []
   );
-
+  
   const getMaxPage = () => {
     if (totalRows === 0) return 1;
     return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
   };
+
+	React.useEffect(() => {
+		mutate({ schoolYearId: selectedYearId });
+	}, [selectedYearId]);
 
   React.useEffect(() => {
     const getSchoolYear = async () => {
       try {
         const data = await fetchSchoolYear(sessionToken);
         if (data.result && data.result.length > 0) {
-          setCurrentSchoolYear(data.result[0]["school-year-code"]);
+          setCurrentSchoolYear(`${data.result[0]["start-year"]} - ${data.result[0]["end-year"]}`);
         }
       } catch (error) {
-        console.error('Error fetching school year:', error);
+        console.error("Error fetching school year:", error);
       }
     };
     getSchoolYear();
@@ -51,7 +59,7 @@ export default function SMClass() {
 
   React.useEffect(() => {
     mutate();
-    if (data?.status === 200  && currentSchoolYear ) {
+    if (data?.status === 200 && currentSchoolYear) {
       setTotalRows(data.result["total-item-count"]);
       const classData: IClassTableData[] = data.result.items.map(
         (item: IClass) => ({
@@ -84,7 +92,7 @@ export default function SMClass() {
             </h3>
           </div>
         </SMHeader>
-          <ClassTableSkeleton />
+        <ClassTableSkeleton />
       </div>
     );
   }
@@ -104,6 +112,13 @@ export default function SMClass() {
           </h3>
         </div>
       </SMHeader>
+      <div
+        className={`w-full h-auto flex flex-row ${
+          isFilterable
+            ? "justify-start items-start"
+            : "justify-center items-center"
+        } pt-5 px-[1.5vw] gap-[1vw]`}
+      >
         <ClassTable
           classTableData={classTableData}
           page={page}
@@ -111,8 +126,17 @@ export default function SMClass() {
           rowsPerPage={rowsPerPage}
           setRowsPerPage={setRowsPerPage}
           totalRows={totalRows}
+          isFilterable={isFilterable}
+          setIsFilterable={setIsFilterable}
           mutate={mutate}
         />
+        <ClassFilterable
+          open={isFilterable}
+          setOpen={setIsFilterable}
+          selectedYearId={selectedYearId}
+          setSelectedYearId={setSelectedYearId}
+        />
+      </div>
     </div>
   );
 }
