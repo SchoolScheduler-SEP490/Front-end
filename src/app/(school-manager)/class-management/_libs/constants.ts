@@ -47,3 +47,8 @@ export interface IUpdateClassData {
   grade: number;
   "subject-group-id": number;
 }
+
+export interface IDropdownOption<T> {
+	value: T;
+	label: string;
+}

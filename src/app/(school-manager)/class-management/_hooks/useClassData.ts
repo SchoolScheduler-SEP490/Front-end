@@ -5,6 +5,7 @@ interface IClassDataProps {
   schoolId: string;
   pageSize: number;
   pageIndex: number;
+  schoolYearId: number;
 }
 const useClassData = ({
   sessionToken,
