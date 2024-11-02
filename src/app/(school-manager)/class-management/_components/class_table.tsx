@@ -149,6 +149,8 @@ interface IClassTableProps {
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
   totalRows?: number;
   mutate: KeyedMutator<any>;
+  isFilterable: boolean;
+  setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -165,6 +167,8 @@ const ClassTable = (props: IClassTableProps) => {
     setRowsPerPage,
     totalRows,
     mutate,
+    isFilterable,
+		setIsFilterable,
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
@@ -178,6 +182,11 @@ const ClassTable = (props: IClassTableProps) => {
   >();
   const open = Boolean(anchorEl);
 
+  const handleFilterable = () => {
+    setIsFilterable(!isFilterable);
+    mutate();
+  };
+  
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
     row: IClassTableData
@@ -236,7 +245,7 @@ const ClassTable = (props: IClassTableProps) => {
   const handleOpenAddForm = () => setOpenAddForm(true);
 
   return (
-    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
+    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <Toolbar
@@ -257,7 +266,7 @@ const ClassTable = (props: IClassTableProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Lọc danh sách">
-              <IconButton>
+              <IconButton onClick={handleFilterable}>
                 <FilterListIcon />
               </IconButton>
             </Tooltip>
