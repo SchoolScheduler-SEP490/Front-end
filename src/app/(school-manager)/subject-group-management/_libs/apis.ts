@@ -63,7 +63,7 @@ export const getUpdateSubjectGroupApi = ({
 	localApi?: string;
 	subjectGroupId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups/helo/${subjectGroupId}`;
+	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
 };
 
 // Update Subject Group API
