@@ -20,7 +20,7 @@ import Image from "next/image";
 import { visuallyHidden } from "@mui/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
-import { ICommonOption } from "@/utils/constants";
+import { CLASSGROUP_STRING_TYPE, ICommonOption } from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IClassTableData } from "../_libs/constants";
 import AddClassModal from "./add_class";
@@ -295,7 +295,13 @@ const ClassTable = (props: IClassTableProps) => {
                         {index + 1 + page * rowsPerPage}
                       </TableCell>
                       <TableCell align="left">{row.className}</TableCell>
-                      <TableCell align="center">{row.grade}</TableCell>
+                      <TableCell align="center">
+                        {row.grade > 0
+                          ? CLASSGROUP_STRING_TYPE.find(
+                              (item) => item.value === row.grade
+                            )?.key
+                          : "-"}
+                      </TableCell>
                       <TableCell align="center">
                         {row.homeroomTeacherName}
                       </TableCell>
