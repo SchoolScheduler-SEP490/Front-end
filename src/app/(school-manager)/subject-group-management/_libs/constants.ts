@@ -53,11 +53,6 @@ export interface IUpdateSubjectGroupRequest {
 	'specialized-subject-ids': number[];
 }
 
-export interface IDropdownOption<T> {
-	value: T;
-	label: string;
-}
-
 export interface ISubjectOptionResponse {
 	id: number;
 	'subject-name': string;

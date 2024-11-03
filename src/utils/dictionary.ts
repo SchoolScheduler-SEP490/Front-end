@@ -104,7 +104,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Update subject group success.': 'Cập nhật Tổ hợp môn thành công',
 	'Delete subject group success.': 'Xóa Tổ hợp môn thành công',
 	'Subject group not exist.': 'Không tìm thấy Tổ hợp môn',
-	'Get subject group list has no items': 'Lấy danh sách Tổ hợp môn không có mục nào',
+	'Get subject group list has no items': 'Chưa có môn học trong năm học được chọn',
 	'Get subject group list successful': 'Lấy danh sách Tổ hợp môn thành công',
 	'Subject group has assign, can not update grade.':
 		'Tổ hợp môn đã được gán, không thể cập nhật khối lớp',

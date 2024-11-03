@@ -30,13 +30,13 @@ import useFetchSGDetail from '../_hooks/useFetchSGDetail';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import useUpdateSubjectGroup from '../_hooks/useUpdateSG';
 import {
-	IDropdownOption,
 	ISchoolYearResponse,
 	ISubjectGroupDetailResponse,
 	ISubjectOptionResponse,
 	IUpdateSubjectGroupRequest,
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
+import { IDropdownOption } from '../../_utils/contants';
 
 const style = {
 	position: 'absolute',

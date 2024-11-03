@@ -1,3 +1,5 @@
+import { IDropdownOption } from '../../_utils/contants';
+
 export interface IClassResponse {
 	name: string;
 	'homeroom-teacher-id': number;
@@ -20,11 +22,6 @@ export interface IClassResponse {
 export interface ITeachingAssignmentSidenavData {
 	title: string;
 	items: { key: string; value: number }[];
-}
-
-export interface IDropdownOption<T> {
-	value: T;
-	label: string;
 }
 
 export interface ITermResponse {

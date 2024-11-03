@@ -1,21 +1,26 @@
 'use client';
 import SMHeader from '@/commons/school_manager/header';
+import { useAppContext } from '@/context/app_provider';
+import useFilterArray from '@/hooks/useFilterArray';
+import useNotify from '@/hooks/useNotify';
+import { TRANSLATOR } from '@/utils/dictionary';
+import { useEffect, useState } from 'react';
+import SubjectGroupSideNav from './_components/lesson_sidenav';
 import LessonTable from './_components/lesson_table';
 import SubjectGroupSideNavSkeleton from './_components/skeleton_sidenav';
-import SubjectGroupSideNav from './_components/lesson_sidenav';
 import LessonTableSkeleton from './_components/skeleton_table';
-import { useEffect, useState } from 'react';
+import useFetchSchoolYear from './_hooks/useFetchSchoolYear';
+import useFetchSGTableData from './_hooks/useFetchSGTableData';
 import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';
-import { useAppContext } from '@/context/app_provider';
+import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	ILessonTableData,
-	ISubjectInGroup,
+	ISchoolYearResponse,
 	ISubjectGroupObjectResponse,
 	ISubjectGroupSidenavData,
+	ISubjectInGroup,
+	IYearDropdownOption,
 } from './_libs/constants';
-import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
-import useFetchSGTableData from './_hooks/useFetchSGTableData';
-import useFilterArray from '@/hooks/useFilterArray';
 
 export default function SMLesson() {
 	const { schoolId, sessionToken } = useAppContext();
@@ -24,11 +29,15 @@ export default function SMLesson() {
 	const [selectedYearId, setSelectedYearId] = useState<number>(1);
 	const [subjectGroup, setSubjectGroup] = useState<ISubjectGroupSidenavData[]>([]);
 	const [lessonTableData, setLessonTableData] = useState<ILessonTableData[]>([]);
+	const [yearDropdownData, setYearDropdownData] = useState<
+		IYearDropdownOption<number>[]
+	>([]);
 	const {
 		data: subjectGroupData,
 		mutate: updateSubjectGroup,
 		isLoading: isSubjectGroupLoading,
 		isValidating: isSubjectGroupValidating,
+		error: subjectGroupError,
 	} = useFetchSGSidenav({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
@@ -45,6 +54,7 @@ export default function SMLesson() {
 		sessionToken: sessionToken,
 		subjectGroupId: selectedSubjectGroup,
 	});
+	const { data: yearData, error } = useFetchSchoolYear();
 
 	useEffect(() => {
 		updateSubjectGroup();
@@ -97,6 +107,18 @@ export default function SMLesson() {
 	}, [subjectGroupTableResponse]);
 
 	useEffect(() => {
+		if (yearData?.status === 200) {
+			const yearStudyOptions: IYearDropdownOption<number>[] = yearData.result.map(
+				(item: ISchoolYearResponse) => ({
+					value: item.id,
+					label: `${item['start-year']} - ${item['end-year']}`,
+				})
+			);
+			setYearDropdownData(yearStudyOptions);
+		}
+	}, [yearData]);
+
+	useEffect(() => {
 		updateSubjectGroup({ schoolYearId: selectedYearId });
 	}, [selectedYearId]);
 
@@ -127,6 +149,16 @@ export default function SMLesson() {
 		);
 	}
 
+	if (subjectGroupError) {
+		useNotify({
+			message:
+				TRANSLATOR[subjectGroupError?.message] ??
+				'Chưa có dữ liệu môn học cho năm học',
+			type: 'error',
+		});
+		setSelectedYearId(yearDropdownData[0].value);
+	}
+
 	return (
 		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
 			<SMHeader>
@@ -144,6 +176,7 @@ export default function SMLesson() {
 				/>
 				<LessonTable
 					subjectTableData={lessonTableData}
+					yearData={yearDropdownData}
 					selectedYearId={selectedYearId}
 					setSelectedYearId={setSelectedYearId}
 					mutator={updateSubjectGroupTable}
