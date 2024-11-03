@@ -12,6 +12,7 @@ import {
   Select,
   MenuItem,
   IconButton,
+  FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { teacherSchema } from "../_libs/teacher_schema";
@@ -20,8 +21,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
 import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
-import { IAddTeacherData } from "../_libs/constants";
+import { IAddTeacherData, IDepartment, ISubject } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
+import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
 
 //Add new teacher form
 interface AddTeacherFormProps {
@@ -30,9 +32,43 @@ interface AddTeacherFormProps {
   mutate: KeyedMutator<any>;
 }
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+      scrollbars: "none",
+    },
+  },
+};
+
 const AddTeacherModal = (props: AddTeacherFormProps) => {
   const { open, onClose, mutate } = props;
   const { schoolId, sessionToken } = useAppContext();
+  const [departments, setDepartments] = React.useState<IDepartment[]>([]);
+  const [subjects, setSubjects] = React.useState<ISubject[]>([]);
+
+  React.useEffect(() => {
+    const loadDepartments = async () => {
+      const data = await getDepartmentName(schoolId, sessionToken);
+      if (data.result?.items) {
+        setDepartments(data.result.items);
+      }
+    };
+    loadDepartments();
+  }, [schoolId, sessionToken]);
+
+  React.useEffect(() => {
+    const loadSubjects = async () => {
+      const data = await getSubjectName(sessionToken, schoolId);
+      if (data.result?.items) {
+        setSubjects(data.result.items);
+      }
+    };
+    loadSubjects();
+  }, [sessionToken, schoolId]);
 
   const handleClose = () => {
     formik.handleReset(formik.initialValues);
@@ -65,10 +101,16 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       "teacher-role": "Role1",
       status: "Active",
       phone: "",
+      "subjects-abreviation": [],
     },
     validationSchema: teacherSchema,
     onSubmit: async (formData) => {
-      handleFormSubmit(formData);
+      handleFormSubmit({
+        ...formData,
+        "subjects-abreviation": Array.isArray(formData["subjects-abreviation"])
+        ? formData["subjects-abreviation"]
+        : [formData["subjects-abreviation"]],
+      });
     },
   });
 
@@ -247,28 +289,111 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Chuyên môn
+                    Tổ bộ môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
+                  <FormControl
                     fullWidth
-                    placeholder="Nhập môn đảm nhiệm"
-                    name="department-code"
-                    type="text"
-                    value={formik.values["department-code"]}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     error={
                       formik.touched["department-code"] &&
                       Boolean(formik.errors["department-code"])
                     }
-                    helperText={
-                      formik.touched["department-code"] &&
-                      formik.errors["department-code"]
+                  >
+                    <Select
+                      variant="standard"
+                      name="department-code"
+                      value={formik.values["department-code"]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="">--Chọn tổ bộ môn--</MenuItem>
+                      {departments.map((department) => (
+                        <MenuItem
+                          key={department["department-code"]}
+                          value={department["department-code"]}
+                        >
+                          {department.name} 
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["department-code"] &&
+                      formik.errors["department-code"] && (
+                        <FormHelperText className="m-0">
+                          {formik.errors["department-code"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Môn học áp dụng
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["subjects-abreviation"] &&
+                      Boolean(formik.errors["subjects-abreviation"])
                     }
-                  />
+                  >
+                    <Select
+                      variant="standard"
+                      multiple
+                      name="subjects-abreviation"
+                      value={
+                        Array.isArray(formik.values["subjects-abreviation"])
+                          ? formik.values["subjects-abreviation"]
+                          : [formik.values["subjects-abreviation"]]
+                      }
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        formik.setFieldValue(
+                          "subjects-abreviation",
+                          Array.isArray(value) ? value : [value]
+                        );
+                      }}
+                      onBlur={formik.handleBlur}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      {subjects.map((subject) => (
+                        <MenuItem key={subject.id} value={subject.abbreviation}>
+                          {`${subject["subject-name"]} - ${subject.abbreviation}`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["subjects-abreviation"] &&
+                      formik.errors["subjects-abreviation"] && (
+                        <FormHelperText className="m-0">
+                          {formik.errors["subjects-abreviation"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>

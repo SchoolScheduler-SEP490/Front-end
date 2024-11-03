@@ -28,6 +28,7 @@ export interface IAddClassData {
   "is-full-day": boolean;
   "period-count": number;
   grade: string;
+  "subject-group-code": string;
 }
 export interface ITeacher {
   id: number;
@@ -49,6 +50,12 @@ export interface IUpdateClassData {
 }
 
 export interface IDropdownOption<T> {
-	value: T;
-	label: string;
+  value: T;
+  label: string;
+}
+
+export interface ISubjectGroup {
+  id: number;
+  "group-code": string;
+  "group-name": string;
 }

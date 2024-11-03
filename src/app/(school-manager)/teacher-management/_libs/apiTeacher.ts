@@ -1,4 +1,6 @@
 import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
+
+const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
   export const deleteTeacherById = async (
     api: string,
@@ -91,3 +93,65 @@ import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
       return false;
     }
 }
+
+export const getDepartmentName = async (
+  schoolId: string,
+  sessionToken: string
+) => {
+  const initialResponse = await fetch(
+    `${api}/api/Department?schoolId=${schoolId}&pageIndex=1&pageSize=20`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+  const response = await fetch(
+    `${api}/api/Department?schoolId=${schoolId}&pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+}
+
+export const getSubjectName = async (
+  sessionToken: string,
+  schoolId: string
+) => {
+  const initialResponse = await fetch(
+    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=1&pageIndex=1`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch(
+    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+};
+

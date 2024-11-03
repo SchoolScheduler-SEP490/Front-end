@@ -24,7 +24,7 @@ import { useAppContext } from "@/context/app_provider";
 import { IAddClassData, ITeacher } from "../_libs/constants";
 import useAddClass from "../_hooks/useAddClass";
 import { getTeacherName } from "../_libs/apiClass";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
+import { CLASSGROUP_STRING_TYPE, SUBJECT_GROUP_TYPE } from "@/utils/constants";
 
 interface AddClassFormProps {
   open: boolean;
@@ -82,6 +82,7 @@ const AddClassModal = (props: AddClassFormProps) => {
       "is-full-day": true,
       "period-count": "",
       grade: '',
+      "subject-group-code": ""
     },
     validationSchema: classSchema,
     onSubmit: async (formData) => {

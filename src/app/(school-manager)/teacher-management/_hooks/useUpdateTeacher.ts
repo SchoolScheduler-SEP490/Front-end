@@ -11,16 +11,15 @@ export function useUpdateTeacher(mutate: () => void) {
 
   const editTeacher = async (teacherId: number, teacherData: IUpdateTeacherRequestBody) => {
     setIsUpdating(true);
-    console.log("Attempting to update teacher with ID:", teacherId);
-    console.log("Teacher data being sent:", teacherData);
-
     try {
       if (!sessionToken) {
         throw new Error('Session token not found. Please log in.');
       }
-      const success = await updateTeacher(api, teacherId, sessionToken, teacherData);
+      const success = await updateTeacher(api, teacherId, sessionToken, {
+        ...teacherData,
+        "school-id": 2555
+      });
       if (success) {
-        console.log(`Successfully updated teacher:`, teacherData);
         mutate();
       }
       setIsUpdating(false);

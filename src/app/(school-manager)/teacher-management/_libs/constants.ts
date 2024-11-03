@@ -32,13 +32,14 @@ export interface IUpdateTeacherRequestBody {
   abbreviation: string;
   email: string;
   gender: string;
-  "department-id": number;
+  "department-id": string;
   "date-of-birth": string;
   "school-id": number;
   "teacher-role": string;
   status: string;
   phone: string;
   "is-deleted": boolean;
+  "teachable-subject-ids": string[];
 }
 //Create new teacher request data
 export interface IAddTeacherData {
@@ -52,4 +53,17 @@ export interface IAddTeacherData {
   "teacher-role": string;
   status: string;
   phone: string;
+  'subjects-abreviation': string[];
+}
+
+export interface IDepartment {
+  id: number;
+  name: string;
+  "department-code": string;  
+}
+
+export interface ISubject {
+	id: number;
+	"subject-name": string;
+	abbreviation: string;
 }
