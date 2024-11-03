@@ -126,7 +126,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 	const { data, isValidating, error, mutate } = useFetchSGClass({
 		sessionToken,
 		schoolId,
-		pageSize: 100,
+		pageSize: 1000,
 		pageIndex: 1,
 		schoolYearId,
 		grade,
@@ -225,7 +225,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 		setIsConfirmOpen(false);
 	};
 
-	useEffect(() => {
+	const handleConfirmApply = () => {
 		if (selectedClasses.length > 0) {
 			var tmpVulClasses: IVulnerableClass[] = [];
 			selectedClasses.map((item) => {
@@ -236,13 +236,8 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 					});
 				}
 			});
-			setVulnerableClasses(
-				useFilterArray([...tmpVulClasses, ...vulnerableClasses], 'className')
-			);
+			setVulnerableClasses(tmpVulClasses);
 		}
-	}, [selectedClasses]);
-
-	const handleConfirmApply = () => {
 		setIsConfirmOpen(true);
 	};
 
@@ -336,6 +331,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 						title='áp dụng'
 						disableRipple
 						type='button'
+						disabled={selectedClasses.length === 0}
 						styles='bg-primary-300 text-white !py-1 px-4'
 						onClick={handleConfirmApply}
 					/>

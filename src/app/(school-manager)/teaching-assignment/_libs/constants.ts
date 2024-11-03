@@ -59,4 +59,45 @@ export interface ITeachingAssignmentTableData {
 	subjectName: string;
 	teacherName: string | undefined;
 	totalSlotPerWeek: number;
+	availableTeachers: IDropdownOption<number>[];
+}
+
+export interface ITeachingAssignmentResponse {
+	'teachable-subject-id': number;
+	'period-count': number;
+	'student-class-id': number;
+	'assignment-type': string;
+	'subject-id': number;
+	'subject-name': string;
+	'teacher-id': number | null;
+	'teacher-first-name': string;
+	'teacher-last-name': string;
+	'teacher-abbreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface ITeacherResponse {
+	id: number;
+	'first-name': string;
+	'last-name': string;
+	abbreviation: string;
+	email: string;
+	gender: string;
+	'department-id': number;
+	'department-name': string;
+	'date-of-birth': string;
+	'teacher-role': string;
+	status: number;
+	'is-deleted': boolean;
+	phone: string;
+	'teachable-subjects': ITeachableSubject[];
+}
+
+export interface ITeachableSubject {
+	'subject-id': number;
+	'subject-name': string;
+	abbreviation: string;
 }

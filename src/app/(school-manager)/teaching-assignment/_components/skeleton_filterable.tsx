@@ -3,7 +3,7 @@ import { Paper, Skeleton } from '@mui/material';
 const TeachingAssignmentFilterableSkeleton = () => {
 	return (
 		<div
-			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[4vh] gap-5`}
+			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] gap-5`}
 		>
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 				<Skeleton variant='text' sx={{ fontSize: '2rem', width: 210 }} />

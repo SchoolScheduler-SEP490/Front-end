@@ -69,7 +69,7 @@ function EnhancedTableHead() {
 
 const TeachingAssignmentTableSkeleton = () => {
 	return (
-		<div className='relative w-[50%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
+		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
@@ -82,7 +82,7 @@ const TeachingAssignmentTableSkeleton = () => {
 						]}
 					>
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Tiết học
+							Phân công giảng dạy
 						</h2>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
 							<Tooltip title='Lọc danh sách'>
@@ -122,7 +122,7 @@ const TeachingAssignmentTableSkeleton = () => {
 											</TableCell>
 											<TableCell
 												align='left'
-												width={160}
+												width={100}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
@@ -136,6 +136,7 @@ const TeachingAssignmentTableSkeleton = () => {
 											</TableCell>
 											<TableCell
 												align='left'
+												width={250}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
@@ -149,6 +150,7 @@ const TeachingAssignmentTableSkeleton = () => {
 											</TableCell>
 											<TableCell
 												align='center'
+												width={80}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',

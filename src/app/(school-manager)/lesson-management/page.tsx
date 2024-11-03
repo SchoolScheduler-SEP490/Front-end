@@ -33,7 +33,7 @@ export default function SMLesson() {
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		pageIndex: 1,
-		pageSize: 100,
+		pageSize: 1000,
 		schoolYearId: selectedYearId,
 	});
 	const {
