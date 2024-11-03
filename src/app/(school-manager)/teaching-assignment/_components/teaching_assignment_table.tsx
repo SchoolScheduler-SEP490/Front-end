@@ -111,6 +111,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	const handleConfirmCancelUpdate = () => {
 		setIsCancelUpdateModalOpen(true);
 		handleCancelUpdateLesson();
+		mutate();
 	};
 
 	const handleCancelUpdateLesson = () => {

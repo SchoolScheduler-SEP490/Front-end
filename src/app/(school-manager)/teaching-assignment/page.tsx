@@ -203,7 +203,7 @@ export default function SMTeachingAssignment() {
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Tiết học
+						Phân công giảng dạy
 					</h3>
 				</div>
 			</SMHeader>
