@@ -5,23 +5,20 @@ import useFilterArray from '@/hooks/useFilterArray';
 import { useEffect, useState } from 'react';
 import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filterable';
 import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
+import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
 import TeachingAssignmentFilterable from './_components/teaching_assignment_filterable';
 import TeachingAssignmentSideNav from './_components/teaching_assignment_sidenav';
 import TeachingAssignmentTable from './_components/teaching_assignment_table';
 import useFetchClassData from './_hooks/useFetchClass';
 import useFetchTeachingAssignment from './_hooks/useFetchTA';
+import useFetchTeacher from './_hooks/useFetchTeacher';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	IClassResponse,
-	IDropdownOption,
-	ITeachableSubject,
-	ITeacherResponse,
 	ITeachingAssignmentResponse,
 	ITeachingAssignmentSidenavData,
 	ITeachingAssignmentTableData,
 } from './_libs/constants';
-import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
-import useFetchTeacher from './_hooks/useFetchTeacher';
 
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId } = useAppContext();

@@ -15,8 +15,9 @@ import {
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useFetchTerm from '../_hooks/useFetchFilterTerm';
-import { IDropdownOption, ISchoolYearResponse, ITermResponse } from '../_libs/constants';
+import { ISchoolYearResponse, ITermResponse } from '../_libs/constants';
 import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
+import { IDropdownOption } from '../../_utils/contants';
 
 interface ISortableDropdown<T> extends IDropdownOption<T> {
 	criteria: string | number;

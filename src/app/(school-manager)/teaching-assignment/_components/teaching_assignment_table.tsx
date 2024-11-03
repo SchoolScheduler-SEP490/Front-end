@@ -17,10 +17,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useAssignTeacher from '../_hooks/useAssignTeacher';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
-	IDropdownOption,
 	ITeachableResponse,
 	ITeacherAssignmentRequest,
 	ITeachingAssignmentTableData,

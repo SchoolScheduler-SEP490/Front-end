@@ -1,6 +1,5 @@
 'use client';
 
-import { useAppContext } from '@/context/app_provider';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	FormControl,
@@ -14,8 +13,9 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
-import { IDropdownOption, ISchoolYearResponse } from '../_libs/constants';
+import { ISchoolYearResponse } from '../_libs/constants';
 
 interface ISubjectGroupFilterableProps {
 	open: boolean;

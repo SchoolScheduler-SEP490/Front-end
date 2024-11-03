@@ -87,3 +87,8 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		],
 	},
 ];
+
+export interface IDropdownOption<T> {
+	value: T;
+	label: string;
+}
