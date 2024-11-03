@@ -166,9 +166,9 @@ const dropdownOptions: ICommonOption[] = [
 ];
 
 const GRADE_COLOR: { [key: number]: string } = {
-	10: 'tertiary-normal',
+	10: '#ff6b35',
 	11: 'black',
-	12: 'primary-500',
+	12: '#004e89',
 };
 const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	const {
@@ -341,9 +341,8 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											<TableCell
 												align='left'
 												width={200}
-												className={`text-${
-													GRADE_COLOR[row.grade]
-												} font-semibold`}
+												className='!font-semibold'
+												sx={{ color: GRADE_COLOR[row.grade] }}
 											>
 												{row.grade > 0
 													? CLASSGROUP_STRING_TYPE.find(

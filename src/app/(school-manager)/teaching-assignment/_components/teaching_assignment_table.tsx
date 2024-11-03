@@ -1,7 +1,7 @@
 'use client';
 
+import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
-import useNotify from '@/hooks/useNotify';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -15,15 +15,16 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
+import useAssignTeacher from '../_hooks/useAssignTeacher';
+import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	IDropdownOption,
+	ITeachableResponse,
 	ITeacherAssignmentRequest,
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
-import useAssignTeacher from '../_hooks/useAssignTeacher';
-import { useAppContext } from '@/context/app_provider';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -84,25 +85,42 @@ interface ITeachingAssignmentTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
-	selectedClass: number;
-	selectedTerm: number;
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
-	const {
-		subjectData,
-		mutate,
-		isFilterable,
-		setIsFilterable,
-		selectedClass,
-		selectedTerm,
-	} = props;
-	const { sessionToken } = useAppContext();
+	const { subjectData, mutate, isFilterable, setIsFilterable } = props;
+	const { sessionToken, schoolId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = useState<ITeacherAssignmentRequest[]>([]);
+	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>(
+		[]
+	);
+	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(
+		subjectData[0]?.subjectKey ?? 0
+	);
 	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] =
 		useState<boolean>(false);
+
+	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
+		schoolId: Number(schoolId),
+		subjectId: selectedSubjectId,
+		sessionToken,
+	});
+
+	useEffect(() => {
+		if (teachableData?.status === 200) {
+			const dropdownOptions: IDropdownOption<number>[] = teachableData.result.map(
+				(item: ITeachableResponse) => {
+					return {
+						value: item['teacher-id'],
+						label: `${item['teacher-name']} (${item['teacher-abreviation']})`,
+					} as IDropdownOption<number>;
+				}
+			);
+			setTeachableDropdown([...dropdownOptions]);
+		}
+	}, [teachableData, selectedSubjectId]);
 
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);
@@ -121,79 +139,34 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	};
 
 	const handleConfirmUpdate = async () => {
-		editingObjects.map((item) => {
-			useAssignTeacher({
-				sessionToken: sessionToken,
-				formData: item,
-			}).then(() => {
-				mutate();
-			});
+		await useAssignTeacher({
+			sessionToken: sessionToken,
+			formData: editingObjects,
 		});
+		mutate();
 		setIsEditing(false);
 		setEditingObjects([]);
 	};
 
-	const handleAssignTeacher = (subjectId: number, selectedTeacherId: number) => {
+	const handleAssignTeacher = (assignmentId: number, selectedTeacherId: number) => {
 		setIsEditing(true);
 		var editingObject: ITeacherAssignmentRequest | undefined = editingObjects.find(
-			(item) => item['subject-id'] === subjectId
+			(item) => item.id === assignmentId
 		);
 		if (!editingObject) {
 			editingObject = {
-				'subject-id': subjectId,
+				id: assignmentId,
 				'teacher-id': selectedTeacherId ?? 0,
-				'student-class-id': selectedClass,
-				'period-count': 0,
-				'term-id': selectedTerm,
 			};
 		} else {
 			editingObject['teacher-id'] = selectedTeacherId;
 		}
-		setEditingObjects(
-			useFilterArray([...editingObjects, editingObject], 'subject-id')
-		);
+		setEditingObjects(useFilterArray([...editingObjects, editingObject], 'id'));
 	};
 
-	const handleUpdatePeriodCount = (subjectId: number, periodCount: number) => {
-		if (periodCount < 0) {
-			useNotify({
-				message: 'Số tiết không thể nhỏ hơn 0',
-				type: 'error',
-			});
-			return;
-		}
-		if (periodCount > 10) {
-			useNotify({
-				message: 'Số tiết không thể vượt quá 10',
-				type: 'error',
-			});
-			return;
-		}
-		if (periodCount === 0) {
-			useNotify({
-				message: 'Phải có ít nhất 1 tiết/tuần',
-				type: 'error',
-			});
-			return;
-		}
-		setIsEditing(true);
-		var editingObject: ITeacherAssignmentRequest | undefined = editingObjects.find(
-			(item) => item['subject-id'] === subjectId
-		);
-		if (!editingObject) {
-			editingObject = {
-				'subject-id': subjectId,
-				'teacher-id': 0,
-				'student-class-id': selectedClass,
-				'period-count': periodCount,
-				'term-id': selectedTerm,
-			};
-		} else {
-			editingObject['period-count'] = periodCount;
-		}
-		setEditingObjects(
-			useFilterArray([...editingObjects, editingObject], 'subject-id')
-		);
+	const handleSelectSubject = (subjectId: number) => {
+		setSelectedSubjectId(subjectId);
+		getTeachableData({ subjectId: selectedSubjectId });
 	};
 
 	return (
@@ -252,7 +225,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 						</div>
 					</Toolbar>
 					<TableContainer>
-						<Table aria-labelledby='tableTitle' size='medium'>
+						<Table aria-labelledby='tableTitle' size='small'>
 							<EnhancedTableHead />
 							<TableBody>
 								{subjectData.map((row, index) => {
@@ -261,7 +234,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 										| ITeacherAssignmentRequest
 										| undefined =
 										editingObjects.find(
-											(item) => item['subject-id'] === row.id
+											(item) => item.id === row.id
 										) ?? undefined;
 
 									return (
@@ -308,7 +281,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 												}}
 											>
 												<Autocomplete
-													options={row.availableTeachers}
+													options={teachableDropdown}
 													getOptionLabel={(
 														option: IDropdownOption<number>
 													) => option.label}
@@ -317,13 +290,15 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 													) => option.value}
 													fullWidth
 													disableClearable
-													defaultValue={
-														row.availableTeachers.find(
-															(teacher) =>
-																teacher.label ===
-																row.teacherName
-														) ?? row.availableTeachers[0]
-													}
+													defaultValue={row.teacherName}
+													onOpen={() => {
+														handleSelectSubject(
+															row.subjectKey
+														);
+													}}
+													onBlur={() => {
+														setTeachableDropdown([]);
+													}}
 													onChange={(
 														event: any,
 														newValue: IDropdownOption<number> | null
@@ -353,39 +328,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<TextField
-													variant='standard'
-													type='number'
-													sx={{
-														width: '60%',
-														'& .MuiInputBase-input': {
-															textAlign: 'center',
-														},
-														'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
-															{
-																position: 'absolute',
-																right: '0',
-																top: '50%',
-																transform:
-																	'translateY(-50%)',
-																zIndex: 10,
-															},
-													}}
-													onChange={(
-														event: React.ChangeEvent<HTMLInputElement>
-													) =>
-														handleUpdatePeriodCount(
-															row.id,
-															Number(event.target.value)
-														)
-													}
-													value={
-														!editedObject
-															? row.totalSlotPerWeek
-															: editedObject['period-count']
-													}
-													id='fullWidth'
-												/>
+												{row.totalSlotPerWeek}
 											</TableCell>
 										</TableRow>
 									);

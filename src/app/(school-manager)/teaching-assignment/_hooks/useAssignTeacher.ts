@@ -6,7 +6,7 @@ import { getAssignTeacherApi } from '../_libs/apis';
 
 interface IUpdateSubjectProps {
 	sessionToken: string;
-	formData: ITeacherAssignmentRequest;
+	formData: ITeacherAssignmentRequest[];
 }
 
 const useAssignTeacher = async (props: IUpdateSubjectProps) => {
@@ -20,7 +20,7 @@ const useAssignTeacher = async (props: IUpdateSubjectProps) => {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
-			method: 'POST',
+			method: 'PATCH',
 			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
