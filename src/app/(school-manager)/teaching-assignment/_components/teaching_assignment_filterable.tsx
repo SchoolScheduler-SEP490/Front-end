@@ -1,6 +1,5 @@
 'use client';
 
-import { useAppContext } from '@/context/app_provider';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	FormControl,
@@ -12,16 +11,8 @@ import {
 	SelectChangeEvent,
 	Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
-import useFetchTerm from '../_hooks/useFetchFilterTerm';
-import { ISchoolYearResponse, ITermResponse } from '../_libs/constants';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import { IDropdownOption } from '../../_utils/contants';
-
-interface ISortableDropdown<T> extends IDropdownOption<T> {
-	criteria: string | number;
-}
 
 interface ITeachingAssignmentFilterableProps {
 	open: boolean;
@@ -31,6 +22,8 @@ interface ITeachingAssignmentFilterableProps {
 	selectedYearId: number;
 	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 	mutate?: KeyedMutator<any>;
+	termStudyOptions: IDropdownOption<number>[];
+	yearStudyOptions: IDropdownOption<number>[];
 }
 
 const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps) => {
@@ -41,76 +34,9 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 		setSelectedTermId,
 		selectedYearId,
 		setSelectedYearId,
+		termStudyOptions,
+		yearStudyOptions,
 	} = props;
-	const { sessionToken, schoolId } = useAppContext();
-	const { data: termData, error: termFetchError } = useFetchTerm({
-		sessionToken,
-		schoolId,
-	});
-	const { data: schoolyearData, error: schoolyearError } = useFetchSchoolYear();
-	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-	const [yearStudyOptions, setYearStudyOptions] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-
-	useEffect(() => {
-		if (termData?.status === 200) {
-			const studyOptions: ISortableDropdown<number>[] = termData.result.map(
-				(item: ITermResponse) => ({
-					value: item.id,
-					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-					criteria: item.name,
-				})
-			);
-			setTermStudyOptions(
-				studyOptions.sort((a, b) =>
-					(a.criteria as string).localeCompare(b.criteria as string)
-				)
-			);
-		}
-	}, [termData]);
-
-	useEffect(() => {
-		if (schoolyearData?.status === 200) {
-			const studyOptions: ISortableDropdown<number>[] = schoolyearData.result.map(
-				(item: ISchoolYearResponse) => ({
-					value: item.id,
-					label: `${item['start-year']} - ${item['end-year']}`,
-					criteria: item['start-year'],
-				})
-			);
-			setYearStudyOptions(
-				studyOptions.sort((a, b) =>
-					(a.criteria as string).localeCompare(b.criteria as string)
-				)
-			);
-		}
-	}, [schoolyearData]);
-
-	useEffect(() => {
-		if (termData?.status === 200) {
-			const termInYear: ITermResponse[] = termData.result.filter(
-				(term: ITermResponse) => term['school-year-id'] === selectedYearId
-			);
-			if (termInYear.length > 0) {
-				const studyOptions: ISortableDropdown<number>[] = termInYear.map(
-					(item: ITermResponse) => ({
-						value: item.id,
-						label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-						criteria: item.name,
-					})
-				);
-				setTermStudyOptions(
-					studyOptions.sort((a, b) =>
-						(a.criteria as string).localeCompare(b.criteria as string)
-					)
-				);
-				setSelectedTermId(studyOptions[0].value);
-			}
-		}
-	}, [selectedYearId]);
 
 	const handleClose = () => {
 		setOpen(false);

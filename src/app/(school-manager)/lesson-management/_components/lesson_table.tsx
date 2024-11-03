@@ -29,11 +29,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import {
 	ILessonTableData,
-	ISchoolYearResponse,
 	IUpdateSubjectInGroupRequest,
 	IYearDropdownOption,
 } from '../_libs/constants';
@@ -249,18 +247,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface ILessonTableProps {
 	subjectTableData: ILessonTableData[];
+	yearData: IYearDropdownOption<number>[];
 	selectedYearId: number;
 	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 	mutator: KeyedMutator<any>;
 }
 const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
-	const { subjectTableData, selectedYearId, setSelectedYearId, mutator } = props;
-	const { data: yearData, error } = useFetchSchoolYear();
+	const { subjectTableData, selectedYearId, setSelectedYearId, mutator, yearData } =
+		props;
+
 	const { sessionToken } = useAppContext();
 
-	const [yearStudyOptions, setYearStudyOptions] = React.useState<
-		IYearDropdownOption<number>[]
-	>([]);
 	const [isEditing, setIsEditing] = React.useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = React.useState<
 		IUpdateSubjectInGroupRequest[]
@@ -282,18 +279,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			setSelectedYearId(Number(event.target.value));
 		}
 	};
-
-	React.useEffect(() => {
-		if (yearData?.status === 200) {
-			const yearStudyOptions: IYearDropdownOption<number>[] = yearData.result.map(
-				(item: ISchoolYearResponse) => ({
-					value: item.id,
-					label: `${item['start-year']} - ${item['end-year']}`,
-				})
-			);
-			setYearStudyOptions(yearStudyOptions);
-		}
-	}, [yearData]);
 
 	const handleUpdateLesson = (
 		target: keyof IUpdateSubjectInGroupRequest,
@@ -660,7 +645,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						value={selectedYearId}
 						onChange={handleYearSelect}
 					>
-						{yearStudyOptions.map((item, index) => (
+						{yearData?.map((item, index) => (
 							<MenuItem key={item.value + index} value={item.value}>
 								{item.label}
 							</MenuItem>

@@ -3,6 +3,7 @@ import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import { useEffect, useState } from 'react';
+import { IDropdownOption } from '../_utils/contants';
 import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filterable';
 import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
 import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
@@ -10,16 +11,24 @@ import TeachingAssignmentFilterable from './_components/teaching_assignment_filt
 import TeachingAssignmentSideNav from './_components/teaching_assignment_sidenav';
 import TeachingAssignmentTable from './_components/teaching_assignment_table';
 import useFetchClassData from './_hooks/useFetchClass';
+import useFetchTerm from './_hooks/useFetchFilterTerm';
+import useFetchSchoolYear from './_hooks/useFetchSchoolYear';
 import useFetchTeachingAssignment from './_hooks/useFetchTA';
 import useFetchTeacher from './_hooks/useFetchTeacher';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	IClassResponse,
+	ISchoolYearResponse,
 	ITeachingAssignmentResponse,
 	ITeachingAssignmentSidenavData,
 	ITeachingAssignmentTableData,
+	ITermResponse,
 } from './_libs/constants';
+import useNotify from '@/hooks/useNotify';
 
+interface ISortableDropdown<T> extends IDropdownOption<T> {
+	criteria: string | number;
+}
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId } = useAppContext();
 
@@ -29,6 +38,12 @@ export default function SMTeachingAssignment() {
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 	const [isFilterable, setIsFilterable] = useState<boolean>(true);
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
+	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>(
+		[]
+	);
+	const [yearStudyOptions, setYearStudyOptions] = useState<IDropdownOption<number>[]>(
+		[]
+	);
 
 	const {
 		data: classData,
@@ -62,6 +77,75 @@ export default function SMTeachingAssignment() {
 		pageSize: 1000,
 		pageIndex: 1,
 	});
+	const { data: termData, error: termFetchError } = useFetchTerm({
+		sessionToken,
+		schoolId,
+	});
+	const { data: schoolyearData, error: schoolyearError } = useFetchSchoolYear();
+
+	useEffect(() => {
+		if (termData?.status === 200) {
+			const studyOptions: ISortableDropdown<number>[] = termData.result.map(
+				(item: ITermResponse) => ({
+					value: item.id,
+					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
+					criteria: item.name,
+				})
+			);
+			setTermStudyOptions(
+				studyOptions.sort((a, b) =>
+					(a.criteria as string).localeCompare(b.criteria as string)
+				)
+			);
+		}
+	}, [termData]);
+
+	useEffect(() => {
+		if (schoolyearData?.status === 200) {
+			const studyOptions: ISortableDropdown<number>[] = schoolyearData.result.map(
+				(item: ISchoolYearResponse) => ({
+					value: item.id,
+					label: `${item['start-year']} - ${item['end-year']}`,
+					criteria: item['start-year'],
+				})
+			);
+			setYearStudyOptions(
+				studyOptions.sort((a, b) =>
+					(a.criteria as string).localeCompare(b.criteria as string)
+				)
+			);
+		}
+	}, [schoolyearData]);
+
+	useEffect(() => {
+		if (termData?.status === 200) {
+			const termInYear: ITermResponse[] = termData.result.filter(
+				(term: ITermResponse) => term['school-year-id'] === selectedYearId
+			);
+			if (termInYear.length > 0) {
+				const studyOptions: ISortableDropdown<number>[] = termInYear.map(
+					(item: ITermResponse) => ({
+						value: item.id,
+						label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
+						criteria: item.name,
+					})
+				);
+				setTermStudyOptions(
+					studyOptions.sort((a, b) =>
+						(a.criteria as string).localeCompare(b.criteria as string)
+					)
+				);
+				if (studyOptions.some((item) => item.value === selectedTermId))
+					setSelectedTermId(studyOptions[0].value);
+			} else {
+				useNotify({
+					type: 'error',
+					message: 'Không có học kỳ cho năm học này',
+				});
+				setSelectedYearId(yearStudyOptions[0].value);
+			}
+		}
+	}, [selectedYearId]);
 
 	useEffect(() => {
 		updateClass();
@@ -139,7 +223,20 @@ export default function SMTeachingAssignment() {
 					)}
 					<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
 						<TeachingAssignmentTableSkeleton />
-						<TeachingAssignmentFilterableSkeleton />
+						{yearStudyOptions.length > 0 && termStudyOptions.length > 0 ? (
+							<TeachingAssignmentFilterable
+								open={isFilterable}
+								setOpen={setIsFilterable}
+								selectedYearId={selectedYearId}
+								setSelectedYearId={setSelectedYearId}
+								selectedTermId={selectedTermId}
+								setSelectedTermId={setSelectedTermId}
+								termStudyOptions={termStudyOptions}
+								yearStudyOptions={yearStudyOptions}
+							/>
+						) : (
+							<TeachingAssignmentFilterableSkeleton />
+						)}
 					</div>
 				</div>
 			</div>
@@ -175,6 +272,8 @@ export default function SMTeachingAssignment() {
 						setSelectedYearId={setSelectedYearId}
 						selectedTermId={selectedTermId}
 						setSelectedTermId={setSelectedTermId}
+						termStudyOptions={termStudyOptions}
+						yearStudyOptions={yearStudyOptions}
 					/>
 				</div>
 			</div>
