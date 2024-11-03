@@ -17,14 +17,16 @@ import {
   Typography,
   DialogContent,
   Grid,
+  FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
-import { IUpdateTeacherRequestBody } from "../_libs/constants";
+import { IDepartment, ISubject, IUpdateTeacherRequestBody } from "../_libs/constants";
 import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
 import { updateTeacherSchema } from "../_libs/teacher_schema";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
+import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
 
 interface UpdateTeacherFormProps {
   open: boolean;
@@ -34,27 +36,43 @@ interface UpdateTeacherFormProps {
 }
 const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const { open, onClose, teacherId, mutate } = props;
-  const { sessionToken } = useAppContext();
+  const { sessionToken, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editTeacher, isUpdating } = useUpdateTeacher(mutate);
   const [oldData, setOldData] = useState<IUpdateTeacherRequestBody>(
     {} as IUpdateTeacherRequestBody
   );
+  const [departments, setDepartments] = React.useState<IDepartment[]>([]);
+  const [subjects, setSubjects] = React.useState<ISubject[]>([]);
 
   const formik = useFormik({
     initialValues: {
       ...oldData,
       "date-of-birth": dayjs(oldData["date-of-birth"]).format("YYYY-MM-DD"),
+      "department-id": oldData["department-id"] || "",
+      "teachable-subject-ids": oldData["teachable-subject-ids"] || [],
+      "school-id": 2555,
     },
     validationSchema: updateTeacherSchema,
     onSubmit: async (values) => {
-      console.log("Form submitted with values:", values);
-      const success = await editTeacher(teacherId, {
-        ...values,
-        status: values.status.toString(),
-      });
+      const updatedTeacher: IUpdateTeacherRequestBody = {
+        "first-name": values["first-name"],
+        "last-name": values["last-name"],
+        abbreviation: values.abbreviation,
+        email: values.email,
+        gender: values.gender,
+        "department-id": values["department-id"],
+        "date-of-birth": values["date-of-birth"],
+        "school-id": 2555,
+        "teacher-role": values["teacher-role"],
+        status: values.status,
+        phone: values.phone,
+        "is-deleted": false,
+        "teachable-subject-ids": values["teachable-subject-ids"]
+      };
+      console.log("Form submitted with values:", updatedTeacher);
+      const success = await editTeacher(teacherId, updatedTeacher);
       if (success) {
-        console.log("Teacher updated successfully");
         useNotify({
           message: "Cập nhật giáo viên thành công.",
           type: "success",
@@ -70,6 +88,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     },
     enableReinitialize: true,
   });
+  
 
   useEffect(() => {
     const fetchTeacherById = async () => {
@@ -80,33 +99,46 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
         },
       });
       const data = await response.json();
-      if (data.status !== 200) {
-        useNotify({
-          type: "error",
-          message: data.message,
-        });
-      } else {
-        setOldData({
-          "first-name": data.result["first-name"],
-          "last-name": data.result["last-name"],
-          abbreviation: data.result.abbreviation,
-          email: data.result.email,
-          gender: data.result.gender,
+      if (data.status == 200) {
+        console.log("Raw API response:", data.result);
+        const teacherData = {
+          ...data.result,
           "department-id": data.result["department-id"],
-          "date-of-birth": data.result["date-of-birth"],
-          "teacher-role": data.result["teacher-role"],
-          status: data.result.status === "2" ? "1" : "1",
-          phone: data.result.phone,
-          "school-id": data.result["school-id"],
-          "is-deleted": data.result["is-deleted"],
+          "teachable-subject-ids": data.result["teachable-subjects"].map(
+            (subject: any) => subject["subject-id"]
+          ) 
+        }
+        setOldData(teacherData);
+      } else {
+        useNotify({
+          message: "Lỗi khi tải dữ liệu giáo viên.",
+          type: "error",
         });
         console.log(oldData);
       }
     };
+
+    const loadDepartments = async () => {
+      const data = await getDepartmentName(schoolId, sessionToken);
+      if (data.result?.items) {
+        setDepartments(data.result.items);
+      }
+    }
+
+    const loadSubjects = async () => {
+      const subjectData = await getSubjectName(sessionToken, schoolId);
+      if (subjectData?.status === 200) {
+        setSubjects(subjectData.result.items);
+        console.log("Subjects loaded:", subjectData.result.items);
+      }
+    };
+
     if (open) {
       fetchTeacherById();
+      loadDepartments();
+      loadSubjects();
     }
-  }, [open]);
+  }, [open, teacherId, sessionToken, schoolId]);
 
   const handleClose = () => {
     formik.resetForm();
@@ -288,28 +320,89 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Chuyên môn
+                    Tổ bộ môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
+                  <FormControl
                     fullWidth
-                    placeholder="Nhập môn đảm nhiệm"
-                    name="department-id"
-                    type="text"
-                    value={formik.values["department-id"]}
-                    onChange={formik.handleChange("department-id")}
-                    onBlur={formik.handleBlur}
                     error={
                       formik.touched["department-id"] &&
                       Boolean(formik.errors["department-id"])
                     }
-                    helperText={
-                      formik.touched["department-id"] &&
-                      formik.errors["department-id"]
-                    }
-                  />
+                  >
+                    <Select
+                      variant="standard"
+                      name="department-id"
+                      value={formik.values["department-id"]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="">--Chọn tổ bộ môn--</MenuItem>
+                      {departments.map((department) => (
+                        <MenuItem
+                          key={department.id}
+                          value={department.id}
+                        >
+                          {department.name} 
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["department-id"] &&
+                      formik.errors["department-id"] && (
+                        <FormHelperText className="m-0">
+                          {formik.errors["department-id"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Môn học
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl fullWidth>
+                    <Select
+                      variant="standard"
+                      multiple
+                      name="teachable-subject-ids"
+                      value={formik.values["teachable-subject-ids"] || []}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      {subjects.map((subject) => (
+                        <MenuItem key={subject.id} value={subject.id}>
+                          {`${subject["subject-name"]} (${subject.abbreviation})`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>
