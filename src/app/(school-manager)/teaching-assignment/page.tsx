@@ -86,76 +86,27 @@ export default function SMTeachingAssignment() {
 			const assignedList: ITeachingAssignmentTableData[] =
 				teachingAssignmentData.result['teacher-assignt-view'].map(
 					(item: ITeachingAssignmentResponse) => {
-						const availableTeachers: IDropdownOption<number>[] =
-							teacherData.result.items
-								.map((teacher: ITeacherResponse) => {
-									if (
-										teacher['teachable-subjects'].some(
-											(subject: ITeachableSubject) =>
-												subject['subject-id'] ===
-												item['subject-id']
-										)
-									) {
-										return {
-											value: teacher.id,
-											label: `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`.toString(),
-										};
-									}
-								})
-								.filter(
-									(teacher: IDropdownOption<number>) =>
-										teacher !== undefined
-								);
 						return {
-							id: item['subject-id'],
+							id: item.id,
 							subjectName: item['subject-name'],
-							teacherName:
-								item['teacher-id'] !== null
-									? `${item['teacher-first-name']} ${item['teacher-last-name']} (${item['teacher-abbreviation']})`.toString()
-									: '- - - - -',
+							teacherName: {
+								label: `${item['teacher-first-name']} ${item['teacher-last-name']} (${item['teacher-abbreviation']})`,
+								value: item['teacher-id'],
+							},
 							totalSlotPerWeek: item['period-count'],
-							availableTeachers: [
-								{ label: '     - - -', value: 0 },
-								...availableTeachers,
-							],
+							subjectKey: item['subject-id'],
 						} as ITeachingAssignmentTableData;
 					}
 				);
 			const notAssignedList: ITeachingAssignmentTableData[] =
 				teachingAssignmentData.result['teacher-not-assignt-view'].map(
 					(item: ITeachingAssignmentResponse) => {
-						const availableTeachers: IDropdownOption<number>[] =
-							teacherData.result.items
-								.map((teacher: ITeacherResponse) => {
-									if (
-										teacher['teachable-subjects'].some(
-											(subject: ITeachableSubject) =>
-												subject['subject-id'] ===
-												item['subject-id']
-										)
-									) {
-										return {
-											value: teacher.id,
-											label: `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`.toString(),
-										};
-									}
-								})
-								.filter(
-									(teacher: IDropdownOption<number>) =>
-										teacher !== undefined
-								);
 						return {
-							id: item['subject-id'],
+							id: item.id,
 							subjectName: item['subject-name'],
-							teacherName:
-								item['teacher-id'] !== null
-									? `${item['teacher-first-name']} ${item['teacher-last-name']} (${item['teacher-abbreviation']})`.toString()
-									: '- - - - -',
+							teacherName: { label: '- - -', value: 0 },
 							totalSlotPerWeek: item['period-count'],
-							availableTeachers: [
-								{ label: '     - - -', value: 0 },
-								...availableTeachers,
-							],
+							subjectKey: item['subject-id'],
 						} as ITeachingAssignmentTableData;
 					}
 				);
@@ -203,7 +154,7 @@ export default function SMTeachingAssignment() {
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Tiết học
+						Phân công giảng dạy
 					</h3>
 				</div>
 			</SMHeader>
@@ -219,8 +170,6 @@ export default function SMTeachingAssignment() {
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
-						selectedClass={selectedClass}
-						selectedTerm={selectedTermId}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}

@@ -40,11 +40,8 @@ export interface ITermResponse {
 }
 
 export interface ITeacherAssignmentRequest {
+	id: number;
 	'teacher-id': number;
-	'subject-id': number;
-	'period-count': number;
-	'term-id': number;
-	'student-class-id': number;
 }
 
 export interface ISchoolYearResponse {
@@ -57,9 +54,9 @@ export interface ISchoolYearResponse {
 export interface ITeachingAssignmentTableData {
 	id: number;
 	subjectName: string;
-	teacherName: string | undefined;
+	teacherName: IDropdownOption<number>;
 	totalSlotPerWeek: number;
-	availableTeachers: IDropdownOption<number>[];
+	subjectKey: number;
 }
 
 export interface ITeachingAssignmentResponse {
@@ -100,4 +97,17 @@ export interface ITeachableSubject {
 	'subject-id': number;
 	'subject-name': string;
 	abbreviation: string;
+}
+
+export interface ITeachableResponse {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abreviation': string;
+	'subject-id': number;
+	'subject-name': string;
+	'subject-abbreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
 }

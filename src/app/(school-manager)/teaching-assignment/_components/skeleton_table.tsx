@@ -93,7 +93,7 @@ const TeachingAssignmentTableSkeleton = () => {
 						</div>
 					</Toolbar>
 					<TableContainer>
-						<Table aria-labelledby='tableTitle' size='medium'>
+						<Table aria-labelledby='tableTitle' size='small'>
 							<EnhancedTableHead />
 							<TableBody>
 								{[1, 2, 3, 4, 5, 6, 7, 8].map((row, index) => {
@@ -122,7 +122,7 @@ const TeachingAssignmentTableSkeleton = () => {
 											</TableCell>
 											<TableCell
 												align='left'
-												width={100}
+												width={215}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',

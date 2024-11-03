@@ -82,3 +82,17 @@ export const getFetchTeacherApi = ({
 export const getAssignTeacherApi = (localApi?: string) => {
 	return `${localApi ?? api}/api/teacher-assignments`;
 };
+
+export const getFetchTeachableTeacherApi = ({
+	localApi,
+	schoolId,
+	subjectId,
+}: {
+	localApi?: string;
+	schoolId: number;
+	subjectId: number;
+}) => {
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
+};
