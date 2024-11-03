@@ -1,16 +1,17 @@
 import ContainedButton from '@/commons/button-contained';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
 import React from 'react';
 import { IVulnerableClass } from '../_libs/constants';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 const style = {
 	position: 'absolute',
-	top: '50%',
+	top: '40%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: '40vw',
+	width: '30vw',
 	height: 'fit-content',
 	bgcolor: 'background.paper',
 };
@@ -32,7 +33,6 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 
 	return (
 		<Modal
-			keepMounted
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'
@@ -41,7 +41,7 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 			<Box sx={style}>
 				<div
 					id='modal-header'
-					className='w-full h-fit flex flex-row justify-between items-center bg-basic-gray-active p-3 py-2'
+					className='w-full h-fit flex flex-row justify-between items-center bg-basic-gray-hover p-3 py-1'
 				>
 					<Typography
 						variant='h6'
@@ -55,20 +55,23 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 					</IconButton>
 				</div>
 				<div className='w-full h-fit px-5 py-[3vh]'>
-					<h2 className='text-title-medium font-normal w-full text-left'>
+					<h2 className='text-title-small font-normal w-full text-left'>
 						Xác nhận lưu những thay đổi
 					</h2>
 					{vulnerableClasses.length > 0 && (
-						<div>
-							<h2 className='text-body-large-strong text-tertiary-normal'>
+						<div className='py-1'>
+							<h2 className='text-body-medium-strong font-normal text-tertiary-normal'>
 								Những môn học sau sẽ được cập nhật tổ hợp môn
 							</h2>
-							<ul className='!list-disc pl-4'>
+							<ul className='!list-disc pl-2'>
 								{vulnerableClasses.map((item, index) => (
 									<li
 										key={index}
-										className='flex flex-row justify-start items-center gap-2'
+										className='flex flex-row py-1 justify-start items-center gap-2'
 									>
+										<FiberManualRecordIcon
+											sx={{ fontSize: '10px' }}
+										/>
 										<p className='text-body-small font-normal'>
 											{item.className}:
 										</p>
@@ -87,20 +90,20 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 				</div>
 				<div
 					id='modal-footer'
-					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'
+					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover px-3 py-2'
 				>
 					<ContainedButton
 						title='xác nhận'
 						disableRipple
 						type='button'
-						styles='bg-primary-300 text-white !py-1 px-4'
+						styles='bg-primary-300 text-white !py-1 px-3'
 						onClick={handleConfirm}
 					/>
 					<ContainedButton
 						title='Huỷ'
 						onClick={handleClose}
 						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-3'
 					/>
 				</div>
 			</Box>

@@ -8,7 +8,7 @@ import MuiAccordionSummary, {
 	AccordionSummaryProps,
 } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ITeachingAssignmentSidenavData } from '../_libs/constants';
 
 const Accordion = styled((props: AccordionProps) => (
@@ -72,10 +72,20 @@ const TeachingAssignmentSideNav = (props: TeachingAssignmentSidenavProps) => {
 			}
 		};
 
+	useEffect(() => {
+		classData.map((item, index) => {
+			item.items.map((subItem) => {
+				if (subItem.value === selectedClass) {
+					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
+				}
+			});
+		});
+	}, [selectedClass]);
+
 	return (
 		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
 			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
-				Tổ hợp môn
+				Lớp học
 			</h1>
 			{classData.map((grade, index) => (
 				<Accordion

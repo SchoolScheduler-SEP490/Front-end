@@ -8,7 +8,7 @@ import MuiAccordionSummary, {
 	AccordionSummaryProps,
 } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ISubjectGroupSidenavData } from '../_libs/constants';
 
 const Accordion = styled((props: AccordionProps) => (
@@ -71,6 +71,16 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 				setExpanded((prev: string[]) => prev.filter((item) => item !== panel));
 			}
 		};
+
+	useEffect(() => {
+		subjectGroup.map((item, index) => {
+			item.items.map((subItem) => {
+				if (subItem.value === selectedSubjectGroup) {
+					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
+				}
+			});
+		});
+	}, [selectedSubjectGroup]);
 
 	return (
 		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>

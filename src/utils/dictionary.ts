@@ -114,6 +114,9 @@ export const TRANSLATOR: { [key: string]: string } = {
 	// Subject in group messages
 	'Update subject in group success.': 'Cập nhật Tiết học thành công',
 	'The subject group assign success.': 'Áp dụng Tổ hợp môn thành công',
+
+	// Teaching assignment messages
+	'Add teaching assignment success.': 'Phân công giảng dạy thành công',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

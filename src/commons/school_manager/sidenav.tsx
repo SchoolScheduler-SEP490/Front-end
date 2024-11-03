@@ -94,7 +94,15 @@ const SMSidenav = () => {
 		router.push(url);
 	};
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		SM_SIDENAV.map((item, index) => {
+			item.items.map((subItem) => {
+				if (subItem.url === currentPath) {
+					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
+				}
+			});
+		});
+	}, [currentPath]);
 
 	const toggleDropdown =
 		(panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
