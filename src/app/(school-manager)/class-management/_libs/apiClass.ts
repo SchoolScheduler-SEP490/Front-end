@@ -128,3 +128,34 @@ export const updateClass = async (
     return false;
   }
 };
+
+export const getSubjectGroup = async (
+  sessionToken: string,
+  schoolId: string
+) => {
+    const initialResponse = await fetch(
+      `${api}/api/subject-groups?schoolId=${schoolId}&includeDeleted=false&pageIndex=1&pageSize=20`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+    const initialData = await initialResponse.json();
+    const totalCount = initialData.result["total-item-count"];
+    const response = await fetch(
+      `${api}/api/subject-groups?schoolId=${schoolId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionToken}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    return data;
+};
