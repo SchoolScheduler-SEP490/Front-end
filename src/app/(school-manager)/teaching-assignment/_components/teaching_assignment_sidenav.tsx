@@ -83,7 +83,7 @@ const TeachingAssignmentSideNav = (props: TeachingAssignmentSidenavProps) => {
 	}, [selectedClass]);
 
 	return (
-		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
+		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
 			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
 				Lớp học
 			</h1>
