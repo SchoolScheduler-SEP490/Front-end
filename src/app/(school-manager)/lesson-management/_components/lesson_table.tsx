@@ -320,13 +320,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if ((value as number) === 0) {
-					useNotify({
-						message: 'Phải có ít nhất 1 tiết/buổi',
-						type: 'error',
-					});
-					break;
-				}
 				break;
 			case 'is-double-period':
 				editingObject['is-double-period'] = value as boolean;
