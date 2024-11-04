@@ -159,7 +159,6 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 		setOpen(false);
 		setIsSelecting(false);
 		setSelectedClasses([]);
-		setClassOptions([]);
 		setTmpSelectedClasses([]);
 	};
 
@@ -243,7 +242,6 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 
 	return (
 		<Modal
-			keepMounted
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

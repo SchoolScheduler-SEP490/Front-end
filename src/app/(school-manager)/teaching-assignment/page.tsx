@@ -135,7 +135,7 @@ export default function SMTeachingAssignment() {
 						(a.criteria as string).localeCompare(b.criteria as string)
 					)
 				);
-				if (studyOptions.some((item) => item.value === selectedTermId))
+				if (!studyOptions.some((item) => item.value === selectedTermId))
 					setSelectedTermId(studyOptions[0].value);
 			} else {
 				useNotify({
