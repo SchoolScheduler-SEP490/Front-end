@@ -27,6 +27,8 @@ import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
+import { ISubjectGroup } from "../_libs/constants";
+import { getSubjectGroup } from "../_libs/apiClass";
 
 interface UpdateClassFormProps {
   open: boolean;
@@ -55,6 +57,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
   const [oldData, setOldData] = useState<IUpdateClassData>(
     {} as IUpdateClassData
   );
+  const [subjectGroups, setSubjectGroups] = useState<ISubjectGroup[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -96,8 +99,8 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           message: data.message,
         });
       } else {
-        const gradeNumber = Number(data.result.grade.split('_')[1]);
-        
+        const gradeNumber = Number(data.result.grade.split("_")[1]);
+
         setOldData({
           ...data.result,
           grade: gradeNumber,
@@ -109,7 +112,19 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
     if (open) {
       fetchClassById();
     }
-}, [open]);
+  }, [open]);
+
+  useEffect(() => {
+    const fetchSubjectGroups = async () => {
+      if (sessionToken && schoolId) {
+        const response = await getSubjectGroup(sessionToken, schoolId);
+        if (response.status === 200) {
+          setSubjectGroups(response.result.items);
+        }
+      }
+    };
+    fetchSubjectGroups();
+  }, [sessionToken, schoolId]);
 
   const handleClose = () => {
     formik.resetForm();
@@ -243,6 +258,51 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                       formik.errors["period-count"]
                     }
                   />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Tổ hợp môn
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["subject-group-id"] &&
+                      Boolean(formik.errors["subject-group-id"])
+                    }
+                  >
+                    <Select
+                      labelId="subject-group-label"
+                      id="subject-group-id"
+                      name="subject-group-id"
+                      variant="standard"
+                      value={formik.values["subject-group-id"] || ""}
+                      onChange={formik.handleChange}
+                      MenuProps={MenuProps}
+                    >
+                      {subjectGroups.map((group) => (
+                        <MenuItem key={group.id} value={group.id}>
+                          {group["group-name"]}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["subject-group-id"] &&
+                      formik.errors["subject-group-id"] && (
+                        <FormHelperText>
+                          {formik.errors["subject-group-id"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>
