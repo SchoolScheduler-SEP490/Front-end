@@ -28,6 +28,7 @@ const useFetchSGTableData = (props: IFetchSubjectGroupDetailProps) => {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 		revalidateIfStale: true,
+		shouldRetryOnError: false,
 	});
 
 	return { data, error, isLoading, isValidating, mutate };

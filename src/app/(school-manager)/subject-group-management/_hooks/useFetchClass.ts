@@ -45,6 +45,7 @@ const useFetchSGClass = ({
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
 			revalidateIfStale: true,
+			shouldRetryOnError: false,
 		}
 	);
 	return { data, error, isValidating, mutate };

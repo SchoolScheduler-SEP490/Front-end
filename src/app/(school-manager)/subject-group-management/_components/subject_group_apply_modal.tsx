@@ -297,7 +297,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 							)}
 							<ContainedButton
 								title='Thêm'
-								styles='!py-1 absolute right-0 top-[50%] translate-y-[-50%] '
+								styles='!py-1 !absolute !right-0 top-[50%] !translate-y-[-50%] '
 								onClick={handleAddClass}
 							/>
 						</div>

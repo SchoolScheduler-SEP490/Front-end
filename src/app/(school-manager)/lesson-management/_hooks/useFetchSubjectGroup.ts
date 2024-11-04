@@ -23,6 +23,7 @@ const useFetchSGSidenav = (props: IFetchSubjectGroupBodyProps) => {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 		revalidateIfStale: true,
+		shouldRetryOnError: false,
 	});
 
 	return { data, mutate, isLoading, isValidating, error };

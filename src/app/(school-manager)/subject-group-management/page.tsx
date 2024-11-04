@@ -9,8 +9,14 @@ import SubjectGroupFilterable from './_components/subject_group_filterable';
 import SubjectGroupTable from './_components/subject_group_table';
 import SubjectGroupTableSkeleton from './_components/table_skeleton';
 import useFetchSGData from './_hooks/useFetchSGData';
-import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
+import {
+	ISchoolYearResponse,
+	ISubjectGroup,
+	ISubjectGroupTableData,
+} from './_libs/constants';
 import { CLASSGROUP_TRANSLATOR } from '@/utils/constants';
+import useFetchSchoolYear from './_hooks/useFetchSchoolYear';
+import { IDropdownOption } from '../_utils/contants';
 
 export default function SMSubject() {
 	const { schoolId, sessionToken } = useAppContext();
@@ -32,13 +38,30 @@ export default function SMSubject() {
 		schoolYearId: selectedYearId, //Change this
 	});
 
+	const { data: yearData, error: yearError } = useFetchSchoolYear();
+	const [yearStudyOptions, setYearStudyOptions] = React.useState<
+		IDropdownOption<number>[]
+	>([]);
+
+	React.useEffect(() => {
+		if (yearData?.status === 200) {
+			const yearStudyOptions: IDropdownOption<number>[] = yearData.result.map(
+				(item: ISchoolYearResponse) => ({
+					value: item.id,
+					label: `${item['start-year']} - ${item['end-year']}`,
+				})
+			);
+			setYearStudyOptions(yearStudyOptions);
+		}
+	}, [yearData]);
+
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
 		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
 	};
 
 	React.useEffect(() => {
-		mutate({ schoolYearId: selectedYearId });
+		mutate({ schoolYearId: selectedYearId, grade: undefined });
 	}, [selectedYearId]);
 
 	React.useEffect(() => {
@@ -85,13 +108,15 @@ export default function SMSubject() {
 		);
 	}
 
-	// if (error && !isErrorShown) {
-	// 	useNotify({
-	// 		type: 'error',
-	// 		message: TRANSLATOR[error.message] ?? 'Có lỗi xảy ra',
-	// 	});
-	// 	setIsErrorShown(true);
-	// }
+	if (error || yearError) {
+		useNotify({
+			type: 'error',
+			message:
+				TRANSLATOR[yearError?.message ?? error?.message] ??
+				'Năm học không có dữ liệu',
+		});
+		setSelectedYearId(yearStudyOptions[0].value);
+	}
 
 	return (
 		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
@@ -122,6 +147,7 @@ export default function SMSubject() {
 					selectedYearId={selectedYearId}
 				/>
 				<SubjectGroupFilterable
+					yearStudyOptions={yearStudyOptions}
 					open={isFilterable}
 					setOpen={setIsFilterable}
 					selectedYearId={selectedYearId}

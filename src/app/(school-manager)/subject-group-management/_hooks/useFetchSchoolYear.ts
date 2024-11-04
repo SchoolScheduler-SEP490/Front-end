@@ -17,6 +17,7 @@ const useFetchSchoolYear = () => {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 		revalidateIfStale: true,
+		shouldRetryOnError: false,
 	});
 
 	return { data, error };
