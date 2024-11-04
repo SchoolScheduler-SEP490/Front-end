@@ -11,11 +11,9 @@ export default function SMLayout({
 }>) {
 	const { userRole } = useAppContext();
 
-	useEffect(() => {
-		if (userRole.toLowerCase() !== 'schoolmanager') {
-			notFound();
-		}
-	}, [userRole]);
+	if (userRole.toLowerCase() !== 'schoolmanager') {
+		notFound();
+	}
 
 	return (
 		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start'>
