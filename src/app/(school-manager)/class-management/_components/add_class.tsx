@@ -292,7 +292,7 @@ const AddClassModal = (props: AddClassFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tổ bộ môn
+                    Tổ hợp môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
