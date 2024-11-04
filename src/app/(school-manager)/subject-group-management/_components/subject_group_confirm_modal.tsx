@@ -61,7 +61,7 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 					{vulnerableClasses.length > 0 && (
 						<div className='py-1'>
 							<h2 className='text-body-medium-strong font-normal text-tertiary-normal'>
-								Những môn học sau sẽ được cập nhật tổ hợp môn
+								Những lớp học sau sẽ được cập nhật tổ hợp môn
 							</h2>
 							<ul className='!list-disc pl-2'>
 								{vulnerableClasses.map((item, index) => (
