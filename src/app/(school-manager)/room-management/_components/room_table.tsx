@@ -28,6 +28,7 @@ import { IRoomTableData } from "../_libs/constants";
 import DeleteRoomModal from "./delete_room";
 import AddRoomModal from "./add_room";
 import UpdateRoomModal from "./update_room";
+import { useRouter } from "next/navigation";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -185,11 +186,18 @@ const RoomTable = (props: IRoomTableProps) => {
     IRoomTableData | undefined
   >();
   const open = Boolean(anchorEl);
+  const router = useRouter();
+
+  const handleRowClick = (roomId: number) => {
+    router.push(`/room-management/detail?id=${roomId}`);
+  };
 
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
     row: IRoomTableData
   ) => {
+    event.preventDefault();
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedRow(row);
   };
@@ -203,7 +211,9 @@ const RoomTable = (props: IRoomTableProps) => {
     setOrderBy(property);
   };
 
-  const handleMenuItemClick = (index: number) => {
+  const handleMenuItemClick = (index: number,  event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     switch (index) {
       case 0:
         setOpenUpdateModal(true);
@@ -289,6 +299,7 @@ const RoomTable = (props: IRoomTableProps) => {
                   return (
                     <TableRow
                       hover
+                      onClick={() => handleRowClick(row.id)}
                       role="checkbox"
                       tabIndex={-1}
                       key={row.id}
@@ -323,7 +334,7 @@ const RoomTable = (props: IRoomTableProps) => {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell width={80}>
+                      <TableCell width={80} onClick={(e) => e.stopPropagation()}>
                         <IconButton
                           color="success"
                           sx={{ zIndex: 10 }}
@@ -357,7 +368,7 @@ const RoomTable = (props: IRoomTableProps) => {
                           {dropdownOptions.map((option, index) => (
                             <MenuItem
                               key={option.title}
-                              onClick={() => handleMenuItemClick(index)}
+                              onClick={(e) => handleMenuItemClick(index, e)}
                               className={`flex flex-row items-center ${
                                 index === dropdownOptions.length - 1 &&
                                 "hover:bg-basic-negative-hover hover:text-basic-negative"

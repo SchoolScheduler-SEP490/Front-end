@@ -11,7 +11,7 @@ const StaffSection = () => {
       </div>
 
       <div className="container">
-        <div className="flex justify-evenly">
+        <div className="!w-screen flex justify-evenly">
           {/* Staff 1 */}
           <div className="text-center">
             <div className="w-40 h-40 rounded-full bg-gray-300 mb-4 mx-auto"></div>

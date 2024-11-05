@@ -59,3 +59,30 @@ export interface ISubjectGroup {
   "group-code": string;
   "group-name": string;
 }
+
+export interface IClassDetail {
+  id: number;
+  name: string;
+  "homeroom-teacher-id": number;
+  "homeroom-teacher-name": string;
+  "homeroom-teacher-abbreviation": string;
+  "main-session": number;
+  "main-session-text": string;
+  grade: string;
+  "is-full-day": boolean;
+  "period-count": number;
+  "subject-group-id": number;
+  "subject-group-name": string;
+  "school-year-id": number;
+  "create-date": string;
+  "update-date": string;
+  "is-deleted": boolean;
+  "school-year": ISchoolYear; 
+}
+
+export interface ISchoolYear {
+  id: number;
+  "start-year": string;
+  "end-year": string;
+  "school-year-code": string;
+}

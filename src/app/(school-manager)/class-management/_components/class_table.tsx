@@ -26,6 +26,7 @@ import { IClassTableData } from "../_libs/constants";
 import AddClassModal from "./add_class";
 import DeleteClassModal from "./delete_class";
 import UpdateClassModal from "./update_class";
+import { useRouter } from "next/navigation";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -181,6 +182,12 @@ const ClassTable = (props: IClassTableProps) => {
     IClassTableData | undefined
   >();
   const open = Boolean(anchorEl);
+  const router = useRouter();
+
+  const handleRowClick = (classId: number) => {
+    router.push(`/class-management/detail?id=${classId}`);
+  };
+  
 
   const handleFilterable = () => {
     setIsFilterable(!isFilterable);
@@ -191,6 +198,8 @@ const ClassTable = (props: IClassTableProps) => {
     event: React.MouseEvent<HTMLButtonElement>,
     row: IClassTableData
   ) => {
+    event.preventDefault();
+    event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedRow(row);
   };
@@ -204,7 +213,9 @@ const ClassTable = (props: IClassTableProps) => {
     setOrderBy(property);
   };
 
-  const handleMenuItemClick = (index: number) => {
+  const handleMenuItemClick = (index: number,  event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     switch (index) {
       case 0:
         setOpenUpdateModal(true);
@@ -290,6 +301,7 @@ const ClassTable = (props: IClassTableProps) => {
                   return (
                     <TableRow
                       hover
+                      onClick={() =>  handleRowClick(row.id)}
                       role="checkbox"
                       tabIndex={-1}
                       key={row.id}
@@ -316,7 +328,7 @@ const ClassTable = (props: IClassTableProps) => {
                       </TableCell>
                       <TableCell align="center">{row.schoolYear}</TableCell>
                       <TableCell align="center">{row.mainSession}</TableCell>
-                      <TableCell width={80}>
+                      <TableCell width={80} onClick={(e) => e.stopPropagation()}>
                         <IconButton
                           color="success"
                           sx={{ zIndex: 10 }}
@@ -350,7 +362,7 @@ const ClassTable = (props: IClassTableProps) => {
                           {dropdownOptions.map((option, index) => (
                             <MenuItem
                               key={option.title}
-                              onClick={() => handleMenuItemClick(index)}
+                              onClick={(e) => handleMenuItemClick(index, e)}
                               className={`flex flex-row items-center ${
                                 index === dropdownOptions.length - 1 &&
                                 "hover:bg-basic-negative-hover hover:text-basic-negative"

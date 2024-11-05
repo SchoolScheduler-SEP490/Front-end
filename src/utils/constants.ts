@@ -91,3 +91,8 @@ export const ROOM_STRING_TYPE: { key: string; value: number }[] = [
 	{ key: 'PRACTICE_ROOM', value: 1 },
 	{ key: 'LECTURE_ROOM', value: 2 },
 ];
+
+export const ROOM_TYPE_TRANSLATOR: { [key: string]: string } = {
+	PRACTICE_ROOM: 'Phòng thực hành',
+	LECTURE_ROOM: 'Phòng học lý thuyết',
+};
