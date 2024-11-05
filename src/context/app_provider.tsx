@@ -3,6 +3,8 @@ import useNotify from '@/hooks/useNotify';
 import fetchWithToken from '@/hooks/fetchWithToken';
 import { createContext, useContext, useMemo, useState } from 'react';
 import useSWR from 'swr';
+import { KeyedMutator } from 'swr';
+
 const AppContext = createContext({
 	sessionToken: '',
 	setSessionToken: (sessionToken: string) => {},
@@ -14,6 +16,7 @@ const AppContext = createContext({
 	setSchoolId: (schoolId: string) => {},
 	schoolName: '',
 	setSchoolName: (schoolName: string) => {},
+	refresher: () => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -62,7 +65,7 @@ export default function AppProvider({
 		});
 	};
 
-	const { data, error } = useSWR(
+	const { data, error, mutate } = useSWR(
 		refreshToken?.length > 0 && userRole.length > 0
 			? [`${serverApi}/api/refresh`, refreshToken, userRole]
 			: null,
@@ -105,6 +108,7 @@ export default function AppProvider({
 				setSchoolId,
 				schoolName,
 				setSchoolName,
+				refresher: mutate,
 			}}
 		>
 			{children}

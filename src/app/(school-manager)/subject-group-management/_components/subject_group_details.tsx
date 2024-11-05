@@ -128,9 +128,11 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 								'subject-name'
 							).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
-									<div className='w-full h-fit flex flex-row justify-between items-baseline'>
-										<p className='max-w-[80%]'>{item['subject-name']}</p>
-										<p className='opacity-80'>{item['total-slot-in-year']}</p>
+									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
+										<p className='max-w-[90%]'>{item['subject-name']}</p>
+										<p className='text-body-medium opacity-80'>
+											{item['total-slot-in-year']}
+										</p>
 									</div>
 								</li>
 							))}
@@ -164,9 +166,11 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 								'subject-name'
 							).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
-									<div className='w-full h-fit flex flex-row justify-between items-baseline'>
-										<p className='max-w-[80%]'>{item['subject-name']}</p>
-										<p className='opacity-80'>{item['total-slot-in-year']}</p>
+									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
+										<p className='max-w-[90%]'>{item['subject-name']}</p>
+										<p className='text-body-medium opacity-80'>
+											{item['total-slot-in-year']}
+										</p>
 									</div>
 								</li>
 							))}

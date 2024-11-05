@@ -91,15 +91,17 @@ export default function SMSubject() {
 
 	if (isValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+			<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
-							Môn học
+							Tổ hợp môn
 						</h3>
 					</div>
 				</SMHeader>
-				<SubjectGroupTableSkeleton />
+				<div className='w-[100%] h-[85%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
+					<SubjectGroupTableSkeleton />
+				</div>
 			</div>
 		);
 	}
@@ -117,7 +119,7 @@ export default function SMSubject() {
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Môn học
+						Tổ hợp môn
 					</h3>
 				</div>
 			</SMHeader>

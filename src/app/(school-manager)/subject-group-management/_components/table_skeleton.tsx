@@ -80,7 +80,7 @@ function EnhancedTableHead() {
 
 const SubjectGroupTableSkeleton = () => {
 	return (
-		<div className='w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]'>
+		<div className='w-[70%] h-full flex flex-col justify-center items-start'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
