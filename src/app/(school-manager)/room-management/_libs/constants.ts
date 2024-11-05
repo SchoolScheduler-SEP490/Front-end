@@ -49,3 +49,17 @@ export interface IRoom {
 	"availabilitye-status": string;
 	"subject-ids": number[];
   }
+
+  export interface IRoomDetail {
+	id: number;
+	name: string;
+	"room-type": string;
+	"max-class-per-time": number;
+	"room-code": string;
+	"building-id": number;
+	"availabilitye-status": string;
+	subjects: ISubject[];
+	"create-date": string;
+	"update-date": string;
+	"is-deleted": boolean;
+  } 

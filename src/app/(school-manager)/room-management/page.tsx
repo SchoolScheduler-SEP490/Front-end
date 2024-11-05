@@ -9,7 +9,7 @@ import useRoomData from "./_hooks/useRoomData";
 import { fetchBuildingName } from "./_libs/apiRoom";
 import RoomTableSkeleton from "./_components/table_skeleton";
 import useNotify from "@/hooks/useNotify";
-import { ERoomType } from "@/utils/constants";
+import { ERoomType, ROOM_TYPE_TRANSLATOR } from "@/utils/constants";
 
 export default function SMRoom() {
   const [page, setPage] = React.useState<number>(0);
@@ -71,7 +71,7 @@ export default function SMRoom() {
           roomName: item.name,
           buildingName: buildingMap.get(item["building-id"]) || "Unknown",
           availableSubjects: item.subjects?.map(subject => subject["subject-name"]).join(", ") || "-",
-          roomType: item["room-type"] === ERoomType.PRACTICE_ROOM ? "Phòng thực hành" : "Phòng học",
+          roomType: ROOM_TYPE_TRANSLATOR[item["room-type"]],
           status: item["availabilitye-status"] === "Available" ? "Hoạt động" : "Bảo trì",
         })
       );
