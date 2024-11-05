@@ -66,20 +66,18 @@ const SMSidenav = () => {
 			},
 			body: JSON.stringify({ sessionToken }),
 		}).then(async (res) => {
-			if (res.status === 200) {
-				router.replace('/');
-				const data = await res.json();
-				setSessionToken('');
-				setRefreshToken('');
-				setUserRole('');
-				setSchoolId('');
-				useNotify({
-					message: data.message ?? 'Đã có lỗi xảy ra',
-					type: 'error',
-					position: 'top-right',
-					variant: 'light',
-				});
-			}
+			router.replace('/');
+			const data = await res.json();
+			setSessionToken('');
+			setRefreshToken('');
+			setUserRole('');
+			setSchoolId('');
+			useNotify({
+				message: data.message ?? 'Đã có lỗi xảy ra',
+				type: 'error',
+				position: 'top-right',
+				variant: 'light',
+			});
 		});
 	};
 
