@@ -67,3 +67,26 @@ export interface ISubject {
 	"subject-name": string;
 	abbreviation: string;
 }
+
+export interface ITeachableSubject {
+  "subject-id": number;
+  "subject-name": string;
+  abbreviation: string;
+}
+
+export interface ITeacherDetail {
+  id: number;
+  "first-name": string;
+  "last-name": string;
+  abbreviation: string;
+  email: string;
+  gender: string;
+  "department-id": number;
+  "department-name": string;
+  "date-of-birth": string;
+  "teacher-role": string;
+  status: number;
+  "is-deleted": boolean;
+  phone: string;
+  "teachable-subjects": ITeachableSubject[];
+}
