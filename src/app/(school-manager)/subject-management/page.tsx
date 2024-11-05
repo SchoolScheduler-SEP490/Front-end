@@ -4,9 +4,10 @@ import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
 import * as React from 'react';
 import SubjectTable from './_components/subject_table';
-import SubjectTableSkeleton from './_components/table_skeleton';
+import SubjectTableSkeleton from './_components/skeleton_table';
 import useFetchData from './_hooks/useFetchData';
 import { ISubject, ISubjectTableData } from './_libs/constants';
+import SubjectDetails from './_components/subject_details';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -20,7 +21,8 @@ export default function SMSubject() {
 	});
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
-	// const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
+	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
+	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -79,7 +81,7 @@ export default function SMSubject() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-hidden overflow-x-hidden'>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -87,15 +89,32 @@ export default function SMSubject() {
 					</h3>
 				</div>
 			</SMHeader>
-			<SubjectTable
-				subjectTableData={subjectTableData ?? []}
-				page={page}
-				setPage={setPage}
-				rowsPerPage={rowsPerPage}
-				setRowsPerPage={setRowsPerPage}
-				totalRows={totalRows}
-				mutate={mutate}
-			/>
+			<div
+				className={`w-full h-full flex justify-${
+					isDetailsShown ? 'end' : 'center'
+				} items-start`}
+			>
+				<div className='w-[70%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
+					<SubjectTable
+						subjectTableData={subjectTableData ?? []}
+						page={page}
+						setPage={setPage}
+						rowsPerPage={rowsPerPage}
+						setRowsPerPage={setRowsPerPage}
+						totalRows={totalRows}
+						mutate={mutate}
+						selectedSubjectId={selectedSubjectId}
+						setSelectedSubjectId={setSelectedSubjectId}
+						isDetailsShown={isDetailsShown}
+						setIsDetailsShown={setIsDetailsShown}
+					/>
+				</div>
+				<SubjectDetails
+					open={isDetailsShown}
+					setOpen={setIsDetailsShown}
+					subjectId={selectedSubjectId}
+				/>
+			</div>
 		</div>
 	);
 }

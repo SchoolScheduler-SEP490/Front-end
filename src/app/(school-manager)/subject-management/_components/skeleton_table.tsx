@@ -76,10 +76,7 @@ function EnhancedTableHead() {
 							{headCell.label}
 							<Box
 								component='span'
-								sx={[
-									visuallyHidden,
-									{ position: 'absolute', zIndex: 10 },
-								]}
+								sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}
 							>
 								{'sorted descending'}
 							</Box>
@@ -123,11 +120,7 @@ const SubjectTableSkeleton = () => {
 						</Tooltip>
 					</Toolbar>
 					<TableContainer>
-						<Table
-							sx={{ minWidth: 750 }}
-							aria-labelledby='tableTitle'
-							size='medium'
-						>
+						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='medium'>
 							<EnhancedTableHead />
 							<TableBody>
 								{[1, 2, 3, 4, 5].map((row, index) => {
@@ -148,10 +141,7 @@ const SubjectTableSkeleton = () => {
 												padding='normal'
 												align='left'
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell
 												align='left'
@@ -162,28 +152,16 @@ const SubjectTableSkeleton = () => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell align='left'>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell align='left' width={130}>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell align='center' width={150}>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton

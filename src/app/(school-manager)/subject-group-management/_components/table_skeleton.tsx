@@ -107,24 +107,14 @@ const SubjectGroupTableSkeleton = () => {
 						</Tooltip>
 					</Toolbar>
 					<TableContainer>
-						<Table
-							sx={{ minWidth: 750 }}
-							aria-labelledby='tableTitle'
-							size='medium'
-						>
+						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='medium'>
 							<EnhancedTableHead />
 							<TableBody>
 								{[1, 2, 3, 4, 5].map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
 
 									return (
-										<TableRow
-											hover
-											role='checkbox'
-											tabIndex={-1}
-											key={index}
-											sx={{ cursor: 'pointer' }}
-										>
+										<TableRow hover role='checkbox' tabIndex={-1} key={index}>
 											<TableCell
 												component='th'
 												id={labelId}
@@ -132,10 +122,7 @@ const SubjectGroupTableSkeleton = () => {
 												padding='normal'
 												align='left'
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell
 												align='left'
@@ -146,22 +133,13 @@ const SubjectGroupTableSkeleton = () => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell align='left'>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell align='left' width={200}>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton

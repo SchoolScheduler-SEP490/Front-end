@@ -66,8 +66,8 @@ const SMSidenav = () => {
 			},
 			body: JSON.stringify({ sessionToken }),
 		}).then(async (res) => {
-			router.replace('/');
 			if (res.status === 200) {
+				router.replace('/');
 				const data = await res.json();
 				setSessionToken('');
 				setRefreshToken('');

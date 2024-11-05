@@ -31,7 +31,7 @@ export default function RootLayout({
 
 	let userData: IJWTTokenPayload = {} as IJWTTokenPayload;
 	if (sessionToken) {
-		userData = jwtDecode(sessionToken.value);
+		userData = jwtDecode(sessionToken?.value);
 	}
 
 	return (

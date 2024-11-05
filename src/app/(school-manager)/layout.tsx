@@ -27,7 +27,7 @@ export default function SMLayout({
 	}
 
 	return (
-		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start'>
+		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start overflow-y-hidden'>
 			<SMSidenav />
 			{children}
 		</section>

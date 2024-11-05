@@ -41,10 +41,7 @@ type Order = 'asc' | 'desc';
 function getComparator<Key extends keyof any>(
 	order: Order,
 	orderBy: Key
-): (
-	a: { [key in Key]: number | string },
-	b: { [key in Key]: number | string }
-) => number {
+): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
 	return order === 'desc'
 		? (a, b) => descendingComparator(a, b, orderBy)
 		: (a, b) => -descendingComparator(a, b, orderBy);
@@ -97,8 +94,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { order, orderBy, rowCount, onRequestSort } = props;
 	const createSortHandler =
-		(property: keyof ISubjectGroupTableData) =>
-		(event: React.MouseEvent<unknown>) => {
+		(property: keyof ISubjectGroupTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -125,14 +121,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							{orderBy === headCell.id ? (
 								<Box
 									component='span'
-									sx={[
-										visuallyHidden,
-										{ position: 'absolute', zIndex: 10 },
-									]}
+									sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}
 								>
-									{order === 'desc'
-										? 'sorted descending'
-										: 'sorted ascending'}
+									{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
 								</Box>
 							) : null}
 						</TableSortLabel>
@@ -157,6 +148,10 @@ interface ISubjectGroupTableProps {
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedYearId: number;
+	selectedSubjectGroupId: number;
+	setSelectedSubjectGroupId: React.Dispatch<React.SetStateAction<number>>;
+	isOpenViewDetails: boolean;
+	setOpenViewDetails: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -182,6 +177,10 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		isFilterable,
 		setIsFilterable,
 		selectedYearId,
+		selectedSubjectGroupId,
+		setSelectedSubjectGroupId,
+		isOpenViewDetails,
+		setOpenViewDetails,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
@@ -191,9 +190,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
 	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
 	const [iApplyModalOpen, setIApplyModalOpen] = React.useState<boolean>(false);
-	const [selectedRow, setSelectedRow] = React.useState<
-		ISubjectGroupTableData | undefined
-	>();
+	const [selectedRow, setSelectedRow] = React.useState<ISubjectGroupTableData | undefined>();
 
 	const open = Boolean(anchorEl);
 
@@ -230,6 +227,11 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		setAnchorEl(null);
 	};
 
+	const handleViewDetails = (row: ISubjectGroupTableData) => {
+		setSelectedSubjectGroupId(row.subjectGroupKey);
+		setOpenViewDetails(true);
+	};
+
 	const handleAddSubject = () => {
 		setIsAddModalOpen(true);
 	};
@@ -261,7 +263,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
-		<div className='w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]'>
+		<div className='w-full h-fit flex flex-row justify-center items-center gap-6 px-1 pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
@@ -290,11 +292,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 						</div>
 					</Toolbar>
 					<TableContainer>
-						<Table
-							sx={{ minWidth: 750 }}
-							aria-labelledby='tableTitle'
-							size='medium'
-						>
+						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='medium'>
 							<EnhancedTableHead
 								order={order}
 								orderBy={orderBy}
@@ -311,7 +309,13 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											role='checkbox'
 											tabIndex={-1}
 											key={row.id}
-											sx={{ cursor: 'pointer' }}
+											sx={[
+												{ userSelect: 'none' },
+												selectedSubjectGroupId === row.subjectGroupKey &&
+													isOpenViewDetails && {
+														backgroundColor: '#f5f5f5',
+													},
+											]}
 										>
 											<TableCell
 												component='th'
@@ -329,7 +333,9 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
 													textOverflow: 'ellipsis',
+													cursor: 'pointer',
 												}}
+												onClick={() => handleViewDetails(row)}
 											>
 												{row.subjectGroupName}
 											</TableCell>
@@ -346,8 +352,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											>
 												{row.grade > 0
 													? CLASSGROUP_STRING_TYPE.find(
-															(item) =>
-																item.value === row.grade
+															(item) => item.value === row.grade
 													  )?.key
 													: '- - -'}
 											</TableCell>
@@ -359,17 +364,11 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 														row.subjectGroupCode + index
 													}`}
 													aria-controls={
-														open
-															? `basic-menu${index}`
-															: undefined
+														open ? `basic-menu${index}` : undefined
 													}
 													aria-haspopup='true'
-													aria-expanded={
-														open ? 'true' : undefined
-													}
-													onClick={(event) =>
-														handleClick(event, row)
-													}
+													aria-expanded={open ? 'true' : undefined}
+													onClick={(event) => handleClick(event, row)}
 												>
 													<Image
 														src='/images/icons/menu.png'
@@ -380,33 +379,23 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 													/>
 												</IconButton>
 												<Menu
-													id={
-														row.subjectGroupCode +
-														'menu' +
-														index
-													}
+													id={row.subjectGroupCode + 'menu' + index}
 													anchorEl={anchorEl}
 													elevation={1}
 													open={open}
 													onClose={() => setAnchorEl(null)}
 													MenuListProps={{
 														'aria-labelledby': `${
-															row.subjectGroupCode +
-															'menu' +
-															index
+															row.subjectGroupCode + 'menu' + index
 														}`,
 													}}
 												>
 													{dropdownOptions.map((option, i) => (
 														<MenuItem
 															key={option.title + i}
-															onClick={() =>
-																handleMenuItemClick(i)
-															}
+															onClick={() => handleMenuItemClick(i)}
 															className={`flex flex-row items-center ${
-																i ===
-																	dropdownOptions.length -
-																		1 &&
+																i === dropdownOptions.length - 1 &&
 																'hover:bg-basic-negative-hover hover:text-basic-negative'
 															}`}
 														>
