@@ -1,15 +1,12 @@
 'use client';
 
-import LoadingComponent from '@/commons/loading';
 import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
-import useNotify from '@/hooks/useNotify';
 import * as React from 'react';
-import { ISubject, ISubjectTableData } from './_libs/constants';
 import SubjectTable from './_components/subject_table';
-import useFetchData from './_hooks/useFetchData';
 import SubjectTableSkeleton from './_components/table_skeleton';
-import { TRANSLATOR } from '@/utils/dictionary';
+import useFetchData from './_hooks/useFetchData';
+import { ISubject, ISubjectTableData } from './_libs/constants';
 
 export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
@@ -22,9 +19,7 @@ export default function SMSubject() {
 		pageIndex: page + 1,
 	});
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
-	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>(
-		[]
-	);
+	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
 	// const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
 	const getMaxPage = () => {
@@ -38,16 +33,14 @@ export default function SMSubject() {
 		if (data?.status === 200) {
 			setTotalRows(data.result['total-item-count']);
 			let index = page * rowsPerPage + 1;
-			const tableData: ISubjectTableData[] = data.result.items.map(
-				(record: ISubject) => ({
-					id: index++,
-					subjectName: record['subject-name'],
-					subjectCode: record.abbreviation,
-					subjectGroup: record['subject-group-type'],
-					subjectType: record['is-required'] ? 'Bắt buộc' : 'Tự chọn',
-					subjectKey: record.id,
-				})
-			);
+			const tableData: ISubjectTableData[] = data.result.items.map((record: ISubject) => ({
+				id: index++,
+				subjectName: record['subject-name'],
+				subjectCode: record.abbreviation,
+				subjectGroup: record['subject-group-type'],
+				subjectType: record['is-required'] ? 'Bắt buộc' : 'Tự chọn',
+				subjectKey: record.id,
+			}));
 			setSubjectTableData(tableData);
 		}
 	}, [data]);

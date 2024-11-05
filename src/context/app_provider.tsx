@@ -1,6 +1,6 @@
 'use client';
 import useNotify from '@/hooks/useNotify';
-import fetchWithToken from '@/hooks/useRefreshToken';
+import fetchWithToken from '@/hooks/fetchWithToken';
 import { createContext, useContext, useMemo, useState } from 'react';
 import useSWR from 'swr';
 const AppContext = createContext({

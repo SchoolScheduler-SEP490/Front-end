@@ -66,6 +66,7 @@ const SMSidenav = () => {
 			},
 			body: JSON.stringify({ sessionToken }),
 		}).then(async (res) => {
+			router.replace('/');
 			if (res.status === 200) {
 				const data = await res.json();
 				setSessionToken('');
@@ -80,7 +81,6 @@ const SMSidenav = () => {
 				});
 			}
 		});
-		router.replace('/');
 	};
 
 	const handleNavigate = (url: string) => {
