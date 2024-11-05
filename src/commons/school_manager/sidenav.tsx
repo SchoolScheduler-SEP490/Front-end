@@ -1,19 +1,13 @@
 'use client';
 
-import {
-	ISMNavigation,
-	ISMSidenav,
-	SM_SIDENAV,
-} from '@/app/(school-manager)/_utils/contants';
+import { ISMNavigation, ISMSidenav, SM_SIDENAV } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { Typography } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, {
-	AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
+import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -73,6 +67,7 @@ const SMSidenav = () => {
 			body: JSON.stringify({ sessionToken }),
 		}).then(async (res) => {
 			if (res.status === 200) {
+				router.replace('/');
 				const data = await res.json();
 				setSessionToken('');
 				setRefreshToken('');
@@ -86,7 +81,6 @@ const SMSidenav = () => {
 				});
 			}
 		});
-		router.replace('/');
 	};
 
 	const handleNavigate = (url: string) => {
@@ -155,9 +149,7 @@ const SMSidenav = () => {
 									/>
 									<p
 										className={`text-body-medium font-normal ${
-											currentPath === subItem.url
-												? ' !font-semibold'
-												: ''
+											currentPath === subItem.url ? ' !font-semibold' : ''
 										}`}
 									>
 										{subItem.name}

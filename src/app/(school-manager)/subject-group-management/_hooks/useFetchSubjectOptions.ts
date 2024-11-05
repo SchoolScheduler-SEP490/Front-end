@@ -32,6 +32,7 @@ const useFetchSubjectOptions = (props: ISubjectFetcherProps) => {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
 		revalidateIfStale: true,
+		shouldRetryOnError: false,
 	});
 
 	return { data, error, isLoading, isValidating };

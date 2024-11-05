@@ -1,37 +1,37 @@
 import useSWR from 'swr';
-import { getFetchSubjectGroupDetailApi } from '../_libs/apis';
-import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
+import { getSubjectDetailApi } from '../_libs/apis';
 
-interface IFetchSubjectGroupDetailProps {
+interface IFetcherProps {
 	sessionToken: string;
-	subjectGroupId: number;
+	subjectId: number;
 }
 
-const useFetchSGTableData = (props: IFetchSubjectGroupDetailProps) => {
-	const { sessionToken, subjectGroupId } = props;
-	const endpoint = getFetchSubjectGroupDetailApi({ subjectGroupId });
+const useFetchSubjectDetails = (props: IFetcherProps) => {
+	const { sessionToken, subjectId } = props;
+	const endpoint = getSubjectDetailApi({ subjectId });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
+			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 			},
 		});
 		const data = await response.json();
 		if (!response.ok) {
-			throw new Error(data);
+			throw new Error(data.message);
 		}
 		return data;
 	}
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
+		revalidateIfStale: false,
 		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateOnReconnect: false,
 		shouldRetryOnError: false,
 	});
 
 	return { data, error, isLoading, isValidating, mutate };
 };
 
-export default useFetchSGTableData;
+export default useFetchSubjectDetails;

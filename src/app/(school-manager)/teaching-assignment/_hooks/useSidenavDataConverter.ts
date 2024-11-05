@@ -32,7 +32,9 @@ const useSidenavDataConverter = (
 	return Object.values(groupedData)
 		.map((group) => ({
 			...group,
-			items: group.items.sort((a, b) => a.key.localeCompare(b.key)), // Sort items by key
+			items: group.items,
+			// .sort((a, b) => a.key.length - b.key.length)
+			// .sort((a, b) => a.key.localeCompare(b.key)), // Sort items by key
 		}))
 		.sort((a, b) => {
 			const gradeOrder = ['Khối 10', 'Khối 11', 'Khối 12'];

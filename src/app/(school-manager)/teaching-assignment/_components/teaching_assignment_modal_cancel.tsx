@@ -12,13 +12,13 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ISubjectDeleteModalProps {
+interface ICancelAssignTeacherModalProps {
 	open: boolean;
 	setOpen: (status: boolean) => void;
 	handleApprove: () => void;
 }
 
-const CancelUpdateLessonModal = (props: ISubjectDeleteModalProps) => {
+const CancelAssignTeacherModal = (props: ICancelAssignTeacherModalProps) => {
 	const { open, setOpen, handleApprove } = props;
 
 	const handleClose = () => {
@@ -76,4 +76,4 @@ const CancelUpdateLessonModal = (props: ISubjectDeleteModalProps) => {
 	);
 };
 
-export default CancelUpdateLessonModal;
+export default CancelAssignTeacherModal;

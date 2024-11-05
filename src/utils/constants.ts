@@ -1,4 +1,4 @@
-import { StyledString } from "next/dist/build/swc";
+import { StyledString } from 'next/dist/build/swc';
 
 export interface INavigation {
 	name: string;
@@ -18,13 +18,7 @@ export interface IJWT {
 	expired: Date;
 }
 
-export const publicPaths = [
-	'/landing',
-	'/community',
-	'/contact',
-	'/schools',
-	'/schedules',
-];
+export const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedules'];
 export const authPaths = ['/login', '/register', '/forgot-password'];
 export const adminPaths = ['/dashboard'];
 export const teacherPaths = ['/published-timetable'];
@@ -89,17 +83,16 @@ export const CLASSGROUP_TRANSLATOR: { [key: string]: number } = {
 };
 
 export enum ERoomType {
-	PRACTICE_ROOM = "PRACTICE_ROOM",
-	LECTURE_ROOM = "LECTURE_ROOM"
-  }
-  
-  export const ROOM_STRING_TYPE: { key: string; value: number }[] = [
+	PRACTICE_ROOM = 'PRACTICE_ROOM',
+	LECTURE_ROOM = 'LECTURE_ROOM',
+}
+
+export const ROOM_STRING_TYPE: { key: string; value: number }[] = [
 	{ key: 'PRACTICE_ROOM', value: 1 },
 	{ key: 'LECTURE_ROOM', value: 2 },
-  ];
+];
 
-  export const ROOM_TYPE_TRANSLATOR: { [key: string]: string } = {
-	PRACTICE_ROOM: "Phòng thực hành",
-	LECTURE_ROOM: "Phòng học lý thuyết"
-  };
-  
+export const ROOM_TYPE_TRANSLATOR: { [key: string]: string } = {
+	PRACTICE_ROOM: 'Phòng thực hành',
+	LECTURE_ROOM: 'Phòng học lý thuyết',
+};

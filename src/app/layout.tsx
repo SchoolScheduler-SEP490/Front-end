@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 		default: 'Schedulify | Trang chủ',
 	},
 	description: 'Hệ thống xây dựng Thời khóa biểu online',
-	metadataBase: new URL('https://schedulify-se078.vercel.app'),
+	metadataBase: new URL('https://schedulify.id.vn'),
 };
 export default function RootLayout({
 	children,
@@ -31,7 +31,7 @@ export default function RootLayout({
 
 	let userData: IJWTTokenPayload = {} as IJWTTokenPayload;
 	if (sessionToken) {
-		userData = jwtDecode(sessionToken.value);
+		userData = jwtDecode(sessionToken?.value);
 	}
 
 	return (

@@ -32,12 +32,14 @@ interface ISortableDropdown<T> extends IDropdownOption<T> {
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId } = useAppContext();
 
-	const [selectedClass, setSelectedClass] = useState<number>(0);
-	const [sidenavData, setSidenavData] = useState<ITeachingAssignmentSidenavData[]>([]);
+	// Selected
+	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedYearId, setSelectedYearId] = useState<number>(1);
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
-	const [isFilterable, setIsFilterable] = useState<boolean>(true);
+
+	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
+	const [sidenavData, setSidenavData] = useState<ITeachingAssignmentSidenavData[]>([]);
 	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>(
 		[]
 	);
@@ -45,6 +47,10 @@ export default function SMTeachingAssignment() {
 		[]
 	);
 
+	//Modal status
+	const [isFilterable, setIsFilterable] = useState<boolean>(true);
+
+	// Fetch data
 	const {
 		data: classData,
 		isValidating: isClassValidating,
@@ -56,17 +62,15 @@ export default function SMTeachingAssignment() {
 		pageIndex: 1,
 		schoolYearId: selectedYearId,
 	});
-
 	const {
 		data: teachingAssignmentData,
 		mutate: updateTeachingAssignment,
 		isValidating: isTeachingAssignmentValidating,
 	} = useFetchTeachingAssignment({
 		sessionToken,
-		studentClassId: selectedClass,
+		studentClassId: selectedClassId,
 		termId: selectedTermId,
 	});
-
 	const {
 		data: teacherData,
 		mutate: updateTeacher,
@@ -83,6 +87,7 @@ export default function SMTeachingAssignment() {
 	});
 	const { data: schoolyearData, error: schoolyearError } = useFetchSchoolYear();
 
+	// Process data
 	useEffect(() => {
 		if (termData?.status === 200) {
 			const studyOptions: ISortableDropdown<number>[] = termData.result.map(
@@ -99,7 +104,6 @@ export default function SMTeachingAssignment() {
 			);
 		}
 	}, [termData]);
-
 	useEffect(() => {
 		if (schoolyearData?.status === 200) {
 			const studyOptions: ISortableDropdown<number>[] = schoolyearData.result.map(
@@ -135,7 +139,7 @@ export default function SMTeachingAssignment() {
 						(a.criteria as string).localeCompare(b.criteria as string)
 					)
 				);
-				if (studyOptions.some((item) => item.value === selectedTermId))
+				if (!studyOptions.some((item) => item.value === selectedTermId))
 					setSelectedTermId(studyOptions[0].value);
 			} else {
 				useNotify({
@@ -155,7 +159,7 @@ export default function SMTeachingAssignment() {
 			);
 			if (tmpData.length > 0) {
 				setSidenavData(tmpData);
-				setSelectedClass(tmpData[0].items[0].value);
+				setSelectedClassId(tmpData[0].items[0].value);
 			}
 		}
 	}, [classData]);
@@ -216,8 +220,8 @@ export default function SMTeachingAssignment() {
 						<TeachingAssignmentSideNavSkeleton />
 					) : (
 						<TeachingAssignmentSideNav
-							selectedClass={selectedClass}
-							setSelectedClass={setSelectedClass}
+							selectedClass={selectedClassId}
+							setSelectedClass={setSelectedClassId}
 							classData={sidenavData}
 						/>
 					)}
@@ -254,8 +258,8 @@ export default function SMTeachingAssignment() {
 			</SMHeader>
 			<div className='w-full h-full flex flex-row justify-start items-start overflow-y-hidden'>
 				<TeachingAssignmentSideNav
-					selectedClass={selectedClass}
-					setSelectedClass={setSelectedClass}
+					selectedClass={selectedClassId}
+					setSelectedClass={setSelectedClassId}
 					classData={sidenavData}
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>

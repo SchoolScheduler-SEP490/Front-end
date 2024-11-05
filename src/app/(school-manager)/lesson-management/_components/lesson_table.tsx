@@ -305,6 +305,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		}
 		switch (target) {
 			case 'main-slot-per-week':
+				editingObject['main-slot-per-week'] = value as number;
 				if ((value as number) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -319,19 +320,12 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if ((value as number) === 0) {
-					useNotify({
-						message: 'Phải có ít nhất 1 tiết/tuần',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['main-slot-per-week'] = value as number;
 				break;
 			case 'is-double-period':
 				editingObject['is-double-period'] = value as boolean;
 				break;
 			case 'sub-slot-per-week':
+				editingObject['sub-slot-per-week'] = value as number;
 				if ((value as number) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -346,14 +340,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if ((value as number) === 0) {
-					useNotify({
-						message: 'Phải có ít nhất 1 tiết/tuần',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['sub-slot-per-week'] = value as number;
 				break;
 			default:
 				break;

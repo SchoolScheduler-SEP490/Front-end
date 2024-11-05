@@ -159,7 +159,6 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 		setOpen(false);
 		setIsSelecting(false);
 		setSelectedClasses([]);
-		setClassOptions([]);
 		setTmpSelectedClasses([]);
 	};
 
@@ -243,7 +242,6 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 
 	return (
 		<Modal
-			keepMounted
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'
@@ -299,7 +297,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 							)}
 							<ContainedButton
 								title='Thêm'
-								styles='!py-1 absolute right-0 top-[50%] translate-y-[-50%] '
+								styles='!py-1 !absolute !right-0 top-[50%] !translate-y-[-50%] '
 								onClick={handleAddClass}
 							/>
 						</div>

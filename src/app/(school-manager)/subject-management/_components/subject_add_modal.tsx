@@ -18,15 +18,15 @@ import {
 } from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { KeyedMutator } from 'swr';
-import { ICreateSubjectRequest, ICreateSubjectResponse } from '../_libs/constants';
 import useCreateSubject from '../_hooks/useCreateSubject';
+import { ICreateSubjectRequest } from '../_libs/constants';
 import { addSubjectSchema } from '../_libs/subject_schema';
 
 const style = {
 	position: 'absolute',
-	top: '40%',
+	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
 	width: '40vw',
@@ -54,8 +54,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 			formData: [
 				{
 					...body,
-					'is-required':
-						body['is-required'].toString() === 'true' ? true : false,
+					'is-required': body['is-required'].toString() === 'true' ? true : false,
 				},
 			],
 			schoolId: schoolId,
@@ -72,13 +71,25 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 			description: '',
 			'is-required': false,
 			'subject-group-type': '',
-		},
+			'slot-specialized': 0,
+			'total-slot-in-year': 0,
+		} as ICreateSubjectRequest,
 		validationSchema: addSubjectSchema,
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
 		validateOnMount: true,
 	});
+
+	useEffect(() => {
+		if (formik.values['total-slot-in-year'] === 0) {
+			formik.setValues({
+				...formik.values,
+				// "slot-specialized": 0,
+				'total-slot-in-year': formik.values['subject-group-type'] === 'BAT_BUOC' ? 105 : 70,
+			});
+		}
+	}, [formik.values['subject-group-type']]);
 
 	return (
 		<Modal
@@ -113,9 +124,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 				>
 					<div className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Tên môn học
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Tên môn học</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
@@ -130,8 +139,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors['subject-name'])
 								}
 								helperText={
-									formik.touched['subject-name'] &&
-									formik.errors['subject-name']
+									formik.touched['subject-name'] && formik.errors['subject-name']
 								}
 								slotProps={{
 									input: {
@@ -149,15 +157,13 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 							/>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Tên tắt TKB
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Tên viết tắt</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
 								id='abbreviation'
 								name='abbreviation'
-								label='Nhập tên viết tắt TKB'
+								label='Nhập tên viết tắt của môn học'
 								value={formik.values.abbreviation}
 								onChange={formik.handleChange('abbreviation')}
 								onBlur={formik.handleBlur}
@@ -166,8 +172,7 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors.abbreviation)
 								}
 								helperText={
-									formik.touched.abbreviation &&
-									formik.errors.abbreviation
+									formik.touched.abbreviation && formik.errors.abbreviation
 								}
 								slotProps={{
 									input: {
@@ -196,13 +201,9 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 								onChange={formik.handleChange('description')}
 								onBlur={formik.handleBlur}
 								error={
-									formik.touched.description &&
-									Boolean(formik.errors.description)
+									formik.touched.description && Boolean(formik.errors.description)
 								}
-								helperText={
-									formik.touched.description &&
-									formik.errors.description
-								}
+								helperText={formik.touched.description && formik.errors.description}
 								slotProps={{
 									input: {
 										endAdornment: (
@@ -277,6 +278,75 @@ const AddSubjectModal = (props: IAddSubjectModalProps) => {
 									</option>
 								))}
 							</TextField>
+						</div>
+						<div className='w-full h-fit flex flex-row justify-between items-center'>
+							<h3 className=' h-full flex justify-start '>Số tiết học</h3>
+							<div className='w-[70%] h-fit flex flex-row justify-between items-stretch'>
+								<TextField
+									className='w-[40%]'
+									variant='standard'
+									type='number'
+									id='slot-specialized'
+									name='slot-specialized'
+									label='Tiết chuyên đề'
+									value={formik.values['slot-specialized']}
+									onChange={formik.handleChange('slot-specialized')}
+									onBlur={formik.handleBlur}
+									error={
+										formik.touched['slot-specialized'] &&
+										Boolean(formik.errors['slot-specialized'])
+									}
+									helperText={
+										formik.touched['slot-specialized'] &&
+										formik.errors['slot-specialized']
+									}
+									slotProps={{
+										input: {
+											endAdornment: (
+												<Image
+													className='opacity-30 mx-2 select-none'
+													src='/images/icons/pin.png'
+													alt='email'
+													width={20}
+													height={20}
+												/>
+											),
+										},
+									}}
+								/>
+								<TextField
+									className='w-[40%]'
+									variant='standard'
+									id='total-slot-in-year'
+									type='number'
+									name='total-slot-in-year'
+									label='Số tiết/năm'
+									value={formik.values['total-slot-in-year']}
+									onChange={formik.handleChange('total-slot-in-year')}
+									onBlur={formik.handleBlur}
+									error={
+										formik.touched['total-slot-in-year'] &&
+										Boolean(formik.errors['total-slot-in-year'])
+									}
+									helperText={
+										formik.touched['total-slot-in-year'] &&
+										formik.errors['total-slot-in-year']
+									}
+									slotProps={{
+										input: {
+											endAdornment: (
+												<Image
+													className='opacity-30 mx-2 select-none'
+													src='/images/icons/pin.png'
+													alt='email'
+													width={20}
+													height={20}
+												/>
+											),
+										},
+									}}
+								/>
+							</div>
 						</div>
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>

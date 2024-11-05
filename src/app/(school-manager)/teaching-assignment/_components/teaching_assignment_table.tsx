@@ -5,6 +5,7 @@ import useFilterArray from '@/hooks/useFilterArray';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import LayersIcon from '@mui/icons-material/Layers';
 import { Autocomplete, TextField, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -23,8 +24,11 @@ import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	ITeachableResponse,
 	ITeacherAssignmentRequest,
+	ITeachingAssignmentResponse,
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
+import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
+import TeachingAssignmentApplyModal from './teaching_assignment_modal_apply';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -101,6 +105,10 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	);
 	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] =
 		useState<boolean>(false);
+	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
+	const [applicableSubjects, setApplicableSubjects] = useState<
+		ITeachingAssignmentTableData[]
+	>([]);
 
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
@@ -122,20 +130,28 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		}
 	}, [teachableData, selectedSubjectId]);
 
+	useEffect(() => {
+		if (subjectData.length > 0) {
+			const assignedSubjects: ITeachingAssignmentTableData[] = subjectData.filter(
+				(item) => item.teacherName.label !== '- - -'
+			);
+			setApplicableSubjects(assignedSubjects);
+		}
+	}, [subjectData]);
+
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);
 	};
 
 	const handleConfirmCancelUpdate = () => {
 		setIsCancelUpdateModalOpen(true);
-		handleCancelUpdateLesson();
-		mutate();
 	};
 
-	const handleCancelUpdateLesson = () => {
+	const handleCancelUpdateTeachingAssignment = () => {
 		setIsEditing(false);
 		setEditingObjects([]);
 		setIsCancelUpdateModalOpen(false);
+		mutate();
 	};
 
 	const handleConfirmUpdate = async () => {
@@ -169,6 +185,8 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		getTeachableData({ subjectId: selectedSubjectId });
 	};
 
+	const handleMultipleApply = () => {};
+
 	return (
 		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
@@ -189,7 +207,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 							Phân công giảng dạy
 						</h2>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-							{isEditing && (
+							{isEditing ? (
 								<>
 									<Tooltip title='Lưu thay đổi'>
 										<IconButton
@@ -208,6 +226,20 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 										</IconButton>
 									</Tooltip>
 								</>
+							) : (
+								<Tooltip title='Áp dụng đồng thời'>
+									<IconButton
+										id='filter-btn'
+										aria-controls={
+											isFilterable ? 'basic-menu' : undefined
+										}
+										aria-haspopup='true'
+										aria-expanded={isFilterable ? 'true' : undefined}
+										onClick={handleMultipleApply}
+									>
+										<LayersIcon fontSize='medium' />
+									</IconButton>
+								</Tooltip>
 							)}
 							<Tooltip title='Lọc danh sách'>
 								<IconButton
@@ -338,6 +370,16 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 					</TableContainer>
 				</Paper>
 			</Box>
+			<CancelAssignTeacherModal
+				open={isCancelUpdateModalOpen}
+				setOpen={setIsCancelUpdateModalOpen}
+				handleApprove={handleCancelUpdateTeachingAssignment}
+			/>
+			<TeachingAssignmentApplyModal
+				open={isApplyModalOpen}
+				setOpen={setIsApplyModalOpen}
+				applicableSubjects={applicableSubjects}
+			/>
 		</div>
 	);
 };

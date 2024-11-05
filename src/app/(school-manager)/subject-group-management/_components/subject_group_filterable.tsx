@@ -11,38 +11,20 @@ import {
 	SelectChangeEvent,
 	Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
-import { ISchoolYearResponse } from '../_libs/constants';
 
 interface ISubjectGroupFilterableProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
+	yearStudyOptions: IDropdownOption<number>[];
 	selectedYearId: number;
 	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 	mutate?: KeyedMutator<any>;
 }
 
 const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
-	const { open, setOpen, selectedYearId, setSelectedYearId } = props;
-	const { data, error } = useFetchSchoolYear();
-	const [yearStudyOptions, setYearStudyOptions] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-
-	useEffect(() => {
-		if (data?.status === 200) {
-			const yearStudyOptions: IDropdownOption<number>[] = data.result.map(
-				(item: ISchoolYearResponse) => ({
-					value: item.id,
-					label: `${item['start-year']} - ${item['end-year']}`,
-				})
-			);
-			setYearStudyOptions(yearStudyOptions);
-		}
-	}, [data]);
+	const { open, setOpen, selectedYearId, setSelectedYearId, yearStudyOptions } = props;
 
 	const handleClose = () => {
 		setOpen(false);
