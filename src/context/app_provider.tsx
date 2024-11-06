@@ -1,9 +1,8 @@
 'use client';
-import useNotify from '@/hooks/useNotify';
 import fetchWithToken from '@/hooks/fetchWithToken';
+import useNotify from '@/hooks/useNotify';
 import { createContext, useContext, useMemo, useState } from 'react';
 import useSWR from 'swr';
-import { KeyedMutator } from 'swr';
 
 const AppContext = createContext({
 	sessionToken: '',
