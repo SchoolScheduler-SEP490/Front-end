@@ -2,12 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SchoolManagerState {
 	isMenuOpen: boolean;
-	selectedSchoolYear: number;
 }
 
 const initialState: SchoolManagerState = {
 	isMenuOpen: false,
-	selectedSchoolYear: 0,
 };
 
 export const schoolManagerSlice = createSlice({
@@ -19,9 +17,6 @@ export const schoolManagerSlice = createSlice({
 		},
 		setMenuOpen: (state, action: PayloadAction<boolean>) => {
 			state.isMenuOpen = action.payload;
-		},
-		setSelectedSchoolYear: (state, action: PayloadAction<number>) => {
-			state.selectedSchoolYear = action.payload;
 		},
 	},
 });

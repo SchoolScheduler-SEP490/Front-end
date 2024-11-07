@@ -1,7 +1,11 @@
 import { useDispatch, useSelector, useStore } from 'react-redux';
-import type { store, AppDispatch, RootState } from '@/context/store';
+import type {
+	schoolManagerStore,
+	SchoolManagerDispatch,
+	SchoolManagerState,
+} from '@/context/school_manager_store';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
-export const useRootDispatch = useDispatch.withTypes<AppDispatch>();
-export const useAppSelector = useSelector.withTypes<RootState>();
-export const useAppStore = useStore.withTypes<typeof store>();
+export const useSMDispatch = useDispatch.withTypes<SchoolManagerDispatch>();
+export const usSMSelector = useSelector.withTypes<SchoolManagerState>();
+export const usSMStore = useStore.withTypes<typeof schoolManagerStore>();

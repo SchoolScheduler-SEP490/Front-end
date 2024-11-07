@@ -1,14 +1,14 @@
 import '@/commons/styles/globals.css';
 import AppProvider from '@/context/app_provider';
 import { inter } from '@/utils/fonts';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { jwtDecode } from 'jwt-decode';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IJWTTokenPayload } from './(auth)/_utils/constants';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -28,6 +28,7 @@ export default function RootLayout({
 	const sessionToken = cookieStore.get('sessionToken');
 	const refreshToken = cookieStore.get('refreshToken');
 	const userRole = cookieStore.get('userRole');
+	const selectedSchoolYearId = cookieStore.get('selectedSchoolYearId');
 
 	let userData: IJWTTokenPayload = {} as IJWTTokenPayload;
 	if (sessionToken) {
@@ -45,6 +46,7 @@ export default function RootLayout({
 					initUserRole={userRole?.value ?? ''}
 					initSchoolId={userData.schoolId ?? ''}
 					initSchoolName={userData.schoolName ?? ''}
+					initSelectedSchoolYearId={Number(selectedSchoolYearId?.value) ?? 0}
 				>
 					{children}
 				</AppProvider>

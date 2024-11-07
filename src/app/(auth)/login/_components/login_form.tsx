@@ -1,15 +1,23 @@
 'use client';
-import {
-	IJWTTokenPayload,
-	ILoginForm,
-	ILoginResponse,
-} from '@/app/(auth)/_utils/constants';
+import { IJWTTokenPayload, ILoginForm, ILoginResponse } from '@/app/(auth)/_utils/constants';
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
+import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useNotify from '@/hooks/useNotify';
-import { IUser } from '@/utils/constants';
+import { ISchoolYearResponse, IUser } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { inter } from '@/utils/fonts';
-import { IconButton, styled } from '@mui/material';
+import {
+	Checkbox,
+	FormControl,
+	IconButton,
+	InputLabel,
+	ListItemText,
+	MenuItem,
+	Select,
+	styled,
+} from '@mui/material';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { useFormik } from 'formik';
@@ -18,7 +26,18 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
-import LoadingComponent from '@/commons/loading';
+
+const ITEM_HEIGHT = 30;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+			scrollbars: 'none',
+		},
+	},
+};
 
 const CustomButton = styled(Button)({
 	width: '100%',
@@ -30,12 +49,48 @@ const CustomButton = styled(Button)({
 });
 
 export const LoginForm = () => {
-	const { setSessionToken, setRefreshToken, setUserRole, setSchoolId, setSchoolName } =
-		useAppContext();
+	const {
+		setSessionToken,
+		setRefreshToken,
+		setUserRole,
+		setSchoolId,
+		setSchoolName,
+		setSelectedSchoolYearId: setSchoolYear,
+	} = useAppContext();
 	const router = useRouter();
 	const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
+
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoggingIn, setIsLoggingIn] = useState(false);
+	const { data, mutate } = useFetchSchoolYear();
+	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
+	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState<number>(0);
+
+	useEffect(() => {
+		mutate();
+		if (data?.status === 200) {
+			const options: IDropdownOption<number>[] = data.result.map(
+				(item: ISchoolYearResponse) => {
+					const currentYear = new Date().getFullYear();
+					if (
+						parseInt(item['start-year']) <= currentYear &&
+						parseInt(item['end-year']) >= currentYear
+					) {
+						setSelectedSchoolYearId(item.id);
+					}
+					return {
+						label: `${item['start-year']} - ${item['end-year']}`,
+						value: item.id,
+					} as IDropdownOption<number>;
+				}
+			);
+			setSchoolYearIdOptions(options.sort((a, b) => a.label.localeCompare(b.label)));
+		}
+	}, [data]);
+
+	const handleSelectSchoolYear = (value: string) => {
+		setSelectedSchoolYearId(Number(value));
+	};
 
 	const handleRegister = () => {
 		router.push('/register');
@@ -86,7 +141,7 @@ export const LoginForm = () => {
 			});
 			const resultFromNextServer = await fetch('/api/auth', {
 				method: 'POST',
-				body: JSON.stringify(result),
+				body: JSON.stringify({ ...result, selectedSchoolYearId }),
 				headers: {
 					'Content-Type': 'application/json',
 				},
@@ -104,6 +159,7 @@ export const LoginForm = () => {
 			setSessionToken(resultFromNextServer.payload.jwt.token);
 			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
 			setUserRole(resultFromNextServer.payload.role);
+			setSchoolYear(resultFromNextServer.payload.selectedSchoolYearId);
 			setIsLoggingIn(false);
 
 			// Redirect to landing page of each role after login
@@ -210,6 +266,42 @@ export const LoginForm = () => {
 						),
 					}}
 				/>
+				<FormControl sx={{ width: '100%' }}>
+					<InputLabel id='school-year-label' variant='standard'>
+						Chọn năm học
+					</InputLabel>
+					<Select
+						labelId='school-year-label'
+						id='school-year'
+						variant='standard'
+						value={
+							selectedSchoolYearId === 0
+								? ''
+								: schoolYearIdOptions.find(
+										(item) => item.value === selectedSchoolYearId
+								  )
+						}
+						onChange={(event: any) => handleSelectSchoolYear(event.target.value)}
+						MenuProps={MenuProps}
+						renderValue={(selected) => {
+							return selected.label;
+						}}
+						sx={{ width: '100%', fontSize: '1.000rem' }}
+					>
+						{schoolYearIdOptions.map((item, index) => (
+							<MenuItem key={item.label + index} value={item.value}>
+								<Checkbox
+									checked={
+										selectedSchoolYearId === 0
+											? false
+											: selectedSchoolYearId === item.value
+									}
+								/>
+								<ListItemText primary={item.label} />
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
 				<h3
 					className='text-body-small opacity-80 font-normal text-right w-full my-2 cursor-pointer'
 					onClick={handleForgotPassword}
@@ -219,7 +311,7 @@ export const LoginForm = () => {
 				<CustomButton
 					variant='contained'
 					disableRipple
-					disabled={!formik.isValid}
+					disabled={!formik.isValid && selectedSchoolYearId !== 0}
 					type='submit'
 					id='login-btn'
 					className='mt-2 dis'

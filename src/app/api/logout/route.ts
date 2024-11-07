@@ -23,6 +23,7 @@ export async function POST(request: Request) {
 					'sessionToken=; HttpOnly; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
 					'refreshToken=; HttpOnly; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
 					'userRole=; HttpOnly; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+					'selectedSchoolYearId=; HttpOnly; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
 					// Add other cookies you want to remove here
 				].join(','),
 			},
