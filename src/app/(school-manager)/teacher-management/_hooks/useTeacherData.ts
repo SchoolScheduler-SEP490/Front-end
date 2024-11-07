@@ -23,7 +23,7 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
     return data;
   };
 
-  const endpoint = `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
+  const endpoint = `${api}/api/schools/${schoolId}/teachers?includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
 
   const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,
