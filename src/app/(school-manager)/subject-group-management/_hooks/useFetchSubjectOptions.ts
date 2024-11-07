@@ -4,8 +4,9 @@ import { getFetchSubjectOptionsApi } from '../_libs/apis';
 interface ISubjectFetcherProps {
 	sessionToken: string;
 	schoolId: string;
-	pageSize?: number;
-	pageIndex?: number;
+	schoolYearId: number;
+	pageSize: number;
+	pageIndex: number;
 	subjectName?: string;
 	isRequired: boolean;
 	deletedIncluded?: boolean;

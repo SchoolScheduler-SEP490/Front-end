@@ -1,12 +1,8 @@
 'use client';
 
-import useNotify from '@/hooks/useNotify';
 import { ICommonOption } from '@/utils/constants';
-import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
+import { Toolbar } from '@mui/material';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,13 +13,9 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
-import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ISubjectTableData } from '../_libs/constants';
-import AddSubjectModal from './subject_add_modal';
-import DeleteSubjectModal from './subject_delete_modal';
-import UpdateSubjectModal from './subject_update_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -131,9 +123,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						</TableSortLabel>
 					</TableCell>
 				))}
-				{/* <TableCell>
-					<h2 className='font-semibold text-white'>CN</h2>
-				</TableCell> */}
 			</TableRow>
 		</TableHead>
 	);
@@ -166,7 +155,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 		setPage,
 		setRowsPerPage,
 		totalRows,
-		mutate,
 		selectedSubjectId,
 		setIsDetailsShown,
 		isDetailsShown,
@@ -175,39 +163,10 @@ const SubjectTable = (props: ISubjectTableProps) => {
 
 	const [order, setOrder] = React.useState<Order>('asc');
 	const [orderBy, setOrderBy] = React.useState<keyof ISubjectTableData>('subjectName');
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
-	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
-	// const [selectedRow, setSelectedRow] = React.useState<ISubjectTableData | undefined>();
-
-	const open = Boolean(anchorEl);
 
 	const handleSelectSubject = (row: ISubjectTableData) => {
 		setSelectedSubjectId(row.subjectKey);
 		setIsDetailsShown(true);
-	};
-
-	const handleMenuItemClick = (index: number) => {
-		switch (index) {
-			case 0:
-				setIUpdateModalOpen(true);
-				break;
-			case 1:
-				setIsDeleteModalOpen(true);
-				break;
-			default:
-				useNotify({
-					message: 'Chức năng đang được phát triển',
-					type: 'warning',
-				});
-				break;
-		}
-		setAnchorEl(null);
-	};
-
-	const handleAddSubject = () => {
-		setIsAddModalOpen(true);
 	};
 
 	const handleRequestSort = (
@@ -252,16 +211,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 							Môn học
 						</h2>
-						{/* <Tooltip title='Thêm Môn học'>
-							<IconButton onClick={handleAddSubject}>
-								<AddIcon />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title='Lọc danh sách'>
-							<IconButton>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip> */}
 					</Toolbar>
 					<TableContainer>
 						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='medium'>
@@ -325,61 +274,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 													{row.subjectType}
 												</h2>
 											</TableCell>
-											{/* <TableCell width={80}>
-												<IconButton
-													color='success'
-													sx={{ zIndex: 10 }}
-													id={`basic-button${row.subjectCode + index}`}
-													aria-controls={
-														open ? `basic-menu${index}` : undefined
-													}
-													aria-haspopup='true'
-													aria-expanded={open ? 'true' : undefined}
-													onClick={(event) => handleClick(event, row)}
-												>
-													<Image
-														src='/images/icons/menu.png'
-														alt='notification-icon'
-														unoptimized={true}
-														width={20}
-														height={20}
-													/>
-												</IconButton>
-												<Menu
-													id={row.subjectCode + 'menu' + index}
-													anchorEl={anchorEl}
-													elevation={1}
-													open={open}
-													onClose={() => setAnchorEl(null)}
-													MenuListProps={{
-														'aria-labelledby': `${
-															row.subjectCode + 'menu' + index
-														}`,
-													}}
-												>
-													{dropdownOptions.map((option, i) => (
-														<MenuItem
-															key={option.title + i}
-															onClick={() => handleMenuItemClick(i)}
-															className={`flex flex-row items-center ${
-																i === dropdownOptions.length - 1 &&
-																'hover:bg-basic-negative-hover hover:text-basic-negative'
-															}`}
-														>
-															<Image
-																className='mr-4'
-																src={option.img}
-																alt={option.title}
-																width={15}
-																height={15}
-															/>
-															<h2 className='text-body-medium'>
-																{option.title}
-															</h2>
-														</MenuItem>
-													))}
-												</Menu>
-											</TableCell> */}
 										</TableRow>
 									);
 								})}
@@ -406,20 +300,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			{/* <AddSubjectModal open={isAddModalOpen} setOpen={setIsAddModalOpen} mutate={mutate} /> */}
-			{/* <DeleteSubjectModal
-				open={isDeleteModalOpen}
-				setOpen={setIsDeleteModalOpen}
-				subjectName={selectedRow?.subjectName ?? 'Không xác định'}
-				subjectId={selectedRow?.subjectKey ?? 0}
-				mutate={mutate}
-			/>
-			<UpdateSubjectModal
-				open={iUpdateModalOpen}
-				setOpen={setIUpdateModalOpen}
-				subjectId={selectedRow?.subjectKey ?? 0}
-				mutate={mutate}
-			/> */}
 		</div>
 	);
 };

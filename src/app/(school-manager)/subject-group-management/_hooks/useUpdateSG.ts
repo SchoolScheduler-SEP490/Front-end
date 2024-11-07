@@ -5,14 +5,16 @@ import { getUpdateSubjectGroupApi } from '../_libs/apis';
 import { IUpdateSubjectGroupRequest } from '../_libs/constants';
 
 interface IUpdateSubjectProps {
+	schoolId: number;
+	schoolYearId: number;
 	subjectGroupId: number;
 	sessionToken: string;
 	formData: IUpdateSubjectGroupRequest;
 }
 
 const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
-	const { subjectGroupId, formData, sessionToken } = props;
-	const endpoint = getUpdateSubjectGroupApi({ subjectGroupId });
+	const { subjectGroupId, formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getUpdateSubjectGroupApi({ schoolId, schoolYearId, subjectGroupId });
 	let response;
 
 	async function updateSubjectGroup(url: string) {

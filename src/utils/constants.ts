@@ -1,5 +1,3 @@
-import { StyledString } from 'next/dist/build/swc';
-
 export interface INavigation {
 	name: string;
 	url: string;

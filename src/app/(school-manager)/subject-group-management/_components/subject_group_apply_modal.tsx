@@ -17,14 +17,10 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { TransitionGroup } from 'react-transition-group';
-import useFetchSGClass from '../_hooks/useFetchClass';
-import {
-	IApplySubjectGroupRequest,
-	ISGClassResponse,
-	IVulnerableClass,
-} from '../_libs/constants';
-import ApllyConfirmationModal from './subject_group_confirm_modal';
 import useApplySubjectGroup from '../_hooks/useApplySG';
+import useFetchSGClass from '../_hooks/useFetchClass';
+import { IApplySubjectGroupRequest, ISGClassResponse, IVulnerableClass } from '../_libs/constants';
+import ApllyConfirmationModal from './subject_group_confirm_modal';
 
 const style = {
 	position: 'absolute',
@@ -45,7 +41,6 @@ const Div = styled('div')(({ theme }) => ({
 interface ISGApplyModalProps {
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	schoolYearId: number;
 	grade: string;
 	subjectGroupName: string;
 	subjectGroupId: number;
@@ -120,15 +115,14 @@ function renderSelectedItem({ item, handleRemoveItem }: RenderSelectedItemOption
 }
 
 const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
-	const { open, setOpen, schoolYearId, grade, subjectGroupName, subjectGroupId } =
-		props;
-	const { schoolId, sessionToken } = useAppContext();
+	const { open, setOpen, grade, subjectGroupName, subjectGroupId } = props;
+	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const { data, isValidating, error, mutate } = useFetchSGClass({
 		sessionToken,
 		schoolId,
 		pageSize: 1000,
 		pageIndex: 1,
-		schoolYearId,
+		schoolYearId: selectedSchoolYearId,
 		grade,
 	});
 
@@ -140,20 +134,22 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 	const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
 
 	useEffect(() => {
-		mutate();
-		if (data?.status === 200) {
-			var sgAvailableClasses: ISGClassResponse[] = [];
-			var sgExistedClasses: ISGClassResponse[] = [];
-			data.result.items.map((item: ISGClassResponse) => {
-				if (item['subject-group-id'] === null) {
-					sgAvailableClasses.push(item);
-				} else {
-					sgExistedClasses.push(item);
-				}
-			});
-			setClassOptions([...sgAvailableClasses, ...sgExistedClasses]);
+		if (open) {
+			mutate();
+			if (data?.status === 200) {
+				var sgAvailableClasses: ISGClassResponse[] = [];
+				var sgExistedClasses: ISGClassResponse[] = [];
+				data.result.items.map((item: ISGClassResponse) => {
+					if (item['subject-group-id'] === null) {
+						sgAvailableClasses.push(item);
+					} else {
+						sgExistedClasses.push(item);
+					}
+				});
+				setClassOptions([...sgAvailableClasses, ...sgExistedClasses]);
+			}
 		}
-	}, [data]);
+	}, [data, open]);
 
 	const handleClose = () => {
 		setOpen(false);
@@ -164,10 +160,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 
 	const handleAddClass = () => {
 		if (tmpSelectedClasses.length > 0) {
-			setSelectedClasses((prev: ISGClassResponse[]) => [
-				...prev,
-				...tmpSelectedClasses,
-			]);
+			setSelectedClasses((prev: ISGClassResponse[]) => [...prev, ...tmpSelectedClasses]);
 			setClassOptions((prev: ISGClassResponse[]) =>
 				prev.filter((item) => !tmpSelectedClasses.includes(item))
 			);
@@ -181,9 +174,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 			prev.filter((selectedItem) => selectedItem !== item)
 		);
 		setClassOptions((prev: ISGClassResponse[]) =>
-			useFilterArray([...prev, item], 'name').sort((a, b) =>
-				a.name.localeCompare(b.name)
-			)
+			useFilterArray([...prev, item], 'name').sort((a, b) => a.name.localeCompare(b.name))
 		);
 	};
 
@@ -214,11 +205,13 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 
 	const handleUpdateSubmit = async () => {
 		await useApplySubjectGroup({
+			sessionToken: sessionToken,
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
 			formData: {
 				'class-ids': selectedClasses.map((item) => item.id),
 				'subject-group-id': subjectGroupId,
 			} as IApplySubjectGroupRequest,
-			sessionToken: sessionToken,
 		});
 		handleClose();
 		setIsConfirmOpen(false);

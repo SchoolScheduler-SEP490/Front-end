@@ -25,7 +25,6 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { KeyedMutator } from 'swr';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import useFetchSGDetail from '../_hooks/useFetchSGDetail';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import useUpdateSubjectGroup from '../_hooks/useUpdateSG';
@@ -37,6 +36,7 @@ import {
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
 import { IDropdownOption } from '../../_utils/contants';
+import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 
 const style = {
 	position: 'absolute',
@@ -81,19 +81,11 @@ interface IAddSubjectModalProps {
 const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupId, subjectGroupMutator } = props;
 	const theme = useTheme();
-	const { schoolId, sessionToken } = useAppContext();
-	const [specialisedSubjects, setSpecialisedSubjects] = useState<
-		IDropdownOption<number>[]
-	>([]);
-	const [optionalSubjects, setOptionalSubjects] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-	const [oldData, setOldData] = useState<ISubjectGroupDetailResponse | undefined>(
-		undefined
-	);
+	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const [specialisedSubjects, setSpecialisedSubjects] = useState<IDropdownOption<number>[]>([]);
+	const [optionalSubjects, setOptionalSubjects] = useState<IDropdownOption<number>[]>([]);
+	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>([]);
+	const [oldData, setOldData] = useState<ISubjectGroupDetailResponse | undefined>(undefined);
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
 
 	// Fetch data
@@ -101,18 +93,25 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		isRequired: true,
+		schoolYearId: selectedSchoolYearId,
+		pageIndex: 1,
+		pageSize: 1000,
 	});
 	const { data: optionalSubjectsData, error: optionalError } = useFetchSubjectOptions({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		isRequired: false,
+		schoolYearId: selectedSchoolYearId,
+		pageIndex: 1,
+		pageSize: 1000,
 	});
 	const { data: schoolYearData, error: schoolYearError } = useFetchSchoolYear();
-	const { data: subjectGroupDetailData, error: subjectGroupDetailError } =
-		useFetchSGDetail({
-			sessionToken: sessionToken,
-			subjectGroupId: subjectGroupId,
-		});
+	const { data: subjectGroupDetailData, error: subjectGroupDetailError } = useFetchSGDetail({
+		sessionToken: sessionToken,
+		subjectGroupId: subjectGroupId,
+		schoolId: Number(schoolId),
+		schoolYearId: selectedSchoolYearId,
+	});
 
 	const handleClose = () => {
 		formik.handleReset(formik.initialValues);
@@ -121,6 +120,8 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 
 	const handleFormSubmit = async (body: IUpdateSubjectGroupRequest) => {
 		await useUpdateSubjectGroup({
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
 			formData: {
 				...body,
 				'is-deleted': false,
@@ -150,72 +151,59 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	});
 
 	useEffect(() => {
-		if (
-			(optionalError || requiredError || schoolYearError) &&
-			!isErrorShown &&
-			open
-		) {
-			useNotify({
-				type: 'error',
-				message:
-					TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
-					'Có lỗi xảy ra khi tải dữ liệu Tổ hợp',
-			});
-			setIsErrorShown(true);
-		}
-		if (requiredSubjectsData?.status === 200) {
-			const requiredSubjects: IDropdownOption<number>[] =
-				requiredSubjectsData.result.items.map(
-					(subject: ISubjectOptionResponse) => ({
+		if (open) {
+			if ((optionalError || requiredError || schoolYearError) && !isErrorShown && open) {
+				useNotify({
+					type: 'error',
+					message:
+						TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
+						'Có lỗi xảy ra khi tải dữ liệu Tổ hợp',
+				});
+				setIsErrorShown(true);
+			}
+			if (requiredSubjectsData?.status === 200) {
+				const requiredSubjects: IDropdownOption<number>[] =
+					requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
 						label: subject['subject-name'],
 						value: subject.id,
-					})
-				);
-			setSpecialisedSubjects(requiredSubjects);
-		}
-		if (optionalSubjectsData?.status === 200) {
-			const optionalSubjects: IDropdownOption<number>[] =
-				optionalSubjectsData.result.items.map(
-					(subject: ISubjectOptionResponse) => ({
+					}));
+				setSpecialisedSubjects(requiredSubjects);
+			}
+			if (optionalSubjectsData?.status === 200) {
+				const optionalSubjects: IDropdownOption<number>[] =
+					optionalSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
 						label: subject['subject-name'],
 						value: subject.id,
+					}));
+				setOptionalSubjects(optionalSubjects);
+			}
+			if (schoolYearData?.status === 200) {
+				const schoolYears: IDropdownOption<number>[] = schoolYearData.result.map(
+					(year: ISchoolYearResponse) => ({
+						label: `${year['start-year']} - ${year['end-year']}`,
+						value: year.id,
 					})
 				);
-			setOptionalSubjects(optionalSubjects);
-		}
-		if (schoolYearData?.status === 200) {
-			const schoolYears: IDropdownOption<number>[] = schoolYearData.result.map(
-				(year: ISchoolYearResponse) => ({
-					label: `${year['start-year']} - ${year['end-year']}`,
-					value: year.id,
-				})
-			);
-			setSchoolYearOptions(schoolYears);
-		}
-		if (subjectGroupDetailData?.status === 200) {
-			setOldData({ ...subjectGroupDetailData?.result });
+				setSchoolYearOptions(schoolYears);
+			}
+			if (subjectGroupDetailData?.status === 200) {
+				setOldData({ ...subjectGroupDetailData?.result });
+			}
 		}
 		setIsErrorShown(false);
-	}, [
-		requiredSubjectsData,
-		optionalSubjectsData,
-		schoolYearData,
-		subjectGroupDetailData,
-	]);
+	}, [requiredSubjectsData, optionalSubjectsData, schoolYearData, subjectGroupDetailData]);
 
 	useEffect(() => {
 		if (formik.values['elective-subject-ids'].length > 0) {
-			const selectedSubjects: IDropdownOption<number>[] = optionalSubjects.filter(
-				(subject) => formik.values['elective-subject-ids'].includes(subject.value)
+			const selectedSubjects: IDropdownOption<number>[] = optionalSubjects.filter((subject) =>
+				formik.values['elective-subject-ids'].includes(subject.value)
 			);
 			if (requiredSubjectsData?.result.items ?? false) {
 				const initialData: IDropdownOption<number>[] =
-					requiredSubjectsData.result.items.map(
-						(subject: ISubjectOptionResponse) => ({
-							label: subject['subject-name'],
-							value: subject.id,
-						})
-					);
+					requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+						label: subject['subject-name'],
+						value: subject.id,
+					}));
 				setSpecialisedSubjects([...initialData, ...selectedSubjects]);
 			}
 		}
@@ -227,9 +215,8 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 			const specialisedSubjectIds: Set<number> = new Set<number>();
 			oldData['subject-selective-views']?.map((item) => {
 				const selectedId =
-					optionalSubjects.find(
-						(subject) => subject.label === item['subject-name']
-					)?.value ?? 0;
+					optionalSubjects.find((subject) => subject.label === item['subject-name'])
+						?.value ?? 0;
 				if (selectedId !== 0) electiveSubjectIds.add(selectedId);
 			});
 			oldData['subject-specializedt-views']?.map((item) => {
@@ -249,7 +236,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				'specialized-subject-ids': Array.from(specialisedSubjectIds),
 			});
 		}
-	}, [oldData]);
+	}, [oldData, open]);
 
 	const selectedElectiveLabels = useMemo(() => {
 		return optionalSubjects
@@ -260,9 +247,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 
 	const selectedSpecialisedLabels = useMemo(() => {
 		return specialisedSubjects
-			.filter((item) =>
-				formik.values['specialized-subject-ids'].includes(item.value)
-			)
+			.filter((item) => formik.values['specialized-subject-ids'].includes(item.value))
 			.map((item) => item.label)
 			.join(', ');
 	}, [formik.values['specialized-subject-ids'], specialisedSubjects]);
@@ -300,9 +285,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				>
 					<div className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Tên tổ hợp
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Tên tổ hợp</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
@@ -317,8 +300,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors['group-name'])
 								}
 								helperText={
-									formik.touched['group-name'] &&
-									formik.errors['group-name']
+									formik.touched['group-name'] && formik.errors['group-name']
 								}
 								slotProps={{
 									input: {
@@ -351,8 +333,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors['group-code'])
 								}
 								helperText={
-									formik.touched['group-code'] &&
-									formik.errors['group-code']
+									formik.touched['group-code'] && formik.errors['group-code']
 								}
 								slotProps={{
 									input: {
@@ -434,17 +415,13 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
 												checked={
-													formik.values[
-														'elective-subject-ids'
-													].indexOf(item.value) > -1
+													formik.values['elective-subject-ids'].indexOf(
+														item.value
+													) > -1
 												}
 											/>
 											<ListItemText primary={item.label} />
@@ -490,11 +467,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
 												checked={
@@ -530,18 +503,12 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										formik.setFieldValue('grade', event.target.value)
 									}
 									onBlur={formik.handleBlur('grade')}
-									error={
-										formik.touched.grade &&
-										Boolean(formik.errors.grade)
-									}
+									error={formik.touched.grade && Boolean(formik.errors.grade)}
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
 								>
 									{CLASSGROUP_STRING_TYPE.map((item, index) => (
-										<MenuItem
-											key={item.key + index}
-											value={item.value}
-										>
+										<MenuItem key={item.key + index} value={item.value}>
 											{item.key}
 										</MenuItem>
 									))}
@@ -554,9 +521,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 							</FormControl>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start '>
-								Năm học áp dụng
-							</h3>
+							<h3 className=' h-full flex justify-start '>Năm học áp dụng</h3>
 							<FormControl sx={{ width: '70%' }}>
 								<InputLabel id='school-year-label' variant='standard'>
 									Thêm năm học áp dụng
@@ -571,10 +536,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 											: formik.values['school-year-id']
 									}
 									onChange={(event) =>
-										formik.setFieldValue(
-											'school-year-id',
-											event.target.value
-										)
+										formik.setFieldValue('school-year-id', event.target.value)
 									}
 									onBlur={formik.handleBlur('school-year-id')}
 									error={
@@ -588,11 +550,7 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											{item.label}
 										</MenuItem>

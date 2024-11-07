@@ -26,7 +26,6 @@ import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useCreateSubjectGroup from '../_hooks/useCreateSG';
-import useFetchSchoolYear from '../_hooks/useFetchSchoolYear';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import {
 	ICreateSubjectGroupRequest,
@@ -35,6 +34,7 @@ import {
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
 import { IDropdownOption } from '../../_utils/contants';
+import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 
 const style = {
 	position: 'absolute',
@@ -78,28 +78,27 @@ function getStyles(
 const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupMutator } = props;
 	const theme = useTheme();
-	const { schoolId, sessionToken } = useAppContext();
-	const [response, setResponse] = useState<any>(undefined);
-	const [specialisedSubjects, setSpecialisedSubjects] = useState<
-		IDropdownOption<number>[]
-	>([]);
-	const [optionalSubjects, setOptionalSubjects] = useState<IDropdownOption<number>[]>(
-		[]
-	);
-	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>(
-		[]
-	);
+	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const [specialisedSubjects, setSpecialisedSubjects] = useState<IDropdownOption<number>[]>([]);
+	const [optionalSubjects, setOptionalSubjects] = useState<IDropdownOption<number>[]>([]);
+	const [schoolYearOptions, setSchoolYearOptions] = useState<IDropdownOption<number>[]>([]);
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
 
 	const { data: requiredSubjectsData, error: requiredError } = useFetchSubjectOptions({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		isRequired: true,
+		schoolYearId: selectedSchoolYearId,
+		pageIndex: 1,
+		pageSize: 1000,
 	});
 	const { data: optionalSubjectsData, error: optionalError } = useFetchSubjectOptions({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		isRequired: false,
+		schoolYearId: selectedSchoolYearId,
+		pageIndex: 1,
+		pageSize: 1000,
 	});
 	const { data: schoolYearData, error: schoolYearError } = useFetchSchoolYear();
 
@@ -109,15 +108,14 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	};
 
 	const handleFormSubmit = async (body: ICreateSubjectGroupRequest) => {
-		setResponse(
-			await useCreateSubjectGroup({
-				formData: {
-					...body,
-				} as ICreateSubjectGroupRequest,
-				schoolId: schoolId,
-				sessionToken: sessionToken,
-			})
-		);
+		await useCreateSubjectGroup({
+			formData: {
+				...body,
+			} as ICreateSubjectGroupRequest,
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
+			sessionToken: sessionToken,
+		});
 		subjectGroupMutator();
 		handleClose();
 	};
@@ -140,11 +138,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	});
 
 	useEffect(() => {
-		if (
-			(optionalError || requiredError || schoolYearError) &&
-			!isErrorShown &&
-			open
-		) {
+		if ((optionalError || requiredError || schoolYearError) && !isErrorShown && open) {
 			useNotify({
 				type: 'error',
 				message:
@@ -155,22 +149,18 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		}
 		if (requiredSubjectsData?.status === 200) {
 			const requiredSubjects: IDropdownOption<number>[] =
-				requiredSubjectsData.result.items.map(
-					(subject: ISubjectOptionResponse) => ({
-						label: subject['subject-name'],
-						value: subject.id,
-					})
-				);
+				requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+					label: subject['subject-name'],
+					value: subject.id,
+				}));
 			setSpecialisedSubjects(requiredSubjects);
 		}
 		if (optionalSubjectsData?.status === 200) {
 			const optionalSubjects: IDropdownOption<number>[] =
-				optionalSubjectsData.result.items.map(
-					(subject: ISubjectOptionResponse) => ({
-						label: subject['subject-name'],
-						value: subject.id,
-					})
-				);
+				optionalSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+					label: subject['subject-name'],
+					value: subject.id,
+				}));
 			setOptionalSubjects(optionalSubjects);
 		}
 		if (schoolYearData?.status === 200) {
@@ -187,17 +177,15 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 
 	useEffect(() => {
 		if (formik.values['elective-subject-ids'].length > 0) {
-			const selectedSubjects: IDropdownOption<number>[] = optionalSubjects.filter(
-				(subject) => formik.values['elective-subject-ids'].includes(subject.value)
+			const selectedSubjects: IDropdownOption<number>[] = optionalSubjects.filter((subject) =>
+				formik.values['elective-subject-ids'].includes(subject.value)
 			);
 			if (requiredSubjectsData?.result.items ?? false) {
 				const initialData: IDropdownOption<number>[] =
-					requiredSubjectsData.result.items.map(
-						(subject: ISubjectOptionResponse) => ({
-							label: subject['subject-name'],
-							value: subject.id,
-						})
-					);
+					requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+						label: subject['subject-name'],
+						value: subject.id,
+					}));
 				setSpecialisedSubjects([...initialData, ...selectedSubjects]);
 			}
 		}
@@ -212,9 +200,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 
 	const selectedSpecialisedLabels = useMemo(() => {
 		return specialisedSubjects
-			.filter((item) =>
-				formik.values['specialized-subject-ids'].includes(item.value)
-			)
+			.filter((item) => formik.values['specialized-subject-ids'].includes(item.value))
 			.map((item) => item.label)
 			.join(', ');
 	}, [formik.values['specialized-subject-ids'], specialisedSubjects]);
@@ -252,9 +238,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				>
 					<div className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Tên tổ hợp
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Tên tổ hợp</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
@@ -269,8 +253,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors['group-name'])
 								}
 								helperText={
-									formik.touched['group-name'] &&
-									formik.errors['group-name']
+									formik.touched['group-name'] && formik.errors['group-name']
 								}
 								slotProps={{
 									input: {
@@ -303,8 +286,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									Boolean(formik.errors['group-code'])
 								}
 								helperText={
-									formik.touched['group-code'] &&
-									formik.errors['group-code']
+									formik.touched['group-code'] && formik.errors['group-code']
 								}
 								slotProps={{
 									input: {
@@ -386,17 +368,13 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
 												checked={
-													formik.values[
-														'elective-subject-ids'
-													].indexOf(item.value) > -1
+													formik.values['elective-subject-ids'].indexOf(
+														item.value
+													) > -1
 												}
 											/>
 											<ListItemText primary={item.label} />
@@ -442,11 +420,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
 												checked={
@@ -477,27 +451,17 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									labelId='grade-label'
 									id='grade'
 									variant='standard'
-									value={
-										formik.values.grade === 0
-											? ''
-											: formik.values.grade
-									}
+									value={formik.values.grade === 0 ? '' : formik.values.grade}
 									onChange={(event) =>
 										formik.setFieldValue('grade', event.target.value)
 									}
 									onBlur={formik.handleBlur('grade')}
-									error={
-										formik.touched.grade &&
-										Boolean(formik.errors.grade)
-									}
+									error={formik.touched.grade && Boolean(formik.errors.grade)}
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
 								>
 									{CLASSGROUP_STRING_TYPE.map((item, index) => (
-										<MenuItem
-											key={item.key + index}
-											value={item.value}
-										>
+										<MenuItem key={item.key + index} value={item.value}>
 											{item.key}
 										</MenuItem>
 									))}
@@ -510,9 +474,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 							</FormControl>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start '>
-								Năm học áp dụng
-							</h3>
+							<h3 className=' h-full flex justify-start '>Năm học áp dụng</h3>
 							<FormControl sx={{ width: '70%' }}>
 								<InputLabel id='school-year-label' variant='standard'>
 									Thêm năm học áp dụng
@@ -527,10 +489,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 											: formik.values['school-year-id']
 									}
 									onChange={(event) =>
-										formik.setFieldValue(
-											'school-year-id',
-											event.target.value
-										)
+										formik.setFieldValue('school-year-id', event.target.value)
 									}
 									onBlur={formik.handleBlur('school-year-id')}
 									error={
@@ -544,11 +503,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 										<MenuItem
 											key={item.label + index}
 											value={item.value}
-											style={getStyles(
-												item,
-												optionalSubjects,
-												theme
-											)}
+											style={getStyles(item, optionalSubjects, theme)}
 										>
 											{item.label}
 										</MenuItem>

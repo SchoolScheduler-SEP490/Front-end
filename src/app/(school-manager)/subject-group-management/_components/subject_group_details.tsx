@@ -22,7 +22,7 @@ interface ISubjectDetailsProps {
 
 const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 	const { open, setOpen, subjectGroupId } = props;
-	const { sessionToken } = useAppContext();
+	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 	const [subjectGroupDetails, setSubjectDetails] = useState<ISubjectGroupDetailResponse | null>(
 		null
 	);
@@ -30,6 +30,8 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 	const { data, mutate } = useFetchSGDetail({
 		sessionToken,
 		subjectGroupId,
+		schoolId: Number(schoolId),
+		schoolYearId: selectedSchoolYearId,
 	});
 
 	const handleClose = () => {
