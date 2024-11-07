@@ -9,12 +9,9 @@ export default function SMLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { userRole, refresher, refreshToken } = useAppContext();
-	useEffect(() => {
-		refresher({ refreshToken });
-	}, []);
+	const { userRole } = useAppContext();
 
-	if (userRole.toLowerCase() !== 'schoolmanager') {
+	if (userRole?.toLowerCase() !== 'schoolmanager') {
 		notFound();
 	}
 

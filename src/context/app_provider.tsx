@@ -16,7 +16,7 @@ const AppContext = createContext({
 	setSchoolId: (schoolId: string) => {},
 	schoolName: '',
 	setSchoolName: (schoolName: string) => {},
-	refresher: ({ refreshToken }: { refreshToken: string }) => {},
+	refresher: () => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
