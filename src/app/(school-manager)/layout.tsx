@@ -1,7 +1,7 @@
 'use client';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import { useAppContext } from '@/context/app_provider';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function SMLayout({
@@ -9,9 +9,9 @@ export default function SMLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { userRole, refresher } = useAppContext();
+	const { userRole, refresher, refreshToken } = useAppContext();
 	useEffect(() => {
-		refresher();
+		refresher({ refreshToken });
 	}, []);
 
 	if (userRole.toLowerCase() !== 'schoolmanager') {

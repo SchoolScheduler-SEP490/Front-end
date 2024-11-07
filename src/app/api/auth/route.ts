@@ -18,9 +18,9 @@ export async function POST(request: Request) {
 		status: 200,
 		headers: {
 			'Set-Cookie': [
-				`sessionToken=${sessionToken}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
+				`sessionToken=${sessionToken}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
 				`refreshToken=${refreshToken}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
-				`userRole=${requestBody.role}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
+				`userRole=${requestBody.role}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
 			].join(','),
 		},
 	});
