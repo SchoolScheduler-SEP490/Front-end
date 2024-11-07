@@ -11,7 +11,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import useNotify from '@/hooks/useNotify';
 
 const SMHeader = ({ children }: { children: ReactNode }) => {
-	const { schoolName, selectedSchoolYearId } = useAppContext();
+	const { schoolName, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
 	const [selectedSchoolYear, setSelectedSchoolYear] = useState<IDropdownOption<number> | null>(
 		null
 	);
@@ -38,6 +38,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 			body: JSON.stringify({ schoolYearId: selectedId }),
 		});
 		if (res.status === 200) {
+			setSelectedSchoolYearId(selectedId);
 			setSelectedSchoolYear(
 				schoolYearOptions.find((item) => item.value === selectedId) ?? null
 			);
