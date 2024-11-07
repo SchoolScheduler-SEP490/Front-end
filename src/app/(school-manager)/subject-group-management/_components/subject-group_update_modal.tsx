@@ -151,44 +151,42 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	});
 
 	useEffect(() => {
-		if (open) {
-			if ((optionalError || requiredError || schoolYearError) && !isErrorShown && open) {
-				useNotify({
-					type: 'error',
-					message:
-						TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
-						'Có lỗi xảy ra khi tải dữ liệu Tổ hợp',
-				});
-				setIsErrorShown(true);
-			}
-			if (requiredSubjectsData?.status === 200) {
-				const requiredSubjects: IDropdownOption<number>[] =
-					requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
-						label: subject['subject-name'],
-						value: subject.id,
-					}));
-				setSpecialisedSubjects(requiredSubjects);
-			}
-			if (optionalSubjectsData?.status === 200) {
-				const optionalSubjects: IDropdownOption<number>[] =
-					optionalSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
-						label: subject['subject-name'],
-						value: subject.id,
-					}));
-				setOptionalSubjects(optionalSubjects);
-			}
-			if (schoolYearData?.status === 200) {
-				const schoolYears: IDropdownOption<number>[] = schoolYearData.result.map(
-					(year: ISchoolYearResponse) => ({
-						label: `${year['start-year']} - ${year['end-year']}`,
-						value: year.id,
-					})
-				);
-				setSchoolYearOptions(schoolYears);
-			}
-			if (subjectGroupDetailData?.status === 200) {
-				setOldData({ ...subjectGroupDetailData?.result });
-			}
+		if ((optionalError || requiredError || schoolYearError) && !isErrorShown && open) {
+			useNotify({
+				type: 'error',
+				message:
+					TRANSLATOR[optionalError?.message || requiredError?.message || ''] ??
+					'Có lỗi xảy ra khi tải dữ liệu Tổ hợp',
+			});
+			setIsErrorShown(true);
+		}
+		if (requiredSubjectsData?.status === 200) {
+			const requiredSubjects: IDropdownOption<number>[] =
+				requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+					label: subject['subject-name'],
+					value: subject.id,
+				}));
+			setSpecialisedSubjects(requiredSubjects);
+		}
+		if (optionalSubjectsData?.status === 200) {
+			const optionalSubjects: IDropdownOption<number>[] =
+				optionalSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+					label: subject['subject-name'],
+					value: subject.id,
+				}));
+			setOptionalSubjects(optionalSubjects);
+		}
+		if (schoolYearData?.status === 200) {
+			const schoolYears: IDropdownOption<number>[] = schoolYearData.result.map(
+				(year: ISchoolYearResponse) => ({
+					label: `${year['start-year']} - ${year['end-year']}`,
+					value: year.id,
+				})
+			);
+			setSchoolYearOptions(schoolYears);
+		}
+		if (subjectGroupDetailData?.status === 200) {
+			setOldData({ ...subjectGroupDetailData?.result });
 		}
 		setIsErrorShown(false);
 	}, [requiredSubjectsData, optionalSubjectsData, schoolYearData, subjectGroupDetailData]);
