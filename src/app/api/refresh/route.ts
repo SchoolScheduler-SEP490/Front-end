@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 					status: 200,
 					headers: {
 						'Set-Cookie': [
-							`sessionToken=${response['jwt-token']}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=900`,
+							`sessionToken=${response['jwt-token']}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
 							`refreshToken=${response['jwt-refresh-token']}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
 							`userRole=${userRole}; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=2592000`,
 						].join(','),
