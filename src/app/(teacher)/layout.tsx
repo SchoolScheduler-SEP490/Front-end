@@ -11,7 +11,7 @@ export default function TeacherLayout({
 }>) {
 	const { userRole } = useAppContext();
 	useMemo(() => {
-		if (userRole.toLowerCase() !== 'teacher') {
+		if (userRole?.toLowerCase() !== 'teacher') {
 			notFound();
 		}
 	}, [userRole]);

@@ -11,7 +11,7 @@ export default function AdminLayout({
 	const { userRole } = useAppContext();
 
 	useMemo(() => {
-		if (userRole.toLowerCase() !== 'admin') {
+		if (userRole?.toLowerCase() !== 'admin') {
 			notFound();
 		}
 	}, [userRole]);

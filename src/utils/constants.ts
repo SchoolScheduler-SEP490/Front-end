@@ -61,6 +61,13 @@ export interface ICommonOption {
 	title: string;
 }
 
+export interface ISchoolYearResponse {
+	id: number;
+	'start-year': string;
+	'end-year': string;
+	'school-year-code': string;
+}
+
 export const SUBJECT_GROUP_TYPE: { key: string; value: number }[] = [
 	{ key: '', value: -1 },
 	{ key: 'TN', value: 0 },

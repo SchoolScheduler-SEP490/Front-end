@@ -1,8 +1,10 @@
 'use client';
-import useNotify from '@/hooks/useNotify';
 import fetchWithToken from '@/hooks/fetchWithToken';
+import useNotify from '@/hooks/useNotify';
+import useRefreshToken from '@/hooks/useRefreshToken';
 import { createContext, useContext, useMemo, useState } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
+
 const AppContext = createContext({
 	sessionToken: '',
 	setSessionToken: (sessionToken: string) => {},
@@ -14,6 +16,9 @@ const AppContext = createContext({
 	setSchoolId: (schoolId: string) => {},
 	schoolName: '',
 	setSchoolName: (schoolName: string) => {},
+	selectedSchoolYearId: 0,
+	setSelectedSchoolYearId: (selectedSchoolYearId: number) => {},
+	refresher: () => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -29,6 +34,7 @@ export default function AppProvider({
 	initUserRole = '',
 	initSchoolId = '',
 	initSchoolName = '',
+	initSelectedSchoolYearId = 0,
 }: {
 	children: React.ReactNode;
 	inititalSessionToken?: string;
@@ -36,33 +42,42 @@ export default function AppProvider({
 	initUserRole?: string;
 	initSchoolId?: string;
 	initSchoolName?: string;
+	initSelectedSchoolYearId?: number;
 }) {
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const [schoolName, setSchoolName] = useState(initSchoolName);
+	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState(initSelectedSchoolYearId);
 	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
 
 	const handleLogout = async () => {
-		await fetch(`${serverApi}/api/logout`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ sessionToken: sessionToken ?? undefined }),
-		}).then((res) => {
-			if (res.ok) {
-				setSessionToken('');
-				setRefreshToken('');
-				setUserRole('');
-				setSchoolId('');
-				setSchoolName('');
-			}
-		});
+		if (sessionToken) {
+			await fetch(`${serverApi}/api/logout`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ sessionToken: sessionToken ?? undefined }),
+			}).then((res) => {
+				if (res.ok) {
+					setSessionToken('');
+					setRefreshToken('');
+					setUserRole('');
+					setSchoolId('');
+					setSchoolName('');
+					setSelectedSchoolYearId(0);
+				}
+			});
+		}
 	};
 
-	const { data, error } = useSWR(
+	const {
+		data,
+		error,
+		mutate: refresher,
+	} = useSWR(
 		refreshToken?.length > 0 && userRole.length > 0
 			? [`${serverApi}/api/refresh`, refreshToken, userRole]
 			: null,
@@ -72,6 +87,7 @@ export default function AppProvider({
 			revalidateOnMount: true,
 			revalidateOnFocus: true,
 			refreshInterval: 480000,
+			shouldRetryOnError: false,
 		}
 	);
 
@@ -81,7 +97,9 @@ export default function AppProvider({
 			setRefreshToken(data['jwt-refresh-token']);
 			setUserRole(data.userRole);
 		} else if (userRole?.length === 0) {
-			handleLogout();
+			if (sessionToken?.length !== 0 && refreshToken?.length !== 0) {
+				handleLogout();
+			}
 		}
 		if (error) {
 			useNotify({
@@ -105,6 +123,9 @@ export default function AppProvider({
 				setSchoolId,
 				schoolName,
 				setSchoolName,
+				refresher,
+				selectedSchoolYearId,
+				setSelectedSchoolYearId,
 			}}
 		>
 			{children}

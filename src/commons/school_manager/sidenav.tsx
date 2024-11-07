@@ -54,8 +54,14 @@ const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
-	const { sessionToken, setSessionToken, setRefreshToken, setUserRole, setSchoolId } =
-		useAppContext();
+	const {
+		sessionToken,
+		setSessionToken,
+		setRefreshToken,
+		setUserRole,
+		setSchoolId,
+		setSelectedSchoolYearId,
+	} = useAppContext();
 	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
 
 	const handleLogout = async () => {
@@ -72,6 +78,7 @@ const SMSidenav = () => {
 			setRefreshToken('');
 			setUserRole('');
 			setSchoolId('');
+			setSelectedSchoolYearId(0);
 			useNotify({
 				message: data.message ?? 'Đã có lỗi xảy ra',
 				type: 'error',

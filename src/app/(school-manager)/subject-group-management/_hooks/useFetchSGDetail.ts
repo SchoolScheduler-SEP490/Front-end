@@ -25,9 +25,11 @@ const useFetchSGDetail = (props: IFetchSubjectGroupDetailProps) => {
 
 	const { data, error, mutate, isValidating } = useSWR(endpoint, fetcher, {
 		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateOnReconnect: false,
+		revalidateIfStale: false,
 		shouldRetryOnError: false,
+		refreshWhenHidden: false,
+		refreshWhenOffline: false,
 	});
 
 	return { data, error, mutate, isValidating };

@@ -5,31 +5,24 @@ import { notFound } from 'next/navigation';
 import { useEffect } from 'react';
 import { IJWTTokenPayload } from '../(auth)/_utils/constants';
 import { jwtDecode } from 'jwt-decode';
-import useRefreshToken from '@/hooks/useRefreshToken';
+import { Provider } from 'react-redux';
+import { schoolManagerStore } from '@/context/school_manager_store';
 
 export default function SMLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const { userRole, sessionToken, refreshToken } = useAppContext();
-	var userData: IJWTTokenPayload = {} as IJWTTokenPayload;
-	if (sessionToken) {
-		userData = jwtDecode(sessionToken);
-	}
+	const { userRole } = useAppContext();
 
-	if (userRole.toLowerCase() !== 'schoolmanager') {
+	if ((userRole?.toLowerCase() ?? '') !== 'schoolmanager') {
 		notFound();
-	}
-
-	if (userData?.exp && userData.exp < Date.now() / 1000) {
-		useRefreshToken({ refreshToken, userRole });
 	}
 
 	return (
 		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start overflow-y-hidden'>
 			<SMSidenav />
-			{children}
+			<Provider store={schoolManagerStore}>{children}</Provider>
 		</section>
 	);
 }
