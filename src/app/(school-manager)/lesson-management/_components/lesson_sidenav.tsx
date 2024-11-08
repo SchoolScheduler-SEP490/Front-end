@@ -4,9 +4,7 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { Typography } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, {
-	AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
+import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { ISubjectGroupSidenavData } from '../_libs/constants';
@@ -25,9 +23,7 @@ const Accordion = styled((props: AccordionProps) => (
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
 	<MuiAccordionSummary
-		expandIcon={
-			<ArrowForwardIosSharpIcon sx={{ fontSize: '0.5rem', border: 'none' }} />
-		}
+		expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: '0.5rem', border: 'none' }} />}
 		{...props}
 	/>
 ))(({ theme }) => ({
@@ -84,9 +80,12 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 
 	return (
 		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
-			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
-				Tổ hợp môn
-			</h1>
+			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>Tổ hợp môn</h1>
+			{subjectGroup.length === 0 && (
+				<p className='text-body-medium w-full pl-3 py-3 text-left italic'>
+					Năm học chưa có Tổ hợp môn
+				</p>
+			)}
 			{subjectGroup.map((item, index) => (
 				<Accordion
 					expanded={expanded.includes(`panel${index}`)}
@@ -99,9 +98,7 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 						id={`panel${index}d-header`}
 						className='!text-black !bg-basic-gray-hover '
 					>
-						<Typography className='!text-body-large-strong'>
-							{item.title}
-						</Typography>
+						<Typography className='!text-body-large-strong'>{item.title}</Typography>
 					</AccordionSummary>
 					<AccordionDetails className='!w-full !p-0'>
 						{item.items.map((subjectGroup, id: number) => (
@@ -113,9 +110,7 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 											? 'bg-basic-gray-active '
 											: 'hover:bg-basic-gray-hover'
 									}`}
-								onClick={() =>
-									handleSelectSubjectGroup(subjectGroup.value)
-								}
+								onClick={() => handleSelectSubjectGroup(subjectGroup.value)}
 							>
 								<p
 									className={`${

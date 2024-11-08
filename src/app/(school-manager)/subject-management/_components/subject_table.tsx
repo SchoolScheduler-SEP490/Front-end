@@ -221,6 +221,15 @@ const SubjectTable = (props: ISubjectTableProps) => {
 								rowCount={subjectTableData.length}
 							/>
 							<TableBody>
+								{visibleRows.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={5} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Chưa có dữ liệu môn học
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
 								{visibleRows.map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
 
