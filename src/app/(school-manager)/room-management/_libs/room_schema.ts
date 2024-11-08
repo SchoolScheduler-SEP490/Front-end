@@ -5,7 +5,8 @@ export const roomSchema = Yup.object().shape({
   'room-code': Yup.string().required('Mã phòng là bắt buộc'),
   'max-class-per-time': Yup.number()
     .required('Số lớp tối đa là bắt buộc')
-    .min(1, 'Số lớp tối đa phải lớn hơn 0'),
+    .min(1, 'Số lớp tối thiểu phải lớn hơn 0')
+    .max(1, 'Số lớp học trong một thời gian tối đa phải 1'),
   'building-code': Yup.string().required('Tòa nhà là bắt buộc'),
   'room-type': Yup.string().required('Loại phòng là bắt buộc'),
   'subjects-abreviation': Yup.array().when('room-type', {

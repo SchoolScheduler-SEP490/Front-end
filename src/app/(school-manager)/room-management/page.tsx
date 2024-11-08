@@ -66,7 +66,7 @@ export default function SMRoom() {
         (item: IRoom) => ({
           id: item.id,
           roomName: item.name,
-          buildingName: buildingMap.get(item["building-id"]) || "Unknown",
+          buildingName: buildingMap.get(item["building-id"]),
           availableSubjects: item.subjects?.map(subject => subject["subject-name"]).join(", ") || "-",
           roomType: ROOM_TYPE_TRANSLATOR[item["room-type"]],
           status: item["availabilitye-status"] === "Available" ? "Hoạt động" : "Bảo trì",
@@ -84,7 +84,7 @@ export default function SMRoom() {
     }
   }, [page, rowsPerPage]);
 
-  if (isValidating) {
+  if (isValidating || !buildingMap.size) {
     return (
       <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
         <SMHeader>
