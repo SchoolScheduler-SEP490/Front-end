@@ -69,6 +69,11 @@ const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
 						value={selectedYearId}
 						onChange={handleYearSelect}
 					>
+						{yearStudyOptions?.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy năm học
+							</MenuItem>
+						)}
 						{yearStudyOptions.map((item, index) => (
 							<MenuItem key={item.value + index} value={item.value}>
 								{item.label}

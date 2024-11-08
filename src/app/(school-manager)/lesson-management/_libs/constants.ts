@@ -44,6 +44,7 @@ export interface ILessonTableData {
 	subMinimumCouple: number;
 	isDouleSlot: boolean;
 	isRequiredSubject: boolean;
+	isSpecializedSubject: boolean;
 }
 
 export interface ISubjectGroupDetailResponse {

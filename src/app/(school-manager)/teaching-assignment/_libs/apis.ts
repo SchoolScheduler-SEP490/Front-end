@@ -3,58 +3,44 @@ const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 export const getFetchClassApi = ({
 	localApi,
 	schoolId,
+	schoolYearId,
 	pageIndex,
 	pageSize,
-	schoolYearId,
+	grade,
 	includedDeleted,
 }: {
 	localApi?: string;
 	schoolId: string;
+	schoolYearId: number;
 	pageIndex: number;
 	pageSize: number;
-	schoolYearId: number;
+	grade?: number;
 	includedDeleted?: boolean;
 }) => {
 	const queryString = new URLSearchParams({
-		schoolId: schoolId.toString(),
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
-		schoolYearId: schoolYearId.toString(),
+		grade: grade ? grade.toString() : '',
 		includedDeleted: includedDeleted ? includedDeleted.toString() : 'false',
 	}).toString();
 
-	return `${localApi ?? api}/api/student-classes?${queryString}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?${queryString}`;
 };
 
-export const getFetchTermApi = ({
+export const getAssignTeacherApi = ({
 	localApi,
 	schoolId,
+	schoolYearId,
 }: {
 	localApi?: string;
 	schoolId: number;
+	schoolYearId: number;
 }) => {
-	return `${localApi ?? api}/api/terms/${schoolId}`;
-};
-
-export const getFetchSchoolYearApi = (localApi?: string) => {
-	return `${localApi ?? api}/api/school-years`;
-};
-
-export const getFetchTeachingAssignmentApi = ({
-	localApi,
-	studentClassId,
-	termId,
-}: {
-	localApi?: string;
-	studentClassId: number;
-	termId: number;
-}) => {
-	const queryString = new URLSearchParams({
-		studentClassId: studentClassId.toString(),
-		termId: termId.toString(),
-	}).toString();
-
-	return `${localApi ?? api}/api/teacher-assignments?${queryString}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments`;
 };
 
 export const getFetchTeacherApi = ({
@@ -71,16 +57,29 @@ export const getFetchTeacherApi = ({
 	includeDeleted?: boolean;
 }) => {
 	const queryString = new URLSearchParams({
-		schoolId: schoolId.toString(),
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
 		includedDeleted: includeDeleted ? includeDeleted.toString() : 'false',
 	}).toString();
-	return `${localApi ?? api}/api/teachers?${queryString}`;
+	return `${localApi ?? api}/api/schools/${schoolId}/teachers?${queryString}`;
 };
 
-export const getAssignTeacherApi = (localApi?: string) => {
-	return `${localApi ?? api}/api/teacher-assignments`;
+export const getFetchTeachingAssignmentApi = ({
+	schoolId,
+	schoolYearId,
+	termId,
+	studentClassId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+	termId: number;
+	studentClassId: number;
+}) => {
+	const queryString = new URLSearchParams({
+		studentClassId: studentClassId.toString(),
+		termId: termId.toString(),
+	}).toString();
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments?${queryString}`;
 };
 
 export const getFetchTeachableTeacherApi = ({
@@ -92,7 +91,5 @@ export const getFetchTeachableTeacherApi = ({
 	schoolId: number;
 	subjectId: number;
 }) => {
-	return `${
-		localApi ?? api
-	}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
+	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
 };

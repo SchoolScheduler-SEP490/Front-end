@@ -364,6 +364,11 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									sx={{ width: '100%' }}
 									renderValue={() => selectedElectiveLabels}
 								>
+									{optionalSubjects?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy môn học
+										</MenuItem>
+									)}
 									{optionalSubjects.map((item, index) => (
 										<MenuItem
 											key={item.label + index}
@@ -416,6 +421,11 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									sx={{ width: '100%' }}
 									renderValue={() => selectedSpecialisedLabels}
 								>
+									{specialisedSubjects?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy môn học
+										</MenuItem>
+									)}
 									{specialisedSubjects.map((item, index) => (
 										<MenuItem
 											key={item.label + index}
@@ -499,6 +509,11 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
 								>
+									{schoolYearOptions?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy năm học
+										</MenuItem>
+									)}
 									{schoolYearOptions.map((item, index) => (
 										<MenuItem
 											key={item.label + index}

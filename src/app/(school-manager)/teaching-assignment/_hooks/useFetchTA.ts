@@ -3,13 +3,20 @@ import { getFetchTeachingAssignmentApi } from '../_libs/apis';
 
 interface IFetchTeachingAssignmentProps {
 	sessionToken: string;
-	studentClassId: number;
+	schoolId: number;
+	schoolYearId: number;
 	termId: number;
+	studentClassId: number;
 }
 
 const useFetchTeachingAssignment = (props: IFetchTeachingAssignmentProps) => {
-	const { sessionToken, studentClassId, termId } = props;
-	const endpoint = getFetchTeachingAssignmentApi({ studentClassId, termId });
+	const { sessionToken, schoolId, schoolYearId, termId, studentClassId } = props;
+	const endpoint = getFetchTeachingAssignmentApi({
+		schoolId,
+		schoolYearId,
+		termId,
+		studentClassId,
+	});
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {

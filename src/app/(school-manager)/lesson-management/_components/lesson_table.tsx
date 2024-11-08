@@ -18,6 +18,7 @@ import {
 	TextField,
 	Toolbar,
 	Tooltip,
+	Typography,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -29,10 +30,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_cancel_modal';
-import { IDropdownOption } from '../../_utils/contants';
 
 interface IClassGroupData {
 	classGroupName: string;
@@ -50,7 +51,7 @@ const headCells: readonly HeadCell[] = [
 	{
 		id: 'id' as keyof ILessonTableData,
 		centered: true,
-		disablePadding: false,
+		disablePadding: true,
 		label: 'STT',
 	},
 	{
@@ -81,7 +82,7 @@ const headCells: readonly HeadCell[] = [
 		id: 'isRequired' as keyof ILessonTableData,
 		centered: true,
 		disablePadding: false,
-		label: 'Môn học bắt buộc',
+		label: 'Môn học chuyên đề',
 	},
 ];
 
@@ -96,7 +97,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 					rowSpan={2}
 					align={headCells[0].centered ? 'center' : 'left'}
 					padding={headCells[0].disablePadding ? 'none' : 'normal'}
-					width={50}
+					width={30}
 					sx={[
 						{
 							fontWeight: 'bold',
@@ -280,6 +281,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	const [isEditing, setIsEditing] = React.useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = React.useState<IUpdateSubjectInGroupRequest[]>([]);
 	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = React.useState<boolean>(false);
+	const [isVulnarable, setIsVulnarable] = React.useState<boolean>(false);
 
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const isFilterableOpen = Boolean(anchorEl);
@@ -292,6 +294,37 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 
 	const handleTermSelect = (event: SelectChangeEvent<number>) => {
 		setSelectedTermId(event.target.value as number);
+	};
+
+	const isValidInput = (value: IUpdateSubjectInGroupRequest): boolean => {
+		if (
+			value['sub-slot-per-week'] < 0 ||
+			value['main-slot-per-week'] < 0 ||
+			value['main-minimum-couple'] < 0 ||
+			value['sub-minimum-couple'] < 0
+		) {
+			useNotify({
+				message: 'Số tiết không thể nhỏ hơn 0',
+				type: 'error',
+			});
+			setIsVulnarable(true);
+			return false;
+		}
+		if (
+			value['sub-slot-per-week'] > 10 ||
+			value['main-slot-per-week'] > 10 ||
+			value['main-minimum-couple'] > 10 ||
+			value['sub-minimum-couple'] > 10
+		) {
+			useNotify({
+				message: 'Số tiết không thể lớn hơn 10',
+				type: 'error',
+			});
+			setIsVulnarable(true);
+			return false;
+		}
+		setIsVulnarable(false);
+		return true;
 	};
 
 	const handleUpdateLesson = (
@@ -321,7 +354,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		}
 		switch (target) {
 			case 'main-slot-per-week':
-				editingObject['main-slot-per-week'] = Number((value as string).replace(/^0+/, ''));
 				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -329,19 +361,12 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if (Number(value) > 10) {
-					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
-						type: 'error',
-					});
-					break;
-				}
+				editingObject['main-slot-per-week'] = Number((value as string).replace(/^0+/, ''));
 				break;
 			case 'is-double-period':
 				editingObject['is-double-period'] = value as boolean;
 				break;
 			case 'sub-slot-per-week':
-				editingObject['sub-slot-per-week'] = Number(value);
 				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -349,16 +374,9 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if (Number(value) > 10) {
-					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
-						type: 'error',
-					});
-					break;
-				}
+				editingObject['sub-slot-per-week'] = Number(value);
 				break;
 			case 'main-minimum-couple':
-				editingObject['main-minimum-couple'] = Number(value);
 				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -366,15 +384,9 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if (Number(value) > 10) {
-					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
-						type: 'error',
-					});
-					break;
-				}
+				editingObject['main-minimum-couple'] = Number((value as string).replace(/^0+/, ''));
+				break;
 			case 'sub-minimum-couple':
-				editingObject['sub-minimum-couple'] = Number(value);
 				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
@@ -382,13 +394,8 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					});
 					break;
 				}
-				if (Number(value) > 10) {
-					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
-						type: 'error',
-					});
-					break;
-				}
+				editingObject['sub-minimum-couple'] = Number(value);
+				break;
 			default:
 				break;
 		}
@@ -496,7 +503,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 										tabIndex={-1}
 										key={row.id}
 										sx={[
-											{ cursor: 'pointer' },
 											editedObject !== undefined && {
 												bgcolor: '#fff0eb',
 											},
@@ -508,12 +514,30 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											scope='row'
 											padding='none'
 											align='center'
-											width={50}
+											width={30}
 										>
 											{index + 1}
 										</TableCell>
-										<TableCell align='left' width={150}>
-											{row.lessonName}
+										<TableCell
+											align='left'
+											width={150}
+											sx={{
+												color: !row.isRequiredSubject
+													? '#175b8e'
+													: '#e66030',
+											}}
+										>
+											<Tooltip
+												title={
+													row.isRequiredSubject
+														? 'Môn học bắt buộc'
+														: 'Môn học tự chọn'
+												}
+											>
+												<Typography fontSize={15}>
+													{row.lessonName}
+												</Typography>
+											</Tooltip>
 										</TableCell>
 										<TableCell align='center' width={100}>
 											<TextField
@@ -538,7 +562,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 												) =>
 													handleUpdateLesson(
 														'main-slot-per-week',
-														event.target.value,
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
@@ -573,7 +597,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 												) =>
 													handleUpdateLesson(
 														'main-minimum-couple',
-														event.target.value,
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
@@ -608,7 +632,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 												) =>
 													handleUpdateLesson(
 														'sub-slot-per-week',
-														event.target.value,
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
@@ -642,7 +666,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 												) =>
 													handleUpdateLesson(
 														'sub-minimum-couple',
-														event.target.value,
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
@@ -678,7 +702,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											/>
 										</TableCell>
 										<TableCell width={50} align='center'>
-											<Checkbox disabled checked={row.isRequiredSubject} />
+											<Checkbox disabled checked={row.isSpecializedSubject} />
 										</TableCell>
 									</TableRow>
 								);
@@ -709,6 +733,11 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						value={selectedTermId}
 						onChange={(event: SelectChangeEvent<number>) => handleTermSelect(event)}
 					>
+						{termData?.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy học kỳ
+							</MenuItem>
+						)}
 						{termData?.map((item, index) => (
 							<MenuItem key={item.value + index} value={item.value}>
 								{item.label}

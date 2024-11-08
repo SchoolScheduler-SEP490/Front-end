@@ -2,6 +2,7 @@
 
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
+import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useNotify from '@/hooks/useNotify';
 import { CLASSGROUP_STRING_TYPE, CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
@@ -25,6 +26,7 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useFetchSGDetail from '../_hooks/useFetchSGDetail';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import useUpdateSubjectGroup from '../_hooks/useUpdateSG';
@@ -35,8 +37,6 @@ import {
 	IUpdateSubjectGroupRequest,
 } from '../_libs/constants';
 import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
-import { IDropdownOption } from '../../_utils/contants';
-import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 
 const style = {
 	position: 'absolute',
@@ -409,6 +409,11 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									sx={{ width: '100%' }}
 									renderValue={() => selectedElectiveLabels}
 								>
+									{optionalSubjects?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy môn học
+										</MenuItem>
+									)}
 									{optionalSubjects.map((item, index) => (
 										<MenuItem
 											key={item.label + index}
@@ -461,6 +466,11 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									sx={{ width: '100%' }}
 									renderValue={() => selectedSpecialisedLabels}
 								>
+									{specialisedSubjects?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy môn học
+										</MenuItem>
+									)}
 									{specialisedSubjects.map((item, index) => (
 										<MenuItem
 											key={item.label + index}
@@ -544,6 +554,11 @@ const UpdateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
 								>
+									{schoolYearOptions?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy năm học
+										</MenuItem>
+									)}
 									{schoolYearOptions.map((item, index) => (
 										<MenuItem
 											key={item.label + index}

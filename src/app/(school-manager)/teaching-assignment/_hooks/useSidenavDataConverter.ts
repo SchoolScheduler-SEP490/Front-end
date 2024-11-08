@@ -1,8 +1,30 @@
 import { IClassResponse, ITeachingAssignmentSidenavData } from '../_libs/constants';
 
-const useSidenavDataConverter = (
-	data: IClassResponse[]
-): ITeachingAssignmentSidenavData[] => {
+function customSort(arr: { key: string; value: number }[]): { key: string; value: number }[] {
+	// Bước 1: Chia mảng lớn thành các mảng con có cùng độ dài chuỗi
+	const lengthMap: { [key: number]: { key: string; value: number }[] } = {};
+
+	arr.forEach((item) => {
+		const length = item.key.length;
+		if (!lengthMap[length]) {
+			lengthMap[length] = [];
+		}
+		lengthMap[length].push(item);
+	});
+
+	// Bước 2: Sắp xếp các mảng con
+	const sortedSubArrays = Object.keys(lengthMap)
+		.map(Number)
+		.sort((a, b) => a - b)
+		.map((key) => {
+			return lengthMap[key].sort((a, b) => a.key.localeCompare(b.key));
+		});
+
+	// Bước 3: Nối các mảng con theo thứ tự chiều dài chuỗi
+	return sortedSubArrays.flat();
+}
+
+const useSidenavDataConverter = (data: IClassResponse[]): ITeachingAssignmentSidenavData[] => {
 	const gradeTitles: { [key: string]: string } = {
 		GRADE_10: 'Khối 10',
 		GRADE_11: 'Khối 11',
@@ -32,9 +54,7 @@ const useSidenavDataConverter = (
 	return Object.values(groupedData)
 		.map((group) => ({
 			...group,
-			items: group.items,
-			// .sort((a, b) => a.key.length - b.key.length)
-			// .sort((a, b) => a.key.localeCompare(b.key)), // Sort items by key
+			items: customSort(group.items),
 		}))
 		.sort((a, b) => {
 			const gradeOrder = ['Khối 10', 'Khối 11', 'Khối 12'];

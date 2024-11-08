@@ -26,8 +26,6 @@ const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
 			method: 'PATCH',
 			body: JSON.stringify({
 				...formData,
-				'total-slot-in-year': 0,
-				'slot-specialized': 0,
 			}),
 		});
 		const data = await response.json();

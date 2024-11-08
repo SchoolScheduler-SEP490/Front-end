@@ -28,8 +28,8 @@ const useFetchSGTableData = (props: IFetchSubjectGroupDetailProps) => {
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
 		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateOnReconnect: false,
+		revalidateIfStale: false,
 		shouldRetryOnError: false,
 	});
 
