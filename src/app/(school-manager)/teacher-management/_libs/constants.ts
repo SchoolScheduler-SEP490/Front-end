@@ -53,7 +53,7 @@ export interface IAddTeacherData {
   "teacher-role": string;
   status: string;
   phone: string;
-  'teachable-subject-ids': number[];
+'subjects-abreviation': string[];
 }
 
 export interface IDepartment {
