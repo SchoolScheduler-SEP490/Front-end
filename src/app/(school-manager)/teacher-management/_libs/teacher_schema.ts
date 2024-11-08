@@ -58,5 +58,5 @@ export const updateTeacherSchema = yup.object().shape({
     .min(10, 'Số điện thoại phải có đúng 10 số.')
     .max(10, 'Số điện thoại phải có đúng 10 số.'),
 
-    ['subjects-abreviation']: yup.array().required('Vui lòng chọn môn học.'),
+    ['teachable-subject-ids']: yup.array().required('Vui lòng chọn môn học.'),
 })

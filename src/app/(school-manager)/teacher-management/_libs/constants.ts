@@ -39,7 +39,7 @@ export interface IUpdateTeacherRequestBody {
   status: string;
   phone: string;
   "is-deleted": boolean;
-  "teachable-subject-ids": string[];
+  "teachable-subject-ids": number[];
 }
 //Create new teacher request data
 export interface IAddTeacherData {
@@ -53,7 +53,7 @@ export interface IAddTeacherData {
   "teacher-role": string;
   status: string;
   phone: string;
-  'subjects-abreviation': string[];
+'subjects-abreviation': string[];
 }
 
 export interface IDepartment {

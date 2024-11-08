@@ -51,7 +51,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       "date-of-birth": dayjs(oldData["date-of-birth"]).format("YYYY-MM-DD"),
       "department-id": oldData["department-id"] || "",
       "teachable-subject-ids": oldData["teachable-subject-ids"] || [],
-      "school-id": 2555,
+      "school-id": schoolId,
     },
     validationSchema: updateTeacherSchema,
     onSubmit: async (values) => {
@@ -68,7 +68,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
         status: values.status,
         phone: values.phone,
         "is-deleted": false,
-        "teachable-subject-ids": values["teachable-subject-ids"]
+        "teachable-subject-ids": values["teachable-subject-ids"].map(Number),
       };
       console.log("Form submitted with values:", updatedTeacher);
       const success = await editTeacher(teacherId, updatedTeacher);
@@ -144,6 +144,10 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     formik.resetForm();
     onClose(false);
   };
+
+  console.log("error", formik.errors);
+  console.log("values", formik.values);
+  console.log("isValid", formik.isValid);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
