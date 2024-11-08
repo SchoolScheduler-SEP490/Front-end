@@ -54,7 +54,6 @@ const AddRoomModal = (props: AddRoomFormProps) => {
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const { addNewRoom } = useAddRoom();
 
-  // Update the useEffect for loading buildings
   React.useEffect(() => {
     const loadBuildingName = async () => {
       try {
