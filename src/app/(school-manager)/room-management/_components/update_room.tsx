@@ -45,7 +45,7 @@ const MenuProps = {
 
 const UpdateRoomModal = (props: UpdateRoomFormProps) => {
   const { open, onClose, roomId, mutate } = props;
-  const { sessionToken, schoolId } = useAppContext();
+  const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editRoom, isUpdating } = useUpdateRoom(mutate);
   const [oldData, setOldData] = useState<IUpdateRoomData>(
@@ -94,7 +94,7 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
 
   useEffect(() => {
     const fetchRoomById = async () => {
-      const response = await fetch(`${api}/api/Room/${roomId}`, {
+      const response = await fetch(`${api}/api/schools/${schoolId}/rooms/${roomId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -123,16 +123,16 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
     };
 
     const getBuildings = async () => {
-      const buildingData = await fetchBuildingName({
+      const buildingData = await fetchBuildingName(
         sessionToken,
         schoolId,
-      });
+      );
       if (buildingData?.status === 200) {
         setBuildings(buildingData.result.items);
       }
     };
     const loadSubjects = async () => {
-      const subjectData = await getSubjectName(sessionToken, schoolId);
+      const subjectData = await getSubjectName(sessionToken, selectedSchoolYearId);
       if (subjectData?.status === 200) {
         setSubjects(subjectData.result.items);
         console.log("Subjects loaded:", subjectData.result.items);

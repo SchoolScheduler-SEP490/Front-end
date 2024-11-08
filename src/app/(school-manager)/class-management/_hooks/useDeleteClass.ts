@@ -1,29 +1,29 @@
 import useNotify from "@/hooks/useNotify";
 import { deleteClassById } from "../_libs/apiClass";
+import { useAppContext } from "@/context/app_provider";
 
-interface IDeleteClassProps {
-  classId: number;
-  sessionToken: string;
-}
+const useDeleteClass = () => {
+  const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
-const useDeleteClass = async (props: IDeleteClassProps) => {
-  const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
-  const { classId, sessionToken } = props;
+  const deleteClass = async (classId: number) => {
+    try {
+      await deleteClassById(classId, sessionToken, schoolId, selectedSchoolYearId);
+      useNotify({
+        message: "Xóa lớp học thành công!",
+        type: "success",
+      });
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete class with ID: ${classId}`, error);
+      useNotify({
+        message: "Xóa lớp học thất bại. Vui lòng thử lại!",
+        type: "error",
+      });
+      return false;
+    }
+  };
 
-  try {
-    const response = await deleteClassById(classId, sessionToken);
-    console.log(`Successfully deleted class with ID: ${classId}`);
-    useNotify({
-      message: "Xóa lớp học thành công!",
-      type: "success",
-    });
-    return response;
-  } catch (error) {
-    console.error(`Failed to delete class with ID: ${classId}`, error);
-    useNotify({
-      message: "Xóa lớp học thất bại. Vui lòng thử lại!",
-      type: "error",
-    });
-  }
+  return { deleteClass };
 };
+
 export default useDeleteClass;

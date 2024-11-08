@@ -1,42 +1,49 @@
-import { IAddRoomData } from "./constants";
+import { IAddRoomData, IUpdateRoomData } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
-interface IBuildingFetchProps {
-  sessionToken: string;
-  schoolId: string;
-}
+export const fetchBuildingName = async (
+  sessionToken: string,
+  schoolId: string
+) => {
+  const initialResponse = await fetch(
+    `${api}/api/schools/${schoolId}/buildings?includeRoom=false&pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
 
-export const fetchBuildingName = async ({
-  sessionToken,
-  schoolId,
-}: IBuildingFetchProps) => {
-  const queryString = new URLSearchParams({
-    schoolId: schoolId,
-    pageSize: "20",
-    pageIndex: "1",
-    includeRoom: "false",
-  }).toString();
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
 
-  const response = await fetch(`${api}/api/buildings?${queryString}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${sessionToken}`,
-    },
-  });
+  const response = await fetch(
+    `${api}/api/schools/${schoolId}/buildings?includeRoom=false&pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
 
-  return response.json();
+  const data = await response.json();
+  return data;
 };
 
 export const deleteRoomById = async (
   id: number,
-  sessionToken: string
+  sessionToken: string,
+  schoolId: string
 ): Promise<void> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
   }
-  const url = `${api}/api/Room/${id}`;
+  const url = `${api}/api/schools/${schoolId}/rooms/${id}`;
 
   const response = await fetch(url, {
     method: "DELETE",
@@ -58,7 +65,7 @@ export const addRoom = async (
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
   }
-  const url = `${api}/api/Room?schoolId=${schoolId}`;
+  const url = `${api}/api/schools/${schoolId}/rooms`;
   const requestBody = [
     {
       ...roomData,
@@ -85,10 +92,10 @@ export const addRoom = async (
 
 export const getSubjectName = async (
   sessionToken: string,
-  schoolId: string
+  selectedSchoolYearId: number
 ) => {
   const initialResponse = await fetch(
-    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=1&pageIndex=1`,
+    `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=20`,
     {
       method: "GET",
       headers: {
@@ -97,11 +104,12 @@ export const getSubjectName = async (
       },
     }
   );
+
   const initialData = await initialResponse.json();
   const totalCount = initialData.result["total-item-count"];
 
   const response = await fetch(
-    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
+    `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount || 20}`,
     {
       method: "GET",
       headers: {
@@ -110,6 +118,7 @@ export const getSubjectName = async (
       },
     }
   );
+
   const data = await response.json();
   return data;
 };
@@ -117,16 +126,17 @@ export const getSubjectName = async (
 export const updateRoom = async (
   roomId: number,
   sessionToken: string,
-  roomData: IAddRoomData
-): Promise<any> => {
+  schoolId: string,
+  roomData: IUpdateRoomData
+): Promise<boolean> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
   }
-  const url = `${api}/api/Room/${roomId}`;
+  const url = `${api}/api/schools/${schoolId}/rooms/${roomId}`;
   const requestBody = roomData;
   console.log("Request Body:", requestBody);
+
   try {
-    
     const response = await fetch(url, {
       method: "PUT",
       headers: {
@@ -135,6 +145,7 @@ export const updateRoom = async (
       },
       body: JSON.stringify(requestBody),
     });
+
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       return false;
@@ -144,5 +155,4 @@ export const updateRoom = async (
     console.error("Error occurred while sending request:", error);
     return false;
   }
-
-}
+};

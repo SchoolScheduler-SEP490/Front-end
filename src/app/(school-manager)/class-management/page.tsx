@@ -15,7 +15,7 @@ import ClassFilterable from "./_components/class_filterable";
 export default function SMClass() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [currentSchoolYear, setCurrentSchoolYear] = React.useState<string>("");
   const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
   const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
@@ -25,7 +25,7 @@ export default function SMClass() {
     schoolId,
     pageSize: rowsPerPage,
     pageIndex: page + 1,
-    schoolYearId: selectedYearId,
+    selectedSchoolYearId
   });
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
     undefined
@@ -55,7 +55,7 @@ export default function SMClass() {
       }
     };
     getSchoolYear();
-  }, [sessionToken]);
+  }, [sessionToken, selectedSchoolYearId]);
 
   React.useEffect(() => {
     mutate();

@@ -51,7 +51,7 @@ const MenuProps = {
 
 const UpdateClassModal = (props: UpdateClassFormProps) => {
   const { open, onClose, classId, mutate } = props;
-  const { sessionToken, schoolId } = useAppContext();
+  const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editClass, isUpdating } = useUpdateClass(mutate);
   const [oldData, setOldData] = useState<IUpdateClassData>(
@@ -86,38 +86,43 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
 
   useEffect(() => {
     const fetchClassById = async () => {
-      const response = await fetch(`${api}/api/student-classes/${classId}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const response = await fetch(
+        `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`, 
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
       const data = await response.json();
-      if (data.status !== 200) {
-        useNotify({
-          type: "error",
-          message: data.message,
-        });
-      } else {
+      if (data.status === 200) {
         const gradeNumber = Number(data.result.grade.split("_")[1]);
-
+  
         setOldData({
           ...data.result,
           grade: gradeNumber,
           "school-id": schoolId,
-          "school-year-id": 1,
+          "school-year-id": selectedSchoolYearId,
+        });
+      } else {
+        useNotify({
+          type: "error",
+          message: data.message,
         });
       }
     };
+  
     if (open) {
       fetchClassById();
     }
-  }, [open]);
+  }, [open, classId, sessionToken, schoolId, selectedSchoolYearId]);
+  
 
   useEffect(() => {
     const fetchSubjectGroups = async () => {
       if (sessionToken && schoolId) {
-        const response = await getSubjectGroup(sessionToken, schoolId);
+        const response = await getSubjectGroup(sessionToken, schoolId, selectedSchoolYearId);
         if (response.status === 200) {
           setSubjectGroups(response.result.items);
         }

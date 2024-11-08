@@ -1,29 +1,30 @@
 import useNotify from "@/hooks/useNotify";
 import { deleteRoomById } from "../_libs/apiRoom";
+import { useAppContext } from "@/context/app_provider";
 
-interface IDeleteRoomProps {
-    roomId: number;
-    sessionToken: string;
-  }
-
-  const useDeleteRoom = async (props: IDeleteRoomProps) => {
-    const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
-    const { roomId, sessionToken } = props;
+  const useDeleteRoom = () => {
+    const { sessionToken, schoolId } = useAppContext();
   
-    try {
-      const response = await deleteRoomById(roomId, sessionToken);
-      console.log(`Successfully deleted class with ID: ${roomId}`);
-      useNotify({
-        message: "Xóa phòng học thành công!",
-        type: "success",
-      });
-      return response;
-    } catch (error) {
-      console.error(`Failed to delete class with ID: ${roomId}`, error);
-      useNotify({
-        message: "Xóa phòng học thất bại. Vui lòng thử lại!",
-        type: "error",
-      });
-    }
+    const deleteRoom = async (roomId: number) => {
+      try {
+        await deleteRoomById(roomId, sessionToken, schoolId);
+        useNotify({
+          message: "Xóa phòng học thành công!",
+          type: "success",
+        });
+        return true;
+      } catch (error) {
+        console.error(`Failed to delete room with ID: ${roomId}`, error);
+        useNotify({
+          message: "Xóa phòng học thất bại. Vui lòng thử lại!",
+          type: "error",
+        });
+        return false;
+      }
+    };
+  
+    return { deleteRoom };
   };
+  
   export default useDeleteRoom;
+  

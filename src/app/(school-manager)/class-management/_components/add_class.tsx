@@ -44,7 +44,7 @@ const MenuProps = {
 };
 const AddClassModal = (props: AddClassFormProps) => {
   const { open, onClose, mutate } = props;
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [subjectGroups, setSubjectGroups] = React.useState<ISubjectGroup[]>([]);
 
@@ -60,7 +60,7 @@ const AddClassModal = (props: AddClassFormProps) => {
 
   React.useEffect(() => {
     const loadSubjectGroup = async () => {
-      const data = await getSubjectGroup(sessionToken, schoolId);
+      const data = await getSubjectGroup(sessionToken, schoolId, selectedSchoolYearId);
       if (data?.status === 200 && data.result?.items) {
         setSubjectGroups(data.result.items);
       }

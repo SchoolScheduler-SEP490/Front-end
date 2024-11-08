@@ -24,7 +24,10 @@ import { roomSchema } from "../_libs/room_schema";
 import { IAddRoomData, IBuilding, IRoom, ISubject } from "../_libs/constants";
 import useAddRoom from "../_hooks/useAddRoom";
 import { fetchBuildingName, getSubjectName } from "../_libs/apiRoom";
-import { ERoomType, ROOM_STRING_TYPE } from "@/utils/constants";
+import {
+  ERoomType,
+  ROOM_TYPE_TRANSLATOR,
+} from "@/utils/constants";
 
 interface AddRoomFormProps {
   open: boolean;
@@ -46,18 +49,16 @@ const MenuProps = {
 
 const AddRoomModal = (props: AddRoomFormProps) => {
   const { open, onClose, mutate } = props;
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [buildings, setBuildings] = React.useState<IBuilding[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
+  const { addNewRoom } = useAddRoom();
 
   // Update the useEffect for loading buildings
   React.useEffect(() => {
     const loadBuildingName = async () => {
       try {
-        const data = await fetchBuildingName({
-          sessionToken,
-          schoolId,
-        });
+        const data = await fetchBuildingName(sessionToken, schoolId);
 
         if (data.result?.items) {
           setBuildings(data.result.items);
@@ -71,23 +72,22 @@ const AddRoomModal = (props: AddRoomFormProps) => {
 
   React.useEffect(() => {
     const loadSubjects = async () => {
-      const data = await getSubjectName(sessionToken, schoolId);
+      const data = await getSubjectName(sessionToken, selectedSchoolYearId);
       if (data.result?.items) {
         setSubjects(data.result.items);
       }
     };
     loadSubjects();
-  }, [sessionToken, schoolId]);
+  }, [sessionToken, selectedSchoolYearId]);
 
-  const handleFormSubmit = async (body: IAddRoomData) => {
-    await useAddRoom({
-      schoolId: schoolId,
-      sessionToken: sessionToken,
-      formData: [body],
-    });
-    mutate();
+  const handleFormSubmit = async (formData: IAddRoomData) => {
+    const success = await addNewRoom(formData);
     handleClose();
+    if (success) {
+      mutate();
+    } 
   };
+
   const handleClose = () => {
     formik.handleReset(formik.initialValues);
     onClose(false);
@@ -326,11 +326,14 @@ const AddRoomModal = (props: AddRoomFormProps) => {
                       MenuProps={MenuProps}
                       sx={{ width: "100%" }}
                     >
-                      {ROOM_STRING_TYPE.map((item) => (
-                        <MenuItem key={item.key} value={item.value}>
-                          {item.key}
-                        </MenuItem>
-                      ))}
+                      <MenuItem value="">--Chọn loại phòng--</MenuItem>
+                      {Object.entries(ROOM_TYPE_TRANSLATOR).map(
+                        ([key, value]) => (
+                          <MenuItem key={key} value={key}>
+                            {value}
+                          </MenuItem>
+                        )
+                      )}
                     </Select>
                     {formik.touched["room-type"] &&
                       formik.errors["room-type"] && (

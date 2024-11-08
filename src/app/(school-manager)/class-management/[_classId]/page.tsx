@@ -12,7 +12,7 @@ import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 export default function ClassDetails() {
   const [classData, setClassData] = useState<IClassDetail>();
   const [schoolYear, setSchoolYear] = useState<ISchoolYear>();
-  const { sessionToken } = useAppContext();
+  const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const searchParams = useSearchParams();
   const classId = searchParams.get("id")
@@ -20,7 +20,7 @@ export default function ClassDetails() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const classResponse = await fetch(`${api}/api/student-classes/${classId}`, {
+      const classResponse = await fetch(`${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`, {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
         },
@@ -29,7 +29,7 @@ export default function ClassDetails() {
       
       if (classData.status === 200) {
         setClassData(classData.result);
-        const schoolYearsResponse = await fetch(`${api}/api/school-years`, {
+        const schoolYearsResponse = await fetch(`${api}/api/academic-years`, {
           headers: {
             Authorization: `Bearer ${sessionToken}`,
           },
