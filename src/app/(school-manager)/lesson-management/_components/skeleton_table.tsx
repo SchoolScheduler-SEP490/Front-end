@@ -8,9 +8,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import * as React from 'react';
 
 interface ILessonTableData {
 	id: number;
@@ -133,9 +131,7 @@ function EnhancedTableHead() {
 				<TableCell
 					rowSpan={2}
 					align={headCells[headCells.length - 1].centered ? 'center' : 'left'}
-					padding={
-						headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'
-					}
+					padding={headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'}
 					sx={[
 						{
 							fontWeight: 'bold',
@@ -146,9 +142,7 @@ function EnhancedTableHead() {
 					]}
 				>
 					{headCells[headCells.length - 1].label}
-					<p className='!italic !text-[11px] !font-light opacity-60'>
-						(Chỉ đọc)
-					</p>
+					<p className='!italic !text-[11px] !font-light opacity-60'>(Chỉ đọc)</p>
 				</TableCell>
 			</TableRow>
 			<TableRow>
@@ -252,11 +246,7 @@ const LessonTableSkeleton = () => {
 					</Tooltip>
 				</Toolbar>
 				<TableContainer>
-					<Table
-						sx={{ minWidth: 750 }}
-						aria-labelledby='tableTitle'
-						size='small'
-					>
+					<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
 						<EnhancedTableHead />
 						<TableBody>
 							{[1, 2, 3, 4, 5].map((row, index) => {

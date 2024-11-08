@@ -93,22 +93,19 @@ interface ITeachingAssignmentTableProps {
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	const { subjectData, mutate, isFilterable, setIsFilterable } = props;
-	const { sessionToken, schoolId } = useAppContext();
+	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = useState<ITeacherAssignmentRequest[]>([]);
-	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>(
-		[]
-	);
+	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(
 		subjectData[0]?.subjectKey ?? 0
 	);
-	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] =
-		useState<boolean>(false);
+	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
 	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
-	const [applicableSubjects, setApplicableSubjects] = useState<
-		ITeachingAssignmentTableData[]
-	>([]);
+	const [applicableSubjects, setApplicableSubjects] = useState<ITeachingAssignmentTableData[]>(
+		[]
+	);
 
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
@@ -158,6 +155,8 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		await useAssignTeacher({
 			sessionToken: sessionToken,
 			formData: editingObjects,
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
 		});
 		mutate();
 		setIsEditing(false);
@@ -210,10 +209,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 							{isEditing ? (
 								<>
 									<Tooltip title='Lưu thay đổi'>
-										<IconButton
-											color='success'
-											onClick={handleConfirmUpdate}
-										>
+										<IconButton color='success' onClick={handleConfirmUpdate}>
 											<AddTaskIcon />
 										</IconButton>
 									</Tooltip>
@@ -230,9 +226,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 								<Tooltip title='Áp dụng đồng thời'>
 									<IconButton
 										id='filter-btn'
-										aria-controls={
-											isFilterable ? 'basic-menu' : undefined
-										}
+										aria-controls={isFilterable ? 'basic-menu' : undefined}
 										aria-haspopup='true'
 										aria-expanded={isFilterable ? 'true' : undefined}
 										onClick={handleMultipleApply}
@@ -244,9 +238,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 							<Tooltip title='Lọc danh sách'>
 								<IconButton
 									id='filter-btn'
-									aria-controls={
-										isFilterable ? 'basic-menu' : undefined
-									}
+									aria-controls={isFilterable ? 'basic-menu' : undefined}
 									aria-haspopup='true'
 									aria-expanded={isFilterable ? 'true' : undefined}
 									onClick={handleFilterable}
@@ -260,14 +252,20 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 						<Table aria-labelledby='tableTitle' size='small'>
 							<EnhancedTableHead />
 							<TableBody>
+								{subjectData.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={4} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Lớp học chưa áp dụng Tổ hợp
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
 								{subjectData.map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
-									const editedObject:
-										| ITeacherAssignmentRequest
-										| undefined =
-										editingObjects.find(
-											(item) => item.id === row.id
-										) ?? undefined;
+									const editedObject: ITeacherAssignmentRequest | undefined =
+										editingObjects.find((item) => item.id === row.id) ??
+										undefined;
 
 									return (
 										<TableRow
@@ -321,12 +319,11 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 														option: IDropdownOption<number>
 													) => option.value}
 													fullWidth
+													noOptionsText='Không có giáo viên phù hợp'
 													disableClearable
 													defaultValue={row.teacherName}
 													onOpen={() => {
-														handleSelectSubject(
-															row.subjectKey
-														);
+														handleSelectSubject(row.subjectKey);
 													}}
 													onBlur={() => {
 														setTeachableDropdown([]);
@@ -344,10 +341,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 													}}
 													blurOnSelect
 													renderInput={(params) => (
-														<TextField
-															{...params}
-															variant='standard'
-														/>
+														<TextField {...params} variant='standard' />
 													)}
 												/>
 											</TableCell>

@@ -18,6 +18,7 @@ import {
 	TextField,
 	Toolbar,
 	Tooltip,
+	Typography,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -29,12 +30,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
-import {
-	ILessonTableData,
-	IUpdateSubjectInGroupRequest,
-	IYearDropdownOption,
-} from '../_libs/constants';
+import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_cancel_modal';
 
 interface IClassGroupData {
@@ -53,7 +51,7 @@ const headCells: readonly HeadCell[] = [
 	{
 		id: 'id' as keyof ILessonTableData,
 		centered: true,
-		disablePadding: false,
+		disablePadding: true,
 		label: 'STT',
 	},
 	{
@@ -78,7 +76,13 @@ const headCells: readonly HeadCell[] = [
 		id: 'doubleAvailability' as keyof ILessonTableData,
 		centered: true,
 		disablePadding: false,
-		label: 'Môn học bắt buộc',
+		label: 'Môn học có tiết cặp',
+	},
+	{
+		id: 'isRequired' as keyof ILessonTableData,
+		centered: true,
+		disablePadding: false,
+		label: 'Môn học chuyên đề',
 	},
 ];
 
@@ -86,8 +90,6 @@ interface EnhancedTableProps {
 	rowCount: number;
 }
 function EnhancedTableHead(props: EnhancedTableProps) {
-	const { rowCount } = props;
-
 	return (
 		<TableHead>
 			<TableRow>
@@ -95,7 +97,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 					rowSpan={2}
 					align={headCells[0].centered ? 'center' : 'left'}
 					padding={headCells[0].disablePadding ? 'none' : 'normal'}
-					width={50}
+					width={30}
 					sx={[
 						{
 							fontWeight: 'bold',
@@ -158,9 +160,22 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 				<TableCell
 					rowSpan={2}
 					align={headCells[headCells.length - 1].centered ? 'center' : 'left'}
-					padding={
-						headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'
-					}
+					padding={headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'}
+					sx={[
+						{
+							fontWeight: 'bold',
+							borderRight: '1px solid #f0f0f0',
+							borderLeft: '1px solid #f0f0f0',
+							borderTop: '1px solid #f0f0f0',
+						},
+					]}
+				>
+					{headCells[headCells.length - 2].label}
+				</TableCell>
+				<TableCell
+					rowSpan={2}
+					align={headCells[headCells.length - 1].centered ? 'center' : 'left'}
+					padding={headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'}
 					sx={[
 						{
 							fontWeight: 'bold',
@@ -171,9 +186,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 					]}
 				>
 					{headCells[headCells.length - 1].label}
-					<p className='!italic !text-[11px] !font-light opacity-60'>
-						(Chỉ đọc)
-					</p>
+					<p className='!italic !text-[11px] !font-light opacity-60'>(Chỉ đọc)</p>
 				</TableCell>
 			</TableRow>
 			<TableRow>
@@ -206,7 +219,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Môn học có tiết cặp
+					Số tiết cặp tối thiểu
 				</TableCell>
 
 				<TableCell
@@ -238,7 +251,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Môn học có tiết cặp
+					Số tiết cặp tối thiểu
 				</TableCell>
 			</TableRow>
 		</TableHead>
@@ -247,23 +260,28 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface ILessonTableProps {
 	subjectTableData: ILessonTableData[];
-	yearData: IYearDropdownOption<number>[];
-	selectedYearId: number;
-	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
+	termData: IDropdownOption<number>[];
+	selectedSubjectGroupId: number;
 	mutator: KeyedMutator<any>;
+	selectedTermId: number;
+	setSelectedTermId: React.Dispatch<React.SetStateAction<number>>;
 }
 const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
-	const { subjectTableData, selectedYearId, setSelectedYearId, mutator, yearData } =
-		props;
+	const {
+		subjectTableData,
+		selectedSubjectGroupId,
+		mutator,
+		termData,
+		selectedTermId,
+		setSelectedTermId,
+	} = props;
 
-	const { sessionToken } = useAppContext();
+	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = React.useState<boolean>(false);
-	const [editingObjects, setEditingObjects] = React.useState<
-		IUpdateSubjectInGroupRequest[]
-	>([]);
-	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] =
-		React.useState<boolean>(false);
+	const [editingObjects, setEditingObjects] = React.useState<IUpdateSubjectInGroupRequest[]>([]);
+	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = React.useState<boolean>(false);
+	const [isVulnarable, setIsVulnarable] = React.useState<boolean>(false);
 
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const isFilterableOpen = Boolean(anchorEl);
@@ -274,15 +292,44 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		setAnchorEl(null);
 	};
 
-	const handleYearSelect = (event: SelectChangeEvent<number>) => {
-		if (setSelectedYearId) {
-			setSelectedYearId(Number(event.target.value));
+	const handleTermSelect = (event: SelectChangeEvent<number>) => {
+		setSelectedTermId(event.target.value as number);
+	};
+
+	const isValidInput = (value: IUpdateSubjectInGroupRequest): boolean => {
+		if (
+			value['sub-slot-per-week'] < 0 ||
+			value['main-slot-per-week'] < 0 ||
+			value['main-minimum-couple'] < 0 ||
+			value['sub-minimum-couple'] < 0
+		) {
+			useNotify({
+				message: 'Số tiết không thể nhỏ hơn 0',
+				type: 'error',
+			});
+			setIsVulnarable(true);
+			return false;
 		}
+		if (
+			value['sub-slot-per-week'] > 10 ||
+			value['main-slot-per-week'] > 10 ||
+			value['main-minimum-couple'] > 10 ||
+			value['sub-minimum-couple'] > 10
+		) {
+			useNotify({
+				message: 'Số tiết không thể lớn hơn 10',
+				type: 'error',
+			});
+			setIsVulnarable(true);
+			return false;
+		}
+		setIsVulnarable(false);
+		return true;
 	};
 
 	const handleUpdateLesson = (
 		target: keyof IUpdateSubjectInGroupRequest,
-		value: number | boolean,
+		value: string | boolean,
 		row: ILessonTableData
 	) => {
 		if (!isEditing) {
@@ -301,45 +348,53 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 				'is-double-period': row.isDouleSlot,
 				'main-slot-per-week': row.mainTotalSlotPerWeek,
 				'sub-slot-per-week': row.subTotalSlotPerWeek,
+				'main-minimum-couple': row.mainMinimumCouple,
+				'sub-minimum-couple': row.subMinimumCouple,
 			};
 		}
 		switch (target) {
 			case 'main-slot-per-week':
-				editingObject['main-slot-per-week'] = value as number;
-				if ((value as number) < 0) {
+				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
 						type: 'error',
 					});
 					break;
 				}
-				if ((value as number) > 10) {
-					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
-						type: 'error',
-					});
-					break;
-				}
+				editingObject['main-slot-per-week'] = Number((value as string).replace(/^0+/, ''));
 				break;
 			case 'is-double-period':
 				editingObject['is-double-period'] = value as boolean;
 				break;
 			case 'sub-slot-per-week':
-				editingObject['sub-slot-per-week'] = value as number;
-				if ((value as number) < 0) {
+				if (Number(value) < 0) {
 					useNotify({
 						message: 'Số tiết không thể nhỏ hơn 0',
 						type: 'error',
 					});
 					break;
 				}
-				if ((value as number) > 10) {
+				editingObject['sub-slot-per-week'] = Number(value);
+				break;
+			case 'main-minimum-couple':
+				if (Number(value) < 0) {
 					useNotify({
-						message: 'Số tiết không thể vượt quá 10',
+						message: 'Số tiết không thể nhỏ hơn 0',
 						type: 'error',
 					});
 					break;
 				}
+				editingObject['main-minimum-couple'] = Number((value as string).replace(/^0+/, ''));
+				break;
+			case 'sub-minimum-couple':
+				if (Number(value) < 0) {
+					useNotify({
+						message: 'Số tiết không thể nhỏ hơn 0',
+						type: 'error',
+					});
+					break;
+				}
+				editingObject['sub-minimum-couple'] = Number(value);
 				break;
 			default:
 				break;
@@ -364,6 +419,10 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	const handleConfirmUpdate = async () => {
 		await useUpdateLesson({
 			sessionToken: sessionToken,
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
+			termId: selectedTermId,
+			subjectGroupId: selectedSubjectGroupId,
 			formData: editingObjects,
 		});
 		setIsEditing(false);
@@ -402,18 +461,12 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						{isEditing && (
 							<>
 								<Tooltip title='Lưu thay đổi'>
-									<IconButton
-										color='success'
-										onClick={handleConfirmUpdate}
-									>
+									<IconButton color='success' onClick={handleConfirmUpdate}>
 										<AddTaskIcon />
 									</IconButton>
 								</Tooltip>
 								<Tooltip title='Hủy bỏ'>
-									<IconButton
-										onClick={handleConfirmCancelUpdate}
-										color='error'
-									>
+									<IconButton onClick={handleConfirmCancelUpdate} color='error'>
 										<HighlightOffIcon />
 									</IconButton>
 								</Tooltip>
@@ -422,9 +475,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						<Tooltip title='Lọc danh sách'>
 							<IconButton
 								id='filter-btn'
-								aria-controls={
-									isFilterableOpen ? 'basic-menu' : undefined
-								}
+								aria-controls={isFilterableOpen ? 'basic-menu' : undefined}
 								aria-haspopup='true'
 								aria-expanded={isFilterableOpen ? 'true' : undefined}
 								onClick={handleFilterClick}
@@ -435,18 +486,12 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					</div>
 				</Toolbar>
 				<TableContainer>
-					<Table
-						sx={{ minWidth: 750 }}
-						aria-labelledby='tableTitle'
-						size='small'
-					>
+					<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
 						<EnhancedTableHead rowCount={subjectTableData.length} />
 						<TableBody>
 							{subjectTableData.map((row, index) => {
 								const labelId = `enhanced-table-checkbox-${index}`;
-								const editedObject:
-									| IUpdateSubjectInGroupRequest
-									| undefined =
+								const editedObject: IUpdateSubjectInGroupRequest | undefined =
 									editingObjects.find(
 										(item) => item['subject-in-group-id'] === row.id
 									) ?? undefined;
@@ -458,7 +503,6 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 										tabIndex={-1}
 										key={row.id}
 										sx={[
-											{ cursor: 'pointer' },
 											editedObject !== undefined && {
 												bgcolor: '#fff0eb',
 											},
@@ -470,12 +514,30 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											scope='row'
 											padding='none'
 											align='center'
-											width={50}
+											width={30}
 										>
 											{index + 1}
 										</TableCell>
-										<TableCell align='left' width={150}>
-											{row.lessonName}
+										<TableCell
+											align='left'
+											width={150}
+											sx={{
+												color: !row.isRequiredSubject
+													? '#175b8e'
+													: '#e66030',
+											}}
+										>
+											<Tooltip
+												title={
+													row.isRequiredSubject
+														? 'Môn học bắt buộc'
+														: 'Môn học tự chọn'
+												}
+											>
+												<Typography fontSize={15}>
+													{row.lessonName}
+												</Typography>
+											</Tooltip>
 										</TableCell>
 										<TableCell align='center' width={100}>
 											<TextField
@@ -500,40 +562,86 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 												) =>
 													handleUpdateLesson(
 														'main-slot-per-week',
-														Number(event.target.value),
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
 												value={
 													!editedObject
 														? row.mainTotalSlotPerWeek
-														: editedObject[
-																'main-slot-per-week'
-														  ]
+														: editedObject['main-slot-per-week']
 												}
 												id='fullWidth'
 											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
-											<Checkbox
-												color='default'
+											<TextField
+												variant='standard'
+												type='number'
+												sx={{
+													width: '60%',
+													'& .MuiInputBase-input': {
+														textAlign: 'center',
+													},
+													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+														{
+															position: 'absolute',
+															right: '0',
+															top: '50%',
+															transform: 'translateY(-50%)',
+															zIndex: 10,
+														},
+												}}
 												onChange={(
 													event: React.ChangeEvent<HTMLInputElement>
-												) => {
+												) =>
 													handleUpdateLesson(
-														'is-double-period',
-														event.target.checked,
+														'main-minimum-couple',
+														event.target.value.replace(/^0+/, ''),
 														row
-													);
-												}}
-												checked={
-													!editedObject
-														? row.isDouleSlot
-														: editedObject['is-double-period']
+													)
 												}
-												inputProps={{
-													'aria-labelledby': labelId,
+												value={
+													!editedObject
+														? row.mainMinimumCouple
+														: editedObject['main-minimum-couple']
+												}
+												id='fullWidth'
+											/>
+										</TableCell>
+
+										<TableCell align='center' width={100}>
+											<TextField
+												variant='standard'
+												type='number'
+												sx={{
+													width: '60%',
+													'& .MuiInputBase-input': {
+														textAlign: 'center',
+													},
+													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+														{
+															position: 'absolute',
+															right: '0',
+															top: '50%',
+															zIndex: 10,
+														},
 												}}
+												onChange={(
+													event: React.ChangeEvent<HTMLInputElement>
+												) =>
+													handleUpdateLesson(
+														'sub-slot-per-week',
+														event.target.value.replace(/^0+/, ''),
+														row
+													)
+												}
+												value={
+													!editedObject
+														? row.subTotalSlotPerWeek
+														: Number(editedObject['sub-slot-per-week'])
+												}
+												id='fullWidth'
 											/>
 										</TableCell>
 										<TableCell align='center' width={100}>
@@ -557,24 +665,21 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 													event: React.ChangeEvent<HTMLInputElement>
 												) =>
 													handleUpdateLesson(
-														'sub-slot-per-week',
-														Number(event.target.value),
+														'sub-minimum-couple',
+														event.target.value.replace(/^0+/, ''),
 														row
 													)
 												}
 												value={
 													!editedObject
-														? row.subTotalSlotPerWeek
-														: Number(
-																editedObject[
-																	'sub-slot-per-week'
-																]
-														  )
+														? row.subMinimumCouple
+														: Number(editedObject['sub-minimum-couple'])
 												}
 												id='fullWidth'
 											/>
 										</TableCell>
-										<TableCell align='center' width={100}>
+
+										<TableCell align='center' width={50}>
 											<Checkbox
 												color='default'
 												onChange={(
@@ -597,10 +702,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											/>
 										</TableCell>
 										<TableCell width={50} align='center'>
-											<Checkbox
-												disabled
-												checked={row.isRequiredSubject}
-											/>
+											<Checkbox disabled checked={row.isSpecializedSubject} />
 										</TableCell>
 									</TableRow>
 								);
@@ -623,15 +725,20 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						id='demo-simple-select-filled-label'
 						className='!text-body-medium font-normal'
 					>
-						Năm học
+						Học kỳ
 					</InputLabel>
 					<Select
 						labelId='demo-simple-select-filled-label'
 						id='demo-simple-select-filled'
-						value={selectedYearId}
-						onChange={handleYearSelect}
+						value={selectedTermId}
+						onChange={(event: SelectChangeEvent<number>) => handleTermSelect(event)}
 					>
-						{yearData?.map((item, index) => (
+						{termData?.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy học kỳ
+							</MenuItem>
+						)}
+						{termData?.map((item, index) => (
 							<MenuItem key={item.value + index} value={item.value}>
 								{item.label}
 							</MenuItem>

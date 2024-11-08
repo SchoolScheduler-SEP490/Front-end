@@ -4,11 +4,13 @@ import { getFetchSubjectGroupDetailApi } from '../_libs/apis';
 interface IFetchSubjectGroupDetailProps {
 	sessionToken: string;
 	subjectGroupId: number;
+	schoolId: number;
+	schoolYearId: number;
 }
 
 const useFetchSGDetail = (props: IFetchSubjectGroupDetailProps) => {
-	const { sessionToken, subjectGroupId } = props;
-	const endpoint = getFetchSubjectGroupDetailApi({ subjectGroupId });
+	const { sessionToken, subjectGroupId, schoolId, schoolYearId } = props;
+	const endpoint = getFetchSubjectGroupDetailApi({ subjectGroupId, schoolId, schoolYearId });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {

@@ -38,16 +38,13 @@ const useFetchSGClass = ({
 		schoolYearId,
 		grade,
 	});
-	const { data, error, isValidating, mutate } = useSWR(
-		sessionToken ? endpoint : null,
-		fetcher,
-		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
-			revalidateIfStale: true,
-			shouldRetryOnError: false,
-		}
-	);
+	const { data, error, isValidating, mutate } = useSWR(sessionToken ? endpoint : null, fetcher, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: true,
+		revalidateIfStale: true,
+		shouldRetryOnError: false,
+	});
 	return { data, error, isValidating, mutate };
 };
 export default useFetchSGClass;
+// Fix done

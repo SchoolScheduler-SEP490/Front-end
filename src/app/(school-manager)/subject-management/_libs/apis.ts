@@ -1,20 +1,9 @@
 const api = process.env.NEXT_PUBLIC_API_URL;
 
-// Create Subject API
-export const getCreateSubjectApi = ({
-	localApi,
-	schoolId,
-}: {
-	localApi?: string;
-	schoolId: string;
-}): string => {
-	return `${localApi ?? api}/api/subjects/${schoolId}/subjects`;
-};
-
 // Fetch Subject API
 export const getFetchSubjectApi = ({
 	localApi,
-	schoolId,
+	schoolYearId,
 	pageSize,
 	pageIndex,
 	subjectName,
@@ -22,7 +11,7 @@ export const getFetchSubjectApi = ({
 	deletedIncluded,
 }: {
 	localApi?: string;
-	schoolId: string;
+	schoolYearId: number;
 	pageSize: number;
 	pageIndex: number;
 	subjectName?: string;
@@ -30,6 +19,7 @@ export const getFetchSubjectApi = ({
 	deletedIncluded?: boolean;
 }): string => {
 	const queryString = new URLSearchParams({
+		schoolYearIdint: schoolYearId.toString(),
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
 		...(subjectName && { subjectName: subjectName }),
@@ -38,18 +28,7 @@ export const getFetchSubjectApi = ({
 			includeDeleted: deletedIncluded.toString(),
 		}),
 	}).toString();
-	return `${localApi ?? api}/api/subjects/${schoolId}/subjects?${queryString}`;
-};
-
-// Update Subject API
-export const getUpdateSubjectApi = ({
-	localApi,
-	subjectId,
-}: {
-	localApi?: string;
-	subjectId: number;
-}): string => {
-	return `${localApi ?? api}/api/subjects/${subjectId}`;
+	return `${localApi ?? api}/api/subjects?${queryString}`;
 };
 
 export const getSubjectDetailApi = ({

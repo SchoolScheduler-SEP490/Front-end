@@ -108,16 +108,6 @@ const SubjectTableSkeleton = () => {
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 							Môn học
 						</h2>
-						<Tooltip title='Thêm Môn học'>
-							<IconButton>
-								<AddIcon />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title='Lọc danh sách'>
-							<IconButton>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip>
 					</Toolbar>
 					<TableContainer>
 						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='medium'>

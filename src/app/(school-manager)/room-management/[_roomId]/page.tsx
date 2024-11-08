@@ -21,7 +21,7 @@ export default function RoomDetails() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const roomResponse = await fetch(`${api}/api/Room/${roomId}`, {
+      const roomResponse = await fetch(`${api}/api/schools/${schoolId}/rooms/${roomId}`, {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
         },
@@ -31,10 +31,10 @@ export default function RoomDetails() {
       if (roomData.status === 200) {
         setRoomData(roomData.result);
         
-        const buildingData = await fetchBuildingName({
+        const buildingData = await fetchBuildingName(
           sessionToken,
           schoolId
-        });
+        );
         
         if (buildingData.status === 200) {
           const matchingBuilding = buildingData.result.items.find(

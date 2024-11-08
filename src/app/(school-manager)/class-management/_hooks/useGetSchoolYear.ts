@@ -2,7 +2,7 @@ import useSWR from 'swr';
 
 const useGetSchoolYear = (sessionToken: string) => {
     const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
-    const endpoint = `${api}/api/school-years`;
+    const endpoint = `${api}/api/academic-years`;
 
     const fetcher = async (url: string) => {
         const response = await fetch(url, {

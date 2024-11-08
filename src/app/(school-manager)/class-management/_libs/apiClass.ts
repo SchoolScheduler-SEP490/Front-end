@@ -4,7 +4,7 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
 //get school year code to display on table
 export const fetchSchoolYear = async (sessionToken: string) => {
-  const response = await fetch(`${api}/api/school-years`, {
+  const response = await fetch(`${api}/api/academic-years`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export const getTeacherName = async (
   schoolId: string
 ) => {
   const initialResponse = await fetch(
-    `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=1&pageIndex=1`,
+    `${api}/api/schools/${schoolId}/teachers?includeDeleted=false&pageSize=20&pageIndex=1`,
     {
       method: "GET",
       headers: {
@@ -34,7 +34,7 @@ export const getTeacherName = async (
 
   //dynamic fetching total count of teacher
   const response = await fetch(
-    `${api}/api/teachers?schoolId=${schoolId}&includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
+    `${api}/api/schools/${schoolId}/teachers?includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
     {
       method: "GET",
       headers: {
@@ -77,12 +77,14 @@ export const addClass = async (
 
 export const deleteClassById = async (
   id: number,
-  sessionToken: string
+  sessionToken: string,
+  schoolId: string,
+  schoolYearId: number
 ): Promise<void> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
   }
-  const url = `${api}/api/student-classes/${id}`;
+  const url = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/${id}`;
 
   const response = await fetch(url, {
     method: "DELETE",
@@ -99,13 +101,16 @@ export const deleteClassById = async (
 export const updateClass = async (
   id: number,
   sessionToken: string,
-  classData: IUpdateClassData
+  classData: IUpdateClassData,
+  schoolId: string,
+  schoolYearId: number
 ): Promise<boolean> => {
   if (!sessionToken) {
     console.error("Session token is not found. Please log in.");
     return false;
   }
-  const url = `${api}/api/student-classes/${id}`;
+
+  const url = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/${id}`;
   const requestBody = classData;
   console.log("Request Body:", requestBody);
 
@@ -118,6 +123,7 @@ export const updateClass = async (
       },
       body: JSON.stringify(requestBody),
     });
+
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       return false;
@@ -129,12 +135,14 @@ export const updateClass = async (
   }
 };
 
+
 export const getSubjectGroup = async (
   sessionToken: string,
-  schoolId: string
+  schoolId: string,
+  selectedSchoolYearId: number
 ) => {
     const initialResponse = await fetch(
-      `${api}/api/subject-groups?schoolId=${schoolId}&includeDeleted=false&pageIndex=1&pageSize=20`,
+      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=20`,
       {
         method: "GET",
         headers: {
@@ -146,7 +154,7 @@ export const getSubjectGroup = async (
     const initialData = await initialResponse.json();
     const totalCount = initialData.result["total-item-count"];
     const response = await fetch(
-      `${api}/api/subject-groups?schoolId=${schoolId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
+      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
       {
         method: "GET",
         headers: {

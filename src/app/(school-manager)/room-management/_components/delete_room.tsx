@@ -2,7 +2,6 @@ import React from "react";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 import ContainedButton from "@/commons/button-contained";
 import { KeyedMutator } from "swr";
-import { useAppContext } from "@/context/app_provider";
 import CloseIcon from "@mui/icons-material/Close";
 import useDeleteRoom from "../_hooks/useDeleteRoom";
 
@@ -26,15 +25,17 @@ const style = {
   
   const DeleteRoomModal = (props: DeleteConfirmationModalProps) => {
     const { open, onClose, roomName, roomId, mutate } = props;
-    const { sessionToken } = useAppContext();
+    const { deleteRoom } = useDeleteRoom();
   
     const handleClose = () => {
       onClose(false);
     };
   
     const handleDeleteRoom = async () => {
-      await useDeleteRoom({ roomId, sessionToken });
-      mutate();
+      const success = await deleteRoom(roomId);
+      if (success) {
+        mutate();
+      }
       handleClose();
     };
 

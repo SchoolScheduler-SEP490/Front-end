@@ -5,15 +5,18 @@ interface IClassDataProps {
   schoolId: string;
   pageSize: number;
   pageIndex: number;
-  schoolYearId: number;
+  selectedSchoolYearId: number;
 }
+
 const useClassData = ({
   sessionToken,
   schoolId,
   pageSize,
   pageIndex,
+  selectedSchoolYearId
 }: IClassDataProps) => {
   const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
+  
   const fetcher = async (url: string) => {
     const response = await fetch(url, {
       headers: {
@@ -27,7 +30,8 @@ const useClassData = ({
     return data;
   };
 
-  const endpoint = `${api}/api/student-classes?schoolId=${schoolId}&schoolYearId=1&includeDeleted=false&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+  const endpoint = `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes?includeDeleted=false&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+
   const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,
     fetcher,
@@ -37,6 +41,8 @@ const useClassData = ({
       revalidateIfStale: true,
     }
   );
+
   return { data, error, isValidating, mutate };
 };
+
 export default useClassData;

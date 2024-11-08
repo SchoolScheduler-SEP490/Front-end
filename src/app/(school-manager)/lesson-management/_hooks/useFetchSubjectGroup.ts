@@ -21,8 +21,8 @@ const useFetchSGSidenav = (props: IFetchSubjectGroupBodyProps) => {
 
 	const { data, mutate, error, isLoading, isValidating } = useSWR(endpoint, fetcher, {
 		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateOnReconnect: false,
+		revalidateIfStale: false,
 		shouldRetryOnError: false,
 	});
 

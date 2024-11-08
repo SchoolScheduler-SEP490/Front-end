@@ -5,6 +5,7 @@ import { KeyedMutator } from 'swr';
 import useDeleteTeacher from '../_hooks/useDeleteTeacher';
 import { useAppContext } from '@/context/app_provider';
 import CloseIcon from '@mui/icons-material/Close';
+import { deleteTeacherById } from '../_libs/apiTeacher';
 
 const style = {
 	position: 'absolute',
@@ -26,14 +27,14 @@ interface DeleteConfirmationModalProps {
 
 const DeleteTeacherModal = (props: DeleteConfirmationModalProps) => {
   const { open, onClose, teacherName, teacherId, mutate } = props;
-  const { sessionToken } = useAppContext();
+  const { sessionToken, schoolId } = useAppContext();
 
   const handleClose = () => {
     onClose(false);
   };
 
   const handleDeleteTeacher = async () => {
-    await useDeleteTeacher({teacherId, sessionToken});
+    await deleteTeacherById(teacherId, sessionToken, schoolId);
     mutate();
     handleClose();
   };

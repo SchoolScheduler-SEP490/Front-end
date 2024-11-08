@@ -18,10 +18,8 @@ export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) =
 		deletedIncluded,
 	} = props;
 	const queryString = new URLSearchParams({
-		schoolId: schoolId,
 		pageSize: pageSize.toString(),
 		pageIndex: pageIndex.toString(),
-		schoolYearId: schoolYearId.toString(),
 		...(grade !== undefined && { grade: grade.toString() }),
 		...(subjectGroupId !== undefined && {
 			subjectGroupId: subjectGroupId.toString(),
@@ -30,7 +28,9 @@ export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) =
 			includeDeleted: deletedIncluded.toString(),
 		}),
 	}).toString();
-	return `${localApi ?? api}/api/subject-groups?${queryString}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups?${queryString}`;
 };
 
 // Fetch term API
@@ -48,39 +48,55 @@ export const getFetchTermApi = ({
 export const getCreateSubjectGroupApi = ({
 	localApi,
 	schoolId,
+	schoolYearId,
 }: {
 	localApi?: string;
-	schoolId: string;
+	schoolId: number;
+	schoolYearId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups?schoolId=${schoolId}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups`;
 };
 
 // Update Subject Group API
 export const getUpdateSubjectGroupApi = ({
 	localApi,
 	subjectGroupId,
+	schoolId,
+	schoolYearId,
 }: {
 	localApi?: string;
 	subjectGroupId: number;
+	schoolId: number;
+	schoolYearId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
 };
 
 // Update Subject Group API
 export const getDeleteSubjectGroupApi = ({
 	localApi,
 	subjectGroupId,
+	schoolId,
+	schoolYearId,
 }: {
 	localApi?: string;
 	subjectGroupId: number;
+	schoolId: number;
+	schoolYearId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
 };
 
 // Fetch Subject Option API
 export const getFetchSubjectOptionsApi = ({
 	localApi,
-	schoolId,
+	schoolYearId,
 	pageSize,
 	pageIndex,
 	subjectName,
@@ -88,37 +104,40 @@ export const getFetchSubjectOptionsApi = ({
 	deletedIncluded,
 }: {
 	localApi?: string;
-	schoolId: string;
-	pageSize?: number;
-	pageIndex?: number;
+	schoolYearId: number;
+	pageSize: number;
+	pageIndex: number;
 	subjectName?: string;
-	isRequired: boolean;
+	isRequired?: boolean;
 	deletedIncluded?: boolean;
 }): string => {
 	const queryString = new URLSearchParams({
-		pageSize: pageSize ? pageSize.toString() : '100',
-		pageIndex: pageIndex ? pageIndex.toString() : '1',
+		schoolYearIdint: schoolYearId.toString(),
+		pageSize: pageSize.toString(),
+		pageIndex: pageIndex.toString(),
 		...(subjectName && { subjectName: subjectName }),
 		...(isRequired !== undefined && { isRequired: isRequired.toString() }),
 		...(deletedIncluded !== undefined && {
 			includeDeleted: deletedIncluded.toString(),
 		}),
 	}).toString();
-	return `${localApi ?? api}/api/subjects/${schoolId}/subjects?${queryString}`;
-};
-
-export const getFetchSchoolYearApi = (localApi?: string) => {
-	return `${localApi ?? api}/api/school-years`;
+	return `${localApi ?? api}/api/subjects?${queryString}`;
 };
 
 export const getFetchSubjectGroupDetailApi = ({
 	localApi,
 	subjectGroupId,
+	schoolId,
+	schoolYearId,
 }: {
 	localApi?: string;
 	subjectGroupId: number;
+	schoolId: number;
+	schoolYearId: number;
 }) => {
-	return `${localApi ?? api}/api/subject-groups/${subjectGroupId}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
 };
 
 export const getFetchClassApi = ({
@@ -139,17 +158,27 @@ export const getFetchClassApi = ({
 	grade: string;
 }) => {
 	const queryString = new URLSearchParams({
-		pageSize: pageSize ? pageSize.toString() : '100',
+		pageSize: pageSize ? pageSize.toString() : '1000',
 		pageIndex: pageIndex ? pageIndex.toString() : '1',
-		schoolId: schoolId,
-		schoolYearId: schoolYearId.toString(),
 		includeDeleted: includeDeleted.toString(),
 		grade: grade,
 	}).toString();
 
-	return `${localApi ?? api}/api/student-classes?${queryString}`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?${queryString}`;
 };
 
-export const getApplySubjectGroupApi = (localApi?: string) => {
-	return `${localApi ?? api}/api/student-classes/assign-subject-group`;
+export const getApplySubjectGroupApi = ({
+	localApi,
+	schoolId,
+	schoolYearId,
+}: {
+	localApi?: string;
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/assign-subject-group`;
 };
