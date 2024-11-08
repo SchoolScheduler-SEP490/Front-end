@@ -101,7 +101,7 @@ export default function SMTeachingAssignment() {
 
 	useEffect(() => {
 		if (termData?.status === 200) {
-			const termInYear: ITermResponse[] = termData.result.filter(
+			const termInYear: ITermResponse[] = termData.result.items.filter(
 				(term: ITermResponse) => term['school-year-id'] === selectedSchoolYearId
 			);
 			if (termInYear.length > 0) {
