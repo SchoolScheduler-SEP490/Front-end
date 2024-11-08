@@ -36,7 +36,7 @@ interface UpdateTeacherFormProps {
 }
 const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const { open, onClose, teacherId, mutate } = props;
-  const { sessionToken, schoolId } = useAppContext();
+ const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editTeacher, isUpdating } = useUpdateTeacher(mutate);
   const [oldData, setOldData] = useState<IUpdateTeacherRequestBody>(
@@ -92,7 +92,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
 
   useEffect(() => {
     const fetchTeacherById = async () => {
-      const response = await fetch(`${api}/api/teachers/${teacherId}`, {
+      const response = await fetch(`${api}/api/schools/${schoolId}/teachers/${teacherId}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${sessionToken}`,
@@ -126,7 +126,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     }
 
     const loadSubjects = async () => {
-      const subjectData = await getSubjectName(sessionToken, schoolId);
+      const subjectData = await getSubjectName(sessionToken, selectedSchoolYearId);
       if (subjectData?.status === 200) {
         setSubjects(subjectData.result.items);
         console.log("Subjects loaded:", subjectData.result.items);

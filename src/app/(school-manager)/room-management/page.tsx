@@ -42,11 +42,8 @@ export default function SMRoom() {
   React.useEffect(() => {
     const getBuildingData = async () => {
       try {
-        const buildingData = await fetchBuildingName({
-          sessionToken,
-          schoolId,
-        });
-
+        const buildingData = await fetchBuildingName(sessionToken, schoolId);
+  
         if (buildingData?.status === 200) {
           const buildings = buildingData.result.items;
           const newBuildingMap = new Map();
@@ -60,7 +57,7 @@ export default function SMRoom() {
       }
     };
     getBuildingData();
-  }, [sessionToken, schoolId]);
+  }, [sessionToken, schoolId]);  
 
   React.useEffect(() => {
     if (data?.status === 200) {

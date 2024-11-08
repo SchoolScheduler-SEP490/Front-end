@@ -27,15 +27,18 @@ interface DeleteConfirmationModalProps {
 const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
   const { open, onClose, className, classId, mutate } = props;
   const { sessionToken } = useAppContext();
+  const { deleteClass } = useDeleteClass();
 
   const handleClose = () => {
     onClose(false);
   };
 
   const handleDeleteClass = async () => {
-    await useDeleteClass({ classId, sessionToken });
-    mutate();
-    handleClose();
+    const success = await deleteClass(classId);
+    if (success) {
+      mutate();
+      handleClose();
+    }
   };
 
   return (

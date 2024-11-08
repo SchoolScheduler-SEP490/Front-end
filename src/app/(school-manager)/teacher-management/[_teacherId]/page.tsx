@@ -10,7 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function TeacherDetails() {
   const [teacherData, setTeacherData] = useState<ITeacherDetail>();
-  const { sessionToken } = useAppContext();
+  const { sessionToken, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const searchParams = useSearchParams();
   const teacherId = searchParams.get('id');
@@ -18,7 +18,7 @@ export default function TeacherDetails() {
 
   useEffect(() => {
     const fetchTeacherDetails = async () => {      
-      const response = await fetch(`${api}/api/teachers/${teacherId}`, {
+      const response = await fetch(`${api}/api/schools/${schoolId}/teachers/${teacherId}`, {
         headers: {
           Authorization: `Bearer ${sessionToken}`,
         },

@@ -5,7 +5,7 @@ import { IUpdateTeacherRequestBody } from "../_libs/constants";
 
 export function useUpdateTeacher(mutate: () => void) {
   const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-  const { sessionToken } = useAppContext();
+  const { sessionToken, schoolId } = useAppContext();
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
@@ -15,10 +15,7 @@ export function useUpdateTeacher(mutate: () => void) {
       if (!sessionToken) {
         throw new Error('Session token not found. Please log in.');
       }
-      const success = await updateTeacher(api, teacherId, sessionToken, {
-        ...teacherData,
-        "school-id": 2555
-      });
+      const success = await updateTeacher(api, teacherId, sessionToken, schoolId, teacherData);
       if (success) {
         mutate();
       }
@@ -34,3 +31,4 @@ export function useUpdateTeacher(mutate: () => void) {
 
   return { editTeacher, isUpdating, updateError };
 }
+

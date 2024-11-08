@@ -2,29 +2,27 @@ import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
-  export const deleteTeacherById = async (
-    api: string,
-    id: number,
-    sessionToken: string
-  ): Promise<void> => {
-    if (!sessionToken) {
-      throw new Error('Session token not found. Please log in.');
-    }
+export const deleteTeacherById = async (
+  id: number,
+  sessionToken: string,
+  schoolId: string
+): Promise<void> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/schools/${schoolId}/teachers/${id}`;
 
-    const url = `${api}/api/teachers/${id}`;
-
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`,
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  };
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+};
 
   export const addTeacher = async (
     api: string,
@@ -37,7 +35,7 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
       return false;
     }
   
-    const url = `${api}/api/teachers/${schoolId}/teachers`;
+    const url = `${api}/api/schools/${schoolId}/teachers`;
     const requestBody = [teacherData];
     console.log('Request Body:', requestBody);
   
@@ -61,17 +59,18 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
     api: string,
     id: number,
     sessionToken: string,
+    schoolId: string,
     teacherData: IUpdateTeacherRequestBody,
   ): Promise<boolean> => {
     if (!sessionToken) {
       console.error('Session token is not found. Please log in.');
       return false;
     }
-
-    const url = `${api}/api/teachers/${id}`;
+  
+    const url = `${api}/api/schools/${schoolId}/teachers/${id}`;
     const requestBody = teacherData;
     console.log('Request Body:', requestBody);
-
+  
     try {
       const response = await fetch(url, {
         method: 'PUT',
@@ -81,25 +80,25 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
         },
         body: JSON.stringify(requestBody),
       });
-
+  
       if (!response.ok) {
         console.error(`HTTP error! status: ${response.status}`);
         return false;
       }
-
+  
       return true;
     } catch (error) {
       console.error("Error occurred while sending request:", error);
       return false;
     }
-}
+  }  
 
 export const getDepartmentName = async (
   schoolId: string,
   sessionToken: string
 ) => {
   const initialResponse = await fetch(
-    `${api}/api/Department?schoolId=${schoolId}&pageIndex=1&pageSize=20`,
+    `${api}/api/schools/${schoolId}/departments?pageIndex=1&pageSize=20`,
     {
       method: 'GET',
       headers: {
@@ -111,7 +110,7 @@ export const getDepartmentName = async (
   const initialData = await initialResponse.json();
   const totalCount = initialData.result["total-item-count"];
   const response = await fetch(
-    `${api}/api/Department?schoolId=${schoolId}&pageIndex=1&pageSize=${totalCount}`,
+    `${api}/api/schools/${schoolId}/departments?pageIndex=1&pageSize=${totalCount}`,
     {
       method: 'GET',
       headers: {
@@ -126,10 +125,10 @@ export const getDepartmentName = async (
 
 export const getSubjectName = async (
   sessionToken: string,
-  schoolId: string
+  schoolYearId: number
 ) => {
   const initialResponse = await fetch(
-    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=1&pageIndex=1`,
+    `${api}/api/subjects?schoolYearIdint=${schoolYearId}&includeDeleted=false&pageIndex=1&pageSize=20`,
     {
       method: "GET",
       headers: {
@@ -142,7 +141,7 @@ export const getSubjectName = async (
   const totalCount = initialData.result["total-item-count"];
 
   const response = await fetch(
-    `${api}/api/subjects/${schoolId}/subjects?includeDeleted=false&pageSize=${totalCount}&pageIndex=1`,
+    `${api}/api/subjects?schoolYearIdint=${schoolYearId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
     {
       method: "GET",
       headers: {

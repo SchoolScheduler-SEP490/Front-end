@@ -46,7 +46,7 @@ const MenuProps = {
 
 const AddTeacherModal = (props: AddTeacherFormProps) => {
   const { open, onClose, mutate } = props;
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
 
@@ -62,7 +62,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
 
   React.useEffect(() => {
     const loadSubjects = async () => {
-      const data = await getSubjectName(sessionToken, schoolId);
+      const data = await getSubjectName(sessionToken, selectedSchoolYearId);
       if (data.result?.items) {
         setSubjects(data.result.items);
       }
@@ -344,7 +344,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Môn học áp dụng
+                    Dạy môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
@@ -381,6 +381,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                         },
                       }}
                     >
+                      <MenuItem value="">--Chọn môn học--</MenuItem>
                       {subjects.map((subject) => (
                         <MenuItem key={subject.id} value={subject.abbreviation}>
                           {`${subject["subject-name"]} - ${subject.abbreviation}`}

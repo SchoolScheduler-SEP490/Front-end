@@ -25,6 +25,11 @@ export const teacherSchema = yup.object().shape({
     .matches(/^[0-9]+$/, 'Số điện thoại chỉ được chứa số.')
     .min(10, 'Số điện thoại phải có đúng 10 số.')
     .max(10, 'Số điện thoại phải có đúng 10 số.'),
+
+    ['subjects-abreviation']: yup
+    .array()
+    .min(1, 'Vui lòng chọn ít nhất một môn học.')
+    .required('Vui lòng chọn môn học.'),
 });
 
 export const updateTeacherSchema = yup.object().shape({
@@ -52,4 +57,6 @@ export const updateTeacherSchema = yup.object().shape({
     .matches(/^[0-9]+$/, 'Số điện thoại chỉ được chứa số.')
     .min(10, 'Số điện thoại phải có đúng 10 số.')
     .max(10, 'Số điện thoại phải có đúng 10 số.'),
+
+    ['subjects-abreviation']: yup.array().required('Vui lòng chọn môn học.'),
 })
