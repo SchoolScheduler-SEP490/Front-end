@@ -1,9 +1,9 @@
 'use client';
 import fetchWithToken from '@/hooks/fetchWithToken';
 import useNotify from '@/hooks/useNotify';
-import useRefreshToken from '@/hooks/useRefreshToken';
+import { useRouter } from 'next/navigation';
 import { createContext, useContext, useMemo, useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 
 const AppContext = createContext({
 	sessionToken: '',
@@ -19,6 +19,7 @@ const AppContext = createContext({
 	selectedSchoolYearId: 0,
 	setSelectedSchoolYearId: (selectedSchoolYearId: number) => {},
 	refresher: () => {},
+	logout: async (): Promise<any> => {},
 });
 export const useAppContext = () => {
 	const context = useContext(AppContext);
@@ -51,10 +52,11 @@ export default function AppProvider({
 	const [schoolName, setSchoolName] = useState(initSchoolName);
 	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState(initSelectedSchoolYearId);
 	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
+	const router = useRouter();
 
 	const handleLogout = async () => {
 		if (sessionToken) {
-			await fetch(`${serverApi}/api/logout`, {
+			const data = await fetch(`${serverApi}/api/logout`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -69,7 +71,15 @@ export default function AppProvider({
 					setSchoolName('');
 					setSelectedSchoolYearId(0);
 				}
+				return res.json();
 			});
+			if (data || !data) {
+				router.replace('/');
+				useNotify({
+					message: 'Đã đăng xuất',
+					type: 'success',
+				});
+			}
 		}
 	};
 
@@ -126,6 +136,7 @@ export default function AppProvider({
 				refresher,
 				selectedSchoolYearId,
 				setSelectedSchoolYearId,
+				logout: handleLogout,
 			}}
 		>
 			{children}
