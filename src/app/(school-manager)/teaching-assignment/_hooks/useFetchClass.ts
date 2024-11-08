@@ -40,7 +40,8 @@ const useFetchClassData = ({
 		{
 			revalidateOnFocus: false,
 			revalidateOnReconnect: true,
-			revalidateIfStale: true,
+			revalidateIfStale: false,
+			shouldRetryOnError: false,
 		}
 	);
 	return { data, error, isValidating, isLoading, mutate };

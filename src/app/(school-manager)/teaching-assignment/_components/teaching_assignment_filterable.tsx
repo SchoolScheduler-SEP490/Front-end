@@ -19,24 +19,12 @@ interface ITeachingAssignmentFilterableProps {
 	setOpen: (open: boolean) => void;
 	selectedTermId: number;
 	setSelectedTermId: React.Dispatch<React.SetStateAction<number>>;
-	selectedYearId: number;
-	setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
 	mutate?: KeyedMutator<any>;
 	termStudyOptions: IDropdownOption<number>[];
-	yearStudyOptions: IDropdownOption<number>[];
 }
 
 const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps) => {
-	const {
-		open,
-		setOpen,
-		selectedTermId,
-		setSelectedTermId,
-		selectedYearId,
-		setSelectedYearId,
-		termStudyOptions,
-		yearStudyOptions,
-	} = props;
+	const { open, setOpen, selectedTermId, setSelectedTermId, termStudyOptions } = props;
 
 	const handleClose = () => {
 		setOpen(false);
@@ -45,11 +33,6 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 	const handleTermSelect = (event: SelectChangeEvent<number>) => {
 		if (setSelectedTermId) {
 			setSelectedTermId(Number(event.target.value));
-		}
-	};
-	const handleYearSelect = (event: SelectChangeEvent<number>) => {
-		if (setSelectedYearId) {
-			setSelectedYearId(Number(event.target.value));
 		}
 	};
 
@@ -78,26 +61,6 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 						id='demo-simple-select-filled-label'
 						className='!text-body-xlarge font-normal'
 					>
-						Năm học
-					</InputLabel>
-					<Select
-						labelId='demo-simple-select-filled-label'
-						id='demo-simple-select-filled'
-						value={selectedYearId}
-						onChange={handleYearSelect}
-					>
-						{yearStudyOptions.map((item, index) => (
-							<MenuItem key={item.value + index} value={item.value}>
-								{item.label}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-				<FormControl fullWidth variant='filled' sx={{ m: 1, minWidth: 120 }}>
-					<InputLabel
-						id='demo-simple-select-filled-label'
-						className='!text-body-xlarge font-normal'
-					>
 						Học kỳ
 					</InputLabel>
 					<Select
@@ -106,6 +69,11 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 						value={selectedTermId}
 						onChange={handleTermSelect}
 					>
+						{termStudyOptions?.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy học kỳ
+							</MenuItem>
+						)}
 						{termStudyOptions.map((item, index) => (
 							<MenuItem key={item.value + index} value={item.value}>
 								{item.label}

@@ -1,5 +1,3 @@
-import { StyledString } from 'next/dist/build/swc';
-
 export interface INavigation {
 	name: string;
 	url: string;
@@ -66,6 +64,17 @@ export interface ISchoolYearResponse {
 	'start-year': string;
 	'end-year': string;
 	'school-year-code': string;
+}
+
+export interface ITermResponse {
+	id: number;
+	name: string;
+	'start-week': number;
+	'end-week': number;
+	'school-year-id': number;
+	'school-year-code': string;
+	'school-year-start': string;
+	'school-year-end': string;
 }
 
 export const SUBJECT_GROUP_TYPE: { key: string; value: number }[] = [

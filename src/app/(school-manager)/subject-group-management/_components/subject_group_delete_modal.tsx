@@ -28,14 +28,18 @@ interface ISubjectDeleteModalProps {
 
 const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 	const { open, setOpen, subjectGroupName, subjectGroupId, mutate } = props;
-	const { sessionToken } = useAppContext();
+	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const handleClose = () => {
 		setOpen(false);
 	};
 
 	const handleDeleteSubject = async () => {
-		const endpoint = getDeleteSubjectGroupApi({ subjectGroupId });
+		const endpoint = getDeleteSubjectGroupApi({
+			subjectGroupId,
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
+		});
 		// Neeeds updating
 		const response = await fetch(endpoint, {
 			method: 'DELETE',

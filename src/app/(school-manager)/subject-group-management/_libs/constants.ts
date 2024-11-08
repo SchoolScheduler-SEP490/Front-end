@@ -82,7 +82,7 @@ export interface ISubjectGroupDetailResponse {
 	'subject-selective-views': ISubjectInGroup[];
 	'subject-specializedt-views': ISubjectInGroup[];
 	'subject-required-views': ISubjectInGroup[];
-	'student-class-views': any[];
+	'student-class-views': { 'student-class-name': string }[];
 	'subject-group-type-name': string | null;
 	'school-year-id': number;
 	'school-year': string;

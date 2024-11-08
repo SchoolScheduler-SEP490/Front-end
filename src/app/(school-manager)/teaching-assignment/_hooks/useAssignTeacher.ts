@@ -6,12 +6,14 @@ import { getAssignTeacherApi } from '../_libs/apis';
 
 interface IUpdateSubjectProps {
 	sessionToken: string;
+	schoolId: number;
+	schoolYearId: number;
 	formData: ITeacherAssignmentRequest[];
 }
 
 const useAssignTeacher = async (props: IUpdateSubjectProps) => {
-	const { formData, sessionToken } = props;
-	const endpoint = getAssignTeacherApi();
+	const { formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getAssignTeacherApi({ schoolId, schoolYearId });
 	let response;
 
 	async function assignTeacher(url: string) {

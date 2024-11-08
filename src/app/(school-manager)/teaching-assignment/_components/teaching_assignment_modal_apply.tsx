@@ -29,8 +29,6 @@ interface IApplyModalProps {
 const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 	const { open, setOpen, applicableSubjects } = props;
 
-	const [selectedSubjects, setSelectedSubjects] = React.useState<number[]>([]);
-
 	const handleClose = () => {
 		setOpen(false);
 		// setIsSelecting(false);

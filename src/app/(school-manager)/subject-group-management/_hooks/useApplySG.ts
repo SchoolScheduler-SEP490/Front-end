@@ -6,12 +6,14 @@ import { IApplySubjectGroupRequest } from '../_libs/constants';
 
 interface IUpdateSubjectProps {
 	sessionToken: string;
+	schoolId: number;
+	schoolYearId: number;
 	formData: IApplySubjectGroupRequest;
 }
 
 const useApplySubjectGroup = async (props: IUpdateSubjectProps) => {
-	const { formData, sessionToken } = props;
-	const endpoint = getApplySubjectGroupApi();
+	const { formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getApplySubjectGroupApi({ schoolId, schoolYearId });
 	let response;
 
 	async function updateSubject(url: string) {
