@@ -28,11 +28,6 @@ export interface ISubjectGroupSidenavData {
 	items: { key: string; value: number }[];
 }
 
-export interface IYearDropdownOption<T> {
-	value: T;
-	label: string;
-}
-
 export interface ISchoolYearResponse {
 	id: number;
 	'start-year': string;
@@ -44,9 +39,10 @@ export interface ILessonTableData {
 	id: number;
 	lessonName: string;
 	mainTotalSlotPerWeek: number;
-	isDouleSlot: boolean;
+	mainMinimumCouple: number;
 	subTotalSlotPerWeek: number;
-	subIsDouleSlot: boolean;
+	subMinimumCouple: number;
+	isDouleSlot: boolean;
 	isRequiredSubject: boolean;
 }
 
@@ -70,11 +66,12 @@ export interface ISubjectInGroup {
 	id: number;
 	'subject-name': string;
 	abbreviation: string;
+	'subject-in-group-type': number;
 	'is-required': boolean;
 	description: string;
 	'main-slot-per-week': number;
 	'sub-slot-per-week': number;
-	'tootal-slot-per-week': number;
+	'total-slot-per-week': number;
 	'is-specialized': boolean;
 	'is-double-period': boolean;
 	'slot-per-term': number;
@@ -90,4 +87,6 @@ export interface IUpdateSubjectInGroupRequest {
 	'sub-slot-per-week': number;
 	'slot-per-term'?: number;
 	'is-double-period': boolean;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }
