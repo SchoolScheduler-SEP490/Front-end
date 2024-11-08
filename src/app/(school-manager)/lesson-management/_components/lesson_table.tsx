@@ -85,7 +85,6 @@ const headCells: readonly HeadCell[] = [
 		label: 'Môn học chuyên đề',
 	},
 ];
-
 interface EnhancedTableProps {
 	rowCount: number;
 }
@@ -257,7 +256,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 		</TableHead>
 	);
 }
-
 interface ILessonTableProps {
 	subjectTableData: ILessonTableData[];
 	termData: IDropdownOption<number>[];
@@ -489,6 +487,15 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
 						<EnhancedTableHead rowCount={subjectTableData.length} />
 						<TableBody>
+							{subjectTableData?.length === 0 && (
+								<TableRow>
+									<TableCell colSpan={8} align='center'>
+										<h1 className='text-body-large-strong italic text-basic-gray'>
+											Tổ hợp không có dữ liệu
+										</h1>
+									</TableCell>
+								</TableRow>
+							)}
 							{subjectTableData.map((row, index) => {
 								const labelId = `enhanced-table-checkbox-${index}`;
 								const editedObject: IUpdateSubjectInGroupRequest | undefined =
@@ -522,9 +529,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											align='left'
 											width={150}
 											sx={{
-												color: !row.isRequiredSubject
-													? '#175b8e'
-													: '#e66030',
+												color: !row.isRequiredSubject ? '#175b8e' : 'black',
 											}}
 										>
 											<Tooltip

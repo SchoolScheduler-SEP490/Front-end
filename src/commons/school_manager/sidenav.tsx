@@ -72,8 +72,8 @@ const SMSidenav = () => {
 			},
 			body: JSON.stringify({ sessionToken }),
 		}).then(async (res) => {
-			router.replace('/');
 			const data = await res.json();
+			router.replace('/');
 			setSessionToken('');
 			setRefreshToken('');
 			setUserRole('');

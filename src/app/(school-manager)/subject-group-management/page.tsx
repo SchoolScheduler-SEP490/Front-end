@@ -81,7 +81,7 @@ export default function SMSubject() {
 				type: 'error',
 			});
 		}
-	}, [error]);
+	}, [isValidating]);
 
 	React.useEffect(() => {
 		mutate({ schoolYearId: selectedSchoolYearId });

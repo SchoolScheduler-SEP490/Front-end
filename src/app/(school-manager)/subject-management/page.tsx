@@ -20,7 +20,7 @@ export default function SMSubject() {
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
 	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
 	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
-	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
+	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(true);
 
 	const { data, isValidating, error, mutate } = useFetchData({
 		sessionToken: sessionToken,
@@ -35,6 +35,7 @@ export default function SMSubject() {
 	};
 
 	React.useEffect(() => {
+		setSubjectTableData([]);
 		mutate();
 		setIsErrorShown(false);
 		if (data?.status === 200) {
@@ -52,17 +53,17 @@ export default function SMSubject() {
 			);
 			setSubjectTableData(tableData);
 		}
-	}, [data]);
+	}, [data, selectedSchoolYearId]);
 
 	React.useEffect(() => {
 		if (error && !isErrorShown) {
-			setIsErrorShown(true);
 			useNotify({
 				message: TRANSLATOR[error?.message] ?? error?.message ?? 'Có lỗi xảy ra',
 				type: 'error',
 			});
+			setIsErrorShown(true);
 		}
-	}, [error]);
+	}, [isValidating]);
 
 	React.useEffect(() => {
 		setPage((prev: number) => Math.min(prev, getMaxPage() - 1));
@@ -76,7 +77,6 @@ export default function SMSubject() {
 
 	React.useEffect(() => {
 		mutate({ schoolYearId: selectedSchoolYearId });
-		setIsErrorShown(false);
 	}, [selectedSchoolYearId]);
 
 	if (isValidating) {

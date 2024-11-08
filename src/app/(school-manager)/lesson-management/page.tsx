@@ -55,13 +55,19 @@ export default function SMLesson() {
 		schoolYearId: selectedSchoolYearId,
 		subjectGroupId: selectedSubjectGroup,
 	});
-	const { data: termData, error: termError } = useFetchTerm({
+	const {
+		data: termData,
+		error: termError,
+		mutate: updateTerm,
+		isValidating: isTermValidating,
+	} = useFetchTerm({
 		pageIndex: 1,
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
 	});
 
 	useEffect(() => {
+		setSubjectGroup([]);
 		updateSubjectGroup();
 		if (subjectGroupData?.status === 200) {
 			const tmpData: ISubjectGroupSidenavData[] = useSidenavDataConverter(
@@ -71,11 +77,11 @@ export default function SMLesson() {
 				setSubjectGroup(tmpData);
 				setSelectedSubjectGroup(tmpData[0].items[0].value);
 			}
-			setIsErrorShown(false);
 		}
 	}, [subjectGroupData]);
 
 	useEffect(() => {
+		setLessonTableData([]);
 		updateSubjectGroupTable();
 		if (subjectGroupTableResponse?.status === 200) {
 			var tmpSpecializedData: { name: string; id: number }[] = [];
@@ -133,7 +139,6 @@ export default function SMLesson() {
 				'lessonName'
 			);
 			setLessonTableData(optimizedData);
-			setIsErrorShown(false);
 		}
 	}, [subjectGroupTableResponse, selectedTermId]);
 
@@ -147,12 +152,17 @@ export default function SMLesson() {
 			);
 			setTermDropdownData(termStudyOptions);
 			setSelectedTermId(termStudyOptions[0].value);
-			setIsErrorShown(false);
 		}
-	}, [termData]);
+	}, [termData, selectedSchoolYearId]);
 
 	useEffect(() => {
+		setTermDropdownData([]);
+		setLessonTableData([]);
+		setSelectedTermId(0);
 		updateSubjectGroup({ schoolYearId: selectedSchoolYearId });
+		updateTerm({ schoolYearId: selectedSchoolYearId });
+		updateSubjectGroupTable({ schoolYearId: selectedSchoolYearId });
+		setIsErrorShown(false);
 	}, [selectedSchoolYearId]);
 
 	useEffect(() => {
@@ -165,9 +175,7 @@ export default function SMLesson() {
 					type: 'error',
 				});
 				setIsErrorShown(true);
-			}
-
-			if (termError) {
+			} else if (termError) {
 				useNotify({
 					message:
 						TRANSLATOR[termError?.message] ?? 'Chưa có dữ liệu môn học cho năm học',
@@ -176,7 +184,7 @@ export default function SMLesson() {
 				setIsErrorShown(true);
 			}
 		}
-	}, [subjectGroupError, termError, subjectTableError]);
+	}, [isSubjectGroupValidating, isSubjectGroupTableValidating, isTermValidating]);
 
 	// Loading components
 	if (isSubjectGroupValidating || isSubjectGroupTableValidating) {

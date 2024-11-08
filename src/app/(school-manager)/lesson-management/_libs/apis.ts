@@ -1,4 +1,3 @@
-import { StringSchema } from 'yup';
 import { IFetchSubjectGroupBodyProps } from './constants';
 
 const api = process.env.NEXT_PUBLIC_API_URL;
