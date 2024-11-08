@@ -344,7 +344,8 @@ const AddRoomModal = (props: AddRoomFormProps) => {
                 </Grid>
               </Grid>
             </Grid>
-
+            
+            {formik.values["room-type"] === "PRACTICE_ROOM" && (
             <Grid item xs={12}>
               <Grid container spacing={2}>
                 <Grid
@@ -406,6 +407,7 @@ const AddRoomModal = (props: AddRoomFormProps) => {
                 </Grid>
               </Grid>
             </Grid>
+            )}
           </Grid>
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
