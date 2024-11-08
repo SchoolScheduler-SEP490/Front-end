@@ -11,7 +11,7 @@ const useDeleteTeacher = async ({ teacherId, sessionToken, schoolId }: IDeleteTe
   const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 
   try {
-    await deleteTeacherById(api, teacherId, schoolId, sessionToken);
+    await deleteTeacherById(teacherId, schoolId, sessionToken);
     console.log(`Successfully deleted teacher with ID: ${teacherId}`);
     useNotify({
       message: 'Xóa giáo viên thành công',

@@ -2,30 +2,27 @@ import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
-  export const deleteTeacherById = async (
-    api: string,
-    id: number,
-    schoolId: string,
-    sessionToken: string
-  ): Promise<void> => {
-    if (!sessionToken) {
-      throw new Error('Session token not found. Please log in.');
-    }
+export const deleteTeacherById = async (
+  id: number,
+  sessionToken: string,
+  schoolId: string
+): Promise<void> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/schools/${schoolId}/teachers/${id}`;
 
-    const url = `${api}/api/schools/${schoolId}/teachers/${id}`;
-
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${sessionToken}`,
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  };
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+};
 
   export const addTeacher = async (
     api: string,
