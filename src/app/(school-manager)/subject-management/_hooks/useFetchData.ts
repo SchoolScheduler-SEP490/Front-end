@@ -1,12 +1,9 @@
 import useSWR from 'swr';
 import { getFetchSubjectApi } from '../_libs/apis';
-import { revalidateEvents } from 'swr/_internal';
-import useNotify from '@/hooks/useNotify';
-import { TRANSLATOR } from '@/utils/dictionary';
 
 interface IFetcherProps {
 	sessionToken: string;
-	schoolId: string;
+	schoolYearId: number;
 	pageSize: number;
 	pageIndex: number;
 	subjectName?: string;
@@ -17,7 +14,7 @@ interface IFetcherProps {
 const useFetchData = (props: IFetcherProps) => {
 	const {
 		sessionToken,
-		schoolId,
+		schoolYearId,
 		pageSize,
 		pageIndex,
 		subjectName,
@@ -25,7 +22,7 @@ const useFetchData = (props: IFetcherProps) => {
 		deletedIncluded,
 	} = props;
 	const endpoint = getFetchSubjectApi({
-		schoolId,
+		schoolYearId,
 		pageSize,
 		pageIndex,
 		subjectName,
@@ -50,6 +47,7 @@ const useFetchData = (props: IFetcherProps) => {
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
+		revalidateOnMount: false,
 		shouldRetryOnError: false,
 	});
 

@@ -22,7 +22,7 @@ interface ISubjectDetailsProps {
 
 const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 	const { open, setOpen, subjectGroupId } = props;
-	const { sessionToken } = useAppContext();
+	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 	const [subjectGroupDetails, setSubjectDetails] = useState<ISubjectGroupDetailResponse | null>(
 		null
 	);
@@ -30,6 +30,8 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 	const { data, mutate } = useFetchSGDetail({
 		sessionToken,
 		subjectGroupId,
+		schoolId: Number(schoolId),
+		schoolYearId: selectedSchoolYearId,
 	});
 
 	const handleClose = () => {
@@ -151,18 +153,19 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 							))}
 						</ul>
 					)}
-					{subjectGroupDetails?.['subject-selective-views'].length === 0 && (
-						<h2 className='text-body-small italic opacity-80'>
-							Tổ hợp chưa áp dụng môn tự chọn
-						</h2>
-					)}
+					{subjectGroupDetails?.['subject-selective-views'] &&
+						subjectGroupDetails?.['subject-selective-views'].length === 0 && (
+							<h2 className='text-body-small italic opacity-80'>
+								Tổ hợp chưa áp dụng môn tự chọn
+							</h2>
+						)}
 				</div>
 				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Môn bắt buộc</h4>
-					{subjectGroupDetails?.['subject-required-views'] ? (
+					<h4 className='text-body-small text-basic-gray'>Môn chuyên đề</h4>
+					{subjectGroupDetails?.['subject-specializedt-views'] ? (
 						<ul className='list-disc pl-6 w-full'>
 							{useFilterArray(
-								subjectGroupDetails?.['subject-required-views'],
+								subjectGroupDetails?.['subject-specializedt-views'],
 								'subject-name'
 							).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
@@ -189,11 +192,12 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 							))}
 						</ul>
 					)}
-					{subjectGroupDetails?.['subject-required-views'].length === 0 && (
-						<h2 className='text-body-small italic opacity-80'>
-							Tổ hợp chưa áp dụng môn bắt buộc
-						</h2>
-					)}
+					{subjectGroupDetails?.['subject-specializedt-views'] &&
+						subjectGroupDetails?.['subject-specializedt-views'].length === 0 && (
+							<h2 className='text-body-small italic opacity-80'>
+								Tổ hợp chưa áp dụng môn chuyên đề
+							</h2>
+						)}
 				</div>
 				<div className='w-full flex flex-col justify-start items-start'>
 					<h4 className='text-body-small text-basic-gray'>Mô tả</h4>

@@ -288,6 +288,11 @@ export const LoginForm = () => {
 						}}
 						sx={{ width: '100%', fontSize: '1.000rem' }}
 					>
+						{schoolYearIdOptions?.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy năm học
+							</MenuItem>
+						)}
 						{schoolYearIdOptions.map((item, index) => (
 							<MenuItem key={item.label + index} value={item.value}>
 								<Checkbox

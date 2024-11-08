@@ -5,14 +5,15 @@ import { getCreateSubjectGroupApi } from '../_libs/apis';
 import { ICreateSubjectGroupRequest } from '../_libs/constants';
 
 interface ICreateSubjectProps {
-	schoolId: string;
+	schoolId: number;
+	schoolYearId: number;
 	sessionToken: string;
 	formData: ICreateSubjectGroupRequest;
 }
 
 const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {
-	const { schoolId, formData, sessionToken } = props;
-	const endpoint = getCreateSubjectGroupApi({ schoolId });
+	const { schoolId, formData, sessionToken, schoolYearId } = props;
+	const endpoint = getCreateSubjectGroupApi({ schoolId, schoolYearId });
 	let response;
 
 	async function createSubject(url: string) {

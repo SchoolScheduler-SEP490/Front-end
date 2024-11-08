@@ -147,7 +147,6 @@ interface ISubjectGroupTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
-	selectedYearId: number;
 	selectedSubjectGroupId: number;
 	setSelectedSubjectGroupId: React.Dispatch<React.SetStateAction<number>>;
 	isOpenViewDetails: boolean;
@@ -176,7 +175,6 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		mutate,
 		isFilterable,
 		setIsFilterable,
-		selectedYearId,
 		selectedSubjectGroupId,
 		setSelectedSubjectGroupId,
 		isOpenViewDetails,
@@ -300,6 +298,15 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 								rowCount={subjectGroupTableData.length}
 							/>
 							<TableBody>
+								{visibleRows.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={6} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Tổ hợp chưa có dữ liệu
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
 								{visibleRows.map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -461,7 +468,6 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 				open={iApplyModalOpen}
 				setOpen={setIApplyModalOpen}
 				grade={selectedRow?.grade.toString() ?? '0'}
-				schoolYearId={selectedYearId}
 				subjectGroupName={selectedRow?.subjectGroupName ?? 'Không xác định'}
 				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
 			/>
