@@ -6,7 +6,7 @@ export interface ITeacherTableData {
 	subjectDepartment: string;
 	email: string;
 	phoneNumber: string;
-	status: string;
+	status: number;
 }
 //Teacher response data
 export interface ITeacher {

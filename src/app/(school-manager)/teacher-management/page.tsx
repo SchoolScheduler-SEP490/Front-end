@@ -8,6 +8,7 @@ import TeacherTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
 import { ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
+import { TEACHER_STATUS } from "@/utils/constants";
 
 export default function SMTeacher() {
   const [page, setPage] = React.useState<number>(0);
@@ -45,7 +46,7 @@ export default function SMTeacher() {
           subjectDepartment: item["department-name"],
           email: item.email,
           phoneNumber: item.phone || "N/A",
-          status: item.status === 1 ? "Hoạt động" : "Vô hiệu",
+          status: item.status,
         })
       );
       setTeacherTableData(teacherData);

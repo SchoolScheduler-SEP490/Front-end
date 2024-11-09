@@ -112,3 +112,20 @@ export const ROOM_TYPE_TRANSLATOR: { [key: string]: string } = {
 	PRACTICE_ROOM: 'Phòng thực hành',
 	LECTURE_ROOM: 'Phòng học lý thuyết',
 };
+
+export const TEACHER_STATUS: { key: string; value: number }[] = [
+	{key: 'HoatDong', value: 1},
+	{key: 'CongTac', value: 2},
+	{key: 'HauSan', value: 3},
+	{key: 'DinhChi', value: 4},
+	{key: 'NgungHoatDong', value: 5},
+
+]
+
+export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
+	1: 'Hoạt động',
+	2: 'Công tác',
+	3: 'Hậu sản',
+	4: 'Định chỉ',
+	5: 'Ngừng hoạt động',
+  };
