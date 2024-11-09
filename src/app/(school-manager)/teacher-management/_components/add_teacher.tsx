@@ -24,6 +24,7 @@ import { useAppContext } from "@/context/app_provider";
 import { IAddTeacherData, IDepartment, ISubject } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
 import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
+import { TEACHER_STATUS, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
 
 //Add new teacher form
 interface AddTeacherFormProps {
@@ -108,8 +109,8 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       handleFormSubmit({
         ...formData,
         "subjects-abreviation": Array.isArray(formData["subjects-abreviation"])
-        ? formData["subjects-abreviation"]
-        : [formData["subjects-abreviation"]],
+          ? formData["subjects-abreviation"]
+          : [formData["subjects-abreviation"]],
       });
     },
   });
@@ -321,7 +322,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                           key={department["department-code"]}
                           value={department["department-code"]}
                         >
-                          {department.name} 
+                          {department.name}
                         </MenuItem>
                       ))}
                     </Select>
@@ -488,8 +489,11 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     >
-                      <MenuItem value="Active">Hoạt động</MenuItem>
-                      <MenuItem value="Inactive">Vô hiệu</MenuItem>
+                      {TEACHER_STATUS.map((status) => (
+                        <MenuItem key={status.value} value={status.value}>
+                          {TEACHER_STATUS_TRANSLATOR[status.value]}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

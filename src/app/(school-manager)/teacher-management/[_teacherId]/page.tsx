@@ -7,6 +7,7 @@ import SMHeader from "@/commons/school_manager/header";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconButton } from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
 
 export default function TeacherDetails() {
   const [teacherData, setTeacherData] = useState<ITeacherDetail>();
@@ -83,7 +84,7 @@ export default function TeacherDetails() {
               <div>
                 <p><strong>Vai trò:</strong> {teacherData["teacher-role"] === "Role1" ? "Giáo viên" : "Trưởng bộ môn"}</p>
                 <p><strong>Tổ bộ môn:</strong> {teacherData["department-name"]}</p>
-                <p><strong>Trạng thái:</strong> {teacherData.status === 1 ? "Hoạt động" : "Vô hiệu"}</p>
+                <p><strong>Trạng thái:</strong> {TEACHER_STATUS_TRANSLATOR[teacherData.status]}</p>
               </div>
             </div>
           </div>
