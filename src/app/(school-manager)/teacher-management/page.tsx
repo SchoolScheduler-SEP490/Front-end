@@ -13,7 +13,7 @@ import { TEACHER_STATUS } from "@/utils/constants";
 export default function SMTeacher() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 
   const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
@@ -33,6 +33,10 @@ export default function SMTeacher() {
     if (totalRows === 0) return 1;
     return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
   };
+
+  React.useEffect(() => {
+		mutate({ schoolYearId: selectedSchoolYearId });
+	}, [selectedSchoolYearId]);
 
   React.useEffect(() => {
     mutate();

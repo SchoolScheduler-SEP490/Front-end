@@ -14,7 +14,7 @@ import { ERoomType, ROOM_TYPE_TRANSLATOR } from "@/utils/constants";
 export default function SMRoom() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [buildingMap, setBuildingMap] = React.useState<Map<number, string>>(
     new Map()
   );
@@ -37,6 +37,10 @@ export default function SMRoom() {
     if (totalRows === 0) return 1;
     return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
   };
+
+  React.useEffect(() => {
+		mutate({ schoolYearId: selectedSchoolYearId });
+	}, [selectedSchoolYearId]);
 
   // Fetch building data
   React.useEffect(() => {

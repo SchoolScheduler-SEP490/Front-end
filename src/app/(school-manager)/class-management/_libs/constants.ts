@@ -86,3 +86,21 @@ export interface ISchoolYear {
   "end-year": string;
   "school-year-code": string;
 }
+
+export interface ITeacherAssignment {
+  "term-id": number,
+  "term-name": string,
+  "teacher-id": number,
+  "teacher-first-name": string,
+  "teacher-last-name": string,
+  "total-period": number,
+  "start-week": number,
+  "end-week": number
+}
+
+export interface ISubjectAssignment {
+  "subject-id": number;
+  "subject-name": string;
+  "assignment-details": ITeacherAssignment[];
+  "total-slot-in-year": number;
+}

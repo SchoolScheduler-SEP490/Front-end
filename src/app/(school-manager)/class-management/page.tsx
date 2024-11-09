@@ -11,6 +11,7 @@ import useNotify from "@/hooks/useNotify";
 import { fetchSchoolYear } from "./_libs/apiClass";
 import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 import ClassFilterable from "./_components/class_filterable";
+import { TRANSLATOR } from "@/utils/dictionary";
 
 export default function SMClass() {
   const [page, setPage] = React.useState<number>(0);
@@ -18,14 +19,14 @@ export default function SMClass() {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [currentSchoolYear, setCurrentSchoolYear] = React.useState<string>("");
   const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
-  const [selectedYearId, setSelectedYearId] = React.useState<number>(1);
+  const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
   const { data, error, isValidating, mutate } = useClassData({
     sessionToken,
     schoolId,
     pageSize: rowsPerPage,
     pageIndex: page + 1,
-    selectedSchoolYearId
+    schoolYearId: selectedSchoolYearId,
   });
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
     undefined
@@ -40,8 +41,8 @@ export default function SMClass() {
   };
 
 	React.useEffect(() => {
-		mutate({ schoolYearId: selectedYearId });
-	}, [selectedYearId]);
+		mutate({ schoolYearId: selectedSchoolYearId });
+	}, [selectedSchoolYearId]);
 
   React.useEffect(() => {
     const getSchoolYear = async () => {
@@ -81,6 +82,16 @@ export default function SMClass() {
       mutate();
     }
   }, [page, rowsPerPage]);
+
+  React.useEffect(() => {
+		if (error && !isErrorShown) {
+			setIsErrorShown(true);
+			useNotify({
+				message: TRANSLATOR[error?.message] ?? 'Lớp học chưa có dữ liệu.',
+				type: 'error',
+			});
+		}
+	}, [isValidating]);
 
   if (isValidating) {
     return (
@@ -130,12 +141,12 @@ export default function SMClass() {
           setIsFilterable={setIsFilterable}
           mutate={mutate}
         />
-        <ClassFilterable
+        {/* <ClassFilterable
           open={isFilterable}
           setOpen={setIsFilterable}
-          selectedYearId={selectedYearId}
-          setSelectedYearId={setSelectedYearId}
-        />
+          selectedYearId={selectedSchoolYearId}
+          setSelectedYearId={selectedSchoolYearId}
+        /> */}
       </div>
     </div>
   );
