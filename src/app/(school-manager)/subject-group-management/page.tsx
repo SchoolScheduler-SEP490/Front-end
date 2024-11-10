@@ -98,8 +98,14 @@ export default function SMSubject() {
 						</h3>
 					</div>
 				</SMHeader>
-				<div className='w-[100%] h-[85%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
-					<SubjectGroupTableSkeleton />
+				<div
+					className={`w-full h-full flex flex-row ${
+						false ? 'justify-start items-start' : 'justify-center items-center'
+					} pl-[1.5vw] gap-[1vw]`}
+				>
+					<div className='w-[70%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
+						<SubjectGroupTableSkeleton />
+					</div>
 				</div>
 			</div>
 		);

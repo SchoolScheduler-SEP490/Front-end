@@ -28,10 +28,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 		setAnchorEl(null);
 	};
 
-	const handleMenuItemClick = async (
-		event: React.MouseEvent<HTMLElement>,
-		selectedId: number
-	) => {
+	const handleUpdateYear = async (selectedId: number) => {
 		setAnchorEl(null);
 		const res = await fetch('/api/school', {
 			method: 'POST',
@@ -46,10 +43,17 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 	};
 
 	useEffect(() => {
-		mutate();
 		if (data?.status === 200) {
 			const options: IDropdownOption<number>[] = data.result.map(
 				(item: ISchoolYearResponse) => {
+					const currentYear = new Date().getFullYear();
+					if (
+						parseInt(item['start-year']) <= currentYear &&
+						parseInt(item['end-year']) >= currentYear &&
+						!selectedSchoolYearId
+					) {
+						handleUpdateYear(item.id);
+					}
 					if (item.id === selectedSchoolYearId) {
 						setSelectedSchoolYear({
 							label: `${item['start-year']} - ${item['end-year']}`,
@@ -112,7 +116,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 						{schoolYearOptions.map((option, index) => (
 							<MenuItem
 								key={option.label + index}
-								onClick={(event) => handleMenuItemClick(event, option.value)}
+								onClick={() => handleUpdateYear(option.value)}
 								sx={
 									option.value === selectedSchoolYearId
 										? { backgroundColor: '#E0E0E0' }

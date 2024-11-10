@@ -80,6 +80,8 @@ export interface ISubjectInGroup {
 	'total-slot-in-year': number;
 	'slot-specialized': number;
 	'subject-group-type': string;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }
 
 export interface IUpdateSubjectInGroupRequest {

@@ -28,18 +28,19 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
-import * as React from 'react';
+import { ChangeEvent, Dispatch, FC, MouseEvent, SetStateAction, useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_cancel_modal';
 
-interface IClassGroupData {
-	classGroupName: string;
-	classes: string[];
+interface ISumObject {
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }
-
 interface HeadCell {
 	disablePadding: boolean;
 	id: keyof ILessonTableData;
@@ -86,9 +87,10 @@ const headCells: readonly HeadCell[] = [
 	},
 ];
 interface EnhancedTableProps {
-	rowCount: number;
+	totalSlot: ISumObject;
 }
 function EnhancedTableHead(props: EnhancedTableProps) {
+	const { totalSlot } = props;
 	return (
 		<TableHead>
 			<TableRow>
@@ -202,7 +204,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Tổng số tiết mỗi tuần
+					Tổng số tiết mỗi tuần{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['main-slot-per-week'] > 30 ? 'error' : 'black'}
+					>
+						({totalSlot?.['main-slot-per-week'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -218,7 +227,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Số tiết cặp tối thiểu
+					Số tiết cặp tối thiểu{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['main-minimum-couple'] > 12 ? 'error' : 'black'}
+					>
+						({totalSlot?.['main-minimum-couple'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -234,7 +250,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Tổng số tiết mỗi tuần
+					Tổng số tiết mỗi tuần{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['sub-slot-per-week'] > 30 ? 'error' : 'black'}
+					>
+						({totalSlot?.['sub-slot-per-week'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -250,7 +273,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Số tiết cặp tối thiểu
+					Số tiết cặp tối thiểu{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['sub-minimum-couple'] > 12 ? 'error' : 'black'}
+					>
+						({totalSlot?.['sub-minimum-couple'] ?? 0})
+					</Typography>
 				</TableCell>
 			</TableRow>
 		</TableHead>
@@ -262,9 +292,9 @@ interface ILessonTableProps {
 	selectedSubjectGroupId: number;
 	mutator: KeyedMutator<any>;
 	selectedTermId: number;
-	setSelectedTermId: React.Dispatch<React.SetStateAction<number>>;
+	setSelectedTermId: Dispatch<SetStateAction<number>>;
 }
-const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
+const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	const {
 		subjectTableData,
 		selectedSubjectGroupId,
@@ -276,14 +306,21 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
-	const [isEditing, setIsEditing] = React.useState<boolean>(false);
-	const [editingObjects, setEditingObjects] = React.useState<IUpdateSubjectInGroupRequest[]>([]);
-	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = React.useState<boolean>(false);
-	const [isVulnarable, setIsVulnarable] = React.useState<boolean>(false);
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [editingObjects, setEditingObjects] = useState<IUpdateSubjectInGroupRequest[]>([]);
+	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
+	const [vulnarableIndexes, setVulnarableIndexes] = useState<number[]>([]);
+	const [sumObject, setSumObject] = useState<ISumObject>({
+		'main-slot-per-week': 0,
+		'sub-slot-per-week': 0,
+		'main-minimum-couple': 0,
+		'sub-minimum-couple': 0,
+	});
+	const [isValidTotal, setIsValidTotal] = useState<boolean>(false);
 
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const isFilterableOpen = Boolean(anchorEl);
-	const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleFilterClick = (event: MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 	const handleClose = () => {
@@ -294,36 +331,94 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		setSelectedTermId(event.target.value as number);
 	};
 
-	const isValidInput = (value: IUpdateSubjectInGroupRequest): boolean => {
-		if (
-			value['sub-slot-per-week'] < 0 ||
-			value['main-slot-per-week'] < 0 ||
-			value['main-minimum-couple'] < 0 ||
-			value['sub-minimum-couple'] < 0
-		) {
-			useNotify({
-				message: 'Số tiết không thể nhỏ hơn 0',
-				type: 'error',
+	useEffect(() => {
+		// Kiểm tra điều kiện của từng môn học
+		if (editingObjects.length !== 0) {
+			editingObjects.map((obj) => {
+				var isVulnerableObj = false;
+				// Nào có tiết đôi thì minimum couple k để trống
+				if (obj['is-double-period']) {
+					if (obj['main-minimum-couple'] === 0 && obj['sub-minimum-couple'] === 0) {
+						isVulnerableObj = true;
+						useNotify({
+							message: 'Môn học có tiết cặp cần có ít nhất 1 tiết cặp tối thiểu',
+							type: 'error',
+						});
+					}
+				}
+
+				// Số cặp tối thiểu < số tiết trên tuần /2
+				if (
+					obj['main-minimum-couple'] > obj['main-slot-per-week'] / 2 ||
+					obj['sub-minimum-couple'] > obj['sub-slot-per-week'] / 2
+				) {
+					isVulnerableObj = true;
+					useNotify({
+						message: 'Số tiết cặp tối thiểu không vượt quá nửa số tiết mỗi tuần',
+						type: 'error',
+					});
+				}
+
+				// Số tiết trên tuần không vượt quá 10 tiết
+				if (obj['main-slot-per-week'] > 10 || obj['sub-slot-per-week'] > 10) {
+					isVulnerableObj = true;
+
+					useNotify({
+						message: 'Số tiết trên tuần không vượt quá 10 tiết',
+						type: 'error',
+					});
+				}
+
+				if (isVulnerableObj) {
+					setVulnarableIndexes((prev) => [...prev, obj['subject-in-group-id']]);
+				} else {
+					setVulnarableIndexes((prev) =>
+						prev.filter((item) => item !== obj['subject-in-group-id'])
+					);
+				}
 			});
-			setIsVulnarable(true);
-			return false;
+
+			// Tiết học thì k quá 30 tiết / buổi / tuần
+			if (sumObject['main-slot-per-week'] > 30 || sumObject['sub-slot-per-week'] > 30) {
+				useNotify({
+					message: 'Tổng số tiết trên tuần không vượt quá 30 tiết',
+					type: 'error',
+				});
+			}
+
+			// Tổng số cặp / buổi / tuần < 12
+			if (sumObject['main-minimum-couple'] > 30 || sumObject['sub-minimum-couple'] > 12) {
+				useNotify({
+					message: 'Tổng số cặp tối thiểu không vượt quá 12 cặp',
+					type: 'error',
+				});
+			}
+			setIsValidTotal(
+				!(sumObject['main-slot-per-week'] > 30) &&
+					!(sumObject['sub-slot-per-week'] > 30) &&
+					!(sumObject['main-minimum-couple'] > 30) &&
+					!(sumObject['sub-minimum-couple'] > 12)
+			);
 		}
-		if (
-			value['sub-slot-per-week'] > 10 ||
-			value['main-slot-per-week'] > 10 ||
-			value['main-minimum-couple'] > 10 ||
-			value['sub-minimum-couple'] > 10
-		) {
-			useNotify({
-				message: 'Số tiết không thể lớn hơn 10',
-				type: 'error',
+	}, [editingObjects]);
+
+	useEffect(() => {
+		if (subjectTableData.length > 0) {
+			var totalSlot: ISumObject = {
+				'main-slot-per-week': 0,
+				'sub-slot-per-week': 0,
+				'main-minimum-couple': 0,
+				'sub-minimum-couple': 0,
+			};
+			subjectTableData.map((item) => {
+				totalSlot['main-slot-per-week'] += item.mainTotalSlotPerWeek;
+				totalSlot['sub-slot-per-week'] += item.subTotalSlotPerWeek;
+				totalSlot['main-minimum-couple'] += item.mainMinimumCouple;
+				totalSlot['sub-minimum-couple'] += item.subMinimumCouple;
 			});
-			setIsVulnarable(true);
-			return false;
+			setSumObject(totalSlot);
 		}
-		setIsVulnarable(false);
-		return true;
-	};
+	}, [subjectTableData]);
 
 	const handleUpdateLesson = (
 		target: keyof IUpdateSubjectInGroupRequest,
@@ -350,57 +445,36 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 				'sub-minimum-couple': row.subMinimumCouple,
 			};
 		}
-		switch (target) {
-			case 'main-slot-per-week':
-				if (Number(value) < 0) {
-					useNotify({
-						message: 'Số tiết không thể nhỏ hơn 0',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['main-slot-per-week'] = Number((value as string).replace(/^0+/, ''));
-				break;
-			case 'is-double-period':
-				editingObject['is-double-period'] = value as boolean;
-				break;
-			case 'sub-slot-per-week':
-				if (Number(value) < 0) {
-					useNotify({
-						message: 'Số tiết không thể nhỏ hơn 0',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['sub-slot-per-week'] = Number(value);
-				break;
-			case 'main-minimum-couple':
-				if (Number(value) < 0) {
-					useNotify({
-						message: 'Số tiết không thể nhỏ hơn 0',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['main-minimum-couple'] = Number((value as string).replace(/^0+/, ''));
-				break;
-			case 'sub-minimum-couple':
-				if (Number(value) < 0) {
-					useNotify({
-						message: 'Số tiết không thể nhỏ hơn 0',
-						type: 'error',
-					});
-					break;
-				}
-				editingObject['sub-minimum-couple'] = Number(value);
-				break;
-			default:
-				break;
+
+		// Assign data
+		if (typeof value === 'string') {
+			if (Number(value) < 0) {
+				useNotify({
+					message: 'Số tiết không thể nhỏ hơn 0',
+					type: 'error',
+				});
+			} else {
+				// Lưu giá trị cũ của editingObject vào một biến tạm
+				const previousValue = (editingObject as any)[target] ?? 0;
+
+				// Cập nhật giá trị mới cho editingObject
+				(editingObject as any)[target] = Number(value as string);
+
+				// Cập nhật sum dựa trên giá trị cũ của editingObject
+				setSumObject((prev: ISumObject) => ({
+					...prev,
+					[target]:
+						((prev as any)[target] ?? 0) + Number(value as string) - previousValue,
+				}));
+			}
+		} else if (typeof value === 'boolean') {
+			(editingObject as any)[target] = value as boolean;
 		}
 		const newEditingObjects = useFilterArray(
 			[...editingObjects, editingObject],
 			'subject-in-group-id'
 		);
+
 		setEditingObjects(newEditingObjects);
 	};
 
@@ -458,8 +532,18 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
 						{isEditing && (
 							<>
-								<Tooltip title='Lưu thay đổi'>
-									<IconButton color='success' onClick={handleConfirmUpdate}>
+								<Tooltip
+									title={
+										vulnarableIndexes.length > 0 && isValidTotal
+											? 'Sửa lỗi trước khi lưu thay đổi'
+											: 'Lưu thay đổi'
+									}
+								>
+									<IconButton
+										color='success'
+										onClick={handleConfirmUpdate}
+										disabled={!isValidTotal || vulnarableIndexes.length > 0}
+									>
 										<AddTaskIcon />
 									</IconButton>
 								</Tooltip>
@@ -485,7 +569,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 				</Toolbar>
 				<TableContainer>
 					<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
-						<EnhancedTableHead rowCount={subjectTableData.length} />
+						<EnhancedTableHead totalSlot={sumObject} />
 						<TableBody>
 							{subjectTableData?.length === 0 && (
 								<TableRow>
@@ -511,7 +595,11 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 										key={row.id}
 										sx={[
 											editedObject !== undefined && {
-												bgcolor: '#fff0eb',
+												bgcolor: vulnarableIndexes.includes(
+													editedObject['subject-in-group-id']
+												)
+													? 'rgba(245, 75, 75, .2)'
+													: '#edf1f5',
 											},
 										]}
 									>
@@ -562,9 +650,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(
-													event: React.ChangeEvent<HTMLInputElement>
-												) =>
+												onChange={(event: ChangeEvent<HTMLInputElement>) =>
 													handleUpdateLesson(
 														'main-slot-per-week',
 														event.target.value.replace(/^0+/, ''),
@@ -597,9 +683,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(
-													event: React.ChangeEvent<HTMLInputElement>
-												) =>
+												onChange={(event: ChangeEvent<HTMLInputElement>) =>
 													handleUpdateLesson(
 														'main-minimum-couple',
 														event.target.value.replace(/^0+/, ''),
@@ -632,9 +716,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(
-													event: React.ChangeEvent<HTMLInputElement>
-												) =>
+												onChange={(event: ChangeEvent<HTMLInputElement>) =>
 													handleUpdateLesson(
 														'sub-slot-per-week',
 														event.target.value.replace(/^0+/, ''),
@@ -666,9 +748,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(
-													event: React.ChangeEvent<HTMLInputElement>
-												) =>
+												onChange={(event: ChangeEvent<HTMLInputElement>) =>
 													handleUpdateLesson(
 														'sub-minimum-couple',
 														event.target.value.replace(/^0+/, ''),
@@ -688,7 +768,7 @@ const LessonTable: React.FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											<Checkbox
 												color='default'
 												onChange={(
-													event: React.ChangeEvent<HTMLInputElement>
+													event: ChangeEvent<HTMLInputElement>
 												) => {
 													handleUpdateLesson(
 														'is-double-period',

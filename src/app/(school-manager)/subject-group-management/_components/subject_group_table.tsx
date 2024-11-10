@@ -4,7 +4,7 @@ import useNotify from '@/hooks/useNotify';
 import { CLASSGROUP_STRING_TYPE, ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Chip, Menu, MenuItem, Stack, Toolbar, Tooltip } from '@mui/material';
+import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -21,10 +21,10 @@ import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ISubjectGroupTableData } from '../_libs/constants';
-import CreateSubjectGroupModal from './subject_group_create_modal';
-import DeleteSubjectGroupModal from './subject_group_delete_modal';
 import UpdateSubjectGroupModal from './subject-group_update_modal';
 import ApplySubjectGroupModal from './subject_group_apply_modal';
+import CreateSubjectGroupModal from './subject_group_create_modal';
+import DeleteSubjectGroupModal from './subject_group_delete_modal';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -438,6 +438,10 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 					<TablePagination
 						rowsPerPageOptions={[5, 10, 25]}
 						component='div'
+						labelRowsPerPage='Số hàng'
+						labelDisplayedRows={({ from, to, count }) =>
+							`${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+						}
 						count={totalRows ?? subjectGroupTableData.length}
 						rowsPerPage={rowsPerPage}
 						page={page}
