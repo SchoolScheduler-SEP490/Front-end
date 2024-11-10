@@ -77,6 +77,11 @@ const headCells: readonly HeadCell[] = [
     label: "Tên bộ môn",
   },
   {
+    id: "teachableSubjects" as keyof ITeacherTableData,
+    centered: false,
+    label: "Dạy môn",
+  },
+  {
     id: "email" as keyof ITeacherTableData,
     centered: false,
     label: "Email",
@@ -319,6 +324,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
                     <TableCell align="left">{row.teacherName}</TableCell>
                     <TableCell align="left">{row.nameAbbreviation}</TableCell>
                     <TableCell align="left">{row.subjectDepartment}</TableCell>
+                    <TableCell align="left">{row.teachableSubjects}</TableCell>
                     <TableCell align="left">{row.email}</TableCell>
                     <TableCell align="left">{row.phoneNumber}</TableCell>
                     <TableCell align="left">
