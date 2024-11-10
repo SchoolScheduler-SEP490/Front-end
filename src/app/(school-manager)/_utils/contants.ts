@@ -35,6 +35,11 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				icon: '/images/icons/stack.png',
 			},
 			{
+				name: 'Tổ bộ môn',
+				url: '/department-management',
+				icon: '/images/icons/book.png',
+			},
+			{
 				name: 'Tiết học',
 				url: '/lesson-management',
 				icon: '/images/icons/open-book.png',
