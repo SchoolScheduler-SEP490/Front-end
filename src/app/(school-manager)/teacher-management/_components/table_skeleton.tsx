@@ -50,6 +50,11 @@ const headCells: readonly HeadCell[] = [
     label: "Tên bộ môn",
   },
   {
+    id: "teachableSubjects" as keyof ITeacherTableData,
+    centered: false,
+    label: "Dạy môn",
+  },
+  {
     id: "email" as keyof ITeacherTableData,
     centered: false,
     label: "Email",
@@ -148,6 +153,9 @@ const TeacherTableSkeleton = () => {
                         padding="normal"
                         align="left"
                       >
+                        <Skeleton animation="wave" variant="text" />
+                      </TableCell>
+                      <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
                       <TableCell align="left">
