@@ -27,6 +27,7 @@ import { updateTeacherSchema } from "../_libs/teacher_schema";
 import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
+import { TEACHER_STATUS, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
 
 interface UpdateTeacherFormProps {
   open: boolean;
@@ -502,8 +503,11 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                       }
                       onBlur={formik.handleBlur}
                     >
-                      <MenuItem value="1">Hoạt động</MenuItem>
-                      <MenuItem value="2">Vô hiệu</MenuItem>
+                      {TEACHER_STATUS.map((status) => (
+                        <MenuItem key={status.value} value={status.value}>
+                          {TEACHER_STATUS_TRANSLATOR[status.value]}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

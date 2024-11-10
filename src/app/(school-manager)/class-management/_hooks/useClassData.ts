@@ -5,7 +5,7 @@ interface IClassDataProps {
   schoolId: string;
   pageSize: number;
   pageIndex: number;
-  selectedSchoolYearId: number;
+  schoolYearId: number;
 }
 
 const useClassData = ({
@@ -13,7 +13,7 @@ const useClassData = ({
   schoolId,
   pageSize,
   pageIndex,
-  selectedSchoolYearId
+  schoolYearId
 }: IClassDataProps) => {
   const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
@@ -30,7 +30,7 @@ const useClassData = ({
     return data;
   };
 
-  const endpoint = `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes?includeDeleted=false&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+  const endpoint = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?includeDeleted=false&pageIndex=${pageIndex}&pageSize=${pageSize}`;
 
   const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,

@@ -74,6 +74,11 @@ const headCells: readonly HeadCell[] = [
     centered: true,
   },
   {
+    id: "subjectGroup" as keyof IClassTableData,
+    label: "Tổ hợp môn",
+    centered: false,
+  },
+  {
     id: "schoolYear" as keyof IClassTableData,
     label: "Năm học",
     centered: true,
@@ -296,6 +301,15 @@ const ClassTable = (props: IClassTableProps) => {
                 rowCount={classTableData.length}
               />
               <TableBody>
+              {visibleRows.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={6} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Lớp học chưa có dữ liệu
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
                 {visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
@@ -325,6 +339,9 @@ const ClassTable = (props: IClassTableProps) => {
                       </TableCell>
                       <TableCell align="center">
                         {row.homeroomTeacherName}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.subjectGroup}
                       </TableCell>
                       <TableCell align="center">{row.schoolYear}</TableCell>
                       <TableCell align="center">{row.mainSession}</TableCell>
@@ -400,6 +417,10 @@ const ClassTable = (props: IClassTableProps) => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
+            labelRowsPerPage='Số hàng'
+            labelDisplayedRows={({from, to, count}) => 
+                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            }
             count={totalRows ?? classTableData.length}
             rowsPerPage={rowsPerPage}
             page={page}

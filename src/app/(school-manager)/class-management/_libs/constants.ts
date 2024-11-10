@@ -5,6 +5,7 @@ export interface IClassTableData {
   homeroomTeacherName: string;
   schoolYear: string;
   mainSession: string;
+  subjectGroup: string;
 }
 export interface IClass {
   id: number;
@@ -13,6 +14,7 @@ export interface IClass {
   "homeroom-teacher-name": string;
   "school-year-code"?: string;
   "main-session-text": string;
+  "subject-group-name": string;
 }
 export interface ISchoolYear {
   id: number;
@@ -85,4 +87,22 @@ export interface ISchoolYear {
   "start-year": string;
   "end-year": string;
   "school-year-code": string;
+}
+
+export interface ITeacherAssignment {
+  "term-id": number,
+  "term-name": string,
+  "teacher-id": number,
+  "teacher-first-name": string,
+  "teacher-last-name": string,
+  "total-period": number,
+  "start-week": number,
+  "end-week": number
+}
+
+export interface ISubjectAssignment {
+  "subject-id": number;
+  "subject-name": string;
+  "assignment-details": ITeacherAssignment[];
+  "total-slot-in-year": number;
 }

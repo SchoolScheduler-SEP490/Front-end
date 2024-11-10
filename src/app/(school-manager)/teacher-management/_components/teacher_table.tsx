@@ -22,7 +22,7 @@ import { ITeacherTableData } from "../_libs/constants";
 import DeleteConfirmationModal from "./delete_teacher";
 import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
-import { ICommonOption } from "@/utils/constants";
+import { ICommonOption, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
 import UpdateTeacherModal from "./update_teacher";
 import { KeyedMutator } from "swr";
 import AddTeacherModal from "./add_teacher";
@@ -325,14 +325,16 @@ const TeacherTable = (props: ITeacherTableProps) => {
                       <div className="w-full h-full flex justify-center items-center">
                         <div
                           className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
-                            ${
-                              row.status === "Hoạt động"
-                                ? "bg-basic-positive-hover text-basic-positive"
-                                : "bg-basic-negative-hover text-basic-negative"
-                            }`}
+                          ${
+                            row.status === 1
+                              ? "bg-basic-positive-hover text-basic-positive"
+                              : row.status === 5 || row.status === 4
+                              ? "bg-basic-negative-hover text-basic-negative"
+                              : "bg-basic-gray-hover text-basic-gray"
+                          }`}
                           style={{ whiteSpace: "nowrap" }}
                         >
-                          {row.status}
+                          {TEACHER_STATUS_TRANSLATOR[row.status]}
                         </div>
                       </div>
                     </TableCell>
@@ -404,6 +406,10 @@ const TeacherTable = (props: ITeacherTableProps) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
+          labelRowsPerPage='Số hàng'
+          labelDisplayedRows={({from, to, count}) => 
+              `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+          }
           count={totalRows ?? teacherTableData.length}
           rowsPerPage={rowsPerPage}
           page={page}

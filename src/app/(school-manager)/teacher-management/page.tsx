@@ -8,11 +8,12 @@ import TeacherTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
 import { ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
+import { TEACHER_STATUS } from "@/utils/constants";
 
 export default function SMTeacher() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const { schoolId, sessionToken } = useAppContext();
+  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 
   const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
@@ -34,6 +35,10 @@ export default function SMTeacher() {
   };
 
   React.useEffect(() => {
+		mutate({ schoolYearId: selectedSchoolYearId });
+	}, [selectedSchoolYearId]);
+
+  React.useEffect(() => {
     mutate();
     if (data?.status === 200) {
       setTotalRows(data.result["total-item-count"]);
@@ -45,7 +50,7 @@ export default function SMTeacher() {
           subjectDepartment: item["department-name"],
           email: item.email,
           phoneNumber: item.phone || "N/A",
-          status: item.status === 1 ? "Hoạt động" : "Vô hiệu",
+          status: item.status,
         })
       );
       setTeacherTableData(teacherData);

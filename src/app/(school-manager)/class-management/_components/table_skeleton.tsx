@@ -48,6 +48,11 @@ const headCells: readonly HeadCell[] = [
     centered: false,
   },
   {
+    id: "subjectGroup" as keyof IClassTableData,
+    label: "Tổ hợp môn",
+    centered: false,
+  },
+  {
     id: "schoolYear" as keyof IClassTableData,
     label: "Năm học",
     centered: false,
@@ -160,6 +165,9 @@ const ClassTableSkeleton = () => {
                       <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
+                      <TableCell align="left">
+                        <Skeleton animation="wave" variant="text" />
+                      </TableCell>
                       <TableCell width={80}>
                         <IconButton
                           color="success"
@@ -186,6 +194,10 @@ const ClassTableSkeleton = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
+            labelRowsPerPage='Số hàng'
+            labelDisplayedRows={({from, to, count}) => 
+                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            }
             count={10}
             rowsPerPage={5}
             page={1}

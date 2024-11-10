@@ -167,3 +167,22 @@ export const getSubjectGroup = async (
     const data = await response.json();
     return data;
 };
+
+export const getTeacherAssignment = async (
+  id: number,
+  sessionToken: string,
+  schoolId: string,
+  schoolYearId: number
+) => {
+  const response = await fetch (`${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/${id}/assignments-in-class`, 
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  )
+  const data = await response.json();
+  return data;
+}
