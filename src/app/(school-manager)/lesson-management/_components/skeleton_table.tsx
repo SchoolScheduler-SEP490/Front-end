@@ -1,6 +1,7 @@
 'use client';
+
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Checkbox, Skeleton, TableHead, Toolbar, Tooltip } from '@mui/material';
+import { Checkbox, Skeleton, TableHead, Toolbar, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -9,17 +10,14 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
+import { ILessonTableData } from '../_libs/constants';
 
-interface ILessonTableData {
-	id: number;
-	lessonName: string;
-	mainTotalSlotPerWeek: number;
-	mainMinOfDouleSlot: number;
-	subTotalSlotPerWeek: number;
-	subMinOfDouleSlot: number;
-	doubleAvailability: boolean;
+interface ISumObject {
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }
-
 interface HeadCell {
 	disablePadding: boolean;
 	id: keyof ILessonTableData;
@@ -31,7 +29,7 @@ const headCells: readonly HeadCell[] = [
 	{
 		id: 'id' as keyof ILessonTableData,
 		centered: true,
-		disablePadding: false,
+		disablePadding: true,
 		label: 'STT',
 	},
 	{
@@ -56,11 +54,20 @@ const headCells: readonly HeadCell[] = [
 		id: 'doubleAvailability' as keyof ILessonTableData,
 		centered: true,
 		disablePadding: false,
-		label: 'Môn học bắt buộc',
+		label: 'Môn học có tiết cặp',
+	},
+	{
+		id: 'isRequired' as keyof ILessonTableData,
+		centered: true,
+		disablePadding: false,
+		label: 'Môn học chuyên đề',
 	},
 ];
-
-function EnhancedTableHead() {
+interface EnhancedTableProps {
+	totalSlot: ISumObject;
+}
+function EnhancedTableHead(props: EnhancedTableProps) {
+	const { totalSlot } = props;
 	return (
 		<TableHead>
 			<TableRow>
@@ -68,7 +75,7 @@ function EnhancedTableHead() {
 					rowSpan={2}
 					align={headCells[0].centered ? 'center' : 'left'}
 					padding={headCells[0].disablePadding ? 'none' : 'normal'}
-					width={50}
+					width={30}
 					sx={[
 						{
 							fontWeight: 'bold',
@@ -141,6 +148,21 @@ function EnhancedTableHead() {
 						},
 					]}
 				>
+					{headCells[headCells.length - 2].label}
+				</TableCell>
+				<TableCell
+					rowSpan={2}
+					align={headCells[headCells.length - 1].centered ? 'center' : 'left'}
+					padding={headCells[headCells.length - 1].disablePadding ? 'none' : 'normal'}
+					sx={[
+						{
+							fontWeight: 'bold',
+							borderRight: '1px solid #f0f0f0',
+							borderLeft: '1px solid #f0f0f0',
+							borderTop: '1px solid #f0f0f0',
+						},
+					]}
+				>
 					{headCells[headCells.length - 1].label}
 					<p className='!italic !text-[11px] !font-light opacity-60'>(Chỉ đọc)</p>
 				</TableCell>
@@ -159,7 +181,14 @@ function EnhancedTableHead() {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Tổng số tiết mỗi tuần
+					Tổng số tiết mỗi tuần{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['main-slot-per-week'] > 30 ? 'error' : 'black'}
+					>
+						({totalSlot?.['main-slot-per-week'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -175,7 +204,14 @@ function EnhancedTableHead() {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Môn học có tiết cặp
+					Số tiết cặp tối thiểu{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['main-minimum-couple'] > 12 ? 'error' : 'black'}
+					>
+						({totalSlot?.['main-minimum-couple'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -191,7 +227,14 @@ function EnhancedTableHead() {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Tổng số tiết mỗi tuần
+					Tổng số tiết mỗi tuần{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['sub-slot-per-week'] > 30 ? 'error' : 'black'}
+					>
+						({totalSlot?.['sub-slot-per-week'] ?? 0})
+					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -207,13 +250,19 @@ function EnhancedTableHead() {
 						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
-					Môn học có tiết cặp
+					Số tiết cặp tối thiểu{' '}
+					<Typography
+						fontSize={12}
+						fontStyle={'normal'}
+						color={totalSlot?.['sub-minimum-couple'] > 12 ? 'error' : 'black'}
+					>
+						({totalSlot?.['sub-minimum-couple'] ?? 0})
+					</Typography>
 				</TableCell>
 			</TableRow>
 		</TableHead>
 	);
 }
-
 const LessonTableSkeleton = () => {
 	return (
 		<Box
@@ -239,33 +288,34 @@ const LessonTableSkeleton = () => {
 					<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 						Tiết học
 					</h2>
-					<Tooltip title='Filter list'>
-						<IconButton>
-							<FilterListIcon />
-						</IconButton>
-					</Tooltip>
+					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
+						<Tooltip title='Lọc danh sách'>
+							<IconButton id='filter-btn'>
+								<FilterListIcon />
+							</IconButton>
+						</Tooltip>
+					</div>
 				</Toolbar>
 				<TableContainer>
 					<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
-						<EnhancedTableHead />
+						<EnhancedTableHead
+							totalSlot={{
+								'main-slot-per-week': 0,
+								'sub-slot-per-week': 0,
+								'main-minimum-couple': 0,
+								'sub-minimum-couple': 0,
+							}}
+						/>
 						<TableBody>
-							{[1, 2, 3, 4, 5].map((row, index) => {
-								const labelId = `enhanced-table-checkbox-${index}`;
-
+							{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((row, index) => {
 								return (
-									<TableRow
-										hover
-										role='checkbox'
-										tabIndex={-1}
-										key={row}
-										sx={{ cursor: 'pointer' }}
-									>
+									<TableRow hover role='checkbox' tabIndex={-1} key={index}>
 										<TableCell
 											component='th'
-											id={labelId}
 											scope='row'
+											padding='none'
 											align='center'
-											width={50}
+											width={30}
 										>
 											<Skeleton animation='wave' variant='text' />
 										</TableCell>
@@ -284,15 +334,11 @@ const LessonTableSkeleton = () => {
 										<TableCell align='center' width={100}>
 											<Skeleton animation='wave' variant='text' />
 										</TableCell>
+										<TableCell align='center' width={50}>
+											<Checkbox color='default' checked={false} />
+										</TableCell>
 										<TableCell width={50} align='center'>
-											<Checkbox
-												color='default'
-												disabled
-												checked={false}
-												inputProps={{
-													'aria-labelledby': labelId,
-												}}
-											/>
+											<Checkbox disabled checked={false} />
 										</TableCell>
 									</TableRow>
 								);

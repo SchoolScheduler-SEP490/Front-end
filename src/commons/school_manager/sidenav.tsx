@@ -97,6 +97,7 @@ const SMSidenav = () => {
 			<div className='w-full h-fit pb-[70px] pt-[50px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
 				{SM_SIDENAV.map((item: ISMSidenav, index: number) => (
 					<Accordion
+						key={item.category + index}
 						expanded={expanded.includes(`panel${index}`)}
 						onChange={toggleDropdown(`panel${index}`)}
 						className='w-full p-0 m-0'

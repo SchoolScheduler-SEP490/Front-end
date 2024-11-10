@@ -128,8 +128,8 @@ export default function SMLesson() {
 							isRequiredSubject: item['is-required'],
 							isSpecializedSubject:
 								tmpSpecializedData?.some((spec) => spec?.id === item.id) ?? false,
-							mainMinimumCouple: 0,
-							subMinimumCouple: 0,
+							mainMinimumCouple: item['main-minimum-couple'],
+							subMinimumCouple: item['sub-minimum-couple'],
 						} as ILessonTableData);
 					}
 				}

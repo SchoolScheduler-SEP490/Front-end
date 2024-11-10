@@ -8,8 +8,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	// School messages
 	'School Not found.': 'Không tìm thấy trường học',
-	'School has been assigned to another account.':
-		'Trường học đã được gán cho tài khoản khác',
+	'School has been assigned to another account.': 'Trường học đã được gán cho tài khoản khác',
 	'Create school manager successful.': 'Tạo mới trường học thành công',
 	'Not found school manager!': 'Không tìm thấy người quản lý trường!',
 	'Confirm create school manager account success':
@@ -20,14 +19,12 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Send otp reset password failed.':
 		'Mã OTP gửi không thành công, vui lòng kiểm tra lại thông tin',
 	'OTP unvalid.': 'Mã OTP không hợp lệ',
-	'Confirm otp reset password success. You can reset password now.':
-		'Xác nhận mã OTP thành công',
+	'Confirm otp reset password success. You can reset password now.': 'Xác nhận mã OTP thành công',
 
 	// Reset password messages
 	'Reset password success.': 'Đặt lại mật khẩu thành công',
 	'Change password success.': 'Thay đổi mật khẩu thành công',
-	'Your password invalid. Try again.':
-		'Mật khẩu của bạn không hợp lệ. Vui lòng thử lại',
+	'Your password invalid. Try again.': 'Mật khẩu của bạn không hợp lệ. Vui lòng thử lại',
 
 	// Room messages
 	'The room does not exist.': 'Không tìm thấy phòng',
@@ -69,8 +66,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Update teacher success.': 'Cập nhật giáo viên thành công',
 	'Delete teacher success.': 'Xóa giáo viên thành công',
 	'Get teachers success.': 'Lấy danh sách giáo viên thành công',
-	'The teacher abbreviation does not exist.':
-		'Không tìm thấy mã viết tắt của giáo viên',
+	'The teacher abbreviation does not exist.': 'Không tìm thấy mã viết tắt của giáo viên',
 
 	// Grade messages
 	'The grade does not exist.': 'Không tìm thấy khối lớp',
@@ -84,10 +80,8 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Delete class success.': 'Xóa lớp thành công',
 	'Get classes success.': 'Lấy danh sách lớp thành công',
 	'Homeroom teacher assign success': 'Gán giáo viên chủ nhiệm thành công',
-	'Homeroom teacher was assigned to other class.':
-		'Giáo viên chủ nhiệm đã được gán cho lớp khác',
-	'Each teacher can only assign to a class.':
-		'Mỗi giáo viên chỉ có thể gán cho một lớp',
+	'Homeroom teacher was assigned to other class.': 'Giáo viên chủ nhiệm đã được gán cho lớp khác',
+	'Each teacher can only assign to a class.': 'Mỗi giáo viên chỉ có thể gán cho một lớp',
 
 	// Miscellaneous messages
 	'Invalid Refresh token!': 'Refresh token không hợp lệ!',
@@ -117,6 +111,10 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	// Teaching assignment messages
 	'Add teaching assignment success.': 'Phân công giảng dạy thành công',
+
+	// Department messages
+	'Update department success.': 'Cập nhật tổ bộ môn thành công',
+	'Delete department success.': 'Xóa tổ bộ môn thành công',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};
