@@ -4,31 +4,62 @@ import { useAppContext } from "@/context/app_provider";
 import { useEffect, useState } from "react";
 import SMHeader from "@/commons/school_manager/header";
 import { useRouter, useSearchParams } from "next/navigation";
-import { IconButton } from "@mui/material";
+import {
+  Dialog,
+  DialogContent,
+  IconButton,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { IClassDetail, ISchoolYear, ISubjectAssignment } from "../_libs/constants";
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  IClassDetail,
+  ISchoolYear,
+  ISubjectAssignment,
+} from "../_libs/constants";
 import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 import { getTeacherAssignment } from "../_libs/apiClass";
 
 export default function ClassDetails() {
   const [classData, setClassData] = useState<IClassDetail>();
   const [schoolYear, setSchoolYear] = useState<ISchoolYear>();
-  const [subjectAssignments, setSubjectAssignments] = useState<ISubjectAssignment[]>([]);
+  const [subjectAssignments, setSubjectAssignments] = useState<
+    ISubjectAssignment[]
+  >([]);
   const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const searchParams = useSearchParams();
   const classId = searchParams.get("id");
   const router = useRouter();
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const classResponse = await fetch(`${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`, {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const classResponse = await fetch(
+        `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
       const classData = await classResponse.json();
-      
+
       if (classData.status === 200) {
         setClassData(classData.result);
         const schoolYearsResponse = await fetch(`${api}/api/academic-years`, {
@@ -37,10 +68,11 @@ export default function ClassDetails() {
           },
         });
         const schoolYearsData = await schoolYearsResponse.json();
-        
+
         if (schoolYearsData.status === 200) {
           const matchingSchoolYear = schoolYearsData.result.find(
-            (year: ISchoolYear) => year.id === classData.result["school-year-id"]
+            (year: ISchoolYear) =>
+              year.id === classData.result["school-year-id"]
           );
           if (matchingSchoolYear) {
             setSchoolYear(matchingSchoolYear);
@@ -48,7 +80,12 @@ export default function ClassDetails() {
         }
 
         // Fetch teacher assignments
-        const assignmentsData = await getTeacherAssignment(Number(classId), sessionToken, schoolId, selectedSchoolYearId);
+        const assignmentsData = await getTeacherAssignment(
+          Number(classId),
+          sessionToken,
+          schoolId,
+          selectedSchoolYearId
+        );
         if (assignmentsData.status === 200) {
           setSubjectAssignments(assignmentsData.result);
         }
@@ -80,60 +117,232 @@ export default function ClassDetails() {
       <div className="w-full p-7">
         {classData && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+            <h2 className="text-title-medium font-semibold text-gray-800 border-b pb-2 mb-4 tracking-wider leading-loose cursor-pointer">
               Thông tin chung
             </h2>
-  
+
             <div className="grid grid-cols-2 gap-6 mb-8 leading-loose">
               <div className="text-gray-700">
-                <p><strong>Tên lớp:</strong> {classData.name}</p>
-                <p><strong>Khối:</strong> {CLASSGROUP_TRANSLATOR[classData.grade]}</p>
-                <p><strong>Số tiết học:</strong> {classData["period-count"]}</p>
+                <p>
+                  <strong>Tên lớp:</strong> {classData.name}
+                </p>
+                <p>
+                  <strong>Khối:</strong>{" "}
+                  {CLASSGROUP_TRANSLATOR[classData.grade]}
+                </p>
+                <p>
+                  <strong>Số tiết học:</strong> {classData["period-count"]}
+                </p>
               </div>
               <div className="text-gray-700">
-                <p><strong>GVCN:</strong> {classData["homeroom-teacher-name"]}</p>
-                <p><strong>Mã GVCN:</strong> {classData["homeroom-teacher-abbreviation"]}</p>
-                <p><strong>Ca học:</strong> {classData["main-session-text"]}</p>
+                <p>
+                  <strong>GVCN:</strong> {classData["homeroom-teacher-name"]}
+                </p>
+                <p>
+                  <strong>Mã GVCN:</strong>{" "}
+                  {classData["homeroom-teacher-abbreviation"]}
+                </p>
+                <p>
+                  <strong>Ca học:</strong> {classData["main-session-text"]}
+                </p>
               </div>
             </div>
-  
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+
+            <h2 className="text-title-medium font-semibold text-gray-800 border-b pb-2 mb-4 tracking-wider leading-loose cursor-pointer">
               Thông tin học tập
             </h2>
-  
+
             <div className="grid grid-cols-2 gap-6 mb-8 leading-loose">
               <div className="text-gray-700">
-                <p><strong>Tổ bộ môn:</strong> {classData["subject-group-name"]}</p>
-                <p><strong>Học cả ngày:</strong> {classData["is-full-day"] ? "Có" : "Không"}</p>
-                <p><strong>Năm học:</strong> {schoolYear ? `${schoolYear["start-year"]} - ${schoolYear["end-year"]}` : ''}</p>
+                <p>
+                  <strong>Tổ bộ môn:</strong> {classData["subject-group-name"]}
+                </p>
+                <p>
+                  <strong>Học cả ngày:</strong>{" "}
+                  {classData["is-full-day"] ? "Có" : "Không"}
+                </p>
+                <p>
+                  <strong>Năm học:</strong>{" "}
+                  {schoolYear
+                    ? `${schoolYear["start-year"]} - ${schoolYear["end-year"]}`
+                    : ""}
+                </p>
               </div>
             </div>
-  
-            <h2 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+
+            <h2
+              className="text-title-medium font-semibold text-gray-800 border-b pb-2 mb-4 tracking-wider leading-loose cursor-pointer"
+              onClick={handleOpenModal}
+            >
               Phân công giáo viên
             </h2>
-  
-            <div className="grid grid-cols-2 gap-6 mb-8 leading-loose">
-              {subjectAssignments.map((subject) => (
-                <div key={subject["subject-id"]} className="bg-gray-50 p-4 rounded-lg border">
-                  <h3 className="text-xl font-semibold mb-2 text-gray-800">
-                    Môn học: {subject["subject-name"]}
-                  </h3>
-                  {subject["assignment-details"].map((assignment) => (
-                    <div key={assignment["term-id"]} className="mb-4 text-gray-700">
-                      <p><strong>Kỳ học:</strong> {assignment["term-name"]}</p>
-                      <p><strong>Giáo viên:</strong> {assignment["teacher-first-name"]} {assignment["teacher-last-name"]}</p>
-                      <p><strong>Tổng số tiết:</strong> {assignment["total-period"]}</p>
-                      <p><strong>Tuần bắt đầu:</strong> {assignment["start-week"]}</p>
-                      <p><strong>Tuần kết thúc:</strong> {assignment["end-week"]}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
+
+            <Dialog
+              open={isModalOpen}
+              onClose={handleCloseModal}
+              maxWidth="md"
+              fullWidth
+            >
+              <div
+                id="modal-header"
+                className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
+              >
+                <Typography
+                  variant="h6"
+                  component="h2"
+                  className="text-title-medium-strong font-normal opacity-60"
+                >
+                  Thông tin phân công chi tiết
+                </Typography>
+                <IconButton onClick={handleCloseModal}>
+                  <CloseIcon />
+                </IconButton>
+              </div>
+              <DialogContent sx={{ p: 3 }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{
+                    width: "100%",
+                    maxHeight: 440,
+                    border: "1px solid rgba(224, 224, 224, 1)",
+                    boxShadow: "none",
+                  }}
+                  className="overflow-y-scroll no-scrollbar"
+                >
+                  <Table
+                    sx={{ minWidth: "100%" }}
+                    stickyHeader
+                    aria-label="teacher assignments table"
+                  >
+                    <TableHead
+                      sx={{
+                        "& .MuiTableCell-head": {
+                          fontWeight: "bold",
+                          borderRight: "1px solid rgba(224, 224, 224, 1)",
+                        },
+                      }}
+                    >
+                      <TableRow
+                        sx={{
+                          whiteSpace: "nowrap",
+                          cursor: "pointer",
+                        }}
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                      >
+                        <TableCell>Môn học</TableCell>
+                        <TableCell>Giáo viên</TableCell>
+                        <TableCell>Học kì</TableCell>
+                        <TableCell>Số tiết</TableCell>
+                        <TableCell>Tuần bắt đầu</TableCell>
+                        <TableCell>Tuần kết thúc</TableCell>
+                        <TableCell>Tổng tiết/năm</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {subjectAssignments.map((subject) => {
+                        const teacherAssignments =
+                          subject["assignment-details"];
+                        let currentTeacher = "";
+                        let currentTeacherRowSpan = 0;
+
+                        return teacherAssignments.map((assignment, index) => {
+                          const teacherName = `${assignment["teacher-first-name"]} ${assignment["teacher-last-name"]}`;
+                          let teacherCell = null;
+                          const rowId = `${subject["subject-id"]}-${index}`;
+
+                          if (teacherName !== currentTeacher) {
+                            currentTeacher = teacherName;
+                            currentTeacherRowSpan = teacherAssignments.filter(
+                              (a) =>
+                                `${a["teacher-first-name"]} ${a["teacher-last-name"]}` ===
+                                teacherName
+                            ).length;
+                            teacherCell = (
+                              <TableCell
+                                rowSpan={currentTeacherRowSpan}
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {teacherName}
+                              </TableCell>
+                            );
+                          }
+
+                          return (
+                            <TableRow key={rowId}>
+                              {index === 0 && (
+                                <TableCell
+                                  rowSpan={teacherAssignments.length}
+                                  sx={{
+                                    borderRight:
+                                      "1px solid rgba(224, 224, 224, 1)",
+                                  }}
+                                >
+                                  {subject["subject-name"]}
+                                </TableCell>
+                              )}
+                              {teacherCell}
+                              <TableCell
+                                className="text-center"
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {assignment["term-name"]}
+                              </TableCell>
+                              <TableCell
+                                className="text-center"
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {assignment["total-period"]}
+                              </TableCell>
+                              <TableCell
+                                className="text-center"
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {assignment["start-week"]}
+                              </TableCell>
+                              <TableCell
+                                className="text-center"
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {assignment["end-week"]}
+                              </TableCell>
+                              <TableCell
+                                className="text-center"
+                                sx={{
+                                  borderRight:
+                                    "1px solid rgba(224, 224, 224, 1)",
+                                }}
+                              >
+                                {subject["total-slot-in-year"]}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        });
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
       </div>
     </div>
-  );  
+  );
 }

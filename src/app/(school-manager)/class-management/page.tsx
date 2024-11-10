@@ -68,6 +68,7 @@ export default function SMClass() {
           className: item.name,
           grade: CLASSGROUP_TRANSLATOR[item.grade],
           homeroomTeacherName: item["homeroom-teacher-name"],
+          subjectGroup: item["subject-group-name"],
           schoolYear: currentSchoolYear,
           mainSession: item["main-session-text"],
         })
