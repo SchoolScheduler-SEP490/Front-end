@@ -185,6 +185,10 @@ const RoomTableSkeleton = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
+            labelRowsPerPage='Số hàng'
+            labelDisplayedRows={({from, to, count}) => 
+                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            }
             count={10}
             rowsPerPage={5}
             page={1}

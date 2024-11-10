@@ -406,6 +406,10 @@ const TeacherTable = (props: ITeacherTableProps) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
+          labelRowsPerPage='Số hàng'
+          labelDisplayedRows={({from, to, count}) => 
+              `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+          }
           count={totalRows ?? teacherTableData.length}
           rowsPerPage={rowsPerPage}
           page={page}

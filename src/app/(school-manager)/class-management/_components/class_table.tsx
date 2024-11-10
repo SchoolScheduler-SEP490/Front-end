@@ -74,6 +74,11 @@ const headCells: readonly HeadCell[] = [
     centered: true,
   },
   {
+    id: "subjectGroup" as keyof IClassTableData,
+    label: "Tổ hợp môn",
+    centered: false,
+  },
+  {
     id: "schoolYear" as keyof IClassTableData,
     label: "Năm học",
     centered: true,
@@ -335,6 +340,9 @@ const ClassTable = (props: IClassTableProps) => {
                       <TableCell align="center">
                         {row.homeroomTeacherName}
                       </TableCell>
+                      <TableCell align="left">
+                        {row.subjectGroup}
+                      </TableCell>
                       <TableCell align="center">{row.schoolYear}</TableCell>
                       <TableCell align="center">{row.mainSession}</TableCell>
                       <TableCell width={80} onClick={(e) => e.stopPropagation()}>
@@ -409,6 +417,10 @@ const ClassTable = (props: IClassTableProps) => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
+            labelRowsPerPage='Số hàng'
+            labelDisplayedRows={({from, to, count}) => 
+                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            }
             count={totalRows ?? classTableData.length}
             rowsPerPage={rowsPerPage}
             page={page}
