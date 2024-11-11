@@ -21,6 +21,7 @@ const useGetSchoolYear = (sessionToken: string) => {
         revalidateOnFocus: false,
         revalidateOnReconnect: true,
         revalidateIfStale: true,
+        shouldRetryOnError: false,
     });
 
     return { data, error };

@@ -39,6 +39,7 @@ const useClassData = ({
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
       revalidateIfStale: true,
+      shouldRetryOnError: false,
     }
   );
 
