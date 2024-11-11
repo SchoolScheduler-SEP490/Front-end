@@ -190,7 +190,7 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 						<CloseIcon />
 					</IconButton>
 				</div>
-				<div className='w-full h-[40vh] p-3 flex flex-col justify-start items-start gap-3'>
+				<div className='w-full h-[50vh] p-3 flex flex-col justify-start items-start gap-3 overflow-y-scroll no-scrollbar'>
 					{departmentData.map((department: IDepartmentTableData, index) => (
 						<div
 							className='w-full flex flex-row justify-between items-baseline'

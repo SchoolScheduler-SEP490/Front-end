@@ -40,6 +40,12 @@ export interface IUpdateDepartmentRequest {
 	'meeting-day'?: number;
 }
 
+export interface IErrorDepartmentResonse {
+	name: string;
+	description: string;
+	'department-code': string;
+	'meeting-day'?: number;
+}
 export interface ISubjectResponse {
 	id: number;
 	'school-year-id': number;

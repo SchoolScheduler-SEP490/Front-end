@@ -38,6 +38,7 @@ import useCreateDepartment from '../_hooks/useCreateDepartment';
 import useFetchSubjects from '../_hooks/useFetchSubject';
 import {
 	ICreateDepartmentRequest,
+	IErrorDepartmentResonse,
 	ISubjectResponse,
 	MEETING_DAY_OPTIONS,
 } from '../_libs/constants';
@@ -104,6 +105,7 @@ interface RenderSelectedItemOptions {
 		value: string | number
 	) => void;
 	theme: any;
+	errorList: IErrorDepartmentResonse[];
 }
 function renderSelectedItem({
 	item,
@@ -111,6 +113,7 @@ function renderSelectedItem({
 	handleRemoveItem,
 	handleUpdateItem,
 	theme,
+	errorList,
 }: RenderSelectedItemOptions) {
 	return (
 		<ListItem
@@ -149,6 +152,7 @@ function renderSelectedItem({
 					onChange={(event: ChangeEvent<HTMLInputElement>) =>
 						handleUpdateItem(index, 'name', event.target.value)
 					}
+					error={errorList.find((error) => error.name === item.name) ? true : false}
 					slotProps={{
 						input: {
 							endAdornment: (
@@ -175,6 +179,7 @@ function renderSelectedItem({
 				onChange={(event: ChangeEvent<HTMLInputElement>) =>
 					handleUpdateItem(index, 'department-code', event.target.value)
 				}
+				error={errorList.find((error) => error.name === item.name) ? true : false}
 				slotProps={{
 					input: {
 						endAdornment: (
@@ -266,17 +271,13 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 	const [subjectOptions, setSubjectOptions] = useState<string[]>([]);
 	const [editingDepartment, setEditingDepartment] = useState<ICreateDepartmentRequest[]>([]);
 	const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
+	const [vulnerableObjects, setVulnerableObjects] = useState<IErrorDepartmentResonse[]>([]);
 
 	const [selectingItems, setSelectingItems] = useState<string[]>([]);
 	const [isDragging, setIsDragging] = useState(false);
 	const listRef = useRef<HTMLDivElement>(null);
 
-	const {
-		data: subjectData,
-		isValidating: isSubjectValidating,
-		error: subjectError,
-		mutate: updateSubject,
-	} = useFetchSubjects({
+	const { data: subjectData, mutate: updateSubject } = useFetchSubjects({
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
 		pageIndex: 1,
@@ -343,13 +344,28 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 	};
 
 	const handleFormSubmit = async () => {
-		await useCreateDepartment({
+		const { response } = await useCreateDepartment({
 			formData: editingDepartment,
 			schoolId: Number(schoolId),
 			sessionToken,
 		});
-		updateDepartment();
-		handleClose();
+		if (response?.status === 200) {
+			updateDepartment();
+			handleClose();
+		} else if (
+			response?.status === 400 &&
+			response?.message === 'Department name or code does existed.'
+		) {
+			alert(JSON.stringify(response));
+			const tmpErrorObjects: IErrorDepartmentResonse[] = response?.result?.map(
+				(item: IErrorDepartmentResonse) => ({
+					...item,
+				})
+			);
+			if (tmpErrorObjects.length > 0) {
+				setVulnerableObjects(tmpErrorObjects);
+			}
+		}
 	};
 
 	const handleAddSeperateDepartment = () => {
@@ -567,6 +583,7 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 												handleRemoveItem: handleRemoveDepartment,
 												handleUpdateItem: handleUpdateDepartment,
 												theme,
+												errorList: vulnerableObjects,
 											})}
 										</Collapse>
 									))}

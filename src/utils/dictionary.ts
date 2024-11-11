@@ -117,6 +117,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Delete department success.': 'Xóa tổ bộ môn thành công',
 	'Add department success.': 'Thêm tổ bộ môn thành công',
 	'Phân công tổ trưởng thành công!': 'Phân công tổ trưởng thành công',
+	'Department name or code does existed.': 'Tên/Mã tổ bộ môn đã tồn tại',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

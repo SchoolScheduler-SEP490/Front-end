@@ -46,6 +46,7 @@ const useCreateDepartment = async (props: ICreateSubjectProps) => {
 			message: TRANSLATOR[err.message ?? ''] ?? 'Có lỗi xảy ra',
 			type: 'error',
 		});
+		return err;
 	}
 };
 

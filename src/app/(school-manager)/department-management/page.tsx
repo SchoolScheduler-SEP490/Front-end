@@ -97,7 +97,11 @@ export default function SMDepartment() {
 					</h3>
 				</div>
 			</SMHeader>
-			<div className='w-full h-fit flex justify-center items-start'>
+			<div
+				className={`w-full h-fit flex items-start ${
+					isDepartmentDetailsOpen ? 'pl-[1vw] justify-between' : 'justify-center'
+				}`}
+			>
 				{/* Add more element here */}
 				<div className='w-fit h-[90vh] pt-[5vh] pb-[5vh] px-2 overflow-y-scroll no-scrollbar flex justify-center items-start'>
 					<DepartmentTable

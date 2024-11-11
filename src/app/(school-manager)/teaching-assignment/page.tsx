@@ -32,6 +32,7 @@ export default function SMTeachingAssignment() {
 
 	// Selected
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
+	const [selectedSubjectGroupName, setSelectedSubjectGroupName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 
 	// Data
@@ -137,6 +138,7 @@ export default function SMTeachingAssignment() {
 			if (tmpData.length > 0) {
 				setSidenavData(tmpData);
 				setSelectedClassId(tmpData[0].items[0].value);
+				setSelectedSubjectGroupName(tmpData[0].items[0].extra);
 			}
 		}
 	}, [classData]);
@@ -198,6 +200,7 @@ export default function SMTeachingAssignment() {
 						<TeachingAssignmentSideNav
 							selectedClass={selectedClassId}
 							setSelectedClass={setSelectedClassId}
+							setSelectedSubjectGroupName={setSelectedSubjectGroupName}
 							classData={sidenavData}
 						/>
 					)}
@@ -233,6 +236,7 @@ export default function SMTeachingAssignment() {
 				<TeachingAssignmentSideNav
 					selectedClass={selectedClassId}
 					setSelectedClass={setSelectedClassId}
+					setSelectedSubjectGroupName={setSelectedSubjectGroupName}
 					classData={sidenavData}
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
@@ -241,6 +245,7 @@ export default function SMTeachingAssignment() {
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
+						selectedSubjectGroupName={selectedSubjectGroupName}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}

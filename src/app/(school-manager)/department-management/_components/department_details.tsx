@@ -29,7 +29,7 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 	});
 
 	useEffect(() => {
-		if (open) {
+		if (open && departmentData) {
 			updateTeacher();
 			if (teacherData?.status === 200) {
 				var tmpTeachersArr: IDropdownOption<number>[] = teacherData.result.items.map(
