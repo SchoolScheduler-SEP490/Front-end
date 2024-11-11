@@ -142,12 +142,12 @@ export default function SMClass() {
           setIsFilterable={setIsFilterable}
           mutate={mutate}
         />
-        {/* <ClassFilterable
+        <ClassFilterable
           open={isFilterable}
           setOpen={setIsFilterable}
           selectedYearId={selectedSchoolYearId}
-          setSelectedYearId={selectedSchoolYearId}
-        /> */}
+          setSelectedYearId={(value: number) => selectedSchoolYearId}
+        />
       </div>
     </div>
   );
