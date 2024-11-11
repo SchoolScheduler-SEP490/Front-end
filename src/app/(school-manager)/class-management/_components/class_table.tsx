@@ -303,7 +303,7 @@ const ClassTable = (props: IClassTableProps) => {
               <TableBody>
               {visibleRows.length === 0 && (
 									<TableRow>
-										<TableCell colSpan={6} align='center'>
+										<TableCell colSpan={8} align='center'>
 											<h1 className='text-body-large-strong italic text-basic-gray'>
 												Lớp học chưa có dữ liệu
 											</h1>
