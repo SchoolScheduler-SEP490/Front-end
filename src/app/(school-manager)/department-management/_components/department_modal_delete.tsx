@@ -93,7 +93,7 @@ const DeleteDepartmentModal = (props: ISubjectDeleteModalProps) => {
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
-						title='Xóa tổ hợp'
+						title='Xóa Tổ bộ môn'
 						disableRipple
 						onClick={handleDeleteSubject}
 						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'

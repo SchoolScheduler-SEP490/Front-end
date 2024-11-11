@@ -241,7 +241,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 											key={row.id}
 											sx={[
 												{ cursor: 'pointer' },
-												selectedSubjectId === row.id &&
+												selectedSubjectId === row.subjectKey &&
 													isDetailsShown && {
 														backgroundColor: '#f5f5f5',
 													},

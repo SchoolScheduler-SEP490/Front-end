@@ -65,7 +65,7 @@ const headCells: readonly HeadCell[] = [
 		id: 'subjectGroupName' as keyof ISubjectGroupTableData,
 		centered: false,
 		disablePadding: false,
-		label: 'Tên khối',
+		label: 'Tên tổ hợp',
 	},
 	{
 		id: 'subjectGroupCode' as keyof ISubjectGroupTableData,

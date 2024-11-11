@@ -114,13 +114,12 @@ export const ROOM_TYPE_TRANSLATOR: { [key: string]: string } = {
 };
 
 export const TEACHER_STATUS: { key: string; value: number }[] = [
-	{key: 'HoatDong', value: 1},
-	{key: 'CongTac', value: 2},
-	{key: 'HauSan', value: 3},
-	{key: 'DinhChi', value: 4},
-	{key: 'NgungHoatDong', value: 5},
-
-]
+	{ key: 'HoatDong', value: 1 },
+	{ key: 'CongTac', value: 2 },
+	{ key: 'HauSan', value: 3 },
+	{ key: 'DinhChi', value: 4 },
+	{ key: 'NgungHoatDong', value: 5 },
+];
 
 export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 	1: 'Hoạt động',
@@ -128,14 +127,36 @@ export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 	3: 'Hậu sản',
 	4: 'Định chỉ',
 	5: 'Ngừng hoạt động',
-  };
+};
 
 export const TEACHER_ROLE: { key: string; value: number }[] = [
 	{ key: 'TEACHER', value: 1 },
-	{ key: 'TEACHER_DEPARTMENT_HEAD', value: 2 }
-]
+	{ key: 'TEACHER_DEPARTMENT_HEAD', value: 2 },
+];
 
 export const TEACHER_ROLE_TRANSLATOR: { [key: number]: string } = {
-	1: "Giáo viên",
-	2: "Trưởng bộ môn"
-}
+	1: 'Giáo viên',
+	2: 'Trưởng bộ môn',
+};
+
+export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
+	'Ngữ văn': 'Văn',
+	Toán: 'Toán',
+	'Ngoại ngữ 1': 'NN1',
+	'Lịch sử': 'Sử',
+	'Giáo dục thể chất': 'GDTC',
+	'Giáo dục quốc phòng và an ninh': 'QPAN',
+	'Địa lí': 'Địa',
+	'Giáo dục kinh tế và pháp luật': 'GDPL',
+	'Vật lí': 'Lý',
+	'Hóa học': 'Hóa',
+	'Sinh học': 'Sinh',
+	'Công nghệ': 'CN',
+	'Tin học': 'Tin',
+	'Âm nhạc': 'Nhạc',
+	'Mỹ thuật': 'M.thuật',
+	'Hoạt động trải nghiệm, hướng nghiệp': 'HĐTN',
+	'Nội dung giáo dục của địa phương': 'GDĐP',
+	'Tiếng dân tộc thiểu số': 'Tiếng DTTS',
+	'Ngoại ngữ 2': 'NN2',
+};

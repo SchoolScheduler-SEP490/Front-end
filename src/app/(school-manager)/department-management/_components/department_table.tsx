@@ -2,7 +2,6 @@
 import useNotify from '@/hooks/useNotify';
 import { ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { Menu, MenuItem, Toolbar, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -21,8 +20,10 @@ import { ChangeEvent, Dispatch, MouseEvent, SetStateAction, useMemo, useState } 
 import { KeyedMutator } from 'swr';
 import { IDepartmentTableData } from '../_libs/constants';
 import CreateDepartment from './department_modal_create';
-import UpdateDepartment from './department_modal_update';
 import DeleteDepartmentModal from './department_modal_delete';
+import UpdateDepartment from './department_modal_update';
+import TuneIcon from '@mui/icons-material/Tune';
+import DepartmentHeadAssignmentModal from './department_modal_head_assignment';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -139,6 +140,10 @@ interface IDepartmentTableProps {
 	setRowsPerPage: Dispatch<SetStateAction<number>>;
 	totalRows?: number;
 	updateTable: KeyedMutator<any>;
+	selectedDepartmentId: number;
+	setSelectedDepartmentId: Dispatch<SetStateAction<number>>;
+	isDepartmentDetailsOpen: boolean;
+	setDepartmentDetailsOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -147,14 +152,26 @@ const dropdownOptions: ICommonOption[] = [
 ];
 
 const DepartmentTable = (props: IDepartmentTableProps) => {
-	const { departmentData, page, setPage, rowsPerPage, setRowsPerPage, totalRows, updateTable } =
-		props;
+	const {
+		departmentData,
+		page,
+		setPage,
+		rowsPerPage,
+		setRowsPerPage,
+		totalRows,
+		updateTable,
+		selectedDepartmentId,
+		setDepartmentDetailsOpen,
+		isDepartmentDetailsOpen,
+		setSelectedDepartmentId,
+	} = props;
+
 	const [order, setOrder] = useState<Order>('asc');
 	const [orderBy, setOrderBy] = useState<keyof IDepartmentTableData>('id');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-	const [iUpdateModalOpen, setIUpdateModalOpen] = useState<boolean>(false);
-	const [iApplyModalOpen, setIApplyModalOpen] = useState<boolean>(false);
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+	const [isHeadAssignmentModalOpen, setIsHeadAssignmentModalOpen] = useState<boolean>(false);
 
 	const [selectedRow, setSelectedRow] = useState<IDepartmentTableData>(
 		{} as IDepartmentTableData
@@ -167,10 +184,17 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 		setSelectedRow(row);
 	};
 
+	const handleDetailsClick = (departmentId: number) => {
+		setSelectedDepartmentId(departmentId);
+		if (!isDepartmentDetailsOpen) {
+			setDepartmentDetailsOpen(true);
+		}
+	};
+
 	const handleMenuItemClick = (index: number) => {
 		switch (index) {
 			case 0:
-				setIUpdateModalOpen(true);
+				setIsUpdateModalOpen(true);
 				break;
 			case 1:
 				setIsDeleteModalOpen(true);
@@ -188,6 +212,11 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 	const handleCreateDepartment = () => {
 		// Add new department
 		setIsCreateModalOpen(true);
+	};
+
+	const handleAssignHeadDepartment = () => {
+		// Add new department
+		setIsHeadAssignmentModalOpen(true);
 	};
 
 	const handleRequestSort = (
@@ -238,9 +267,9 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 								<AddIcon />
 							</IconButton>
 						</Tooltip>
-						<Tooltip title='Lọc danh sách'>
-							<IconButton>
-								<FilterListIcon />
+						<Tooltip title='Phân công tổ trưởng'>
+							<IconButton onClick={handleAssignHeadDepartment}>
+								<TuneIcon />
 							</IconButton>
 						</Tooltip>
 					</div>
@@ -271,13 +300,13 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 										role='checkbox'
 										tabIndex={-1}
 										key={row.id}
-										// sx={[
-										// 	{ userSelect: 'none' },
-										// 	selectedSubjectGroupId === row.subjectGroupKey &&
-										// 		isOpenViewDetails && {
-										// 			backgroundColor: '#f5f5f5',
-										// 		},
-										// ]}
+										sx={[
+											{ userSelect: 'none' },
+											selectedDepartmentId === row.departmentKey &&
+												isDepartmentDetailsOpen && {
+													backgroundColor: '#f5f5f5',
+												},
+										]}
 									>
 										<TableCell
 											component='th'
@@ -297,6 +326,7 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 												textOverflow: 'ellipsis',
 												cursor: 'pointer',
 											}}
+											onClick={() => handleDetailsClick(row.departmentKey)}
 										>
 											<Typography noWrap width={200} fontSize={15}>
 												{row.departmentName}
@@ -403,8 +433,8 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 			/>
 			<UpdateDepartment
 				departmentData={selectedRow}
-				open={iUpdateModalOpen}
-				setOpen={setIUpdateModalOpen}
+				open={isUpdateModalOpen}
+				setOpen={setIsUpdateModalOpen}
 				updateDepartment={updateTable}
 			/>
 			<DeleteDepartmentModal
@@ -413,6 +443,12 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 				departmentId={selectedRow.departmentKey}
 				departmentName={selectedRow.departmentName}
 				mutate={updateTable}
+			/>
+			<DepartmentHeadAssignmentModal
+				departmentData={departmentData}
+				open={isHeadAssignmentModalOpen}
+				setOpen={setIsHeadAssignmentModalOpen}
+				updateDepartment={updateTable}
 			/>
 		</Box>
 	);
