@@ -32,6 +32,7 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
       revalidateIfStale: true,
+      shouldRetryOnError: false,
     }
   );
 

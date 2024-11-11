@@ -1,62 +1,77 @@
-import * as yup from 'yup';
+import * as yup from "yup";
 
 export const teacherSchema = yup.object().shape({
-  ['first-name']: yup.string().required('Vui lòng nhập họ giáo viên.'),
+  ["first-name"]: yup.string().required("Vui lòng nhập họ giáo viên."),
 
-  ['last-name']: yup.string().required('Vui lòng nhập tên giáo viên.'),
+  ["last-name"]: yup.string().required("Vui lòng nhập tên giáo viên."),
 
-  abbreviation: yup.string().required('Vui lòng nhập tên viết tắt giáo viên.'),
+  abbreviation: yup.string().required("Vui lòng nhập tên viết tắt giáo viên."),
 
-  email: yup.string().required('Vui lòng nhập địa chỉ email.').email('Email không hợp lệ. Vui lòng nhập lại.'),
+  email: yup
+    .string()
+    .required("Vui lòng nhập địa chỉ email.")
+    .email("Email không hợp lệ. Vui lòng nhập lại."),
 
-  gender: yup.string().required('Vui lòng chọn giới tính.'),
+  gender: yup.string().required("Vui lòng chọn giới tính."),
 
-  ['department-code']: yup.string().required('Vui lòng chọn mã tổ bộ môn.'),
+  ["department-code"]: yup.string().required("Vui lòng chọn mã tổ bộ môn."),
 
-  ['date-of-birth']: yup.string().required('Vui lòng nhập ngày sinh.'),
+  ["date-of-birth"]: yup.string().required("Vui lòng nhập ngày sinh."),
 
-  ['teacher-role']: yup.string().required('Vui lòng chọn vai trò.'),
+  ["teacher-role"]: yup.string().required("Vui lòng chọn vai trò."),
 
-  status: yup.string().required('Vui lòng chọn trạng thái.'),
+  status: yup.string().required("Vui lòng chọn trạng thái."),
 
   phone: yup
     .string()
-    .required('Vui lòng nhập số điện thoại.')
-    .matches(/^[0-9]+$/, 'Số điện thoại chỉ được chứa số.')
-    .min(10, 'Số điện thoại phải có đúng 10 số.')
-    .max(10, 'Số điện thoại phải có đúng 10 số.'),
+    .required("Vui lòng nhập số điện thoại.")
+    .matches(/^[0-9]+$/, "Số điện thoại chỉ được chứa số.")
+    .min(10, "Số điện thoại phải có đúng 10 số.")
+    .max(10, "Số điện thoại phải có đúng 10 số."),
 
-    ['main-subject']: yup.object().shape({
-      ['subject-abreviation']: yup.string().required('Vui lòng chọn môn học.'),
-      grade: yup.string().required('Vui lòng chọn khối.')
-    })
+  ["main-subject"]: yup.object().shape({
+    ["subject-abreviation"]: yup.string().required("Vui lòng chọn môn học."),
+    grades: yup
+      .array()
+      .min(1, "Vui lòng chọn ít nhất một khối.")
+      .required("Vui lòng chọn khối."),
+  }),
 });
 
 export const updateTeacherSchema = yup.object().shape({
-  ['first-name']: yup.string().required('Vui lòng nhập họ giáo viên.'),
+  ["first-name"]: yup.string().required("Vui lòng nhập họ giáo viên."),
 
-  ['last-name']: yup.string().required('Vui lòng nhập tên giáo viên.'),
+  ["last-name"]: yup.string().required("Vui lòng nhập tên giáo viên."),
 
-  abbreviation: yup.string().required('Vui lòng nhập tên viết tắt giáo viên.'),
+  abbreviation: yup.string().required("Vui lòng nhập tên viết tắt giáo viên."),
 
-  email: yup.string().required('Vui lòng nhập địa chỉ email.').email('Email không hợp lệ. Vui lòng nhập lại.'),
+  email: yup
+    .string()
+    .required("Vui lòng nhập địa chỉ email.")
+    .email("Email không hợp lệ. Vui lòng nhập lại."),
 
-  gender: yup.string().required('Vui lòng chọn giới tính.'),
+  gender: yup.string().required("Vui lòng chọn giới tính."),
 
-  ['department-id']: yup.string().required('Vui lòng chọn mã tổ bộ môn.'),
+  ["department-id"]: yup.string().required("Vui lòng chọn mã tổ bộ môn."),
 
-  ['date-of-birth']: yup.string().required('Vui lòng nhập ngày sinh.'),
+  ["date-of-birth"]: yup.string().required("Vui lòng nhập ngày sinh."),
 
-  ['teacher-role']: yup.string().required('Vui lòng chọn vai trò.'),
+  ["teacher-role"]: yup.string().required("Vui lòng chọn vai trò."),
 
-  status: yup.string().required('Vui lòng chọn trạng thái.'),
+  status: yup.string().required("Vui lòng chọn trạng thái."),
 
   phone: yup
     .string()
-    .required('Vui lòng nhập số điện thoại.')
-    .matches(/^[0-9]+$/, 'Số điện thoại chỉ được chứa số.')
-    .min(10, 'Số điện thoại phải có đúng 10 số.')
-    .max(10, 'Số điện thoại phải có đúng 10 số.'),
+    .required("Vui lòng nhập số điện thoại.")
+    .matches(/^[0-9]+$/, "Số điện thoại chỉ được chứa số.")
+    .min(10, "Số điện thoại phải có đúng 10 số.")
+    .max(10, "Số điện thoại phải có đúng 10 số."),
 
-    ['teachable-subject-ids']: yup.array().required('Vui lòng chọn môn học.'),
-})
+    "teachable-subjects": yup.array().of(
+      yup.object().shape({
+        "subject-abreviation": yup.string().required(),
+        "grades": yup.array().of(yup.string()).min(1, "Vui lòng chọn ít nhất một khối."),
+        "is-main": yup.boolean()
+      })
+    )
+});
