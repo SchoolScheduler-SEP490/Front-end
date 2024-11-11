@@ -18,20 +18,32 @@ import {
   DialogContent,
   Grid,
   FormHelperText,
+  Checkbox,
 } from "@mui/material";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
 import {
   IDepartment,
   ISubject,
+  IUpdateTeachableSubject,
   IUpdateTeacherRequestBody,
 } from "../_libs/constants";
 import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
 import { updateTeacherSchema } from "../_libs/teacher_schema";
 import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
-import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
-import { TEACHER_STATUS, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
+import {
+  fetchTeacherById,
+  getDepartmentName,
+  getSubjectName,
+} from "../_libs/apiTeacher";
+import {
+  CLASSGROUP_STRING_TYPE,
+  TEACHER_ROLE,
+  TEACHER_ROLE_TRANSLATOR,
+  TEACHER_STATUS,
+  TEACHER_STATUS_TRANSLATOR,
+} from "@/utils/constants";
 
 interface UpdateTeacherFormProps {
   open: boolean;
@@ -49,82 +61,83 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   );
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const formik = useFormik({
     initialValues: {
-      ...oldData,
-      "date-of-birth": dayjs(oldData["date-of-birth"]).format("YYYY-MM-DD"),
-      "department-id": oldData["department-id"] || "",
-      "teachable-subject-ids": oldData["teachable-subject-ids"] || [],
+      "first-name": "",
+      "last-name": "",
+      abbreviation: "",
+      email: "",
+      gender: "",
+      "department-id": "",
+      "date-of-birth": "",
       "school-id": schoolId,
+      "teacher-role": "",
+      status: "",
+      phone: "",
+      "is-deleted": false,
+      "teachable-subjects": [] as IUpdateTeachableSubject[],
     },
     validationSchema: updateTeacherSchema,
     onSubmit: async (values) => {
-      const updatedTeacher: IUpdateTeacherRequestBody = {
-        "first-name": values["first-name"],
-        "last-name": values["last-name"],
-        abbreviation: values.abbreviation,
-        email: values.email,
-        gender: values.gender,
-        "department-id": values["department-id"],
-        "date-of-birth": values["date-of-birth"],
-        "school-id": 2555,
-        "teacher-role": values["teacher-role"],
-        status: values.status,
-        phone: values.phone,
-        "is-deleted": false,
-        "teachable-subject-ids": values["teachable-subject-ids"].map(Number),
-      };
-      console.log("Form submitted with values:", updatedTeacher);
-      const success = await editTeacher(teacherId, updatedTeacher);
+      const success = await editTeacher(teacherId, values);
       if (success) {
         useNotify({
           message: "Cập nhật giáo viên thành công.",
           type: "success",
         });
         handleClose();
+        mutate();
       } else {
         useNotify({
           message: "Cập nhật giáo viên thất bại.",
           type: "error",
         });
-        console.log("Failed to update teacher");
       }
     },
-    enableReinitialize: true,
   });
 
   useEffect(() => {
-    const fetchTeacherById = async () => {
-      const response = await fetch(
-        `${api}/api/schools/${schoolId}/teachers/${teacherId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (data.status == 200) {
-        console.log("Raw API response:", data.result);
-        const teacherData = {
-          ...data.result,
-          "department-id": data.result["department-id"],
-          "teachable-subject-ids": data.result["teachable-subjects"].map(
-            (subject: any) => subject["subject-id"]
+    const loadTeacherData = async () => {
+      try {
+        const teacherData = await fetchTeacherById(
+          schoolId,
+          teacherId,
+          sessionToken
+        );
+        formik.setValues({
+          "first-name": teacherData["first-name"],
+          "last-name": teacherData["last-name"],
+          abbreviation: teacherData.abbreviation,
+          email: teacherData.email,
+          gender: teacherData.gender,
+          "department-id": teacherData["department-id"].toString(),
+          "date-of-birth": dayjs(teacherData["date-of-birth"]).format(
+            "YYYY-MM-DD"
           ),
-        };
-        setOldData(teacherData);
-      } else {
+          "school-id": schoolId,
+          "teacher-role": teacherData["teacher-role"],
+          status: teacherData.status.toString(),
+          phone: teacherData.phone,
+          "is-deleted": teacherData["is-deleted"],
+          "teachable-subjects": teacherData["teachable-subjects"].map(
+            (subject) => ({
+              ...subject,
+              "subject-abreviation": subject.abbreviation,
+              grades: subject.grade || [],
+            })
+          ),
+        });
+        setIsLoading(false);
+      } catch (error) {
         useNotify({
-          message: "Lỗi khi tải dữ liệu giáo viên.",
+          message: "Lỗi khi tải dữ liệu giáo viên",
           type: "error",
         });
-        console.log(oldData);
+        console.error(error);
       }
     };
-
     const loadDepartments = async () => {
       const data = await getDepartmentName(schoolId, sessionToken);
       if (data.result?.items) {
@@ -144,7 +157,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     };
 
     if (open) {
-      fetchTeacherById();
+      loadTeacherData();
       loadDepartments();
       loadSubjects();
     }
@@ -405,30 +418,98 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <FormControl fullWidth>
-                    <Select
-                      variant="standard"
-                      multiple
-                      name="teachable-subject-ids"
-                      value={formik.values["teachable-subject-ids"] || []}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
-                          },
-                        },
-                      }}
-                    >
-                      {subjects.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.id}>
-                          {`${subject["subject-name"]} (${subject.abbreviation})`}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  {formik.values["teachable-subjects"].map((subject, index) => (
+                    <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
+                      <Grid item xs={5}>
+                        <FormControl fullWidth>
+                          <Select
+                            variant="standard"
+                            value={subject["subject-abreviation"]}
+                            onChange={(e) => {
+                              const newSubjects = [
+                                ...formik.values["teachable-subjects"],
+                              ];
+                              newSubjects[index]["subject-abreviation"] =
+                                e.target.value;
+                              formik.setFieldValue(
+                                "teachable-subjects",
+                                newSubjects
+                              );
+                            }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  maxHeight: 150,
+                                  overflow: "auto",
+                                },
+                              },
+                            }}
+                          >
+                            {subjects.map((sub) => (
+                              <MenuItem key={sub.id} value={sub.abbreviation}>
+                                {`${sub["subject-name"]} - ${sub.abbreviation}`}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={5}>
+                        <FormControl fullWidth>
+                          <Select
+                            multiple
+                            variant="standard"
+                            value={subject.grades}
+                            onChange={(e) => {
+                              const newSubjects = [
+                                ...formik.values["teachable-subjects"],
+                              ];
+                              newSubjects[index].grades = e.target
+                                .value as string[];
+                              formik.setFieldValue(
+                                "teachable-subjects",
+                                newSubjects
+                              );
+                            }}
+                          >
+                            {CLASSGROUP_STRING_TYPE.map((grade) => (
+                              <MenuItem
+                                key={grade.key}
+                                value={`GRADE_${grade.value}`}
+                              >
+                                {grade.key}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid
+                        item
+                        xs={2}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={subject["is-main"]}
+                              onChange={(e) => {
+                                const newSubjects = [
+                                  ...formik.values["teachable-subjects"],
+                                ];
+                                newSubjects[index]["is-main"] =
+                                  e.target.checked;
+                                formik.setFieldValue(
+                                  "teachable-subjects",
+                                  newSubjects
+                                );
+                              }}
+                            />
+                          }
+                          label="Chính"
+                        />
+                      </Grid>
+                    </Grid>
+                  ))}
                 </Grid>
               </Grid>
             </Grid>
@@ -486,16 +567,14 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                       value={formik.values["teacher-role"]}
                       onChange={formik.handleChange("teacher-role")}
                     >
-                      <FormControlLabel
-                        value="Role1"
-                        control={<Radio />}
-                        label="Giáo viên"
-                      />
-                      <FormControlLabel
-                        value="Role2"
-                        control={<Radio />}
-                        label="Trưởng bộ môn"
-                      />
+                      {TEACHER_ROLE.map((role) => (
+                        <FormControlLabel
+                          key={role.key}
+                          value={role.key}
+                          control={<Radio />}
+                          label={TEACHER_ROLE_TRANSLATOR[role.value]}
+                        />
+                      ))}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -518,7 +597,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                     <Select
                       variant="standard"
                       name="status"
-                      value={formik.values.status || 1}
+                      value={formik.values.status}
                       onChange={(event) =>
                         formik.setFieldValue("status", event.target.value)
                       }

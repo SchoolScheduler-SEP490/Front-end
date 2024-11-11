@@ -9,11 +9,13 @@ import { useAppContext } from "@/context/app_provider";
 import { ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 import { TEACHER_STATUS } from "@/utils/constants";
+import { TRANSLATOR } from "@/utils/dictionary";
 
 export default function SMTeacher() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+  const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
   const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
@@ -40,6 +42,7 @@ export default function SMTeacher() {
 
   React.useEffect(() => {
     mutate();
+    setIsErrorShown(false);
     if (data?.status === 200) {
       setTotalRows(data.result["total-item-count"]);
       const teacherData: ITeacherTableData[] = data.result.items.map(
@@ -64,9 +67,22 @@ export default function SMTeacher() {
   React.useEffect(() => {
     setPage((prev) => Math.min(prev, getMaxPage() - 1));
     if (page <= getMaxPage()) {
-      mutate();
+      mutate({
+        pageSize: rowsPerPage,
+				pageIndex: page,
+      });
     }
   }, [page, rowsPerPage]);
+
+  React.useEffect(() => {
+		if (error && !isErrorShown) {
+			setIsErrorShown(true);
+			useNotify({
+				message: TRANSLATOR[error?.message] ?? 'Không tìm thấy giáo viên.',
+				type: 'error',
+			});
+		}
+	}, [isValidating]);
 
   if (isValidating) {
     return (
@@ -74,7 +90,7 @@ export default function SMTeacher() {
         <SMHeader>
           <div>
             <h3 className="text-title-small text-white font-semibold tracking-wider">
-              Môn học
+              Giáo viên
             </h3>
           </div>
         </SMHeader>
@@ -83,13 +99,6 @@ export default function SMTeacher() {
         </div>
       </div>
     );
-  }
-
-  if (error) {
-    useNotify({
-      type: "error",
-      message: error.message ?? "Có lỗi xảy ra",
-    });
   }
 
   return (
