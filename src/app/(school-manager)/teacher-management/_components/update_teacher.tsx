@@ -21,7 +21,11 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
-import { IDepartment, ISubject, IUpdateTeacherRequestBody } from "../_libs/constants";
+import {
+  IDepartment,
+  ISubject,
+  IUpdateTeacherRequestBody,
+} from "../_libs/constants";
 import { useUpdateTeacher } from "../_hooks/useUpdateTeacher";
 import { updateTeacherSchema } from "../_libs/teacher_schema";
 import React, { useEffect, useState } from "react";
@@ -37,7 +41,7 @@ interface UpdateTeacherFormProps {
 }
 const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const { open, onClose, teacherId, mutate } = props;
- const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
+  const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editTeacher, isUpdating } = useUpdateTeacher(mutate);
   const [oldData, setOldData] = useState<IUpdateTeacherRequestBody>(
@@ -89,16 +93,18 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     },
     enableReinitialize: true,
   });
-  
 
   useEffect(() => {
     const fetchTeacherById = async () => {
-      const response = await fetch(`${api}/api/schools/${schoolId}/teachers/${teacherId}`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const response = await fetch(
+        `${api}/api/schools/${schoolId}/teachers/${teacherId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
       const data = await response.json();
       if (data.status == 200) {
         console.log("Raw API response:", data.result);
@@ -107,8 +113,8 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
           "department-id": data.result["department-id"],
           "teachable-subject-ids": data.result["teachable-subjects"].map(
             (subject: any) => subject["subject-id"]
-          ) 
-        }
+          ),
+        };
         setOldData(teacherData);
       } else {
         useNotify({
@@ -124,10 +130,13 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       if (data.result?.items) {
         setDepartments(data.result.items);
       }
-    }
+    };
 
     const loadSubjects = async () => {
-      const subjectData = await getSubjectName(sessionToken, selectedSchoolYearId);
+      const subjectData = await getSubjectName(
+        sessionToken,
+        selectedSchoolYearId
+      );
       if (subjectData?.status === 200) {
         setSubjects(subjectData.result.items);
         console.log("Subjects loaded:", subjectData.result.items);
@@ -151,7 +160,22 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   console.log("isValid", formik.isValid);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      sx={{
+        "& .MuiDialog-paper": {
+          overflowY: "auto",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+        },
+      }}
+    >
       <div
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
@@ -353,11 +377,8 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                     >
                       <MenuItem value="">--Chọn tổ bộ môn--</MenuItem>
                       {departments.map((department) => (
-                        <MenuItem
-                          key={department.id}
-                          value={department.id}
-                        >
-                          {department.name} 
+                        <MenuItem key={department.id} value={department.id}>
+                          {department.name}
                         </MenuItem>
                       ))}
                     </Select>

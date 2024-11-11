@@ -21,7 +21,7 @@ interface IClassFilterableProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   selectedYearId: number;
-  setSelectedYearId: React.Dispatch<React.SetStateAction<number>>;
+  setSelectedYearId: (value: number) => void;
   mutate?: KeyedMutator<any>;
 }
 

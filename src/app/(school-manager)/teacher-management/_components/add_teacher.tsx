@@ -24,7 +24,14 @@ import { useAppContext } from "@/context/app_provider";
 import { IAddTeacherData, IDepartment, ISubject } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
 import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
-import { TEACHER_STATUS, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
+import {
+  CLASSGROUP_STRING_TYPE,
+  CLASSGROUP_TRANSLATOR,
+  TEACHER_ROLE,
+  TEACHER_ROLE_TRANSLATOR,
+  TEACHER_STATUS,
+  TEACHER_STATUS_TRANSLATOR,
+} from "@/utils/constants";
 
 //Add new teacher form
 interface AddTeacherFormProps {
@@ -39,7 +46,7 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
+      width: 150,
       scrollbars: "none",
     },
   },
@@ -102,21 +109,44 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       "teacher-role": "Role1",
       status: "Active",
       phone: "",
-      "subjects-abreviation": [],
+      "main-subject": {
+        "subject-abreviation": "",
+        grade: "",
+      },
     },
     validationSchema: teacherSchema,
     onSubmit: async (formData) => {
       handleFormSubmit({
         ...formData,
-        "subjects-abreviation": Array.isArray(formData["subjects-abreviation"])
-          ? formData["subjects-abreviation"]
-          : [formData["subjects-abreviation"]],
+        "main-subject": {
+          "subject-abreviation": formData["main-subject"]["subject-abreviation"],
+          "grade": String(formData["main-subject"].grade)
+        }
       });
     },
   });
 
+  console.log("isValid", formik.isValid);
+  console.log("error:", formik.errors)
+  console.log("values:", formik.values);
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      sx={{
+        "& .MuiDialog-paper": {
+          overflowY: "auto",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          "-ms-overflow-style": "none",
+        },
+      }}
+    >
       <div
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
@@ -345,42 +375,28 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Dạy môn
+                    Môn học chính
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <FormControl
                     fullWidth
                     error={
-                      formik.touched["subjects-abreviation"] &&
-                      Boolean(formik.errors["subjects-abreviation"])
+                      formik.touched["main-subject"]?.["subject-abreviation"] &&
+                      Boolean(
+                        formik.errors["main-subject"]?.["subject-abreviation"]
+                      )
                     }
                   >
                     <Select
                       variant="standard"
-                      multiple
-                      name="subjects-abreviation"
+                      name="main-subject.subject-abreviation"
                       value={
-                        Array.isArray(formik.values["subjects-abreviation"])
-                          ? formik.values["subjects-abreviation"]
-                          : [formik.values["subjects-abreviation"]]
+                        formik.values["main-subject"]["subject-abreviation"]
                       }
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        formik.setFieldValue(
-                          "subjects-abreviation",
-                          Array.isArray(value) ? value : [value]
-                        );
-                      }}
+                      onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
-                          },
-                        },
-                      }}
+                      MenuProps={MenuProps}
                     >
                       <MenuItem value="">--Chọn môn học--</MenuItem>
                       {subjects.map((subject) => (
@@ -389,10 +405,56 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                         </MenuItem>
                       ))}
                     </Select>
-                    {formik.touched["subjects-abreviation"] &&
-                      formik.errors["subjects-abreviation"] && (
-                        <FormHelperText className="m-0">
-                          {formik.errors["subjects-abreviation"]}
+                    {formik.touched["main-subject"]?.["subject-abreviation"] &&
+                      formik.errors["main-subject"]?.[
+                        "subject-abreviation"
+                      ] && (
+                        <FormHelperText>
+                          {formik.errors["main-subject"]["subject-abreviation"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Khối
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["main-subject"]?.grade &&
+                      Boolean(formik.errors["main-subject"]?.grade)
+                    }
+                  >
+                    <Select
+                      variant="standard"
+                      name="main-subject.grade"
+                      value={formik.values["main-subject"].grade}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    >
+                      <MenuItem value="">--Chọn khối--</MenuItem>
+                      {CLASSGROUP_STRING_TYPE.map((grade) => (
+                        <MenuItem key={grade.key} value={grade.value}>
+                          {grade.key}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["main-subject"]?.grade &&
+                      formik.errors["main-subject"]?.grade && (
+                        <FormHelperText>
+                          {formik.errors["main-subject"].grade}
                         </FormHelperText>
                       )}
                   </FormControl>
@@ -453,16 +515,14 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                       value={formik.values["teacher-role"]}
                       onChange={formik.handleChange}
                     >
-                      <FormControlLabel
-                        value="Role1"
-                        control={<Radio />}
-                        label="Giáo viên"
-                      />
-                      <FormControlLabel
-                        value="Role2"
-                        control={<Radio />}
-                        label="Trưởng bộ môn"
-                      />
+                      {TEACHER_ROLE.map((role) => (
+                        <FormControlLabel
+                          key={role.key}
+                          value={role.value}
+                          control={<Radio />}
+                          label={TEACHER_ROLE_TRANSLATOR[role.value]}
+                        />
+                      ))}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
