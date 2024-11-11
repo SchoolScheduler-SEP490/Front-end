@@ -129,6 +129,16 @@ export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 	5: 'Ngừng hoạt động',
 };
 
+export const TEACHER_ROLE: { key: string; value: number }[] = [
+	{ key: 'TEACHER', value: 1 },
+	{ key: 'TEACHER_DEPARTMENT_HEAD', value: 2 },
+];
+
+export const TEACHER_ROLE_TRANSLATOR: { [key: number]: string } = {
+	1: 'Giáo viên',
+	2: 'Trưởng bộ môn',
+};
+
 export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
 	'Ngữ văn': 'Văn',
 	Toán: 'Toán',

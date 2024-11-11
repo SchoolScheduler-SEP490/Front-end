@@ -7,6 +7,7 @@ export interface ITeacherTableData {
 	email: string;
 	phoneNumber: string;
 	status: number;
+  teachableSubjects: string;
 }
 //Teacher response data
 export interface ITeacher {
@@ -23,6 +24,7 @@ export interface ITeacher {
   status: number;
   "is-deleted": boolean;
   phone: string;
+  "teachable-subjects": ISubject;
 }
 
 // Update teacher response data
@@ -53,7 +55,12 @@ export interface IAddTeacherData {
   "teacher-role": string;
   status: string;
   phone: string;
-'subjects-abreviation': string[];
+  "main-subject": IMainSubject;
+}
+
+export interface IMainSubject {
+  "subject-abreviation": string;
+  "grade": string;
 }
 
 export interface IDepartment {

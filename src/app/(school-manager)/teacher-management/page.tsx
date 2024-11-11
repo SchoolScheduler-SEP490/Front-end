@@ -48,11 +48,15 @@ export default function SMTeacher() {
           teacherName: `${item["first-name"]} ${item["last-name"]}`,
           nameAbbreviation: item.abbreviation,
           subjectDepartment: item["department-name"],
+          teachableSubjects: Array.isArray(item["teachable-subjects"]) && item["teachable-subjects"].length > 0 
+          ? item["teachable-subjects"]
+              .map(subject => subject["subject-name"])
+              .join(", ")
+          : "-",
           email: item.email,
           phoneNumber: item.phone || "N/A",
           status: item.status,
-        })
-      );
+        })      );
       setTeacherTableData(teacherData);
     }
   }, [data]);
