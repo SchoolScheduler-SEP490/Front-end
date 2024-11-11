@@ -82,11 +82,14 @@ const TeachingAssignmentTableSkeleton = () => {
 							},
 						]}
 					>
-						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Phân công giảng dạy
-						</h2>
+						<div className='w-full flex flex-col justify-start items-start'>
+							<h2 className='text-title-medium-strong font-semibold w-full text-left'>
+								Phân công giảng dạy
+							</h2>
+							<Skeleton animation='wave' variant='text' sx={{ width: '40%' }} />
+						</div>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-							<Tooltip title='Áp dụng đồng thời'>
+							<Tooltip title='Áp dụng tự động'>
 								<IconButton>
 									<LayersIcon fontSize='medium' />
 								</IconButton>
@@ -121,10 +124,7 @@ const TeachingAssignmentTableSkeleton = () => {
 												align='center'
 												width={50}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell
 												align='left'
@@ -135,10 +135,7 @@ const TeachingAssignmentTableSkeleton = () => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell
 												align='left'
@@ -149,10 +146,7 @@ const TeachingAssignmentTableSkeleton = () => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell
 												align='center'
@@ -163,10 +157,7 @@ const TeachingAssignmentTableSkeleton = () => {
 													textOverflow: 'ellipsis',
 												}}
 											>
-												<Skeleton
-													animation='wave'
-													variant='text'
-												/>
+												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 										</TableRow>
 									);

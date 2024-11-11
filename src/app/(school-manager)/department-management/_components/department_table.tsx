@@ -2,6 +2,7 @@
 import useNotify from '@/hooks/useNotify';
 import { ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
+import TuneIcon from '@mui/icons-material/Tune';
 import { Menu, MenuItem, Toolbar, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -21,9 +22,8 @@ import { KeyedMutator } from 'swr';
 import { IDepartmentTableData } from '../_libs/constants';
 import CreateDepartment from './department_modal_create';
 import DeleteDepartmentModal from './department_modal_delete';
-import UpdateDepartment from './department_modal_update';
-import TuneIcon from '@mui/icons-material/Tune';
 import DepartmentHeadAssignmentModal from './department_modal_head_assignment';
+import UpdateDepartment from './department_modal_update';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -238,7 +238,7 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 
 	const emptyRows =
 		departmentData.length < rowsPerPage && rowsPerPage < 10
-			? rowsPerPage - departmentData.length + 1
+			? rowsPerPage - departmentData.length
 			: 0;
 
 	const visibleRows = useMemo(

@@ -21,7 +21,7 @@ export interface IClassResponse {
 
 export interface ITeachingAssignmentSidenavData {
 	title: string;
-	items: { key: string; value: number }[];
+	items: { key: string; value: number; extra: string }[];
 }
 
 export interface ITermResponse {

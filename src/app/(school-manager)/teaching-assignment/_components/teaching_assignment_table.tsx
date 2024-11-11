@@ -24,11 +24,10 @@ import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	ITeachableResponse,
 	ITeacherAssignmentRequest,
-	ITeachingAssignmentResponse,
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
-import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
 import TeachingAssignmentApplyModal from './teaching_assignment_modal_apply';
+import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -89,10 +88,11 @@ interface ITeachingAssignmentTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
+	selectedSubjectGroupName: string;
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
-	const { subjectData, mutate, isFilterable, setIsFilterable } = props;
+	const { subjectData, mutate, isFilterable, setIsFilterable, selectedSubjectGroupName } = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -202,9 +202,17 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 							},
 						]}
 					>
-						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Phân công giảng dạy
-						</h2>
+						<div className='w-full flex flex-col justify-start items-start'>
+							<h2 className='text-title-medium-strong font-semibold w-full text-left'>
+								Phân công giảng dạy
+							</h2>
+							<h3 className='w-full flex flex-row justify-start items-baseline gap-2 text-body-small'>
+								Tổ hợp môn:
+								<p className='text-body-small font-medium text-primary-500'>
+									{selectedSubjectGroupName}
+								</p>
+							</h3>
+						</div>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
 							{isEditing ? (
 								<>
@@ -223,7 +231,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 									</Tooltip>
 								</>
 							) : (
-								<Tooltip title='Áp dụng đồng thời'>
+								<Tooltip title='Áp dụng tự động'>
 									<IconButton
 										id='filter-btn'
 										aria-controls={isFilterable ? 'basic-menu' : undefined}
