@@ -1,5 +1,7 @@
 import useSWR from 'swr';
 import { getFetchSubjectApi } from '../_libs/apis';
+import { IPaginatedResponse } from '@/utils/constants';
+import { ISubjectResponse } from '../_libs/constants';
 
 interface IFetcherProps {
 	sessionToken: string;
@@ -40,7 +42,7 @@ const useFetchSubjects = (props: IFetcherProps) => {
 		if (!response.ok) {
 			throw new Error(data.message);
 		}
-		return data;
+		return data as IPaginatedResponse<ISubjectResponse>;
 	}
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {

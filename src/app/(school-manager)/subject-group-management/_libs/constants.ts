@@ -140,3 +140,7 @@ export interface IApplySubjectGroupRequest {
 	'class-ids': number[];
 	'subject-group-id': number;
 }
+
+export interface GroupedClasses {
+	[key: string]: string[];
+}

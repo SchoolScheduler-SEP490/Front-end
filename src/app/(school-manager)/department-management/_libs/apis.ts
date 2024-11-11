@@ -69,3 +69,31 @@ export const getFetchSubjectApi = ({
 	}).toString();
 	return `${localApi ?? api}/api/subjects?${queryString}`;
 };
+
+export const getFetchTeacherApi = ({
+	localApi,
+	schoolId,
+	pageIndex,
+	pageSize,
+	includeDeleted,
+	departmentId,
+}: {
+	localApi?: string;
+	schoolId: string;
+	pageIndex: number;
+	pageSize: number;
+	includeDeleted?: boolean;
+	departmentId?: number;
+}) => {
+	const queryString = new URLSearchParams({
+		pageSize: pageSize.toString(),
+		pageIndex: pageIndex.toString(),
+		includedDeleted: includeDeleted ? includeDeleted.toString() : 'false',
+		...(departmentId && { departmentId: departmentId.toString() }),
+	}).toString();
+	return `${localApi ?? api}/api/schools/${schoolId}/teachers?${queryString}`;
+};
+
+export const getAssignDepartmentHeadApi = ({ schoolId }: { schoolId: number }) => {
+	return `${api}/api/schools/${schoolId}/teachers/assign-department-head`;
+};

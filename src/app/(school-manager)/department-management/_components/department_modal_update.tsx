@@ -1,14 +1,33 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, IconButton, Modal, TextField, Typography } from '@mui/material';
+import {
+	Box,
+	FormControl,
+	FormHelperText,
+	IconButton,
+	InputLabel,
+	ListItemText,
+	MenuItem,
+	Modal,
+	Select,
+	TextField,
+	Theme,
+	Typography,
+	useTheme,
+} from '@mui/material';
 import { useFormik } from 'formik';
 import Image from 'next/image';
 import { Dispatch, useEffect } from 'react';
 import { KeyedMutator } from 'swr';
+import { IDropdownOption } from '../../_utils/contants';
 import useUpdateDepartment from '../_hooks/useUpdateDepartment';
-import { IDepartmentTableData, IUpdateDepartmentRequest } from '../_libs/constants';
-import { createDepartmentSchema as departmentSchema } from '../_libs/schemas';
+import {
+	IDepartmentTableData,
+	IUpdateDepartmentRequest,
+	MEETING_DAY_OPTIONS,
+} from '../_libs/constants';
+import { departmentSchema } from '../_libs/schemas';
 
 const style = {
 	position: 'absolute',
@@ -20,6 +39,29 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+	PaperProps: {
+		style: {
+			maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+			width: 250,
+			scrollbars: 'none',
+		},
+	},
+};
+function getStyles(
+	selected: IDropdownOption<number>,
+	personName: IDropdownOption<number>[],
+	theme: Theme
+) {
+	return {
+		fontWeight: personName.includes(selected)
+			? theme.typography.fontWeightMedium
+			: theme.typography.fontWeightRegular,
+	};
+}
+
 interface ICreateDepartmentProps {
 	open: boolean;
 	setOpen: Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +72,7 @@ interface ICreateDepartmentProps {
 const UpdateDepartment = (props: ICreateDepartmentProps) => {
 	const { schoolId, sessionToken } = useAppContext();
 	const { open, setOpen, updateDepartment, departmentData } = props;
+	const theme = useTheme();
 
 	const handleFormSubmit = async (formData: IUpdateDepartmentRequest) => {
 		await useUpdateDepartment({
@@ -66,6 +109,7 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 				name: departmentData.departmentName,
 				'department-code': departmentData.departmentCode,
 				description: departmentData.description,
+				'meeting-day': departmentData.meetingDay,
 			} as IUpdateDepartmentRequest);
 		}
 	}, [departmentData, open]);
@@ -196,7 +240,53 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 								}}
 							/>
 						</div>
+						<div className='w-full h-fit flex flex-row justify-between items-center'>
+							<h3 className=' h-full flex justify-start '>Môn tự chọn</h3>
+							<FormControl sx={{ width: '70%' }}>
+								<InputLabel id='elective-label' variant='standard'>
+									Lịch họp TBM
+								</InputLabel>
+								<Select
+									labelId='elective-label'
+									id='elective'
+									variant='standard'
+									value={formik.values['meeting-day']}
+									onChange={(event) =>
+										formik.setFieldValue('meeting-day', event.target.value)
+									}
+									onBlur={formik.handleBlur('meeting-day')}
+									error={
+										formik.touched['meeting-day'] &&
+										Boolean(formik.errors['meeting-day'])
+									}
+									MenuProps={MenuProps}
+									sx={{ width: '100%' }}
+									// renderValue={(selected) => selected.label}
+								>
+									{MEETING_DAY_OPTIONS?.length === 0 && (
+										<MenuItem disabled value={0}>
+											Không tìm thấy lịch họp
+										</MenuItem>
+									)}
+									{MEETING_DAY_OPTIONS.map((item, index) => (
+										<MenuItem
+											key={item.label + index}
+											value={item.value}
+											style={getStyles(item, MEETING_DAY_OPTIONS, theme)}
+										>
+											<ListItemText primary={item.label} />
+										</MenuItem>
+									))}
+								</Select>
+								{formik.touched['meeting-day'] && formik.errors['meeting-day'] && (
+									<FormHelperText error variant='standard'>
+										{formik.errors['meeting-day']}
+									</FormHelperText>
+								)}
+							</FormControl>
+						</div>
 					</div>
+
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
 							title='Cập nhật TBM'

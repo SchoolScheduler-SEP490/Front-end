@@ -9,6 +9,7 @@ import useFetchDepartment from './_hooks/useFetchDepartment';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import DepartmentTableSkeleton from './_components/skeleton_table';
+import DepartmentDetails from './_components/department_details';
 
 export default function SMDepartment() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
@@ -17,6 +18,8 @@ export default function SMDepartment() {
 	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(false);
 	const [departmentTableData, setDepartmentTableData] = useState<IDepartmentTableData[]>([]);
+	const [selectedDepartmentId, setSelectedDepartmentId] = useState<number>(0);
+	const [isDepartmentDetailsOpen, setIsDepartmentDetailsOpen] = useState<boolean>(false);
 
 	const {
 		data: departmentData,
@@ -42,13 +45,16 @@ export default function SMDepartment() {
 						departmentCode: item['department-code'],
 						description: item.description || '',
 						departmentKey: item.id,
+						meetingDay: item['meeting-day'] ? Number(item['meeting-day']) : 0,
+						departmentHeadId: item['teacher-department-head-id'],
+						departmentHeadName: `${item['teacher-department-first-name']} ${item['teacher-department-last-name']} (${item['teacher-department-abbreviation']})`,
 					} as IDepartmentTableData)
 			);
 			setIsErrorShown(false);
 			setDepartmentTableData(tmpDepartmentData);
 			setTotalRows(departmentData.result['total-item-count']);
 		}
-	}, [departmentData]);
+	}, [departmentData, selectedSchoolYearId]);
 
 	useEffect(() => {
 		if (!isErrorShown) {
@@ -72,7 +78,7 @@ export default function SMDepartment() {
 						</h3>
 					</div>
 				</SMHeader>
-				<div className='w-full h-fit flex flex justify-center items-start overflow-hidden'>
+				<div className='w-full h-fit flex justify-center items-start overflow-hidden'>
 					{/* Add more element here */}
 					<div className='w-fit h-[90%] pt-[5vh] pb-[10vh] px-2 overflow-y-scroll no-scrollbar flex justify-center items-start'>
 						<DepartmentTableSkeleton />
@@ -91,7 +97,7 @@ export default function SMDepartment() {
 					</h3>
 				</div>
 			</SMHeader>
-			<div className='w-full h-fit flex flex justify-center items-start'>
+			<div className='w-full h-fit flex justify-center items-start'>
 				{/* Add more element here */}
 				<div className='w-fit h-[90vh] pt-[5vh] pb-[5vh] px-2 overflow-y-scroll no-scrollbar flex justify-center items-start'>
 					<DepartmentTable
@@ -102,8 +108,21 @@ export default function SMDepartment() {
 						rowsPerPage={rowsPerPage}
 						setRowsPerPage={setRowsPerPage}
 						totalRows={totalRows}
+						isDepartmentDetailsOpen={isDepartmentDetailsOpen}
+						setDepartmentDetailsOpen={setIsDepartmentDetailsOpen}
+						selectedDepartmentId={selectedDepartmentId}
+						setSelectedDepartmentId={setSelectedDepartmentId}
 					/>
 				</div>
+				<DepartmentDetails
+					open={isDepartmentDetailsOpen}
+					setOpen={setIsDepartmentDetailsOpen}
+					departmentData={
+						departmentData?.result.items.find(
+							(item: IDepartmentResponse) => item.id === selectedDepartmentId
+						) ?? ({} as IDepartmentResponse)
+					}
+				/>
 			</div>
 		</div>
 	);

@@ -22,3 +22,16 @@ export interface ISubjectTableData {
 	subjectType: string;
 	subjectKey: number;
 }
+
+export interface ITeachableTeacherResponse {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abreviation': string;
+	'subject-id': number;
+	'subject-name': string;
+	'subject-abreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}

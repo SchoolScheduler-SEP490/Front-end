@@ -4,7 +4,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Divider, IconButton, Skeleton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import useFetchSubjectDetails from '../_hooks/useFetchSubjectDetails';
-import { ISubjectResponse } from '../_libs/constants';
+import { ISubjectResponse, ITeachableTeacherResponse } from '../_libs/constants';
+import useFetchTeachableTeacher from '../_hooks/useFetchTeacher';
 
 interface ISubjectDetailsProps {
 	open: boolean;
@@ -14,11 +15,17 @@ interface ISubjectDetailsProps {
 
 const SubjectDetails = (props: ISubjectDetailsProps) => {
 	const { open, setOpen, subjectId } = props;
-	const { sessionToken } = useAppContext();
+	const { sessionToken, schoolId } = useAppContext();
 	const [subjectDetails, setSubjectDetails] = useState<ISubjectResponse | null>(null);
-	const [convertedDateString, setConvertedDateString] = useState<string>('');
-	const { data, error, isValidating, mutate } = useFetchSubjectDetails({
+	const [availableTeachers, setAvailableTeachers] = useState<string[] | null>(null);
+
+	const { data, mutate } = useFetchSubjectDetails({
 		sessionToken,
+		subjectId,
+	});
+	const { data: teacherData } = useFetchTeachableTeacher({
+		sessionToken,
+		schoolId: Number(schoolId),
 		subjectId,
 	});
 
@@ -27,13 +34,20 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 	};
 
 	useEffect(() => {
+		if (teacherData?.status === 200) {
+			const teachers = teacherData.result.map(
+				(item: ITeachableTeacherResponse) =>
+					`${item['teacher-name']} (${item['teacher-abreviation']})`
+			);
+			setAvailableTeachers(teachers);
+		}
+	}, [teacherData, open]);
+
+	useEffect(() => {
 		if (data?.status === 200) {
-		}
-		{
 			setSubjectDetails(data?.result);
-			setConvertedDateString(useFormatDate(data?.result?.['create-date'] ?? ''));
 		}
-	}, [data]);
+	}, [data, open]);
 
 	useEffect(() => {
 		mutate({ subjectId });
@@ -89,6 +103,36 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 					)}
 				</div>
 				<div className='w-full flex flex-col justify-start items-start'>
+					<h4 className='text-body-small text-basic-gray'>Danh sách giáo viên</h4>
+					{availableTeachers ? (
+						<ul className='list-disc pl-6 w-full'>
+							{availableTeachers.map((item, index) => (
+								<li className='w-full h-fit' key={item + index}>
+									<p className='max-w-[90%]'>{item}</p>
+								</li>
+							))}
+						</ul>
+					) : (
+						<ul className='list-disc pl-6 w-full'>
+							{[1, 2, 3, 4].map((item) => (
+								<li key={item}>
+									<Skeleton
+										className='!text-body-large-strong'
+										animation='wave'
+										variant='text'
+										sx={{ width: '80%' }}
+									/>
+								</li>
+							))}
+						</ul>
+					)}
+					{availableTeachers && availableTeachers.length === 0 && (
+						<h2 className='text-body-small italic opacity-80'>
+							Chưa có giáo viên dạy môn học này
+						</h2>
+					)}
+				</div>
+				<div className='w-full flex flex-col justify-start items-start'>
 					<h4 className='text-body-small text-basic-gray'>Tổ bộ môn</h4>
 					{subjectDetails?.['subject-group-type'] ? (
 						<h2 className='text-body-large-strong'>
@@ -127,7 +171,7 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 				<div className='w-full flex flex-row justify-between items-baseline'>
 					<div className='w-full flex flex-col justify-start items-start'>
 						<h4 className='text-body-small text-basic-gray'>Số tiết trong năm</h4>
-						{subjectDetails?.['total-slot-in-year'] ? (
+						{subjectDetails?.['total-slot-in-year'] !== undefined ? (
 							<h2 className={`text-body-large-strong`}>
 								{subjectDetails?.['total-slot-in-year']}
 							</h2>
@@ -142,7 +186,7 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 					</div>
 					<div className='w-full flex flex-col justify-start items-start'>
 						<h4 className='text-body-small text-basic-gray'>Số tiết chuyên đề</h4>
-						{subjectDetails?.['slot-specialized'] ? (
+						{subjectDetails?.['slot-specialized'] !== undefined ? (
 							<h2 className={`text-body-large-strong `}>
 								{subjectDetails?.['slot-specialized']}
 							</h2>
@@ -155,19 +199,6 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 							/>
 						)}
 					</div>
-				</div>
-				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Ngày tạo</h4>
-					{subjectDetails?.['create-date'] ? (
-						<h2 className='text-body-large-strong'>{convertedDateString}</h2>
-					) : (
-						<Skeleton
-							className='!text-body-large-strong'
-							animation='wave'
-							variant='text'
-							sx={{ width: '50%' }}
-						/>
-					)}
 				</div>
 				<Divider
 					variant='middle'

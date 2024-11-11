@@ -40,3 +40,15 @@ export const getSubjectDetailApi = ({
 }) => {
 	return `${localApi ?? api}/api/subjects/${subjectId}`;
 };
+
+export const getTeachableTeachersApi = ({
+	localApi,
+	schoolId,
+	subjectId,
+}: {
+	localApi?: string;
+	schoolId: number;
+	subjectId: number;
+}) => {
+	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
+};

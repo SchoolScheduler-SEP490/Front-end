@@ -2,7 +2,6 @@
 
 import SMHeader from '@/commons/school_manager/header';
 import { useAppContext } from '@/context/app_provider';
-import * as React from 'react';
 import SubjectTable from './_components/subject_table';
 import SubjectTableSkeleton from './_components/skeleton_table';
 import useFetchData from './_hooks/useFetchData';
@@ -10,19 +9,25 @@ import { ISubjectResponse, ISubjectTableData } from './_libs/constants';
 import SubjectDetails from './_components/subject_details';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
+import { useEffect, useState } from 'react';
 
 export default function SMSubject() {
 	const { selectedSchoolYearId, sessionToken } = useAppContext();
 
-	const [page, setPage] = React.useState<number>(0);
-	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
-	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
-	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
-	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
-	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(true);
+	const [page, setPage] = useState<number>(0);
+	const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
+	const [subjectTableData, setSubjectTableData] = useState<ISubjectTableData[]>([]);
+	const [isDetailsShown, setIsDetailsShown] = useState<boolean>(false);
+	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(0);
+	const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
 
-	const { data, isValidating, error, mutate } = useFetchData({
+	const {
+		data: subjectData,
+		isValidating: isSubjectValidating,
+		error: subjectError,
+		mutate: updateSubject,
+	} = useFetchData({
 		sessionToken: sessionToken,
 		schoolYearId: selectedSchoolYearId,
 		pageSize: rowsPerPage,
@@ -34,14 +39,14 @@ export default function SMSubject() {
 		return totalRows ? Math.ceil(totalRows / rowsPerPage) : 1;
 	};
 
-	React.useEffect(() => {
+	useEffect(() => {
 		setSubjectTableData([]);
-		mutate();
+		updateSubject();
 		setIsErrorShown(false);
-		if (data?.status === 200) {
-			setTotalRows(data.result['total-item-count']);
+		if (subjectData?.status === 200) {
+			setTotalRows(subjectData.result['total-item-count']);
 			let index = page * rowsPerPage + 1;
-			const tableData: ISubjectTableData[] = data.result.items.map(
+			const tableData: ISubjectTableData[] = subjectData.result.items.map(
 				(record: ISubjectResponse) => ({
 					id: index++,
 					subjectName: record['subject-name'],
@@ -53,33 +58,34 @@ export default function SMSubject() {
 			);
 			setSubjectTableData(tableData);
 		}
-	}, [data, selectedSchoolYearId]);
+	}, [subjectData, selectedSchoolYearId]);
 
-	React.useEffect(() => {
-		if (error && !isErrorShown) {
+	useEffect(() => {
+		if (subjectError && !isErrorShown) {
 			useNotify({
-				message: TRANSLATOR[error?.message] ?? error?.message ?? 'Có lỗi xảy ra',
+				message:
+					TRANSLATOR[subjectError?.message] ?? subjectError?.message ?? 'Có lỗi xảy ra',
 				type: 'error',
 			});
 			setIsErrorShown(true);
 		}
-	}, [isValidating]);
+	}, [isSubjectValidating]);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		setPage((prev: number) => Math.min(prev, getMaxPage() - 1));
 		if (page <= getMaxPage()) {
-			mutate({
+			updateSubject({
 				pageSize: rowsPerPage,
 				pageIndex: page,
 			});
 		}
 	}, [page, rowsPerPage]);
 
-	React.useEffect(() => {
-		mutate({ schoolYearId: selectedSchoolYearId });
+	useEffect(() => {
+		updateSubject({ schoolYearId: selectedSchoolYearId });
 	}, [selectedSchoolYearId]);
 
-	if (isValidating) {
+	if (isSubjectValidating) {
 		return (
 			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
 				<SMHeader>
@@ -122,7 +128,7 @@ export default function SMSubject() {
 						rowsPerPage={rowsPerPage}
 						setRowsPerPage={setRowsPerPage}
 						totalRows={totalRows}
-						mutate={mutate}
+						mutate={updateSubject}
 						selectedSubjectId={selectedSubjectId}
 						setSelectedSubjectId={setSelectedSubjectId}
 						isDetailsShown={isDetailsShown}
