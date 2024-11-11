@@ -60,6 +60,7 @@ export default function SMClass() {
 
   React.useEffect(() => {
     mutate();
+    setIsErrorShown(false);
     if (data?.status === 200 && currentSchoolYear) {
       setTotalRows(data.result["total-item-count"]);
       const classData: IClassTableData[] = data.result.items.map(
@@ -80,7 +81,10 @@ export default function SMClass() {
   React.useEffect(() => {
     setPage((prev) => Math.min(prev, getMaxPage() - 1));
     if (page <= getMaxPage()) {
-      mutate();
+      mutate({
+        pageSize: rowsPerPage,
+				pageIndex: page,
+      });
     }
   }, [page, rowsPerPage]);
 
@@ -107,12 +111,6 @@ export default function SMClass() {
         <ClassTableSkeleton />
       </div>
     );
-  }
-  if (error) {
-    useNotify({
-      type: "error",
-      message: error.message ?? "Có lỗi xảy ra",
-    });
   }
 
   return (
