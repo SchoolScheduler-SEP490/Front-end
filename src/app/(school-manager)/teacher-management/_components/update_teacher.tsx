@@ -18,13 +18,13 @@ import {
   DialogContent,
   Grid,
   FormHelperText,
-  Checkbox,
 } from "@mui/material";
 import { useFormik } from "formik";
 import dayjs from "dayjs";
 import {
   IDepartment,
   ISubject,
+  ITeacherDetail,
   IUpdateTeachableSubject,
   IUpdateTeacherRequestBody,
 } from "../_libs/constants";
@@ -63,6 +63,8 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [localFormData, setLocalFormData] = useState<IUpdateTeacherRequestBody | null>(null);
+  const [teacherData, setTeacherData] = useState<ITeacherDetail | null>(null);
+
 
   const formik = useFormik({
     initialValues: {
@@ -79,7 +81,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       phone: "",
       "is-deleted": false,
       "teachable-subjects": [] as IUpdateTeachableSubject[],
-    },
+    } as IUpdateTeacherRequestBody,
     validationSchema: updateTeacherSchema,
     onSubmit: async (values) => {
       const success = await editTeacher(teacherId, values);
@@ -100,6 +102,12 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   });
 
   useEffect(() => {
+    if (!open) {
+      setIsLoading(true);
+    }
+  }, [open])
+
+  useEffect(() => {
     const loadTeacherData = async () => {
       try {
         const teacherData = await fetchTeacherById(
@@ -114,6 +122,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
         const nonMainSubjects = teacherData["teachable-subjects"].filter(
           (subject) => !subject["is-main"]
         );
+        setTeacherData(teacherData);
         formik.setValues({
           "first-name": teacherData["first-name"],
           "last-name": teacherData["last-name"],
@@ -767,7 +776,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
             title="Cập nhật"
             disableRipple
             type="submit"
-            disabled={!formik.dirty}
+            disabled={!formik.isValid}
             styles="bg-primary-300 text-white !py-1 px-4"
           />
 
