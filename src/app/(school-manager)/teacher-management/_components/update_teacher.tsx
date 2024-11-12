@@ -106,6 +106,13 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
           teacherId,
           sessionToken
         );
+        const mainSubject = teacherData["teachable-subjects"].find(
+          (subject) => subject["is-main"]
+        );
+
+        const nonMainSubjects = teacherData["teachable-subjects"].filter(
+          (subject) => !subject["is-main"]
+        );
         formik.setValues({
           "first-name": teacherData["first-name"],
           "last-name": teacherData["last-name"],
@@ -121,13 +128,22 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
           status: teacherData.status.toString(),
           phone: teacherData.phone,
           "is-deleted": teacherData["is-deleted"],
-          "teachable-subjects": teacherData["teachable-subjects"].map(
-            (subject) => ({
-              ...subject,
+          "teachable-subjects": [
+            ...(mainSubject
+              ? [
+                  {
+                    "subject-abreviation": mainSubject.abbreviation,
+                    grades: mainSubject.grade || [],
+                    "is-main": true,
+                  },
+                ]
+              : []),
+            ...nonMainSubjects.map((subject) => ({
               "subject-abreviation": subject.abbreviation,
               grades: subject.grade || [],
-            })
-          ),
+              "is-main": false,
+            })),
+          ],
         });
         setIsLoading(false);
       } catch (error) {
@@ -414,102 +430,191 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Môn học
+                    Chuyên môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  {formik.values["teachable-subjects"].map((subject, index) => (
-                    <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
-                      <Grid item xs={5}>
-                        <FormControl fullWidth>
-                          <Select
-                            variant="standard"
-                            value={subject["subject-abreviation"]}
-                            onChange={(e) => {
-                              const newSubjects = [
-                                ...formik.values["teachable-subjects"],
-                              ];
-                              newSubjects[index]["subject-abreviation"] =
-                                e.target.value;
-                              formik.setFieldValue(
-                                "teachable-subjects",
-                                newSubjects
-                              );
-                            }}
-                            MenuProps={{
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 150,
-                                  overflow: "auto",
-                                },
-                              },
-                            }}
-                          >
-                            {subjects.map((sub) => (
-                              <MenuItem key={sub.id} value={sub.abbreviation}>
-                                {`${sub["subject-name"]} - ${sub.abbreviation}`}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={5}>
-                        <FormControl fullWidth>
-                          <Select
-                            multiple
-                            variant="standard"
-                            value={subject.grades}
-                            onChange={(e) => {
-                              const newSubjects = [
-                                ...formik.values["teachable-subjects"],
-                              ];
-                              newSubjects[index].grades = e.target
-                                .value as string[];
-                              formik.setFieldValue(
-                                "teachable-subjects",
-                                newSubjects
-                              );
-                            }}
-                          >
-                            {CLASSGROUP_STRING_TYPE.map((grade) => (
-                              <MenuItem
-                                key={grade.key}
-                                value={`GRADE_${grade.value}`}
-                              >
-                                {grade.key}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </Grid>
-
-                      <Grid
-                        item
-                        xs={2}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={subject["is-main"]}
-                              onChange={(e) => {
-                                const newSubjects = [
-                                  ...formik.values["teachable-subjects"],
-                                ];
-                                newSubjects[index]["is-main"] =
-                                  e.target.checked;
-                                formik.setFieldValue(
-                                  "teachable-subjects",
-                                  newSubjects
-                                );
-                              }}
-                            />
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={5}>
+                      <FormControl fullWidth>
+                        <Select
+                          variant="standard"
+                          value={
+                            formik.values["teachable-subjects"].find(
+                              (s) => s["is-main"]
+                            )?.["subject-abreviation"] || ""
                           }
-                          label="Chính"
-                        />
-                      </Grid>
+                          onChange={(e) => {
+                            const mainSubject = {
+                              "subject-abreviation": e.target.value,
+                              grades: [],
+                              "is-main": true,
+                            };
+                            const nonMainSubjects = formik.values[
+                              "teachable-subjects"
+                            ].filter((s) => !s["is-main"]);
+                            formik.setFieldValue("teachable-subjects", [
+                              ...nonMainSubjects,
+                              mainSubject,
+                            ]);
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 150,
+                                overflow: "auto",
+                              },
+                            },
+                          }}
+                        >
+                          {subjects.map((sub) => (
+                            <MenuItem key={sub.id} value={sub.abbreviation}>
+                              {`${sub["subject-name"]} - ${sub.abbreviation}`}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
                     </Grid>
-                  ))}
+                    <Grid item xs={5}>
+                      <FormControl fullWidth>
+                        <Select
+                          multiple
+                          variant="standard"
+                          value={
+                            formik.values["teachable-subjects"].find(
+                              (s) => s["is-main"]
+                            )?.grades || []
+                          }
+                          onChange={(e) => {
+                            const mainSubject = formik.values[
+                              "teachable-subjects"
+                            ].find((s) => s["is-main"]);
+                            if (mainSubject) {
+                              mainSubject.grades = e.target.value as string[];
+                              const nonMainSubjects = formik.values[
+                                "teachable-subjects"
+                              ].filter((s) => !s["is-main"]);
+                              formik.setFieldValue("teachable-subjects", [
+                                ...nonMainSubjects,
+                                mainSubject,
+                              ]);
+                            }
+                          }}
+                        >
+                          {CLASSGROUP_STRING_TYPE.map((grade) => (
+                            <MenuItem
+                              key={grade.key}
+                              value={`GRADE_${grade.value}`}
+                            >
+                              {grade.key}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Môn có thể dạy
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <Grid container spacing={2} sx={{ mb: 2 }}>
+                    <Grid item xs={5}>
+                      <FormControl fullWidth>
+                        <Select
+                          multiple
+                          variant="standard"
+                          value={formik.values["teachable-subjects"]
+                            .filter((s) => !s["is-main"])
+                            .map((s) => s["subject-abreviation"])}
+                          onChange={(e) => {
+                            const selectedSubjects = (
+                              e.target.value as string[]
+                            ).map((abbrev) => ({
+                              "subject-abreviation": abbrev,
+                              grades: [],
+                              "is-main": false,
+                            }));
+                            const mainSubject = formik.values[
+                              "teachable-subjects"
+                            ].find((s) => s["is-main"]);
+                            formik.setFieldValue(
+                              "teachable-subjects",
+                              mainSubject
+                                ? [...selectedSubjects, mainSubject]
+                                : selectedSubjects
+                            );
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 150,
+                                overflow: "auto",
+                              },
+                            },
+                          }}
+                        >
+                          {subjects.map((sub) => (
+                            <MenuItem key={sub.id} value={sub.abbreviation}>
+                              {`${sub["subject-name"]} - ${sub.abbreviation}`}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={5}>
+                      <FormControl fullWidth>
+                        <Select
+                          multiple
+                          variant="standard"
+                          value={formik.values["teachable-subjects"]
+                            .filter((s) => !s["is-main"])
+                            .flatMap((s) => s.grades)}
+                          onChange={(e) => {
+                            const selectedGrades = e.target.value as string[];
+                            const nonMainSubjects = formik.values[
+                              "teachable-subjects"
+                            ].filter((s) => !s["is-main"]);
+                            const updatedSubjects = nonMainSubjects.map(
+                              (s) => ({
+                                ...s,
+                                grades: selectedGrades,
+                              })
+                            );
+                            const mainSubject = formik.values[
+                              "teachable-subjects"
+                            ].find((s) => s["is-main"]);
+                            formik.setFieldValue(
+                              "teachable-subjects",
+                              mainSubject
+                                ? [...updatedSubjects, mainSubject]
+                                : updatedSubjects
+                            );
+                          }}
+                        >
+                          {CLASSGROUP_STRING_TYPE.map((grade) => (
+                            <MenuItem
+                              key={grade.key}
+                              value={`GRADE_${grade.value}`}
+                            >
+                              {grade.key}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
