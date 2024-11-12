@@ -418,7 +418,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			});
 			setSumObject(totalSlot);
 		}
-	}, [subjectTableData]);
+	}, [subjectTableData, isEditing]);
 
 	const handleUpdateLesson = (
 		target: keyof IUpdateSubjectInGroupRequest,

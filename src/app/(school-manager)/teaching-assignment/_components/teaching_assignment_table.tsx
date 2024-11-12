@@ -103,9 +103,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	);
 	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
 	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
-	const [applicableSubjects, setApplicableSubjects] = useState<ITeachingAssignmentTableData[]>(
-		[]
-	);
 
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
@@ -132,12 +129,15 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 			const assignedSubjects: ITeachingAssignmentTableData[] = subjectData.filter(
 				(item) => item.teacherName.label !== '- - -'
 			);
-			setApplicableSubjects(assignedSubjects);
 		}
 	}, [subjectData]);
 
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);
+	};
+
+	const handleAutoAssign = () => {
+		setIsApplyModalOpen(true);
 	};
 
 	const handleConfirmCancelUpdate = () => {
@@ -184,8 +184,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		getTeachableData({ subjectId: selectedSubjectId });
 	};
 
-	const handleMultipleApply = () => {};
-
 	return (
 		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
@@ -231,13 +229,13 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 									</Tooltip>
 								</>
 							) : (
-								<Tooltip title='Áp dụng tự động'>
+								<Tooltip title='Phân công tự động'>
 									<IconButton
 										id='filter-btn'
 										aria-controls={isFilterable ? 'basic-menu' : undefined}
 										aria-haspopup='true'
 										aria-expanded={isFilterable ? 'true' : undefined}
-										onClick={handleMultipleApply}
+										onClick={handleAutoAssign}
 									>
 										<LayersIcon fontSize='medium' />
 									</IconButton>
@@ -377,11 +375,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 				setOpen={setIsCancelUpdateModalOpen}
 				handleApprove={handleCancelUpdateTeachingAssignment}
 			/>
-			<TeachingAssignmentApplyModal
-				open={isApplyModalOpen}
-				setOpen={setIsApplyModalOpen}
-				applicableSubjects={applicableSubjects}
-			/>
+			<TeachingAssignmentApplyModal open={isApplyModalOpen} setOpen={setIsApplyModalOpen} />
 		</div>
 	);
 };

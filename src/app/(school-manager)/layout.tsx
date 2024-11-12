@@ -1,12 +1,9 @@
 'use client';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import { useAppContext } from '@/context/app_provider';
-import { notFound } from 'next/navigation';
-import { useEffect } from 'react';
-import { IJWTTokenPayload } from '../(auth)/_utils/constants';
-import { jwtDecode } from 'jwt-decode';
-import { Provider } from 'react-redux';
 import { schoolManagerStore } from '@/context/school_manager_store';
+import { notFound } from 'next/navigation';
+import { Provider } from 'react-redux';
 
 export default function SMLayout({
 	children,

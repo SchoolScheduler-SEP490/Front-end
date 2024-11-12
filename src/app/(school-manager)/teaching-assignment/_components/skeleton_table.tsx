@@ -89,7 +89,7 @@ const TeachingAssignmentTableSkeleton = () => {
 							<Skeleton animation='wave' variant='text' sx={{ width: '40%' }} />
 						</div>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-							<Tooltip title='Áp dụng tự động'>
+							<Tooltip title='Phân công tự động'>
 								<IconButton>
 									<LayersIcon fontSize='medium' />
 								</IconButton>

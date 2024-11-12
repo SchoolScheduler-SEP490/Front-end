@@ -108,3 +108,16 @@ export interface ITeachableResponse {
 	'update-date': string | null;
 	'is-deleted': boolean;
 }
+
+export interface ITeachingAssignmentAvailabilityResponse {
+	'Giáo viên': string[];
+	'Lớp học': string[];
+	'Năm học': string[];
+	'Môn học': string[];
+}
+export const ENTITY_TARGET: { [key: string]: string } = {
+	'Giáo viên': '/teacher-management',
+	'Lớp học': '/class-management',
+	'Năm học': '',
+	'Môn học': '/subject-management',
+};
