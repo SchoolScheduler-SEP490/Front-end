@@ -187,7 +187,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 												rel='noopener noreferrer'
 												className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
 											>
-												Đi đến {entity}
+												Sửa lỗi {entity}
 												<ArrowOutwardIcon
 													color='inherit'
 													sx={{ fontSize: 18, opacity: 0.8 }}

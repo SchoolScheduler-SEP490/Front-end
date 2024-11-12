@@ -120,7 +120,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 					} as IDropdownOption<number>;
 				}
 			);
-			setTeachableDropdown([...dropdownOptions]);
+			setTeachableDropdown([...useFilterArray(dropdownOptions, 'value')]);
 		}
 	}, [teachableData, selectedSubjectId]);
 
