@@ -19,9 +19,7 @@ export const classSchema = yup.object().shape({
 export const updateClassSchema = yup.object().shape({
   name: yup.string().required("Vui lòng nhập tên lớp"),
 
-  ["homeroom-teacher-abbreviation"]: yup
-    .string()
-    .required("Vui lòng chọn tên của giáo viên chủ nhiệm"),
+  ["homeroom-teacher-id"]: yup.number().required("Vui lòng chọn giáo viên chủ nhiệm"),
 
   ["main-session"]: yup.number().required("Vui lòng chọn ca học chính"),
 
@@ -30,4 +28,7 @@ export const updateClassSchema = yup.object().shape({
   ["period-count"]: yup.number().required("Vui lòng chọn số buổi học"),
 
   grade: yup.number().required("Vui lòng chọn khối lớp"),
+
+  ["subject-group-id"]: yup.number().required("Vui lòng chọn tổ hợp môn")
+
 });
