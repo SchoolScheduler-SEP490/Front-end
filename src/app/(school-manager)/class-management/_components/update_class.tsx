@@ -21,14 +21,14 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { IUpdateClassData } from "../_libs/constants";
+import { IClassDetail, ITeacher, IUpdateClassData } from "../_libs/constants";
 import { updateClassSchema } from "../_libs/class_schema";
 import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 import { ISubjectGroup } from "../_libs/constants";
-import { getSubjectGroup } from "../_libs/apiClass";
+import { getSubjectGroup, getTeacherName } from "../_libs/apiClass";
 
 interface UpdateClassFormProps {
   open: boolean;
@@ -54,82 +54,112 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
   const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const { editClass, isUpdating } = useUpdateClass(mutate);
-  const [oldData, setOldData] = useState<IUpdateClassData>(
-    {} as IUpdateClassData
-  );
   const [subjectGroups, setSubjectGroups] = useState<ISubjectGroup[]>([]);
+  const [teachers, setTeachers] = useState<ITeacher[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [classData, setClassData] = useState<IClassDetail | null>(null);
 
   const formik = useFormik({
     initialValues: {
-      ...oldData,
+      name: "",
+      "homeroom-teacher-id": 0,
+      "school-id": schoolId,
+      "school-year-id": selectedSchoolYearId,
+      "main-session": "",
+      "is-full-day": false,
+      "period-count": 0,
+      grade: 0,
+      "subject-group-id": 0,
     },
     validationSchema: updateClassSchema,
     onSubmit: async (values) => {
-      const success = await editClass(classId, values);
+      const updatedValues: IUpdateClassData = {
+        ...values,
+        "school-id": Number(values["school-id"]),
+      };
+      const success = await editClass(classId, updatedValues);
       if (success) {
-        console.log("Class updated successfully");
         useNotify({
           message: "Cập nhật lớp học thành công.",
           type: "success",
         });
         handleClose();
       } else {
-        console.log("Failed to update teacher");
         useNotify({
           message: "Cập nhật lớp học thất bại.",
           type: "error",
         });
       }
     },
-    enableReinitialize: true,
   });
 
   useEffect(() => {
-    const fetchClassById = async () => {
-      const response = await fetch(
-        `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`, 
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (data.status === 200) {
-        const gradeNumber = Number(data.result.grade.split("_")[1]);
-  
-        setOldData({
-          ...data.result,
-          grade: gradeNumber,
-          "school-id": schoolId,
-          "school-year-id": selectedSchoolYearId,
-        });
-      } else {
-        useNotify({
-          type: "error",
-          message: data.message,
-        });
-      }
-    };
-  
-    if (open) {
-      fetchClassById();
+    if (!open) {
+      setIsLoading(true);
     }
-  }, [open, classId, sessionToken, schoolId, selectedSchoolYearId]);
-  
+  }, [open]);
 
   useEffect(() => {
-    const fetchSubjectGroups = async () => {
-      if (sessionToken && schoolId) {
-        const response = await getSubjectGroup(sessionToken, schoolId, selectedSchoolYearId);
-        if (response.status === 200) {
-          setSubjectGroups(response.result.items);
+    const loadClassData = async () => {
+      try {
+        const response = await fetch(
+          `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/classes/${classId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${sessionToken}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (data.status === 200) {
+          const gradeNumber = Number(data.result.grade.split("_")[1]);
+          setClassData(data);
+          formik.setValues({
+            name: data.result.name,
+            "homeroom-teacher-id": data.result["homeroom-teacher-id"],
+            "school-id": schoolId,
+            "school-year-id": selectedSchoolYearId,
+            "main-session": data.result["main-session"].toString(),
+            "is-full-day": data.result["is-full-day"],
+            "period-count": data.result["period-count"],
+            grade: gradeNumber,
+            "subject-group-id": data.result["subject-group-id"],
+          });
         }
+        setIsLoading(false);
+      } catch (error) {
+        useNotify({
+          type: "error",
+          message: "Lỗi khi tải dữ liệu lớp học",
+        });
       }
     };
-    fetchSubjectGroups();
-  }, [sessionToken, schoolId]);
+
+    const loadSubjectGroups = async () => {
+      const response = await getSubjectGroup(
+        sessionToken,
+        schoolId,
+        selectedSchoolYearId
+      );
+      if (response.status === 200) {
+        setSubjectGroups(response.result.items);
+      }
+    };
+
+    const loadTeacherName = async () => {
+      const response = await getTeacherName(sessionToken, schoolId);
+      if (response.status === 200) {
+        setTeachers(response.result.items);
+      }
+    };
+
+    if (open && isLoading) {
+      loadClassData();
+      loadSubjectGroups();
+      loadTeacherName();
+    }
+  }, [open, isLoading, classId, sessionToken, schoolId, selectedSchoolYearId]);
 
   const handleClose = () => {
     formik.resetForm();
@@ -263,6 +293,60 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                       formik.errors["period-count"]
                     }
                   />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Giáo viên chủ nhiệm
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl fullWidth>
+                    <Select
+                      variant="standard"
+                      name="homeroom-teacher-id"
+                      value={formik.values["homeroom-teacher-id"]}
+                      onChange={(event) => {
+                        formik.setFieldValue(
+                          "homeroom-teacher-id",
+                          event.target.value
+                        );
+                      }}
+                      error={
+                        formik.touched["homeroom-teacher-id"] &&
+                        Boolean(formik.errors["homeroom-teacher-id"])
+                      }
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="">--Chọn giáo viên--</MenuItem>
+                      {teachers.map((teacher) => (
+                        <MenuItem key={teacher.id} value={teacher.id}>
+                          {`${teacher["first-name"]} ${teacher["last-name"]} (${teacher.abbreviation})`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["homeroom-teacher-id"] &&
+                      formik.errors["homeroom-teacher-id"] && (
+                        <FormHelperText error>
+                          {formik.errors["homeroom-teacher-id"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>

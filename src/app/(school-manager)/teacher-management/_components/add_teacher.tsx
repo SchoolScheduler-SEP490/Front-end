@@ -167,7 +167,24 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
         </IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
-        <DialogContent>
+        <DialogContent
+          sx={{
+            maxHeight: "70vh",
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              display: "none",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "-ms-overflow-style": "none",
+          }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
