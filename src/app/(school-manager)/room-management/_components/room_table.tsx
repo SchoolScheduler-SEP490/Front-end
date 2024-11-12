@@ -294,6 +294,15 @@ const RoomTable = (props: IRoomTableProps) => {
                 rowCount={roomTableData.length}
               />
               <TableBody>
+              {visibleRows.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={8} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Phòng học chưa có dữ liệu
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
                 {visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
