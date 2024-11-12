@@ -74,6 +74,7 @@ const AddClassModal = (props: AddClassFormProps) => {
       schoolId: schoolId,
       sessionToken: sessionToken,
       formData: [body],
+      schoolYearId: selectedSchoolYearId,
     });
     mutate();
     handleClose();
@@ -89,20 +90,24 @@ const AddClassModal = (props: AddClassFormProps) => {
       name: "",
       "homeroom-teacher-abbreviation": "",
       "main-session": "",
-      "is-full-day": true,
-      "period-count": "",
+      "is-full-day": false,
       grade: "",
-      "subject-group-code": "",
+      "subject-group-code": ""
     },
     validationSchema: classSchema,
-    onSubmit: async (formData) => {
-      handleFormSubmit({
-        ...formData,
-        "main-session": Number(formData["main-session"]),
-        "period-count": Number(formData["period-count"]),
-      });
-    },
+    onSubmit: async (values) => {
+      const formData: IAddClassData = {
+        name: values.name,
+        "homeroom-teacher-abbreviation": values["homeroom-teacher-abbreviation"],
+        "main-session": Number(values["main-session"]),
+        "is-full-day": values["is-full-day"],
+        grade: values.grade,
+        "subject-group-code": values["subject-group-code"]
+      };
+      await handleFormSubmit(formData);
+    }
   });
+  
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -247,39 +252,6 @@ const AddClassModal = (props: AddClassFormProps) => {
                         </FormHelperText>
                       )}
                   </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Số tiết học
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    type="number"
-                    name="period-count"
-                    value={formik.values["period-count"]}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched["period-count"] &&
-                      Boolean(formik.errors["period-count"])
-                    }
-                    helperText={
-                      formik.touched["period-count"] &&
-                      formik.errors["period-count"]
-                    }
-                  />
                 </Grid>
               </Grid>
             </Grid>

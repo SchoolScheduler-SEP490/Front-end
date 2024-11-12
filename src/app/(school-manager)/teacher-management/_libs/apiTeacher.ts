@@ -1,4 +1,4 @@
-import { IAddTeacherData, IUpdateTeacherRequestBody  } from "./constants";
+import { IAddTeacherData, IUpdateTeacherRequestBody, ITeacherDetail  } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
@@ -154,3 +154,27 @@ export const getSubjectName = async (
   return data;
 };
 
+export const fetchTeacherById = async (
+  schoolId: string,
+  teacherId: number,
+  sessionToken: string
+): Promise<ITeacherDetail> => {
+  const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
+  const url = `${api}/api/schools/${schoolId}/teachers/${teacherId}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to fetch teacher data.");
+  }
+
+  const data = await response.json();
+  return data.result;
+}

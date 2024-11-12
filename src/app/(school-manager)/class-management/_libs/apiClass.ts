@@ -50,13 +50,14 @@ export const getTeacherName = async (
 export const addClass = async (
   schoolId: string,
   sessionToken: string,
-  classData: IAddClassData
+  classData: IAddClassData,
+  schoolYearId: number
 ): Promise<any> => {
   if (!sessionToken) {
     console.error("Session token is not found. Please log in.");
     return false;
   }
-  const url = `${api}/api/student-classes?schoolId=${schoolId}&schoolYearId=1`;
+  const url = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes`;
   const requestBody = [classData];
   console.log("Request Body:", requestBody);
 

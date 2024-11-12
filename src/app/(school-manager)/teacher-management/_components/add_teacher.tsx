@@ -97,6 +97,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
     handleClose();
   };
 
+  // Update the formik initialValues
   const formik = useFormik({
     initialValues: {
       "first-name": "",
@@ -106,12 +107,13 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       gender: "Male",
       "department-code": "",
       "date-of-birth": "",
-      "teacher-role": "Role1",
+      "teacher-role": "TEACHER",
       status: "Active",
       phone: "",
       "main-subject": {
         "subject-abreviation": "",
-        grade: "",
+        grades: [],
+        "is-main": true,
       },
     },
     validationSchema: teacherSchema,
@@ -119,15 +121,17 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       handleFormSubmit({
         ...formData,
         "main-subject": {
-          "subject-abreviation": formData["main-subject"]["subject-abreviation"],
-          "grade": String(formData["main-subject"].grade)
-        }
+          "subject-abreviation":
+            formData["main-subject"]["subject-abreviation"],
+          grades: formData["main-subject"].grades,
+          "is-main": true,
+        },
       });
     },
   });
 
   console.log("isValid", formik.isValid);
-  console.log("error:", formik.errors)
+  console.log("error:", formik.errors);
   console.log("values:", formik.values);
 
   return (
@@ -375,7 +379,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Môn học chính
+                    Chuyên môn
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
@@ -409,7 +413,7 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                       formik.errors["main-subject"]?.[
                         "subject-abreviation"
                       ] && (
-                        <FormHelperText>
+                        <FormHelperText sx={{ margin: 0 }}>
                           {formik.errors["main-subject"]["subject-abreviation"]}
                         </FormHelperText>
                       )}
@@ -433,28 +437,35 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                   <FormControl
                     fullWidth
                     error={
-                      formik.touched["main-subject"]?.grade &&
-                      Boolean(formik.errors["main-subject"]?.grade)
+                      formik.touched["main-subject"]?.grades &&
+                      Boolean(formik.errors["main-subject"]?.grades)
                     }
                   >
                     <Select
                       variant="standard"
-                      name="main-subject.grade"
-                      value={formik.values["main-subject"].grade}
-                      onChange={formik.handleChange}
+                      name="main-subject.grades"
+                      multiple
+                      value={formik.values["main-subject"].grades}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        formik.setFieldValue(
+                          "main-subject.grades",
+                          typeof value === "string" ? value.split(",") : value
+                        );
+                      }}
                       onBlur={formik.handleBlur}
+                      MenuProps={MenuProps}
                     >
-                      <MenuItem value="">--Chọn khối--</MenuItem>
                       {CLASSGROUP_STRING_TYPE.map((grade) => (
                         <MenuItem key={grade.key} value={grade.value}>
                           {grade.key}
                         </MenuItem>
                       ))}
                     </Select>
-                    {formik.touched["main-subject"]?.grade &&
-                      formik.errors["main-subject"]?.grade && (
-                        <FormHelperText>
-                          {formik.errors["main-subject"].grade}
+                    {formik.touched["main-subject"]?.grades &&
+                      formik.errors["main-subject"]?.grades && (
+                        <FormHelperText sx={{ margin: 0 }}>
+                          {formik.errors["main-subject"].grades}
                         </FormHelperText>
                       )}
                   </FormControl>

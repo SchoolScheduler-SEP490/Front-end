@@ -11,9 +11,9 @@ export const classSchema = yup.object().shape({
 
   ["is-full-day"]: yup.boolean().required("Vui lòng chọn"),
 
-  ["period-count"]: yup.number().required("Vui lòng chọn số buổi học"),
-
   grade: yup.number().required("Vui lòng chọn khối lớp"),
+
+  "subject-group-code": yup.string().required("Vui lòng chọn tổ hợp môn")
 });
 
 export const updateClassSchema = yup.object().shape({
