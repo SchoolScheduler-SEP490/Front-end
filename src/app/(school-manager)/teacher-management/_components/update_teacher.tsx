@@ -62,6 +62,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [localFormData, setLocalFormData] = useState<IUpdateTeacherRequestBody | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -172,12 +173,18 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       }
     };
 
-    if (open) {
+    if (open && isLoading) {
       loadTeacherData();
       loadDepartments();
       loadSubjects();
     }
-  }, [open, teacherId, sessionToken, schoolId]);
+  }, [open, teacherId, sessionToken, schoolId, isLoading]);
+
+  useEffect(() => {
+    if (localFormData && open) {
+      formik.setValues(localFormData);
+    }
+  }, [localFormData, open]);
 
   const handleClose = () => {
     formik.resetForm();
@@ -194,16 +201,6 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      sx={{
-        "& .MuiDialog-paper": {
-          overflowY: "auto",
-          scrollbarWidth: "none",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          "-ms-overflow-style": "none",
-        },
-      }}
     >
       <div
         id="modal-header"
@@ -221,7 +218,24 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
         </IconButton>
       </div>
       <form onSubmit={formik.handleSubmit}>
-        <DialogContent>
+        <DialogContent
+        sx={{ 
+          maxHeight: '70vh',
+          overflowY: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '8px', 
+            display: "none",
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#888',
+            borderRadius: '4px'
+          },
+          "-ms-overflow-style": "none",
+        }}
+        >
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Grid container spacing={2}>
@@ -435,7 +449,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={5}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth>
                         <Select
                           variant="standard"
@@ -475,7 +489,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth>
                         <Select
                           multiple
@@ -530,7 +544,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                 </Grid>
                 <Grid item xs={9}>
                   <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={5}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth>
                         <Select
                           multiple
@@ -573,7 +587,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={5}>
+                    <Grid item xs={6}>
                       <FormControl fullWidth>
                         <Select
                           multiple
@@ -770,3 +784,4 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
 };
 
 export default UpdateTeacherModal;
+   
