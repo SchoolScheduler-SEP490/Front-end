@@ -28,7 +28,6 @@ export interface IAddClassData {
   "homeroom-teacher-abbreviation"?: string;
   "main-session": number;
   "is-full-day": boolean;
-  "period-count": number;
   grade: string;
   "subject-group-code": string;
 }
