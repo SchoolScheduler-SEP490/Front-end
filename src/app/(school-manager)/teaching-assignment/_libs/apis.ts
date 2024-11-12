@@ -93,3 +93,23 @@ export const getFetchTeachableTeacherApi = ({
 }) => {
 	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
 };
+
+export const getCheckAutoAssignAvailabilityApi = ({
+	schoolId,
+	schoolYearId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments/check-auto-assign-teacher`;
+};
+
+export const getAutoAssignmentApi = ({
+	schoolId,
+	schoolYearId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments/auto-assign-teacher`;
+};
