@@ -1,8 +1,10 @@
 import { IClassResponse, ITeachingAssignmentSidenavData } from '../_libs/constants';
 
-function customSort(arr: { key: string; value: number }[]): { key: string; value: number }[] {
+function customSort(
+	arr: { key: string; value: number; extra: string }[]
+): { key: string; value: number; extra: string }[] {
 	// Bước 1: Chia mảng lớn thành các mảng con có cùng độ dài chuỗi
-	const lengthMap: { [key: number]: { key: string; value: number }[] } = {};
+	const lengthMap: { [key: number]: { key: string; value: number; extra: string }[] } = {};
 
 	arr.forEach((item) => {
 		const length = item.key.length;
@@ -44,6 +46,7 @@ const useSidenavDataConverter = (data: IClassResponse[]): ITeachingAssignmentSid
 			acc[grade].items.push({
 				key: item.name,
 				value: item.id,
+				extra: item['subject-group-name'],
 			});
 			return acc;
 		},

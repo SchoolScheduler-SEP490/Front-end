@@ -38,7 +38,7 @@ const useCreateDepartment = async (props: ICreateSubjectProps) => {
 		});
 		useNotify({
 			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-			type: response?.status === 201 ? 'success' : 'error',
+			type: response?.status === 200 ? 'success' : 'error',
 		});
 		return response;
 	} catch (err: any) {
@@ -46,6 +46,7 @@ const useCreateDepartment = async (props: ICreateSubjectProps) => {
 			message: TRANSLATOR[err.message ?? ''] ?? 'Có lỗi xảy ra',
 			type: 'error',
 		});
+		return err;
 	}
 };
 

@@ -1,19 +1,18 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { IUpdateDepartmentRequest } from '../_libs/constants';
-import { getUpdateDepartmentApi } from '../_libs/apis';
+import { getAssignDepartmentHeadApi } from '../_libs/apis';
+import { IDepartmentHeadAssignmentRequest } from '../_libs/constants';
 
 interface IUpdateSubjectProps {
 	schoolId: number;
-	departmentId: number;
 	sessionToken: string;
-	formData: IUpdateDepartmentRequest;
+	formData: IDepartmentHeadAssignmentRequest[];
 }
 
-const useUpdateDepartment = async (props: IUpdateSubjectProps) => {
-	const { departmentId, formData, sessionToken, schoolId } = props;
-	const endpoint = getUpdateDepartmentApi({ schoolId, departmentId });
+const useAssignDepartmentHead = async (props: IUpdateSubjectProps) => {
+	const { formData, sessionToken, schoolId } = props;
+	const endpoint = getAssignDepartmentHeadApi({ schoolId });
 	let response;
 
 	async function updateDepartment(url: string) {
@@ -23,9 +22,7 @@ const useUpdateDepartment = async (props: IUpdateSubjectProps) => {
 				'Content-Type': 'application/json',
 			},
 			method: 'PATCH',
-			body: JSON.stringify({
-				...formData,
-			}),
+			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -40,16 +37,16 @@ const useUpdateDepartment = async (props: IUpdateSubjectProps) => {
 			revalidate: true,
 		});
 		useNotify({
-			message: TRANSLATOR[response?.message || ''] ?? 'Không thể cập nhật tổ bộ môn',
+			message: TRANSLATOR[response?.message || ''] ?? 'Không thể phân công',
 			type: response?.status === 200 ? 'success' : 'error',
 		});
 		return response;
 	} catch (err: any) {
 		useNotify({
-			message: TRANSLATOR[err.message ?? ''] ?? 'Không thể cập nhật tổ bộ môn',
+			message: TRANSLATOR[err.message ?? ''] ?? 'Không thể phân công',
 			type: 'error',
 		});
 	}
 };
 
-export default useUpdateDepartment;
+export default useAssignDepartmentHead;

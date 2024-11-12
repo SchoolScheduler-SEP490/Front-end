@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Menu, MenuItem, Skeleton, Toolbar, Tooltip } from '@mui/material';
+import TuneIcon from '@mui/icons-material/Tune';
+import { Skeleton, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -129,7 +129,7 @@ const DepartmentTableSkeleton = () => {
 						</Tooltip>
 						<Tooltip title='Lọc danh sách'>
 							<IconButton>
-								<FilterListIcon />
+								<TuneIcon />
 							</IconButton>
 						</Tooltip>
 					</div>
