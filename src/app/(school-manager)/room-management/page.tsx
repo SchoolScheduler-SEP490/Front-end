@@ -10,11 +10,13 @@ import { fetchBuildingName } from "./_libs/apiRoom";
 import RoomTableSkeleton from "./_components/table_skeleton";
 import useNotify from "@/hooks/useNotify";
 import { ERoomType, ROOM_TYPE_TRANSLATOR } from "@/utils/constants";
+import { TRANSLATOR } from "@/utils/dictionary";
 
 export default function SMRoom() {
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+  const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
   const [buildingMap, setBuildingMap] = React.useState<Map<number, string>>(
     new Map()
   );
@@ -84,9 +86,22 @@ export default function SMRoom() {
   React.useEffect(() => {
     setPage((prev) => Math.min(prev, getMaxPage() - 1));
     if (page <= getMaxPage()) {
-      mutate();
+      mutate({
+        pageSize: rowsPerPage,
+				pageIndex: page,
+      });
     }
   }, [page, rowsPerPage]);
+
+  React.useEffect(() => {
+		if (error && !isErrorShown) {
+			setIsErrorShown(true);
+			useNotify({
+				message: TRANSLATOR[error?.message] ?? 'Phòng học chưa có dữ liệu.',
+				type: 'error',
+			});
+		}
+	}, [isValidating]);
 
   if (isValidating || !buildingMap.size) {
     return (

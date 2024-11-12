@@ -32,8 +32,8 @@ const useRoomData = (props: IFetcherProps) => {
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
-      revalidateOnMount: true,
-      refreshInterval: 30000,
+      revalidateIfStale: true,
+      shouldRetryOnError: false,
     }
   );
 
