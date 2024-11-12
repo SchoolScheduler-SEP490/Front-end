@@ -119,5 +119,5 @@ export const ENTITY_TARGET: { [key: string]: string } = {
 	'Giáo viên': '/teacher-management',
 	'Lớp học': '/class-management',
 	'Năm học': '',
-	'Môn học': '/subject-management',
+	'Môn học': '/teacher-management',
 };
