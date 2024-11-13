@@ -19,6 +19,7 @@ import UpdateTeacherModal from "../_components/update_teacher";
 import ContainedButton from "@/commons/button-contained";
 import { Card, CardContent, Typography, Divider } from "@mui/material";
 import TeacherSidenav from "./sidenav";
+import TeacherAssignment from "./teacher_assignment";
 
 export default function TeacherDetails() {
   const [teacherData, setTeacherData] = useState<ITeacherDetail>();
@@ -73,202 +74,235 @@ export default function TeacherDetails() {
       </SMHeader>
 
       {isLoading && teacherData && (
-      <div className="flex h-full">
-      <TeacherSidenav activeTab={activeTab} handleTabChange={handleTabChange} />
-      <div className="flex-1 p-6 overflow-auto">
-
-      <div className="w-full p-7">
-        <div className="flex justify-end">
-          <ContainedButton
-            onClick={() => setOpenUpdateModal(true)}
-            title="Chỉnh sửa thông tin"
-            styles="bg-primary-300 text-white !py-1 px-4"
+        <div className="flex h-full">
+          <TeacherSidenav
+            activeTab={activeTab}
+            handleTabChange={handleTabChange}
           />
+          <div className="flex-1 p-6 overflow-auto">
+            {activeTab === 0 && (
+              <div className="w-full p-7">
+                <div className="flex justify-end">
+                  <ContainedButton
+                    onClick={() => setOpenUpdateModal(true)}
+                    title="Chỉnh sửa thông tin"
+                    styles="bg-primary-300 text-white !py-1 px-4"
+                  />
+                </div>
+                <UpdateTeacherModal
+                  open={openUpdateModal}
+                  onClose={setOpenUpdateModal}
+                  teacherId={Number(teacherId)}
+                  mutate={fetchTeacherDetails}
+                />
+                {teacherData && (
+                  <Grid
+                    container
+                    spacing={2}
+                    className="flex justify-evenly mx-auto my-auto"
+                  >
+                    <Grid item xs={12} md={5}>
+                      <Card className="w-fit shadow-md border border-gray-200 rounded-lg">
+                        <CardContent>
+                          <div className="flex items-center mb-6">
+                            <Avatar
+                              alt={`${teacherData["first-name"]} ${teacherData["last-name"]}`}
+                              className="w-16 h-16 mr-4"
+                            />
+                            <div>
+                              <Typography
+                                variant="h6"
+                                className="text-gray-800 font-semibold"
+                              >
+                                {teacherData["first-name"]}{" "}
+                                {teacherData["last-name"]}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500"
+                              >
+                                {
+                                  TEACHER_ROLE_TRANSLATOR[
+                                    TEACHER_ROLE.find(
+                                      (role) =>
+                                        role.key === teacherData["teacher-role"]
+                                    )?.value || 1
+                                  ]
+                                }
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500"
+                              >
+                                Ho Chi Minh City
+                              </Typography>
+                            </div>
+                          </div>
+
+                          <Divider className="my-4" />
+
+                          {/* Personal Information Section */}
+                          <Typography
+                            variant="h6"
+                            className="text-gray-800 font-semibold mb-4"
+                          >
+                            Thông tin cá nhân
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">Họ:</strong>{" "}
+                                {teacherData["first-name"]}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">Tên:</strong>{" "}
+                                {teacherData["last-name"]}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Email:
+                                </strong>{" "}
+                                {teacherData.email}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Số điện thoại:
+                                </strong>{" "}
+                                {teacherData.phone}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Ngày sinh:
+                                </strong>{" "}
+                                {dayjs(teacherData["date-of-birth"]).format(
+                                  "DD-MM-YYYY"
+                                )}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Giới tính:
+                                </strong>{" "}
+                                {
+                                  TEACHER_GENDER_TRANSLATOR[
+                                    TEACHER_GENDER.find(
+                                      (role) => role.key === teacherData.gender
+                                    )?.value || 1
+                                  ]
+                                }
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Tên viết tắt:
+                                </strong>{" "}
+                                {teacherData.abbreviation}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Trạng thái:
+                                </strong>{" "}
+                                {
+                                  TEACHER_STATUS_TRANSLATOR[
+                                    teacherData.status as keyof typeof TEACHER_STATUS_TRANSLATOR
+                                  ]
+                                }
+                              </Typography>
+                            </Grid>
+                          </Grid>
+
+                          <Divider className="my-4" />
+
+                          <Typography
+                            variant="h6"
+                            className="text-gray-800 font-semibold mb-4"
+                          >
+                            Thông tin giảng dạy
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Dạy môn:
+                                </strong>{" "}
+                                {teacherData["teachable-subjects"]
+                                  .map((subject) => subject["subject-name"])
+                                  .join(" - ")}
+                              </Typography>
+                            </Grid>
+
+                            <Grid item xs={6}>
+                              <Typography
+                                variant="body2"
+                                className="text-gray-500 mb-4"
+                              >
+                                <strong className="text-gray-800">
+                                  Tổ bộ môn:
+                                </strong>{" "}
+                                {teacherData["department-name"]}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  </Grid>
+                )}
+              </div>
+            )}
+            {activeTab === 1 && (
+              <div>
+                <h2 className="text-title-medium font-semibold mb-4">
+                  Phân công giảng dạy
+                </h2>
+                <TeacherAssignment teacherId={teacherId}                
+                />
+              </div>
+            )}
+          </div>
         </div>
-        <UpdateTeacherModal
-          open={openUpdateModal}
-          onClose={setOpenUpdateModal}
-          teacherId={Number(teacherId)}
-          mutate={fetchTeacherDetails}
-        />
-        {teacherData && (
-          <Grid
-            container
-            spacing={2}
-            className="flex justify-evenly mx-auto my-auto"
-          >
-            <Grid item xs={12} md={5}>
-              <Card className="w-fit shadow-md border border-gray-200 rounded-lg">
-                <CardContent>
-                  <div className="flex items-center mb-6">
-                    <Avatar
-                      alt={`${teacherData["first-name"]} ${teacherData["last-name"]}`}
-                      className="w-16 h-16 mr-4"
-                    />
-                    <div>
-                      <Typography
-                        variant="h6"
-                        className="text-gray-800 font-semibold"
-                      >
-                        {teacherData["first-name"]} {teacherData["last-name"]}
-                      </Typography>
-                      <Typography variant="body2" className="text-gray-500">
-                        {
-                          TEACHER_ROLE_TRANSLATOR[
-                            TEACHER_ROLE.find(
-                              (role) => role.key === teacherData["teacher-role"]
-                            )?.value || 1
-                          ]
-                        }
-                      </Typography>
-                      <Typography variant="body2" className="text-gray-500">
-                       Ho Chi Minh City
-                      </Typography>
-                    </div>
-                  </div>
-
-                  <Divider className="my-4" />
-
-                  {/* Personal Information Section */}
-                  <Typography
-                    variant="h6"
-                    className="text-gray-800 font-semibold mb-4"
-                  >
-                    Thông tin cá nhân
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Họ:</strong>{" "}
-                        {teacherData["first-name"]}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Tên:</strong>{" "}
-                        {teacherData["last-name"]}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Email:</strong>{" "}
-                        {teacherData.email}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">
-                          Số điện thoại:
-                        </strong>{" "}
-                        {teacherData.phone}
-                      </Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">
-                          Ngày sinh:
-                        </strong>{" "}
-                        {dayjs(teacherData["date-of-birth"]).format("DD-MM-YYYY")}
-                      </Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Giới tính:</strong>{" "}
-                        {
-                          TEACHER_GENDER_TRANSLATOR[
-                            TEACHER_GENDER.find(
-                              (role) => role.key === teacherData.gender
-                            )?.value || 1
-                          ]
-                        }
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Tên viết tắt:</strong>{" "}
-                        {teacherData.abbreviation}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Trạng thái:</strong>{" "}
-                        {
-                          TEACHER_STATUS_TRANSLATOR[
-                            teacherData.status as keyof typeof TEACHER_STATUS_TRANSLATOR
-                          ]
-                        }
-                      </Typography>
-                    </Grid>
-                  </Grid>
-
-                  <Divider className="my-4" />
-
-                  <Typography
-                    variant="h6"
-                    className="text-gray-800 font-semibold mb-4"
-                  >
-                    Thông tin giảng dạy
-                  </Typography>
-                  <Grid container spacing={2}>
-
-                  <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Dạy môn:</strong>{" "}
-                        {teacherData["teachable-subjects"]
-                    .map((subject) => subject["subject-name"])
-                    .join(" - ")}
-                      </Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <Typography
-                        variant="body2"
-                        className="text-gray-500 mb-4"
-                      >
-                        <strong className="text-gray-800">Tổ bộ môn:</strong>{" "}
-                        {teacherData["department-name"]}
-                      </Typography>
-                    </Grid>
-
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        )}
-      </div>
-      </div>
-      </div>
-      )}     
+      )}
     </div>
   );
 }

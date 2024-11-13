@@ -159,7 +159,6 @@ export const fetchTeacherById = async (
   teacherId: number,
   sessionToken: string
 ): Promise<ITeacherDetail> => {
-  const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   const url = `${api}/api/schools/${schoolId}/teachers/${teacherId}`;
 
   const response = await fetch(url, {
@@ -177,4 +176,22 @@ export const fetchTeacherById = async (
 
   const data = await response.json();
   return data.result;
+}
+
+export const getTeacherAssignment = async (
+  schoolId: string,
+  teacherId: number,
+  schoolYearId: number,
+  sessionToken: string
+) => {
+  const url  = `${api}/api/schools/${schoolId}/teachers/assignment?teacherId=${teacherId}&schoolYearId=${schoolYearId}`
+  const response = await fetch (url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  })
+  const data = await response.json();
+  return data; 
 }
