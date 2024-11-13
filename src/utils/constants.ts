@@ -160,3 +160,13 @@ export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
 	'Tiếng dân tộc thiểu số': 'Tiếng DTTS',
 	'Ngoại ngữ 2': 'NN2',
 };
+
+export const TEACHER_GENDER: { key: string; value: number }[] = [
+	{ key: 'Male', value: 1 },
+	{ key: 'Female', value: 2 },
+];
+
+export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
+	1: 'Nam',
+	2: 'Nữ',
+};

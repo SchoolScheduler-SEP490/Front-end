@@ -27,6 +27,8 @@ import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
 import {
   CLASSGROUP_STRING_TYPE,
   CLASSGROUP_TRANSLATOR,
+  TEACHER_GENDER,
+  TEACHER_GENDER_TRANSLATOR,
   TEACHER_ROLE,
   TEACHER_ROLE_TRANSLATOR,
   TEACHER_STATUS,
@@ -317,16 +319,14 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                       value={formik.values.gender}
                       onChange={formik.handleChange}
                     >
-                      <FormControlLabel
-                        value="Male"
-                        control={<Radio />}
-                        label="Nam"
-                      />
-                      <FormControlLabel
-                        value="Female"
-                        control={<Radio />}
-                        label="Nữ"
-                      />
+                      {TEACHER_GENDER.map((gender) => (
+                        <FormControlLabel
+                          key={gender.key}
+                          value={gender.key}
+                          control={<Radio />}
+                          label={TEACHER_GENDER_TRANSLATOR[gender.value]}
+                        />
+                      ))}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
