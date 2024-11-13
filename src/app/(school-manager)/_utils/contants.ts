@@ -97,3 +97,14 @@ export interface IDropdownOption<T> {
 	value: T;
 	label: string;
 }
+export const TEACHER_SIDENAV = [
+	{
+		name: 'Thông tin chung',
+	},
+	{
+		name: 'Phân công giảng dạy',
+	},
+	{
+		name: 'Thời khóa biểu',
+	},
+]
