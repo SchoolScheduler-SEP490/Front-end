@@ -20,7 +20,7 @@ import { TransitionGroup } from 'react-transition-group';
 import useApplySubjectGroup from '../_hooks/useApplySG';
 import useFetchSGClass from '../_hooks/useFetchClass';
 import { IApplySubjectGroupRequest, ISGClassResponse, IVulnerableClass } from '../_libs/constants';
-import ApllyConfirmationModal from './subject_group_confirm_modal';
+import ApllyConfirmationModal from './subject_group_modal_confirm';
 
 const style = {
 	position: 'absolute',
@@ -319,18 +319,18 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'
 				>
 					<ContainedButton
+						title='Huỷ'
+						onClick={handleClose}
+						disableRipple
+						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+					/>
+					<ContainedButton
 						title='áp dụng'
 						disableRipple
 						type='button'
 						disabled={selectedClasses.length === 0}
 						styles='bg-primary-300 text-white !py-1 px-4'
 						onClick={handleConfirmApply}
-					/>
-					<ContainedButton
-						title='Huỷ'
-						onClick={handleClose}
-						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 				</div>
 				<ApllyConfirmationModal

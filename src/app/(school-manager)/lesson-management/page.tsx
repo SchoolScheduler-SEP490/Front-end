@@ -17,10 +17,14 @@ import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	ILessonTableData,
+	IQuickAssignResponse,
 	ISubjectGroupObjectResponse,
 	ISubjectGroupSidenavData,
 	ISubjectInGroup,
+	TermSeperatedAssignedObject,
 } from './_libs/constants';
+import useFetchQuickAssignment from './_hooks/useFetchQuickAssignment';
+import LessonQuickApplyModal from './_components/lesson_modal_quick_apply';
 
 export default function SMLesson() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
@@ -31,7 +35,15 @@ export default function SMLesson() {
 	const [lessonTableData, setLessonTableData] = useState<ILessonTableData[]>([]);
 	const [termDropdownData, setTermDropdownData] = useState<IDropdownOption<number>[]>([]);
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(false);
+	const [isQuickAssignmentApplied, setQuickAssignmentApplied] = useState<boolean>(false);
+	const [quickAssignedData, setQuickAssignedData] = useState<TermSeperatedAssignedObject>({});
 
+	const { data: quickApplyData, mutate: toggleQuickApply } = useFetchQuickAssignment({
+		schoolId: Number(schoolId),
+		sessionToken,
+		schoolYearId: selectedSchoolYearId,
+		quickAssignmentApplied: isQuickAssignmentApplied,
+	});
 	const {
 		data: subjectGroupData,
 		mutate: updateSubjectGroup,
@@ -187,6 +199,23 @@ export default function SMLesson() {
 		}
 	}, [isSubjectGroupValidating, isSubjectGroupTableValidating, isTermValidating]);
 
+	useEffect(() => {
+		var termSeperatedQuickAssignment: TermSeperatedAssignedObject = {};
+		if (isQuickAssignmentApplied && quickApplyData?.status === 200) {
+			termDropdownData.map((term) => {
+				termSeperatedQuickAssignment = {
+					...termSeperatedQuickAssignment,
+					[term.label]: quickApplyData.result.filter(
+						(item: IQuickAssignResponse) => item['term-id'] === term.value
+					),
+				};
+			});
+		}
+		if (termSeperatedQuickAssignment) {
+			setQuickAssignedData(termSeperatedQuickAssignment);
+		}
+	}, [isQuickAssignmentApplied, quickApplyData, selectedTermId]);
+
 	// Loading components
 	if (isSubjectGroupValidating || isSubjectGroupTableValidating) {
 		return (
@@ -236,8 +265,16 @@ export default function SMLesson() {
 					setSelectedTermId={setSelectedTermId}
 					selectedSubjectGroupId={selectedSubjectGroup}
 					mutator={updateSubjectGroupTable}
+					isQuickAssignmentApplied={isQuickAssignmentApplied}
+					setQuickAssignmentApplied={setQuickAssignmentApplied}
+					toggleQuickApply={toggleQuickApply}
 				/>
 			</div>
+			<LessonQuickApplyModal
+				open={isQuickAssignmentApplied}
+				setOpen={setQuickAssignmentApplied}
+				data={quickAssignedData}
+			/>
 		</div>
 	);
 }

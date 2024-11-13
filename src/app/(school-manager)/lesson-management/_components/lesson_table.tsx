@@ -7,8 +7,8 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
+	Button,
 	Checkbox,
-	Divider,
 	Menu,
 	MenuItem,
 	TableHead,
@@ -30,7 +30,7 @@ import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
-import CancelUpdateLessonModal from './lesson_cancel_modal';
+import CancelUpdateLessonModal from './lesson_modal_cancel';
 
 interface ISumObject {
 	'main-slot-per-week': number;
@@ -290,6 +290,9 @@ interface ILessonTableProps {
 	mutator: KeyedMutator<any>;
 	selectedTermId: number;
 	setSelectedTermId: Dispatch<SetStateAction<number>>;
+	isQuickAssignmentApplied: boolean;
+	setQuickAssignmentApplied: Dispatch<SetStateAction<boolean>>;
+	toggleQuickApply: KeyedMutator<any>;
 }
 const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	const {
@@ -299,6 +302,9 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		termData,
 		selectedTermId,
 		setSelectedTermId,
+		isQuickAssignmentApplied,
+		setQuickAssignmentApplied,
+		toggleQuickApply,
 	} = props;
 
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
@@ -496,7 +502,15 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		});
 		setIsEditing(false);
 		setEditingObjects([]);
+		setVulnarableIndexes([]);
 		mutator();
+	};
+
+	const handleQuickAssign = () => {
+		setQuickAssignmentApplied(true);
+		if (isQuickAssignmentApplied) {
+			toggleQuickApply();
+		}
 	};
 
 	return (
@@ -524,7 +538,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					]}
 				>
 					<div className='w-full flex flex-row justify-start items-baseline'>
-						<h2 className='text-title-medium-strong font-semibold w-[10%] text-left'>
+						<h2 className='text-title-medium-strong font-semibold w-[15%] text-left'>
 							Tiết học
 						</h2>
 						<div
@@ -564,7 +578,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 							))}
 						</Menu>
 					</div>
-					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
+					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2 pr-2'>
 						{isEditing && (
 							<>
 								<Tooltip
@@ -589,6 +603,20 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 								</Tooltip>
 							</>
 						)}
+						<Button
+							variant='contained'
+							onClick={handleQuickAssign}
+							color='inherit'
+							sx={{
+								bgcolor: '#175b8e',
+								color: 'white',
+								borderRadius: 0,
+								width: 150,
+								boxShadow: 'none',
+							}}
+						>
+							xếp tiết nhanh
+						</Button>
 					</div>
 				</Toolbar>
 				<TableContainer>

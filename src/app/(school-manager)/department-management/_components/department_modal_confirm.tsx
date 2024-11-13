@@ -61,17 +61,17 @@ const CreateConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover px-3 py-2'
 				>
 					<ContainedButton
+						title='Huỷ'
+						onClick={handleClose}
+						disableRipple
+						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-3'
+					/>
+					<ContainedButton
 						title='xác nhận'
 						disableRipple
 						type='button'
 						styles='bg-primary-300 text-white !py-1 px-3'
 						onClick={handleConfirm}
-					/>
-					<ContainedButton
-						title='Huỷ'
-						onClick={handleClose}
-						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-3'
 					/>
 				</div>
 			</Box>

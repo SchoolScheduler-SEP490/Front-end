@@ -1,7 +1,7 @@
 'use client';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Checkbox, Skeleton, TableHead, Toolbar, Typography } from '@mui/material';
+import { Button, Checkbox, Skeleton, TableHead, Toolbar, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -285,7 +285,7 @@ const LessonTableSkeleton = () => {
 					]}
 				>
 					<div className='w-full flex flex-row justify-start items-baseline'>
-						<h2 className='text-title-medium-strong font-semibold w-[10%] text-left'>
+						<h2 className='text-title-medium-strong font-semibold w-[15%] text-left'>
 							Tiết học
 						</h2>
 						<div
@@ -299,6 +299,22 @@ const LessonTableSkeleton = () => {
 							/>
 							<KeyboardArrowDownIcon sx={{ fontSize: 20 }} />
 						</div>
+					</div>
+					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2 pr-2'>
+						<Button
+							variant='contained'
+							color='inherit'
+							disabled
+							sx={{
+								bgcolor: '#175b8e',
+								color: 'white',
+								borderRadius: 0,
+								width: 150,
+								boxShadow: 'none',
+							}}
+						>
+							xếp tiết nhanh
+						</Button>
 					</div>
 				</Toolbar>
 				<TableContainer>
