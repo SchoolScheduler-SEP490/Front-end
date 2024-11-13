@@ -143,6 +143,7 @@ export default function SMLesson() {
 	}, [subjectGroupTableResponse, selectedTermId]);
 
 	useEffect(() => {
+		updateTerm();
 		if (termData?.status === 200) {
 			const termStudyOptions: IDropdownOption<number>[] = termData.result.items.map(
 				(item: ITermResponse) => ({

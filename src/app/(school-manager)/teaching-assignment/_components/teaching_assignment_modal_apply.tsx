@@ -1,18 +1,17 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Divider, IconButton, Modal, styled, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import useCheckAutoAssignAvailability from '../_hooks/useCheckAvailability';
+import { getAutoAssignmentApi } from '../_libs/apis';
 import {
 	ENTITY_TARGET,
 	ITeachingAssignmentAvailabilityResponse as ITAAvailabilityResponse,
 } from '../_libs/constants';
-import { getAutoAssignmentApi } from '../_libs/apis';
-import useNotify from '@/hooks/useNotify';
-import { TRANSLATOR } from '@/utils/dictionary';
 
 const style = {
 	position: 'absolute',
@@ -55,6 +54,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 		schoolId: Number(schoolId),
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
+		revalidate: !isAutomationAvaialable && open,
 	});
 
 	const handleAutoAssignment = async () => {
@@ -156,7 +156,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Áp dụng phân công giảng dạy
+						Phân công tự động
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -164,7 +164,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 				</div>
 				<div className='w-full h-fit max-h-[50vh] p-3 overflow-y-scroll no-scrollbar'>
 					{isAutomationAvaialable && (
-						<h2 className='text-title-small font-normal w-full text-left'>
+						<h2 className='text-body-large-strong font-normal w-full text-left py-5'>
 							Phân công tự động cho toàn bộ giáo viên?
 						</h2>
 					)}

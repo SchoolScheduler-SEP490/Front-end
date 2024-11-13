@@ -1,9 +1,8 @@
 'use client';
 
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Checkbox, Skeleton, TableHead, Toolbar, Tooltip, Typography } from '@mui/material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { Checkbox, Skeleton, TableHead, Toolbar, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -285,15 +284,21 @@ const LessonTableSkeleton = () => {
 						},
 					]}
 				>
-					<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-						Tiết học
-					</h2>
-					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-						<Tooltip title='Lọc danh sách'>
-							<IconButton id='filter-btn'>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip>
+					<div className='w-full flex flex-row justify-start items-baseline'>
+						<h2 className='text-title-medium-strong font-semibold w-[10%] text-left'>
+							Tiết học
+						</h2>
+						<div
+							className='text-body-medium-strong font-normal leading-4 opacity-80 flex flex-row justify-between items-center cursor-pointer'
+							id='basic-button'
+						>
+							<Skeleton
+								animation='wave'
+								variant='text'
+								sx={{ width: 120, fontSize: '1.250rem' }}
+							/>
+							<KeyboardArrowDownIcon sx={{ fontSize: 20 }} />
+						</div>
 					</div>
 				</Toolbar>
 				<TableContainer>

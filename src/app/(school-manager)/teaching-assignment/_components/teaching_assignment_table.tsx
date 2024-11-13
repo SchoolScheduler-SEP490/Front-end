@@ -89,10 +89,20 @@ interface ITeachingAssignmentTableProps {
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedSubjectGroupName: string;
+	isApplyModalOpen: boolean;
+	setIsApplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
-	const { subjectData, mutate, isFilterable, setIsFilterable, selectedSubjectGroupName } = props;
+	const {
+		subjectData,
+		mutate,
+		isFilterable,
+		setIsFilterable,
+		selectedSubjectGroupName,
+		isApplyModalOpen,
+		setIsApplyModalOpen,
+	} = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -102,8 +112,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		subjectData[0]?.subjectKey ?? 0
 	);
 	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
-	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
-
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
 		subjectId: selectedSubjectId,
@@ -123,14 +131,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 			setTeachableDropdown([...useFilterArray(dropdownOptions, 'value')]);
 		}
 	}, [teachableData, selectedSubjectId]);
-
-	useEffect(() => {
-		if (subjectData.length > 0) {
-			const assignedSubjects: ITeachingAssignmentTableData[] = subjectData.filter(
-				(item) => item.teacherName.label !== '- - -'
-			);
-		}
-	}, [subjectData]);
 
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);

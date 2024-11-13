@@ -34,6 +34,7 @@ export default function SMTeachingAssignment() {
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedSubjectGroupName, setSelectedSubjectGroupName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
+	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
 
 	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
@@ -76,7 +77,11 @@ export default function SMTeachingAssignment() {
 		pageSize: 1000,
 		pageIndex: 1,
 	});
-	const { data: termData, error: termFetchError } = useFetchTerm({
+	const {
+		data: termData,
+		error: termFetchError,
+		mutate: updateTerm,
+	} = useFetchTerm({
 		pageIndex: 1,
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
@@ -101,6 +106,7 @@ export default function SMTeachingAssignment() {
 	}, [termData]);
 
 	useEffect(() => {
+		updateTerm({ schoolYearId: selectedSchoolYearId });
 		if (termData?.status === 200) {
 			const termInYear: ITermResponse[] = termData.result.items.filter(
 				(term: ITermResponse) => term['school-year-id'] === selectedSchoolYearId
@@ -204,7 +210,7 @@ export default function SMTeachingAssignment() {
 							classData={sidenavData}
 						/>
 					)}
-					<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
+					<div className='w-[85%] h-full flex justify-center items-start pt-[2vh] gap-5 overflow-y-scroll no-scrollbar'>
 						<TeachingAssignmentTableSkeleton />
 						{termStudyOptions.length > 0 ? (
 							<TeachingAssignmentFilterable
@@ -213,6 +219,8 @@ export default function SMTeachingAssignment() {
 								selectedTermId={selectedTermId}
 								setSelectedTermId={setSelectedTermId}
 								termStudyOptions={termStudyOptions}
+								isApplyModalOpen={isApplyModalOpen}
+								setIsApplyModalOpen={setIsApplyModalOpen}
 							/>
 						) : (
 							<TeachingAssignmentFilterableSkeleton />
@@ -239,13 +247,15 @@ export default function SMTeachingAssignment() {
 					setSelectedSubjectGroupName={setSelectedSubjectGroupName}
 					classData={sidenavData}
 				/>
-				<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
+				<div className='w-[85%] h-full flex justify-center items-start pt-[2vh] gap-5 overflow-y-scroll no-scrollbar'>
 					<TeachingAssignmentTable
 						subjectData={tableData}
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
 						selectedSubjectGroupName={selectedSubjectGroupName}
+						isApplyModalOpen={isApplyModalOpen}
+						setIsApplyModalOpen={setIsApplyModalOpen}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}
@@ -253,6 +263,8 @@ export default function SMTeachingAssignment() {
 						selectedTermId={selectedTermId}
 						setSelectedTermId={setSelectedTermId}
 						termStudyOptions={termStudyOptions}
+						isApplyModalOpen={isApplyModalOpen}
+						setIsApplyModalOpen={setIsApplyModalOpen}
 					/>
 				</div>
 			</div>

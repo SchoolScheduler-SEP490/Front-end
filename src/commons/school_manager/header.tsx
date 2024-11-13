@@ -4,11 +4,10 @@ import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import { ISchoolYearResponse } from '@/utils/constants';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import useNotify from '@/hooks/useNotify';
 
 const SMHeader = ({ children }: { children: ReactNode }) => {
 	const { schoolName, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();

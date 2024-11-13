@@ -2,7 +2,6 @@
 
 import { ISMNavigation, ISMSidenav, SM_SIDENAV } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
-import useNotify from '@/hooks/useNotify';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { Typography } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
