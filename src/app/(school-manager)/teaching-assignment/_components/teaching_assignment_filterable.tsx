@@ -2,6 +2,7 @@
 
 import CloseIcon from '@mui/icons-material/Close';
 import {
+	Button,
 	FormControl,
 	IconButton,
 	InputLabel,
@@ -21,10 +22,24 @@ interface ITeachingAssignmentFilterableProps {
 	setSelectedTermId: React.Dispatch<React.SetStateAction<number>>;
 	mutate?: KeyedMutator<any>;
 	termStudyOptions: IDropdownOption<number>[];
+	isApplyModalOpen: boolean;
+	setIsApplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps) => {
-	const { open, setOpen, selectedTermId, setSelectedTermId, termStudyOptions } = props;
+	const {
+		open,
+		setOpen,
+		selectedTermId,
+		setSelectedTermId,
+		termStudyOptions,
+		isApplyModalOpen,
+		setIsApplyModalOpen,
+	} = props;
+
+	const handleAutoAssignment = () => {
+		setIsApplyModalOpen(true);
+	};
 
 	const handleClose = () => {
 		setOpen(false);
@@ -38,12 +53,21 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 
 	return (
 		<div
-			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] ${
+			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] gap-3 ${
 				open
 					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
 					: 'hidden'
 			}`}
 		>
+			<Button
+				variant='contained'
+				fullWidth
+				onClick={handleAutoAssignment}
+				color='inherit'
+				sx={{ bgcolor: '#175b8e', color: 'white', borderRadius: 0 }}
+			>
+				Phân công tự động
+			</Button>
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 				<div className='w-full flex flex-row justify-between items-center pt-1'>
 					<Typography

@@ -8,12 +8,14 @@ interface IAvailabilityCheckProps {
 	sessionToken: string;
 	schoolYearId: number;
 	schoolId: number;
+	revalidate: boolean;
 }
 
 const useCheckAutoAssignAvailability = ({
 	sessionToken,
 	schoolYearId,
 	schoolId,
+	revalidate,
 }: IAvailabilityCheckProps) => {
 	const fetcher = async (url: string) => {
 		const response = await fetch(url, {
@@ -32,7 +34,7 @@ const useCheckAutoAssignAvailability = ({
 		sessionToken ? endpoint : null,
 		fetcher,
 		{
-			revalidateOnFocus: true,
+			revalidateOnFocus: revalidate,
 			revalidateOnReconnect: true,
 			revalidateIfStale: false,
 			shouldRetryOnError: false,

@@ -4,16 +4,13 @@ import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
 	Checkbox,
-	FormControl,
-	InputLabel,
+	Divider,
 	Menu,
 	MenuItem,
-	Select,
-	SelectChangeEvent,
 	TableHead,
 	TextField,
 	Toolbar,
@@ -320,15 +317,15 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const isFilterableOpen = Boolean(anchorEl);
-	const handleFilterClick = (event: MouseEvent<HTMLButtonElement>) => {
+	const handleFilterClick = (event: MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 	const handleClose = () => {
 		setAnchorEl(null);
 	};
 
-	const handleTermSelect = (event: SelectChangeEvent<number>) => {
-		setSelectedTermId(event.target.value as number);
+	const handleTermSelect = (termId: number) => {
+		setSelectedTermId(termId);
 	};
 
 	useEffect(() => {
@@ -526,9 +523,47 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						},
 					]}
 				>
-					<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-						Tiết học
-					</h2>
+					<div className='w-full flex flex-row justify-start items-baseline'>
+						<h2 className='text-title-medium-strong font-semibold w-[10%] text-left'>
+							Tiết học
+						</h2>
+						<div
+							className='text-body-medium-strong font-normal leading-4 opacity-80 flex flex-row justify-between items-center cursor-pointer'
+							id='basic-button'
+							aria-controls={isFilterableOpen ? 'basic-menu' : undefined}
+							aria-haspopup='true'
+							aria-expanded={isFilterableOpen ? 'true' : undefined}
+							onClick={handleFilterClick}
+						>
+							{termData.find((item) => item.value === selectedTermId)?.label ??
+								'Không tìm thấy học kỳ'}
+							<KeyboardArrowDownIcon sx={{ fontSize: 20 }} />
+						</div>
+						<Menu
+							id='basic-menu'
+							anchorEl={anchorEl}
+							open={isFilterableOpen}
+							onClose={handleClose}
+							MenuListProps={{
+								'aria-labelledby': 'basic-button',
+							}}
+						>
+							{termData?.length === 0 && (
+								<MenuItem disabled value={0}>
+									Không tìm thấy học kỳ
+								</MenuItem>
+							)}
+							{termData?.map((item, index) => (
+								<MenuItem
+									key={item.value + index}
+									value={item.value}
+									onClick={() => handleTermSelect(item.value)}
+								>
+									{item.label}
+								</MenuItem>
+							))}
+						</Menu>
+					</div>
 					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
 						{isEditing && (
 							<>
@@ -554,17 +589,6 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 								</Tooltip>
 							</>
 						)}
-						<Tooltip title='Lọc danh sách'>
-							<IconButton
-								id='filter-btn'
-								aria-controls={isFilterableOpen ? 'basic-menu' : undefined}
-								aria-haspopup='true'
-								aria-expanded={isFilterableOpen ? 'true' : undefined}
-								onClick={handleFilterClick}
-							>
-								<FilterListIcon />
-							</IconButton>
-						</Tooltip>
 					</div>
 				</Toolbar>
 				<TableContainer>
@@ -796,41 +820,6 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 					</Table>
 				</TableContainer>
 			</Paper>
-			<Menu
-				id='filter-menu'
-				anchorEl={anchorEl}
-				open={isFilterableOpen}
-				onClose={handleClose}
-				MenuListProps={{
-					'aria-labelledby': 'filter-btn',
-				}}
-			>
-				<FormControl fullWidth variant='filled' sx={{ p: 1, minWidth: 200 }}>
-					<InputLabel
-						id='demo-simple-select-filled-label'
-						className='!text-body-medium font-normal'
-					>
-						Học kỳ
-					</InputLabel>
-					<Select
-						labelId='demo-simple-select-filled-label'
-						id='demo-simple-select-filled'
-						value={selectedTermId}
-						onChange={(event: SelectChangeEvent<number>) => handleTermSelect(event)}
-					>
-						{termData?.length === 0 && (
-							<MenuItem disabled value={0}>
-								Không tìm thấy học kỳ
-							</MenuItem>
-						)}
-						{termData?.map((item, index) => (
-							<MenuItem key={item.value + index} value={item.value}>
-								{item.label}
-							</MenuItem>
-						))}
-					</Select>
-				</FormControl>
-			</Menu>
 			<CancelUpdateLessonModal
 				open={isCancelUpdateModalOpen}
 				setOpen={setIsCancelUpdateModalOpen}
