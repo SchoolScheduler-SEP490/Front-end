@@ -17,12 +17,17 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import { Dispatch, Fragment, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react';
 import {
 	ILessonTableData,
+	IQuickAssignRequest,
 	IQuickAssignResponse,
+	IUpdateSubjectInGroupRequest,
 	TermSeperatedAssignedObject,
 } from '../_libs/constants';
+import useNotify from '@/hooks/useNotify';
+import useFilterArray from '@/hooks/useFilterArray';
+import { Ribeye_Marrow } from 'next/font/google';
 
 const style = {
 	position: 'absolute',
@@ -85,13 +90,10 @@ const headCells: readonly HeadCell[] = [
 		label: 'Môn học chuyên đề',
 	},
 ];
-interface EnhancedTableProps {
-	totalSlot: ISumObject;
-}
-function EnhancedTableHead(props: EnhancedTableProps) {
-	const { totalSlot } = props;
+
+function EnhancedTableHead() {
 	return (
-		<TableHead>
+		<TableHead sx={{ position: 'sticky', top: 0, left: 0 }}>
 			<TableRow>
 				<TableCell
 					rowSpan={2}
@@ -186,17 +188,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
-					<Typography
-						fontSize={12}
-						fontStyle={'normal'}
-						color={totalSlot?.['main-slot-per-week'] > 30 ? 'error' : 'black'}
-					>
-						({totalSlot?.['main-slot-per-week'] ?? 0})
-					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -209,17 +203,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}
-					<Typography
-						fontSize={12}
-						fontStyle={'normal'}
-						color={totalSlot?.['main-minimum-couple'] > 12 ? 'error' : 'black'}
-					>
-						({totalSlot?.['main-minimum-couple'] ?? 0})
-					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -232,17 +218,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
-					<Typography
-						fontSize={12}
-						fontStyle={'normal'}
-						color={totalSlot?.['sub-slot-per-week'] > 30 ? 'error' : 'black'}
-					>
-						({totalSlot?.['sub-slot-per-week'] ?? 0})
-					</Typography>
 				</TableCell>
 
 				<TableCell
@@ -255,17 +233,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}
-					<Typography
-						fontSize={12}
-						fontStyle={'normal'}
-						color={totalSlot?.['sub-minimum-couple'] > 12 ? 'error' : 'black'}
-					>
-						({totalSlot?.['sub-minimum-couple'] ?? 0})
-					</Typography>
 				</TableCell>
 			</TableRow>
 		</TableHead>
@@ -280,14 +250,168 @@ interface IQuickApplyModalProps {
 
 const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 	const { open, setOpen, data } = props;
-	const [subjectTableData, setSubjectTableData] = useState<ILessonTableData[]>([]);
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [editingObjects, setEditingObjects] = useState<IQuickAssignRequest[]>([]);
+	const [vulnarableIndexes, setVulnarableIndexes] = useState<number[]>([]);
+	const [sumObjects, setSumObjects] = useState<ISumObject[]>([]);
+	const [isValidTotal, setIsValidTotal] = useState<boolean>(false);
 
 	const handleClose = () => {
 		setOpen(false);
 	};
 
-	function Row(props: { rows: IQuickAssignResponse[]; termLabel: string }) {
-		const { rows, termLabel } = props;
+	// Validate thông tin người dùng nhập
+	useEffect(() => {
+		// Kiểm tra điều kiện của từng môn học
+		if (editingObjects.length !== 0) {
+			editingObjects.map((obj) => {
+				var isVulnerableObj = false;
+				// Nào có tiết đôi thì minimum couple k để trống
+				if (obj['is-double-period']) {
+					if (obj['main-minimum-couple'] === 0 && obj['sub-minimum-couple'] === 0) {
+						isVulnerableObj = true;
+						useNotify({
+							message: 'Môn học có tiết cặp cần có ít nhất 1 tiết cặp tối thiểu',
+							type: 'error',
+						});
+					}
+				}
+
+				// Số cặp tối thiểu < số tiết trên tuần /2
+				if (
+					obj['main-minimum-couple'] > obj['main-slot-per-week'] / 2 ||
+					obj['sub-minimum-couple'] > obj['sub-slot-per-week'] / 2
+				) {
+					isVulnerableObj = true;
+					useNotify({
+						message: 'Số tiết cặp tối thiểu không vượt quá nửa số tiết mỗi tuần',
+						type: 'error',
+					});
+				}
+
+				// Số tiết trên tuần không vượt quá 10 tiết
+				if (obj['main-slot-per-week'] > 10 || obj['sub-slot-per-week'] > 10) {
+					isVulnerableObj = true;
+
+					useNotify({
+						message: 'Số tiết trên tuần không vượt quá 10 tiết',
+						type: 'error',
+					});
+				}
+
+				if (isVulnerableObj) {
+					setVulnarableIndexes((prev) => [...prev, obj['subject-id']]);
+				} else {
+					setVulnarableIndexes((prev) =>
+						prev.filter((item) => item !== obj['subject-id'])
+					);
+				}
+			});
+
+			// Tiết học thì k quá 30 tiết / buổi / tuần
+			if (
+				sumObjects.findIndex((item) => item['main-slot-per-week'] > 30) > 0 ||
+				sumObjects.findIndex((item) => item['sub-slot-per-week'] > 30) > 0
+			) {
+				useNotify({
+					message: 'Tổng số tiết trên tuần không vượt quá 30 tiết',
+					type: 'error',
+				});
+			}
+
+			// Tổng số cặp / buổi / tuần < 12
+			if (
+				sumObjects.findIndex((item) => item['main-minimum-couple'] > 12) > 0 ||
+				sumObjects.findIndex((item) => item['sub-minimum-couple'] > 12) > 0
+			) {
+				useNotify({
+					message: 'Tổng số cặp tối thiểu không vượt quá 12 cặp',
+					type: 'error',
+				});
+			}
+			setIsValidTotal(
+				!sumObjects.some((item) => item['main-slot-per-week'] > 30) &&
+					!sumObjects.some((item) => item['sub-slot-per-week'] > 30) &&
+					!sumObjects.some((item) => item['main-minimum-couple'] > 12) &&
+					!sumObjects.some((item) => item['sub-minimum-couple'] > 12)
+			);
+		}
+	}, [editingObjects]);
+
+	useEffect(() => {
+		if (Object.entries(data).length > 0) {
+			var totalSlot: ISumObject[] = [];
+			Object.entries(data).map(([key, values]) => {
+				var tmpTotal = {
+					'main-slot-per-week': 0,
+					'sub-slot-per-week': 0,
+					'main-minimum-couple': 0,
+					'sub-minimum-couple': 0,
+				};
+				values.forEach((item) => {
+					tmpTotal['main-slot-per-week'] += item['main-slot-per-week'];
+					tmpTotal['sub-slot-per-week'] += item['sub-slot-per-week'];
+					tmpTotal['main-minimum-couple'] += item['main-minimum-couple'];
+					tmpTotal['sub-minimum-couple'] += item['sub-minimum-couple'];
+				});
+				totalSlot.push(tmpTotal);
+			});
+			setSumObjects(totalSlot);
+		}
+	}, [data, isEditing]);
+
+	const handleUpdateLesson = (
+		target: keyof IQuickAssignRequest,
+		value: string | boolean,
+		row: IQuickAssignResponse,
+		sumIndex: number
+	) => {
+		if (!isEditing) {
+			setIsEditing(true);
+		}
+		var editingObject: IQuickAssignRequest;
+		if (editingObjects.some((item) => item['subject-id'] === row['subject-id'])) {
+			// Update existing editing data
+			editingObject = editingObjects.find(
+				(item) => item['subject-id'] === row['subject-id']
+			) as IQuickAssignRequest;
+		} else {
+			// Create new editing data
+			editingObject = { ...row };
+		}
+
+		// Assign data
+		if (typeof value === 'string') {
+			if (Number(value) < 0) {
+				useNotify({
+					message: 'Số tiết không thể nhỏ hơn 0',
+					type: 'error',
+				});
+			} else {
+				// Lưu giá trị cũ của editingObject vào một biến tạm
+				const previousValue = (editingObject as any)[target] ?? 0;
+
+				// Cập nhật giá trị mới cho editingObject
+				(editingObject as any)[target] = Number(value as string);
+
+				// Cập nhật sum dựa trên giá trị cũ của editingObject
+				const currentSumObjs: ISumObject[] = sumObjects;
+				currentSumObjs[sumIndex][target as keyof ISumObject] =
+					currentSumObjs[sumIndex][target as keyof ISumObject] -
+					previousValue +
+					Number(value as string);
+				setSumObjects(currentSumObjs);
+			}
+		} else if (typeof value === 'boolean') {
+			(editingObject as any)[target] = value as boolean;
+		}
+		const newEditingObjects = useFilterArray([...editingObjects, editingObject], 'subject-id');
+
+		setEditingObjects(newEditingObjects);
+	};
+
+	function Row(props: { rows: IQuickAssignResponse[]; termLabel: string; labelIndex: number }) {
+		const { rows, termLabel, labelIndex } = props;
 		const [open, setOpen] = useState(true);
 
 		return (
@@ -306,13 +430,20 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 				</TableRow>
 				{rows.map((row, index) => {
 					const labelId = `enhanced-table-checkbox-${index}`;
-					// const editedObject: IUpdateSubjectInGroupRequest | undefined =
-					// 	editingObjects.find(
-					// 		(item) => item['subject-in-group-id'] === row.id
-					// 	) ?? undefined;
+					const editedObject: IQuickAssignRequest | undefined =
+						editingObjects.find((item) => item['subject-id'] === row['subject-id']) ??
+						undefined;
 					return (
-						<TableRow>
-							<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+						<TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+							<TableCell
+								style={{
+									paddingBottom: 0,
+									paddingTop: 0,
+									paddingLeft: 0,
+									paddingRight: 0,
+								}}
+								colSpan={7}
+							>
 								<Collapse in={open} timeout='auto' unmountOnExit>
 									<TableCell
 										component='th'
@@ -320,16 +451,20 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 										scope='row'
 										padding='normal'
 										align='center'
+										width={50}
 									>
 										{index + 1}
 									</TableCell>
-									<TableCell align='left' width={300}>
-										<Typography fontSize={15}>{row['subject-name']}</Typography>
+									<TableCell align='left' width={280}>
+										<Typography fontSize={15} width={280}>
+											{row['subject-name']}
+										</Typography>
 									</TableCell>
 									<TableCell align='center'>
 										<TextField
 											variant='standard'
 											type='number'
+											onFocus={(event) => event.target.select()}
 											sx={{
 												width: '60%',
 												'& .MuiInputBase-input': {
@@ -344,19 +479,19 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 														zIndex: 10,
 													},
 											}}
-											// onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											// 	handleUpdateLesson(
-											// 		'main-slot-per-week',
-											// 		event.target.value.replace(/^0+/, ''),
-											// 		row
-											// 	)
-											// }
-											// value={
-											// 	!editedObject
-											// 		? row.mainTotalSlotPerWeek
-											// 		: editedObject['main-slot-per-week']
-											// }
-											value={row['main-slot-per-week']}
+											onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												handleUpdateLesson(
+													'main-slot-per-week',
+													event.target.value.replace(/^0+/, ''),
+													row,
+													labelIndex
+												)
+											}
+											value={
+												!editedObject
+													? row['main-slot-per-week']
+													: editedObject['main-slot-per-week']
+											}
 											id='fullWidth'
 										/>
 									</TableCell>
@@ -364,6 +499,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 										<TextField
 											variant='standard'
 											type='number'
+											onFocus={(event) => event.target.select()}
 											sx={{
 												width: '60%',
 												'& .MuiInputBase-input': {
@@ -378,19 +514,19 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 														zIndex: 10,
 													},
 											}}
-											// onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											// 	handleUpdateLesson(
-											// 		'main-minimum-couple',
-											// 		event.target.value.replace(/^0+/, ''),
-											// 		row
-											// 	)
-											// }
-											// value={
-											// 	!editedObject
-											// 		? row.mainMinimumCouple
-											// 		: editedObject['main-minimum-couple']
-											// }
-											value={row['main-minimum-couple']}
+											onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												handleUpdateLesson(
+													'main-minimum-couple',
+													event.target.value.replace(/^0+/, ''),
+													row,
+													labelIndex
+												)
+											}
+											value={
+												!editedObject
+													? row['main-minimum-couple']
+													: editedObject['main-minimum-couple']
+											}
 											id='fullWidth'
 										/>
 									</TableCell>
@@ -399,6 +535,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 										<TextField
 											variant='standard'
 											type='number'
+											onFocus={(event) => event.target.select()}
 											sx={{
 												width: '60%',
 												'& .MuiInputBase-input': {
@@ -412,19 +549,19 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 														zIndex: 10,
 													},
 											}}
-											// onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											// 	handleUpdateLesson(
-											// 		'sub-slot-per-week',
-											// 		event.target.value.replace(/^0+/, ''),
-											// 		row
-											// 	)
-											// }
-											// value={
-											// 	!editedObject
-											// 		? row.subTotalSlotPerWeek
-											// 		: Number(editedObject['sub-slot-per-week'])
-											// }
-											value={row['sub-slot-per-week']}
+											onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												handleUpdateLesson(
+													'sub-slot-per-week',
+													event.target.value.replace(/^0+/, ''),
+													row,
+													labelIndex
+												)
+											}
+											value={
+												!editedObject
+													? row['sub-slot-per-week']
+													: Number(editedObject['sub-slot-per-week'])
+											}
 											id='fullWidth'
 										/>
 									</TableCell>
@@ -432,6 +569,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 										<TextField
 											variant='standard'
 											type='number'
+											onFocus={(event) => event.target.select()}
 											sx={{
 												width: '60%',
 												'& .MuiInputBase-input': {
@@ -445,42 +583,42 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 														zIndex: 10,
 													},
 											}}
-											// onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											// 	handleUpdateLesson(
-											// 		'sub-minimum-couple',
-											// 		event.target.value.replace(/^0+/, ''),
-											// 		row
-											// 	)
-											// }
-											// value={
-											// 	!editedObject
-											// 		? row.subMinimumCouple
-											// 		: Number(editedObject['sub-minimum-couple'])
-											// }
-											value={row['sub-minimum-couple']}
+											onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												handleUpdateLesson(
+													'sub-minimum-couple',
+													event.target.value.replace(/^0+/, ''),
+													row,
+													labelIndex
+												)
+											}
+											value={
+												!editedObject
+													? row['sub-minimum-couple']
+													: Number(editedObject['sub-minimum-couple'])
+											}
 											id='fullWidth'
 										/>
 									</TableCell>
 
-									<TableCell align='center'>
+									<TableCell align='center' width={100}>
 										<Checkbox
 											color='default'
-											// onChange={(event: ChangeEvent<HTMLInputElement>) => {
-											// 	handleUpdateLesson(
-											// 		'is-double-period',
-											// 		event.target.checked,
-											// 		row
-											// 	);
-											// }}
-											// checked={
-											// 	!editedObject
-											// 		? row.isDouleSlot
-											// 		: editedObject['is-double-period']
-											// }
-											// inputProps={{
-											// 	'aria-labelledby': labelId,
-											// }}
-											checked={row['is-double-period']}
+											onChange={(event: ChangeEvent<HTMLInputElement>) => {
+												handleUpdateLesson(
+													'is-double-period',
+													event.target.checked,
+													row,
+													labelIndex
+												);
+											}}
+											checked={
+												!editedObject
+													? row['is-double-period']
+													: editedObject['is-double-period']
+											}
+											inputProps={{
+												'aria-labelledby': labelId,
+											}}
 										/>
 									</TableCell>
 								</Collapse>
@@ -515,7 +653,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 						<CloseIcon />
 					</IconButton>
 				</div>
-				<div className='w-full h-[60vh] relative flex flex-row justify-start items-start overflow-y-scroll no-scrollbar'>
+				<div className='w-full h-[65vh] relative flex flex-row justify-start items-start overflow-y-scroll no-scrollbar'>
 					<TableContainer>
 						<Table
 							sx={{ minWidth: 750 }}
@@ -523,16 +661,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 							aria-label='sticky table'
 							size='small'
 						>
-							<EnhancedTableHead
-								totalSlot={
-									{
-										'main-slot-per-week': 0,
-										'sub-slot-per-week': 0,
-										'main-minimum-couple': 0,
-										'sub-minimum-couple': 0,
-									} as ISumObject
-								}
-							/>
+							<EnhancedTableHead />
 							<TableBody>
 								{Object.entries(data)?.length === 0 && (
 									<TableRow>
@@ -544,7 +673,12 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 									</TableRow>
 								)}
 								{Object.entries(data).map(([key, values], index) => (
-									<Row rows={values} termLabel={key} key={key + index} />
+									<Row
+										rows={values}
+										termLabel={key}
+										key={key + index}
+										labelIndex={index}
+									/>
 								))}
 							</TableBody>
 						</Table>

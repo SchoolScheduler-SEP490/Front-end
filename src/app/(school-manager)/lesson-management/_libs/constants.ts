@@ -108,6 +108,20 @@ export interface IQuickAssignResponse {
 	'term-name': string;
 }
 
+export interface IQuickAssignRequest {
+	'subject-id': number;
+	'subject-name': string;
+	'subject-abbreviation': string;
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'slot-per-term': number;
+	'is-double-period': boolean;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
+	'term-id': number;
+	'term-name': string;
+}
+
 export interface TermSeperatedAssignedObject {
 	[key: string]: IQuickAssignResponse[];
 }

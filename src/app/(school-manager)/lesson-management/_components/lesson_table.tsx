@@ -390,7 +390,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			}
 
 			// Tổng số cặp / buổi / tuần < 12
-			if (sumObject['main-minimum-couple'] > 30 || sumObject['sub-minimum-couple'] > 12) {
+			if (sumObject['main-minimum-couple'] > 12 || sumObject['sub-minimum-couple'] > 12) {
 				useNotify({
 					message: 'Tổng số cặp tối thiểu không vượt quá 12 cặp',
 					type: 'error',
@@ -399,7 +399,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			setIsValidTotal(
 				!(sumObject['main-slot-per-week'] > 30) &&
 					!(sumObject['sub-slot-per-week'] > 30) &&
-					!(sumObject['main-minimum-couple'] > 30) &&
+					!(sumObject['main-minimum-couple'] > 12) &&
 					!(sumObject['sub-minimum-couple'] > 12)
 			);
 		}
