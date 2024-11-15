@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { IJWTTokenPayload } from './(auth)/_utils/constants';
+import { NotificationProvider } from './(school-manager)/notification/_contexts/notificationContext';
 
 export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
@@ -40,6 +41,10 @@ export default function RootLayout({
 			<body
 				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
 			>
+				<NotificationProvider 
+                    sessionToken={sessionToken?.value ?? ''} 
+                    accountId={Number(userData.accountId) ?? 0}
+                >
 				<AppProvider
 					inititalSessionToken={sessionToken?.value ?? ''}
 					inititalRefreshToken={refreshToken?.value ?? ''}
@@ -50,6 +55,7 @@ export default function RootLayout({
 				>
 					{children}
 				</AppProvider>
+				</NotificationProvider>
 				<ToastContainer
 					position='top-right'
 					autoClose={5000}
@@ -65,6 +71,8 @@ export default function RootLayout({
 				/>
 				<Analytics />
 				<SpeedInsights />
+
+
 			</body>
 		</html>
 	);
