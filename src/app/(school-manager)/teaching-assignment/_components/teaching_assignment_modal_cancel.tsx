@@ -59,16 +59,16 @@ const CancelAssignTeacherModal = (props: ICancelAssignTeacherModalProps) => {
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
-						title='Huỷ cập nhật'
-						disableRipple
-						onClick={handleApprove}
-						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'
-					/>
-					<ContainedButton
 						title='Huỷ'
 						onClick={handleClose}
 						disableRipple
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+					/>
+					<ContainedButton
+						title='Huỷ cập nhật'
+						disableRipple
+						onClick={handleApprove}
+						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'
 					/>
 				</div>
 			</Box>

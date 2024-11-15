@@ -128,7 +128,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 					} as IDropdownOption<number>;
 				}
 			);
-			setTeachableDropdown([...useFilterArray(dropdownOptions, 'value')]);
+			setTeachableDropdown([...useFilterArray(dropdownOptions, ['value'])]);
 		}
 	}, [teachableData, selectedSubjectId]);
 
@@ -176,7 +176,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		} else {
 			editingObject['teacher-id'] = selectedTeacherId;
 		}
-		setEditingObjects(useFilterArray([...editingObjects, editingObject], 'id'));
+		setEditingObjects(useFilterArray([...editingObjects, editingObject], ['id']));
 	};
 
 	const handleSelectSubject = (subjectId: number) => {

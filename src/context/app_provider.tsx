@@ -18,7 +18,6 @@ const AppContext = createContext({
 	setSchoolName: (schoolName: string) => {},
 	selectedSchoolYearId: 0,
 	setSelectedSchoolYearId: (selectedSchoolYearId: number) => {},
-	refresher: () => {},
 	logout: async (): Promise<any> => {},
 });
 export const useAppContext = () => {
@@ -83,11 +82,7 @@ export default function AppProvider({
 		}
 	};
 
-	const {
-		data,
-		error,
-		mutate: refresher,
-	} = useSWR(
+	const { data, error } = useSWR(
 		refreshToken?.length > 0 && userRole.length > 0
 			? [`${serverApi}/api/refresh`, refreshToken, userRole]
 			: null,
@@ -95,7 +90,7 @@ export default function AppProvider({
 		{
 			revalidateOnReconnect: true,
 			revalidateOnMount: true,
-			revalidateOnFocus: true,
+			revalidateOnFocus: false,
 			refreshInterval: 480000,
 			shouldRetryOnError: false,
 		}
@@ -133,7 +128,6 @@ export default function AppProvider({
 				setSchoolId,
 				schoolName,
 				setSchoolName,
-				refresher,
 				selectedSchoolYearId,
 				setSelectedSchoolYearId,
 				logout: handleLogout,

@@ -1,11 +1,16 @@
-const useFilterArray = <T, K extends keyof T>(array: T[], key: K): T[] => {
-	const seen = new Set<T[K]>();
+const useFilterArray = <T, K extends keyof T>(array: T[], keys: K[]): T[] => {
+	const seen = new Set<string>();
+
 	return array.reverse().filter((item) => {
-		const value = item[key];
-		if (seen.has(value)) {
-			return false;
+		// Kết hợp tất cả các giá trị của các key thành một chuỗi duy nhất để kiểm tra
+		const combinedKey = keys.map((key) => item[key]).join('|');
+
+		if (seen.has(combinedKey)) {
+			return false; // Bỏ qua phần tử nếu "chuỗi đại diện" đã tồn tại
 		}
-		seen.add(value);
+
+		// Nếu chưa tồn tại, thêm vào "seen" và giữ lại phần tử
+		seen.add(combinedKey);
 		return true;
 	});
 };

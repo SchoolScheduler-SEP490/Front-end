@@ -140,10 +140,9 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					<h4 className='text-body-small text-basic-gray'>Môn tự chọn</h4>
 					{subjectGroupDetails?.['subject-selective-views'] ? (
 						<ul className='list-disc pl-6 w-full'>
-							{useFilterArray(
-								subjectGroupDetails?.['subject-selective-views'],
-								'subject-name'
-							).map((item, index) => (
+							{useFilterArray(subjectGroupDetails?.['subject-selective-views'], [
+								'subject-name',
+							]).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
 									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 										<p className='max-w-[90%]'>{item['subject-name']}</p>
@@ -179,10 +178,9 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					<h4 className='text-body-small text-basic-gray'>Môn chuyên đề</h4>
 					{subjectGroupDetails?.['subject-specializedt-views'] ? (
 						<ul className='list-disc pl-6 w-full'>
-							{useFilterArray(
-								subjectGroupDetails?.['subject-specializedt-views'],
-								'subject-name'
-							).map((item, index) => (
+							{useFilterArray(subjectGroupDetails?.['subject-specializedt-views'], [
+								'subject-name',
+							]).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
 									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 										<p className='max-w-[90%]'>{item['subject-name']}</p>

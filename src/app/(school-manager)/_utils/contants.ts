@@ -15,12 +15,12 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		category: 'Thời khóa biểu',
 		items: [
 			{
-				name: 'Thời khóa biểu toàn trường',
+				name: 'Thời khóa biểu trường',
 				url: '/timetable-management',
 				icon: '/images/icons/schedule.png',
 			},
 			{
-				name: 'Thời khóa biểu từng lớp',
+				name: 'Thời khóa biểu lớp',
 				url: '/timetable-management?classId=',
 				icon: '/images/icons/timeline.png',
 			},
@@ -86,7 +86,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 			},
 			{
 				name: 'Cấu hình chung',
-				url: '/migrate-timetable',
+				url: '/general-configurations',
 				icon: '/images/icons/constraint.png',
 			},
 		],

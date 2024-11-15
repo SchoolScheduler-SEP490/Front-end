@@ -112,7 +112,7 @@ const SMSidenav = () => {
 							{item.items.map((subItem: ISMNavigation) => (
 								<div
 									key={subItem.name}
-									className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 rounded-[3px] hover:cursor-pointer 
+									className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-4 pr-2 gap-3 rounded-[3px] hover:cursor-pointer 
 									${currentPath === subItem.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 									onClick={() => handleNavigate(subItem.url)}
 								>

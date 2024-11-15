@@ -69,9 +69,7 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 										key={index}
 										className='flex flex-row py-1 justify-start items-center gap-2'
 									>
-										<FiberManualRecordIcon
-											sx={{ fontSize: '10px' }}
-										/>
+										<FiberManualRecordIcon sx={{ fontSize: '10px' }} />
 										<p className='text-body-small font-normal'>
 											{item.className}:
 										</p>
@@ -93,17 +91,17 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover px-3 py-2'
 				>
 					<ContainedButton
+						title='Huỷ'
+						onClick={handleClose}
+						disableRipple
+						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-3'
+					/>
+					<ContainedButton
 						title='xác nhận'
 						disableRipple
 						type='button'
 						styles='bg-primary-300 text-white !py-1 px-3'
 						onClick={handleConfirm}
-					/>
-					<ContainedButton
-						title='Huỷ'
-						onClick={handleClose}
-						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-3'
 					/>
 				</div>
 			</Box>

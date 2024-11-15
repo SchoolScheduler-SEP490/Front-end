@@ -71,3 +71,13 @@ export const getUpdateLessonApi = ({
 		termId ? `?termId=${termId}` : ''
 	}`;
 };
+
+export const getQuickAssignmentApi = ({
+	schoolId,
+	schoolYearId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/quick-assign-period-data`;
+};
