@@ -1,4 +1,4 @@
-import { IDropdownOption } from '../../_utils/contants';
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 
 export interface IClassResponse {
 	name: string;
