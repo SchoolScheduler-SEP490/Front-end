@@ -1,5 +1,7 @@
 'use client';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import { useNotification } from '@/app/(school-manager)/notification/_hooks/useNotification';
+import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
 import { toggleMenu } from '@/context/school_manager_slice';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
@@ -38,6 +40,8 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 	const { data, mutate } = useFetchSchoolYear();
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
+	const { notifications, unreadCount, markAsRead } = useNotification();
+	const [showNotifications, setShowNotifications] = useState(false);
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 	const dispatch = useDispatch();
 
@@ -47,6 +51,10 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 
 	const handleClose = () => {
 		setAnchorEl(null);
+	};
+
+	const handleToggleMenu = () => {
+		dispatch(toggleMenu());
 	};
 
 	const handleUpdateYear = async (selectedId: number) => {
@@ -61,10 +69,6 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 				schoolYearOptions.find((item) => item.value === selectedId) ?? null
 			);
 		}
-	};
-
-	const handleToggleMenu = () => {
-		dispatch(toggleMenu());
 	};
 
 	useEffect(() => {
@@ -97,7 +101,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 
 	return (
 		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
-			<div className='w-fit h-full flex flex-row justify-start items-center gap-2'>
+			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
 				<LightTooltip
 					title={!isMenuOpen ? 'Thu gọn Menu' : 'Mở rộng menu'}
 					placement='bottom'
@@ -120,15 +124,65 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 				{children}
 			</div>
 			<div className='flex flex-row justify-end items-center gap-3'>
-				<IconButton color='primary'>
-					<Image
-						src='/images/icons/notification-bell.png'
-						alt='notification-icon'
-						unoptimized={true}
-						width={20}
-						height={20}
-					/>
-				</IconButton>
+				<div className='relative'>
+					<IconButton
+						color='primary'
+						onClick={() => setShowNotifications(!showNotifications)}
+					>
+						<div className='relative'>
+							<Image
+								src='/images/icons/notification-bell.png'
+								alt='notification-icon'
+								unoptimized={true}
+								width={20}
+								height={20}
+							/>
+							{unreadCount > 0 && (
+								<span className='absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center'>
+									{unreadCount}
+								</span>
+							)}
+						</div>
+					</IconButton>
+
+					{showNotifications && (
+						<div className='absolute right-0 top-12 w-80 bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto'>
+							<div className='p-4'>
+								<h5 className='text-lg font-semibold mb-2'>Tất cả thông báo</h5>
+								{notifications.length > 0 ? (
+									notifications.map((notification, index) => (
+										<div
+											key={index}
+											className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
+												!notification['is-read'] ? 'bg-blue-50' : ''
+											}`}
+											onClick={() => {
+												markAsRead(notification['notification-url']);
+												if (notification.link) {
+													window.location.href = notification.link;
+												}
+											}}
+										>
+											<div className='font-medium'>{notification.title}</div>
+											<div className='text-sm text-gray-600'>
+												{notification.message}
+											</div>
+											<div className='text-xs text-gray-400 mt-1'>
+												{new Date(
+													notification['create-date']
+												).toLocaleString()}
+											</div>
+										</div>
+									))
+								) : (
+									<div className='text-center text-gray-500 py-4'>
+										Không có thông báo
+									</div>
+								)}
+							</div>
+						</div>
+					)}
+				</div>
 				<div className='w-fit h-full flex flex-col justify-between items-end text-white pr-3'>
 					<h3 className='text-body-medium font-medium leading-4 pr-1'>{schoolName}</h3>
 					<div

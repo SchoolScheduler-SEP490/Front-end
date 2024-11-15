@@ -1,12 +1,12 @@
 // Display data table teacher
 export interface ITeacherTableData {
-	id: number;
-	teacherName: string;
-	nameAbbreviation: string;
-	subjectDepartment: string;
-	email: string;
-	phoneNumber: string;
-	status: number;
+  id: number;
+  teacherName: string;
+  nameAbbreviation: string;
+  subjectDepartment: string;
+  email: string;
+  phoneNumber: string;
+  status: number;
   teachableSubjects: string;
 }
 //Teacher response data
@@ -45,7 +45,7 @@ export interface IUpdateTeacherRequestBody {
 }
 export interface IUpdateTeachableSubject {
   "subject-abreviation": string;
-  "grades": string[];
+  grades: string[];
   "is-main": boolean;
 }
 //Create new teacher request data
@@ -65,28 +65,28 @@ export interface IAddTeacherData {
 
 export interface IMainSubject {
   "subject-abreviation": string;
-  "grades": string[];
+  grades: string[];
   "is-main": boolean;
 }
 
 export interface IDepartment {
   id: number;
   name: string;
-  "department-code": string;  
+  "department-code": string;
 }
 
 export interface ISubject {
-	id: number;
-	"subject-name": string;
-	abbreviation: string;
+  id: number;
+  "subject-name": string;
+  abbreviation: string;
 }
 
 export interface ITeachableSubject {
   "subject-id": number;
   "subject-name": string;
-  "abbreviation": string;
+  abbreviation: string;
   "appropriate-level": number;
-  "grade": string[];
+  grade: string[];
   "is-main": boolean;
 }
 
@@ -105,4 +105,20 @@ export interface ITeacherDetail {
   "is-deleted": boolean;
   phone: string;
   "teachable-subjects": ITeachableSubject[];
+}
+export interface ITeacherAssignment {
+  "teacher-id": number;
+  "teacher-first-name": string;
+  "teacher-last-name": string;
+  "total-slot-in-year": number;
+  "assignment-details": IAssignmentDetail[];
+}
+
+export interface IAssignmentDetail {
+  "subject-id": number;
+  "subject-name": string;
+  "class-name": string;
+  "start-week": number;
+  "end-week": number;
+  "total-period": number;
 }
