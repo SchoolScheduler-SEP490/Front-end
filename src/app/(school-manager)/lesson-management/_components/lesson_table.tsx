@@ -31,6 +31,7 @@ import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_modal_cancel';
+import SubjectGroupTable from '../../subject-group-management/_components/subject_group_table';
 
 interface ISumObject {
 	'main-slot-per-week': number;
@@ -198,7 +199,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
@@ -221,7 +221,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}
@@ -244,7 +243,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
@@ -267,7 +265,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}
@@ -475,7 +472,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		}
 		const newEditingObjects = useFilterArray(
 			[...editingObjects, editingObject],
-			'subject-in-group-id'
+			['subject-in-group-id']
 		);
 
 		setEditingObjects(newEditingObjects);
@@ -607,6 +604,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 							variant='contained'
 							onClick={handleQuickAssign}
 							color='inherit'
+							disabled={selectedSubjectGroupId === 0}
 							sx={{
 								bgcolor: '#175b8e',
 								color: 'white',
@@ -688,6 +686,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											<TextField
 												variant='standard'
 												type='number'
+												onFocus={(event) => event.target.select()}
 												sx={{
 													width: '60%',
 													'& .MuiInputBase-input': {
@@ -721,6 +720,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											<TextField
 												variant='standard'
 												type='number'
+												onFocus={(event) => event.target.select()}
 												sx={{
 													width: '60%',
 													'& .MuiInputBase-input': {
@@ -755,6 +755,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											<TextField
 												variant='standard'
 												type='number'
+												onFocus={(event) => event.target.select()}
 												sx={{
 													width: '60%',
 													'& .MuiInputBase-input': {
@@ -787,6 +788,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 											<TextField
 												variant='standard'
 												type='number'
+												onFocus={(event) => event.target.select()}
 												sx={{
 													width: '60%',
 													'& .MuiInputBase-input': {

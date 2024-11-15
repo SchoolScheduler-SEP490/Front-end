@@ -174,7 +174,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 			prev.filter((selectedItem) => selectedItem !== item)
 		);
 		setClassOptions((prev: ISGClassResponse[]) =>
-			useFilterArray([...prev, item], 'name').sort((a, b) => a.name.localeCompare(b.name))
+			useFilterArray([...prev, item], ['name']).sort((a, b) => a.name.localeCompare(b.name))
 		);
 	};
 

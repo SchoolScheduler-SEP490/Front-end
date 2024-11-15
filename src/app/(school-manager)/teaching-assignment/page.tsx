@@ -181,7 +181,7 @@ export default function SMTeachingAssignment() {
 			});
 			const tableData: ITeachingAssignmentTableData[] = useFilterArray(
 				[...notAssignedList, ...assignedList],
-				'id'
+				['id']
 			).reverse();
 			console.log(JSON.stringify(tableData, null, 2));
 			setTableData(tableData);

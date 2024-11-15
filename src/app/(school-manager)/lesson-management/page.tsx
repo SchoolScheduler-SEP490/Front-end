@@ -31,14 +31,26 @@ export default function SMLesson() {
 
 	const [selectedSubjectGroup, setSelectedSubjectGroup] = useState<number>(0);
 	const [selectedTermId, setSelectedTermId] = useState<number>(0);
-	const [subjectGroup, setSubjectGroup] = useState<ISubjectGroupSidenavData[]>([]);
+	const [subjectGroupSidenavData, setSubjectGroupSidenavData] = useState<
+		ISubjectGroupSidenavData[]
+	>([]);
+
 	const [lessonTableData, setLessonTableData] = useState<ILessonTableData[]>([]);
 	const [termDropdownData, setTermDropdownData] = useState<IDropdownOption<number>[]>([]);
+
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(false);
+
 	const [isQuickAssignmentApplied, setQuickAssignmentApplied] = useState<boolean>(false);
 	const [quickAssignedData, setQuickAssignedData] = useState<TermSeperatedAssignedObject>({});
+	const [applicableSubjectGroups, setApplicableSubjectGroups] = useState<
+		IDropdownOption<number>[]
+	>([]);
 
-	const { data: quickApplyData, mutate: toggleQuickApply } = useFetchQuickAssignment({
+	const {
+		data: quickApplyData,
+		mutate: toggleQuickApply,
+		isValidating: isQuickAssignLoading,
+	} = useFetchQuickAssignment({
 		schoolId: Number(schoolId),
 		sessionToken,
 		schoolYearId: selectedSchoolYearId,
@@ -79,15 +91,27 @@ export default function SMLesson() {
 	});
 
 	useEffect(() => {
-		setSubjectGroup([]);
+		setSubjectGroupSidenavData([]);
+		setApplicableSubjectGroups([]);
 		updateSubjectGroup();
 		if (subjectGroupData?.status === 200) {
 			const tmpData: ISubjectGroupSidenavData[] = useSidenavDataConverter(
 				subjectGroupData.result.items as ISubjectGroupObjectResponse[]
 			);
 			if (tmpData.length > 0) {
-				setSubjectGroup(tmpData);
+				setSubjectGroupSidenavData(tmpData);
 				setSelectedSubjectGroup(tmpData[0].items[0].value);
+			}
+			const tmpApplicableSubjectGroups: IDropdownOption<number>[] =
+				subjectGroupData.result.items.map(
+					(item: ISubjectGroupObjectResponse) =>
+						({
+							label: item['group-name'],
+							value: item.id,
+						} as IDropdownOption<number>)
+				);
+			if (tmpApplicableSubjectGroups.length > 0) {
+				setApplicableSubjectGroups(tmpApplicableSubjectGroups);
 			}
 		}
 	}, [subjectGroupData]);
@@ -148,7 +172,7 @@ export default function SMLesson() {
 			);
 			const optimizedData = useFilterArray(
 				[...tmpSelectiveData, ...tmpRequiredData],
-				'lessonName'
+				['lessonName']
 			);
 			setLessonTableData(optimizedData);
 		}
@@ -199,6 +223,7 @@ export default function SMLesson() {
 		}
 	}, [isSubjectGroupValidating, isSubjectGroupTableValidating, isTermValidating]);
 
+	// Process quick assignment data
 	useEffect(() => {
 		var termSeperatedQuickAssignment: TermSeperatedAssignedObject = {};
 		if (isQuickAssignmentApplied && quickApplyData?.status === 200) {
@@ -234,7 +259,7 @@ export default function SMLesson() {
 						<SubjectGroupSideNav
 							selectedSubjectGroup={selectedSubjectGroup}
 							setSelectedSubjectGroup={setSelectedSubjectGroup}
-							subjectGroup={subjectGroup}
+							subjectGroup={subjectGroupSidenavData}
 						/>
 					)}
 					<LessonTableSkeleton />
@@ -256,7 +281,7 @@ export default function SMLesson() {
 				<SubjectGroupSideNav
 					selectedSubjectGroup={selectedSubjectGroup}
 					setSelectedSubjectGroup={setSelectedSubjectGroup}
-					subjectGroup={subjectGroup}
+					subjectGroup={subjectGroupSidenavData}
 				/>
 				<LessonTable
 					subjectTableData={lessonTableData}
@@ -274,6 +299,8 @@ export default function SMLesson() {
 				open={isQuickAssignmentApplied}
 				setOpen={setQuickAssignmentApplied}
 				data={quickAssignedData}
+				isLoading={isQuickAssignLoading}
+				applicableSubjectGroups={applicableSubjectGroups}
 			/>
 		</div>
 	);

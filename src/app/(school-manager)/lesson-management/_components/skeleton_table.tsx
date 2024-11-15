@@ -177,7 +177,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
@@ -200,7 +199,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}
@@ -223,7 +221,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Tổng số tiết mỗi tuần{' '}
@@ -246,7 +243,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
 						},
-						headCells[0].centered ? { paddingLeft: '3%' } : {},
 					]}
 				>
 					Số tiết cặp tối thiểu{' '}

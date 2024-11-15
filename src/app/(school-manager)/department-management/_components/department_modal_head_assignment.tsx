@@ -142,13 +142,15 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 			editingObject['teacher-id'] = teacherId;
 			const newEditingObjects = useFilterArray(
 				[...editingObjects, editingObject],
-				'department-id'
+				['department-id']
 			);
 			setEditingObjects(newEditingObjects);
 
 			const selectedTeacher = teacherOptions.find((opt) => opt.value === teacherId);
 			if (selectedTeacher) {
-				setSelectedTeachers((prev) => useFilterArray([...prev, selectedTeacher], 'value'));
+				setSelectedTeachers((prev) =>
+					useFilterArray([...prev, selectedTeacher], ['value'])
+				);
 			}
 		}
 	};

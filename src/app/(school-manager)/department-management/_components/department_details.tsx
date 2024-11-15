@@ -43,7 +43,7 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 							label: `${teacher['first-name']} ${teacher['last-name']} (${teacher['abbreviation']})`,
 						} as IDropdownOption<number>)
 				);
-				setExistingTeachers(useFilterArray(tmpTeachersArr, 'value'));
+				setExistingTeachers(useFilterArray(tmpTeachersArr, ['value']));
 			}
 		}
 	}, [teacherData, open, departmentData]);
