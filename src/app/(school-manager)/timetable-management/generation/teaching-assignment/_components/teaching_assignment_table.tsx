@@ -18,7 +18,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
-import { IDropdownOption } from '../../_utils/contants';
 import useAssignTeacher from '../_hooks/useAssignTeacher';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
@@ -28,6 +27,7 @@ import {
 } from '../_libs/constants';
 import TeachingAssignmentApplyModal from './teaching_assignment_modal_apply';
 import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 
 interface HeadCell {
 	disablePadding: boolean;
