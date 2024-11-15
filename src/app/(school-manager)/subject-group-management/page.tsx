@@ -11,9 +11,12 @@ import SubjectGroupTable from './_components/subject_group_table';
 import SubjectGroupTableSkeleton from './_components/table_skeleton';
 import useFetchSGData from './_hooks/useFetchSGData';
 import { ISubjectGroup, ISubjectGroupTableData } from './_libs/constants';
+import { useSelector } from 'react-redux';
 
 export default function SMSubject() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+
 	const [page, setPage] = React.useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
@@ -90,7 +93,11 @@ export default function SMSubject() {
 
 	if (isValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+			<div
+				className={`w-[${
+					!isMenuOpen ? '84' : '100'
+				}%] h-screen flex flex-col justify-start items-start`}
+			>
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -112,7 +119,11 @@ export default function SMSubject() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start`}
+		>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>

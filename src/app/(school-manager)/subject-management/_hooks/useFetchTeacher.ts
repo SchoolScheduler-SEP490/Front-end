@@ -1,8 +1,7 @@
 import useSWR from 'swr';
-import { getFetchSubjectApi } from '../_libs/apis';
-import { getFetchTeachableTeacherApi } from '../../teaching-assignment/_libs/apis';
 import { ICommonResponse } from '@/utils/constants';
 import { ITeachableTeacherResponse } from '../_libs/constants';
+import { getTeachableTeachersApi } from '../_libs/apis';
 
 interface IFetcherProps {
 	sessionToken: string;
@@ -12,7 +11,7 @@ interface IFetcherProps {
 
 const useFetchTeachableTeacher = (props: IFetcherProps) => {
 	const { sessionToken, schoolId, subjectId } = props;
-	const endpoint = getFetchTeachableTeacherApi({
+	const endpoint = getTeachableTeachersApi({
 		schoolId,
 		subjectId,
 	});

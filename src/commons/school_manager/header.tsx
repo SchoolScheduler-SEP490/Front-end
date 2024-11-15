@@ -1,13 +1,33 @@
 'use client';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
+import { toggleMenu } from '@/context/school_manager_slice';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import { ISchoolYearResponse } from '@/utils/constants';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import {
+	IconButton,
+	Menu,
+	MenuItem,
+	styled,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
+} from '@mui/material';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 13,
+	},
+}));
 
 const SMHeader = ({ children }: { children: ReactNode }) => {
 	const { schoolName, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
@@ -18,6 +38,8 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 	const { data, mutate } = useFetchSchoolYear();
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+	const dispatch = useDispatch();
 
 	const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -39,6 +61,10 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 				schoolYearOptions.find((item) => item.value === selectedId) ?? null
 			);
 		}
+	};
+
+	const handleToggleMenu = () => {
+		dispatch(toggleMenu());
 	};
 
 	useEffect(() => {
@@ -71,13 +97,26 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 
 	return (
 		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
-			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
-				{/* <label className='flex flex-col gap-2 w-8'>
-					<input className='peer hidden' type='checkbox' />
-					<div className='rounded-2xl h-[3px] w-1/2 bg-black duration-500 peer-checked:rotate-[225deg] origin-right peer-checked:-translate-x-[12px] peer-checked:-translate-y-[1px]'></div>
-					<div className='rounded-2xl h-[3px] w-full bg-black duration-500 peer-checked:-rotate-45'></div>
-					<div className='rounded-2xl h-[3px] w-1/2 bg-black duration-500 place-self-end peer-checked:rotate-[225deg] origin-left peer-checked:translate-x-[12px] peer-checked:translate-y-[1px]'></div>
-				</label> */}
+			<div className='w-fit h-full flex flex-row justify-start items-center gap-2'>
+				<LightTooltip
+					title={!isMenuOpen ? 'Thu gọn Menu' : 'Mở rộng menu'}
+					placement='bottom'
+					arrow
+				>
+					<label className='select-none'>
+						<div className='w-9 h-10 cursor-pointer flex flex-col items-center justify-center'>
+							<input
+								className='hidden peer'
+								type='checkbox'
+								checked={!isMenuOpen}
+								onClick={handleToggleMenu}
+							/>
+							<div className='w-[50%] h-[2px] bg-white rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg]' />
+							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-center peer-checked:hidden' />
+							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-left -translate-y-[0.45rem] peer-checked:rotate-[45deg]' />
+						</div>
+					</label>
+				</LightTooltip>
 				{children}
 			</div>
 			<div className='flex flex-row justify-end items-center gap-3'>

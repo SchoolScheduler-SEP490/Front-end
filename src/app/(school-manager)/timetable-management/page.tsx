@@ -3,11 +3,12 @@
 import SMHeader from '@/commons/school_manager/header';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import { Fab } from '@mui/material';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
-import { alpha } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,9 +18,13 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
 import { visuallyHidden } from '@mui/utils';
 import * as React from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import { usePathname, useRouter } from 'next/navigation';
+import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
+import { useSelector } from 'react-redux';
 
 interface ITimetableTableData {
 	id: number;
@@ -52,33 +57,9 @@ function importRecord(
 }
 
 const timetableTableData: ITimetableTableData[] = [
-	importRecord(
-		1,
-		'T01',
-		'Thời khóa biểu 1',
-		'2022-09-01',
-		'2022-09-30',
-		100,
-		'Công bố'
-	),
-	importRecord(
-		2,
-		'T02',
-		'Thời khóa biểu 2',
-		'2022-09-01',
-		'2022-09-30',
-		60,
-		'Chờ duyệt'
-	),
-	importRecord(
-		3,
-		'T03',
-		'Thời khóa biểu 3',
-		'2022-09-01',
-		'2022-09-30',
-		80,
-		'Chờ duyệt'
-	),
+	importRecord(1, 'T01', 'Thời khóa biểu 1', '2022-09-01', '2022-09-30', 100, 'Công bố'),
+	importRecord(2, 'T02', 'Thời khóa biểu 2', '2022-09-01', '2022-09-30', 60, 'Chờ duyệt'),
+	importRecord(3, 'T03', 'Thời khóa biểu 3', '2022-09-01', '2022-09-30', 80, 'Chờ duyệt'),
 	importRecord(4, 'T04', 'Thời khóa biểu 4', '2022-09-01', '2022-09-30', 5, 'Vô hiệu'),
 	importRecord(5, 'T05', 'Thời khóa biểu 5', '2022-09-01', '2022-09-30', 95, 'Vô hiệu'),
 	importRecord(6, 'T06', 'Thời khóa biểu 6', '2022-09-01', '2022-09-30', 69, 'Vô hiệu'),
@@ -99,10 +80,7 @@ type Order = 'asc' | 'desc';
 function getComparator<Key extends keyof any>(
 	order: Order,
 	orderBy: Key
-): (
-	a: { [key in Key]: number | string },
-	b: { [key in Key]: number | string }
-) => number {
+): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
 	return order === 'desc'
 		? (a, b) => descendingComparator(a, b, orderBy)
 		: (a, b) => -descendingComparator(a, b, orderBy);
@@ -154,21 +132,28 @@ const headCells: readonly HeadCell[] = [
 	},
 ];
 
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 13,
+	},
+}));
+
 // For extrafunction of Table head (filter, sort, etc.)
 interface EnhancedTableProps {
 	numSelected: number;
-	onRequestSort: (
-		event: React.MouseEvent<unknown>,
-		property: keyof ITimetableTableData
-	) => void;
+	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof ITimetableTableData) => void;
 	onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	order: Order;
 	orderBy: string;
 	rowCount: number;
 }
 function EnhancedTableHead(props: EnhancedTableProps) {
-	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
-		props;
+	const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
 	const createSortHandler =
 		(property: keyof ITimetableTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
@@ -205,14 +190,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 							{orderBy === headCell.id ? (
 								<Box
 									component='span'
-									sx={[
-										visuallyHidden,
-										{ position: 'absolute', zIndex: 10 },
-									]}
+									sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}
 								>
-									{order === 'desc'
-										? 'sorted descending'
-										: 'sorted ascending'}
+									{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
 								</Box>
 							) : null}
 						</TableSortLabel>
@@ -238,10 +218,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 				},
 				numSelected > 0 && {
 					bgcolor: (theme) =>
-						alpha(
-							theme.palette.primary.main,
-							theme.palette.action.activatedOpacity
-						),
+						alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
 				},
 			]}
 		>
@@ -273,9 +250,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 
 export default function SMLanding() {
+	const router = useRouter();
+	const pathName = usePathname();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] =
-		React.useState<keyof ITimetableTableData>('timetableCode');
+	const [orderBy, setOrderBy] = React.useState<keyof ITimetableTableData>('timetableCode');
 	const [selected, setSelected] = React.useState<readonly number[]>([]);
 	const [page, setPage] = React.useState(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -338,10 +318,14 @@ export default function SMLanding() {
 	);
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div
+			className={`relative w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start`}
+		>
 			<SMHeader>
 				<div>
-					<h3 className='text-title-small text-white font-semibold tracking-wider'>
+					<h3 className='text-title-small text-white font-medium tracking-wider'>
 						Thời khóa biểu
 					</h3>
 				</div>
@@ -372,9 +356,7 @@ export default function SMLanding() {
 										return (
 											<TableRow
 												hover
-												onClick={(event) =>
-													handleOneClick(event, row.id)
-												}
+												onClick={(event) => handleOneClick(event, row.id)}
 												role='checkbox'
 												aria-checked={isItemSelected}
 												tabIndex={-1}
@@ -406,9 +388,7 @@ export default function SMLanding() {
 												<TableCell align='center'>
 													{row.appliedDate}
 												</TableCell>
-												<TableCell align='center'>
-													{row.endDate}
-												</TableCell>
+												<TableCell align='center'>{row.endDate}</TableCell>
 												<TableCell align='center'>
 													<h2
 														className={`font-semibold ${
@@ -462,6 +442,21 @@ export default function SMLanding() {
 						/>
 					</Paper>
 				</Box>
+			</div>
+			<div className='absolute w-fit h-fit overflow-visible bottom-[3vw] right-[3vw]'>
+				<LightTooltip title='Tạo Thời khóa biểu' placement='top' arrow>
+					<Fab
+						color='primary'
+						aria-label='add'
+						onClick={() =>
+							router.push(
+								pathName + '/generation/' + TIMETABLE_GENERATION_TABS[0].value
+							)
+						}
+					>
+						<AddIcon color='inherit' sx={{ color: 'white' }} />
+					</Fab>
+				</LightTooltip>
 			</div>
 		</div>
 	);

@@ -1,11 +1,10 @@
 'use client';
-import SMHeader from '@/commons/school_manager/header';
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
 import { useEffect, useState } from 'react';
-import { IDropdownOption } from '../_utils/contants';
 import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filterable';
 import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
 import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
@@ -191,14 +190,7 @@ export default function SMTeachingAssignment() {
 	// Render skeleton if data while fetching data
 	if (isClassValidating || isTeachingAssignmentValidating || isTeacherValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
-				<SMHeader>
-					<div>
-						<h3 className='text-title-small text-white font-semibold tracking-wider'>
-							Tiết học
-						</h3>
-					</div>
-				</SMHeader>
+			<div className='w-full h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
 				<div className='w-full h-full flex flex-row justify-start items-start'>
 					{isClassValidating ? (
 						<TeachingAssignmentSideNavSkeleton />
@@ -232,14 +224,7 @@ export default function SMTeachingAssignment() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
-			<SMHeader>
-				<div>
-					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Phân công giảng dạy
-					</h3>
-				</div>
-			</SMHeader>
+		<div className='w-full h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
 			<div className='w-full h-full flex flex-row justify-start items-start overflow-y-hidden'>
 				<TeachingAssignmentSideNav
 					selectedClass={selectedClassId}
