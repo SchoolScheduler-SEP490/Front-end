@@ -34,7 +34,8 @@ const useFetchTeachingAssignment = (props: IFetchTeachingAssignmentProps) => {
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
 		revalidateOnFocus: false,
 		revalidateOnReconnect: true,
-		revalidateIfStale: true,
+		revalidateIfStale: false,
+		shouldRetryOnError: false,
 	});
 
 	return { data, error, isLoading, isValidating, mutate };

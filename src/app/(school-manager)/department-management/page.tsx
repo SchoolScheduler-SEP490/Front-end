@@ -10,9 +10,12 @@ import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import DepartmentTableSkeleton from './_components/skeleton_table';
 import DepartmentDetails from './_components/department_details';
+import { useSelector } from 'react-redux';
 
 export default function SMDepartment() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+
 	const [page, setPage] = useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
@@ -71,7 +74,11 @@ export default function SMDepartment() {
 
 	if (isDepartmentValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+			<div
+				className={`w-[${
+					!isMenuOpen ? '84' : '100'
+				}%] h-screen flex flex-col justify-start items-start`}
+			>
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -90,7 +97,11 @@ export default function SMDepartment() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start`}
+		>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>

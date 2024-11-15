@@ -2,11 +2,11 @@ import SMHeader from '@/commons/school_manager/header';
 
 export default function Home() {
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start'>
+		<div className='w-full h-screen flex flex-col justify-start items-start'>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
-						Ràng buộc hệ thống
+						Sắp TKB
 					</h3>
 				</div>
 			</SMHeader>

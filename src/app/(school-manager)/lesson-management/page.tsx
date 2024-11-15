@@ -7,11 +7,14 @@ import useNotify from '@/hooks/useNotify';
 import { ITermResponse } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
+import LessonQuickApplyModal from './_components/lesson_modal_quick_apply';
 import SubjectGroupSideNav from './_components/lesson_sidenav';
 import LessonTable from './_components/lesson_table';
 import SubjectGroupSideNavSkeleton from './_components/skeleton_sidenav';
 import LessonTableSkeleton from './_components/skeleton_table';
+import useFetchQuickAssignment from './_hooks/useFetchQuickAssignment';
 import useFetchSGTableData from './_hooks/useFetchSGTableData';
 import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
@@ -23,11 +26,10 @@ import {
 	ISubjectInGroup,
 	TermSeperatedAssignedObject,
 } from './_libs/constants';
-import useFetchQuickAssignment from './_hooks/useFetchQuickAssignment';
-import LessonQuickApplyModal from './_components/lesson_modal_quick_apply';
 
 export default function SMLesson() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 
 	const [selectedSubjectGroup, setSelectedSubjectGroup] = useState<number>(0);
 	const [selectedTermId, setSelectedTermId] = useState<number>(0);
@@ -244,7 +246,11 @@ export default function SMLesson() {
 	// Loading components
 	if (isSubjectGroupValidating || isSubjectGroupTableValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+			<div
+				className={`w-[${
+					!isMenuOpen ? '84' : '100'
+				}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+			>
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -269,7 +275,11 @@ export default function SMLesson() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+		<div
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+		>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>

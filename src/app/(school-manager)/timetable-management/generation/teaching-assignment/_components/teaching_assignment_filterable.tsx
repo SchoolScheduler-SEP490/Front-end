@@ -1,5 +1,6 @@
 'use client';
 
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Button,
@@ -13,7 +14,6 @@ import {
 	Typography,
 } from '@mui/material';
 import { KeyedMutator } from 'swr';
-import { IDropdownOption } from '../../_utils/contants';
 
 interface ITeachingAssignmentFilterableProps {
 	open: boolean;

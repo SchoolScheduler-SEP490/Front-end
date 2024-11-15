@@ -10,9 +10,11 @@ import SubjectDetails from './_components/subject_details';
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function SMSubject() {
 	const { selectedSchoolYearId, sessionToken } = useAppContext();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 
 	const [page, setPage] = useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = useState<number>(5);
@@ -87,7 +89,11 @@ export default function SMSubject() {
 
 	if (isSubjectValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+			<div
+				className={`w-[${
+					!isMenuOpen ? '84' : '100'
+				}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+			>
 				<SMHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>
@@ -107,7 +113,11 @@ export default function SMSubject() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-hidden overflow-x-hidden'>
+		<div
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+		>
 			<SMHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>
