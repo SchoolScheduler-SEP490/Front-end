@@ -22,9 +22,9 @@ import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ISubjectGroupTableData } from '../_libs/constants';
 import UpdateSubjectGroupModal from './subject-group_update_modal';
-import ApplySubjectGroupModal from './subject_group_apply_modal';
-import CreateSubjectGroupModal from './subject_group_create_modal';
-import DeleteSubjectGroupModal from './subject_group_delete_modal';
+import ApplySubjectGroupModal from './subject_group_modal_apply';
+import CreateSubjectGroupModal from './subject_group_modal_create';
+import DeleteSubjectGroupModal from './subject_group_modal_delete';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {

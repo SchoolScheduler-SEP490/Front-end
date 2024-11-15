@@ -1,9 +1,7 @@
 import ContainedButton from '@/commons/button-contained';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
 import React from 'react';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 const style = {
 	position: 'absolute',
@@ -15,13 +13,13 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ISubjectGroupConfirmModalProps {
+interface IQuickApplyConfirmModalProps {
 	handleConfirm: () => void;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CreateConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
+const QuickApplyConfirmationModal = (props: IQuickApplyConfirmModalProps) => {
 	const { handleConfirm, setOpen, open } = props;
 
 	const handleClose = () => {
@@ -53,7 +51,7 @@ const CreateConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 				</div>
 				<div className='w-full h-fit px-5 py-[3vh]'>
 					<h2 className='text-title-small font-normal w-full text-left'>
-						Xác nhận lưu những thay đổi?
+						Xác nhận lưu những thay đổi
 					</h2>
 				</div>
 				<div
@@ -79,4 +77,4 @@ const CreateConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 	);
 };
 
-export default CreateConfirmationModal;
+export default QuickApplyConfirmationModal;

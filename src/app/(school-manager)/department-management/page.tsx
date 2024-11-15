@@ -20,6 +20,7 @@ export default function SMDepartment() {
 	const [departmentTableData, setDepartmentTableData] = useState<IDepartmentTableData[]>([]);
 	const [selectedDepartmentId, setSelectedDepartmentId] = useState<number>(0);
 	const [isDepartmentDetailsOpen, setIsDepartmentDetailsOpen] = useState<boolean>(false);
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
 	const {
 		data: departmentData,
@@ -116,11 +117,15 @@ export default function SMDepartment() {
 						setDepartmentDetailsOpen={setIsDepartmentDetailsOpen}
 						selectedDepartmentId={selectedDepartmentId}
 						setSelectedDepartmentId={setSelectedDepartmentId}
+						isUpdateDepartmentOpen={isUpdateModalOpen}
+						setUpdateDepartmentOpen={setIsUpdateModalOpen}
 					/>
 				</div>
 				<DepartmentDetails
 					open={isDepartmentDetailsOpen}
 					setOpen={setIsDepartmentDetailsOpen}
+					isUpdateDepartmentOpen={isUpdateModalOpen}
+					setUpdateDepartmentOpen={setIsUpdateModalOpen}
 					departmentData={
 						departmentData?.result.items.find(
 							(item: IDepartmentResponse) => item.id === selectedDepartmentId

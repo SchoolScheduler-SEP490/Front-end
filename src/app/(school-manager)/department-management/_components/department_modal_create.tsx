@@ -594,17 +594,17 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
+						title='Huỷ'
+						onClick={handleClose}
+						disableRipple
+						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+					/>
+					<ContainedButton
 						title='Thêm tổ bộ môn'
 						disableRipple
 						disabled={editingDepartment.length === 0}
 						onClick={() => setIsConfirmOpen(true)}
 						styles='bg-primary-300 text-white !py-1 px-4'
-					/>
-					<ContainedButton
-						title='Huỷ'
-						onClick={handleClose}
-						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 				</div>
 				<CreateConfirmationModal

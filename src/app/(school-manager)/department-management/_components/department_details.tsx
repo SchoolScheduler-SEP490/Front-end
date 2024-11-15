@@ -1,20 +1,24 @@
 import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import CloseIcon from '@mui/icons-material/Close';
-import { Divider, IconButton, Skeleton, Typography } from '@mui/material';
+import { Divider, IconButton, Skeleton, Tooltip, Typography } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { IDropdownOption } from '../../_utils/contants';
 import useFetchTeacher from '../_hooks/useFetchTeacher';
 import { IDepartmentResponse, ITeacherResponse } from '../_libs/constants';
+import Image from 'next/image';
 
 interface IDepartmentDetailsProps {
 	open: boolean;
 	setOpen: Dispatch<SetStateAction<boolean>>;
+	isUpdateDepartmentOpen: boolean;
+	setUpdateDepartmentOpen: Dispatch<SetStateAction<boolean>>;
 	departmentData: IDepartmentResponse;
 }
 
 const DepartmentDetails = (props: IDepartmentDetailsProps) => {
-	const { departmentData, open, setOpen } = props;
+	const { departmentData, open, setOpen, isUpdateDepartmentOpen, setUpdateDepartmentOpen } =
+		props;
 	const { schoolId, sessionToken } = useAppContext();
 
 	const [existingTeachers, setExistingTeachers] = useState<IDropdownOption<number>[] | undefined>(
@@ -39,13 +43,17 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 							label: `${teacher['first-name']} ${teacher['last-name']} (${teacher['abbreviation']})`,
 						} as IDropdownOption<number>)
 				);
-				setExistingTeachers(useFilterArray(tmpTeachersArr, 'value'));
+				setExistingTeachers(useFilterArray(tmpTeachersArr, ['value']));
 			}
 		}
 	}, [teacherData, open, departmentData]);
 
 	const handleClose = () => {
 		setOpen(false);
+	};
+
+	const handleUpdateDepartment = () => {
+		setUpdateDepartmentOpen(true);
 	};
 
 	return (
@@ -58,12 +66,27 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 		>
 			<div className='w-full bg-white sticky top-0 left-0 pt-[2vh]'>
 				<div className='w-full flex flex-row justify-between items-center pb-1 px-5 '>
-					<Typography
-						variant='h6'
-						className='text-title-small-strong font-normal w-full text-left'
-					>
-						Thông tin Tổ bộ môn
-					</Typography>
+					<div className='w-fit flex flex-row justify-start items-baseline gap-1'>
+						<Typography
+							variant='h6'
+							className='text-title-small-strong font-normal w-full text-left'
+						>
+							Thông tin Tổ bộ môn
+						</Typography>
+						<Tooltip title='Chỉnh sửa thông tin bộ môn'>
+							<IconButton
+								onClick={handleUpdateDepartment}
+								className='translate-y-[1px] opacity-80'
+							>
+								<Image
+									src='/images/icons/compose.png'
+									alt='Chỉnh sửa'
+									width={17}
+									height={17}
+								/>
+							</IconButton>
+						</Tooltip>
+					</div>
 					<IconButton onClick={handleClose} className='translate-x-2'>
 						<CloseIcon />
 					</IconButton>

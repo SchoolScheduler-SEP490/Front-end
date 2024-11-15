@@ -144,6 +144,8 @@ interface IDepartmentTableProps {
 	setSelectedDepartmentId: Dispatch<SetStateAction<number>>;
 	isDepartmentDetailsOpen: boolean;
 	setDepartmentDetailsOpen: Dispatch<SetStateAction<boolean>>;
+	isUpdateDepartmentOpen: boolean;
+	setUpdateDepartmentOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -161,52 +163,38 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 		totalRows,
 		updateTable,
 		selectedDepartmentId,
+		setSelectedDepartmentId,
 		setDepartmentDetailsOpen,
 		isDepartmentDetailsOpen,
-		setSelectedDepartmentId,
+		isUpdateDepartmentOpen,
+		setUpdateDepartmentOpen,
 	} = props;
 
 	const [order, setOrder] = useState<Order>('asc');
 	const [orderBy, setOrderBy] = useState<keyof IDepartmentTableData>('id');
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 	const [isHeadAssignmentModalOpen, setIsHeadAssignmentModalOpen] = useState<boolean>(false);
 
 	const [selectedRow, setSelectedRow] = useState<IDepartmentTableData>(
 		{} as IDepartmentTableData
 	);
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const open = Boolean(anchorEl);
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>, row: IDepartmentTableData) => {
-		setAnchorEl((event.target as HTMLElement) ?? null);
+	const handleDeleteClick = (
+		event: React.MouseEvent<HTMLButtonElement>,
+		row: IDepartmentTableData
+	) => {
+		event.stopPropagation();
 		setSelectedRow(row);
+		setIsDeleteModalOpen(true);
 	};
 
-	const handleDetailsClick = (departmentId: number) => {
-		setSelectedDepartmentId(departmentId);
+	const handleDetailsClick = (department: IDepartmentTableData) => {
+		setSelectedRow(department);
+		setSelectedDepartmentId(department.departmentKey);
 		if (!isDepartmentDetailsOpen) {
 			setDepartmentDetailsOpen(true);
 		}
-	};
-
-	const handleMenuItemClick = (index: number) => {
-		switch (index) {
-			case 0:
-				setIsUpdateModalOpen(true);
-				break;
-			case 1:
-				setIsDeleteModalOpen(true);
-				break;
-			default:
-				useNotify({
-					message: 'Chức năng đang được phát triển',
-					type: 'warning',
-				});
-				break;
-		}
-		setAnchorEl(null);
 	};
 
 	const handleCreateDepartment = () => {
@@ -301,12 +289,13 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 										tabIndex={-1}
 										key={row.id}
 										sx={[
-											{ userSelect: 'none' },
+											{ userSelect: 'none', cursor: 'pointer' },
 											selectedDepartmentId === row.departmentKey &&
 												isDepartmentDetailsOpen && {
 													backgroundColor: '#f5f5f5',
 												},
 										]}
+										onClick={() => handleDetailsClick(row)}
 									>
 										<TableCell
 											component='th'
@@ -326,7 +315,6 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 												textOverflow: 'ellipsis',
 												cursor: 'pointer',
 											}}
-											onClick={() => handleDetailsClick(row.departmentKey)}
 										>
 											<Typography noWrap width={200} fontSize={15}>
 												{row.departmentName}
@@ -342,60 +330,19 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 													: '- - - - -'}
 											</Typography>
 										</TableCell>
-										<TableCell width={80}>
+										<TableCell sx={{ overflow: 'visible' }}>
 											<IconButton
-												color='success'
+												color='error'
 												sx={{ zIndex: 10 }}
-												id={`basic-button${row.departmentCode + index}`}
-												aria-controls={
-													open ? `basic-menu${index}` : undefined
-												}
-												aria-haspopup='true'
-												aria-expanded={open ? 'true' : undefined}
-												onClick={(event) => handleClick(event, row)}
+												onClick={(event) => handleDeleteClick(event, row)}
 											>
 												<Image
-													src='/images/icons/menu.png'
-													alt='notification-icon'
-													unoptimized={true}
-													width={20}
-													height={20}
+													src='/images/icons/delete.png'
+													alt='Xóa tổ bộ môn'
+													width={15}
+													height={15}
 												/>
 											</IconButton>
-											<Menu
-												id={row.departmentCode + 'menu' + index}
-												anchorEl={anchorEl}
-												elevation={1}
-												open={open}
-												onClose={() => setAnchorEl(null)}
-												MenuListProps={{
-													'aria-labelledby': `${
-														row.departmentCode + 'menu' + index
-													}`,
-												}}
-											>
-												{dropdownOptions.map((option, i) => (
-													<MenuItem
-														key={option.title + i}
-														onClick={() => handleMenuItemClick(i)}
-														className={`flex flex-row items-center ${
-															i === dropdownOptions.length - 1 &&
-															'hover:bg-basic-negative-hover hover:text-basic-negative'
-														}`}
-													>
-														<Image
-															className='mr-4'
-															src={option.img}
-															alt={option.title}
-															width={15}
-															height={15}
-														/>
-														<h2 className='text-body-medium'>
-															{option.title}
-														</h2>
-													</MenuItem>
-												))}
-											</Menu>
 										</TableCell>
 									</TableRow>
 								);
@@ -433,8 +380,8 @@ const DepartmentTable = (props: IDepartmentTableProps) => {
 			/>
 			<UpdateDepartment
 				departmentData={selectedRow}
-				open={isUpdateModalOpen}
-				setOpen={setIsUpdateModalOpen}
+				open={isUpdateDepartmentOpen}
+				setOpen={setUpdateDepartmentOpen}
 				updateDepartment={updateTable}
 			/>
 			<DeleteDepartmentModal
