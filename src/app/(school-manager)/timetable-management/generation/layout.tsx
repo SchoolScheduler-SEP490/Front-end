@@ -1,11 +1,12 @@
 'use client';
+import SMHeader from '@/commons/school_manager/header';
+import { IconButton } from '@mui/material';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import TimetableTabs from '../_components/timetable-tabs';
-import { Box, IconButton } from '@mui/material';
-import { usePathname } from 'next/navigation';
 import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
-import SMHeader from '@/commons/school_manager/header';
-import Image from 'next/image';
+import { useSelector } from 'react-redux';
 
 interface TabPanelProps {
 	children?: ReactNode;
@@ -18,14 +19,14 @@ function CustomTabPanel(props: TabPanelProps) {
 
 	return (
 		<div
-			className='w-full h-fit'
+			className='w-full h-full overflow-y-hidden'
 			role='tabpanel'
 			hidden={value !== index}
 			id={`simple-tabpanel-${index}`}
 			aria-labelledby={`simple-tab-${index}`}
 			{...other}
 		>
-			{value === index && <div className='w-full h-fit'>{children}</div>}
+			{value === index && <div className='w-full h-full overflow-y-hidden'>{children}</div>}
 		</div>
 	);
 }
@@ -36,6 +37,9 @@ export default function SMLayout({
 	children: ReactNode;
 }>) {
 	const pathName = usePathname();
+	const router = useRouter();
+	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+
 	const [value, setValue] = useState(0);
 
 	useEffect(() => {
@@ -47,10 +51,14 @@ export default function SMLayout({
 	}, [pathName]);
 
 	return (
-		<section className='w-[84%] h-fit min-h-screen flex flex-col justify-start items-start overflow-y-hidden'>
+		<section
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-fit min-h-screen max-h-[100vh] flex flex-col justify-start items-start overflow-y-hidden`}
+		>
 			<SMHeader>
 				<div className='flex flex-row justify-start items-center gap-2'>
-					<IconButton color='info'>
+					<IconButton color='info' onClick={() => router.back()}>
 						<Image
 							src='/images/icons/arrow.png'
 							alt='Trở lại'

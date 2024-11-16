@@ -26,7 +26,7 @@ const TimetableTabs = () => {
 
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		const tmpPathArr: string[] = pathName.split('/');
-		tmpPathArr.pop();
+		tmpPathArr.splice(3);
 		tmpPathArr.push(TIMETABLE_GENERATION_TABS[newValue].value);
 		router.push(tmpPathArr.join('/'));
 		setValue(newValue);

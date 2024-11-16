@@ -24,7 +24,8 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { usePathname, useRouter } from 'next/navigation';
 import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleMenu } from '@/context/school_manager_slice';
 
 interface ITimetableTableData {
 	id: number;
@@ -253,6 +254,7 @@ export default function SMLanding() {
 	const router = useRouter();
 	const pathName = usePathname();
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
+	const dispatch = useDispatch();
 
 	const [order, setOrder] = React.useState<Order>('asc');
 	const [orderBy, setOrderBy] = React.useState<keyof ITimetableTableData>('timetableCode');
@@ -316,6 +318,13 @@ export default function SMLanding() {
 				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
 		[order, orderBy, page, rowsPerPage]
 	);
+
+	const handleGenerateTimetable = () => {
+		if (!isMenuOpen) {
+			dispatch(toggleMenu());
+		}
+		router.push(pathName + '/generation/' + TIMETABLE_GENERATION_TABS[0].value);
+	};
 
 	return (
 		<div
@@ -445,15 +454,7 @@ export default function SMLanding() {
 			</div>
 			<div className='absolute w-fit h-fit overflow-visible bottom-[3vw] right-[3vw]'>
 				<LightTooltip title='Tạo Thời khóa biểu' placement='top' arrow>
-					<Fab
-						color='primary'
-						aria-label='add'
-						onClick={() =>
-							router.push(
-								pathName + '/generation/' + TIMETABLE_GENERATION_TABS[0].value
-							)
-						}
-					>
+					<Fab color='primary' aria-label='add' onClick={handleGenerateTimetable}>
 						<AddIcon color='inherit' sx={{ color: 'white' }} />
 					</Fab>
 				</LightTooltip>

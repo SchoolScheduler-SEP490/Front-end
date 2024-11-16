@@ -1,7 +1,9 @@
-export default function Home() {
-	return (
-		<div className='w-full h-full flex flex-col justify-start items-start'>
-			<h2>TimetableContent here</h2>
-		</div>
-	);
-}
+'use client';
+import { usePathname, useRouter } from 'next/navigation';
+
+const SMConstraintPage = () => {
+	const router = useRouter();
+	const pathName = usePathname();
+	router.replace(pathName + '/teacher-unavailability');
+};
+export default SMConstraintPage;
