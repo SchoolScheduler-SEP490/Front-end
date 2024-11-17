@@ -77,11 +77,8 @@ const CurriculumDetails = (props: ISubjectDetailsProps) => {
 
 	return (
 		<div
-			className={`h-full w-[35%] flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar ${
-				open
-					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
-					: 'hidden'
-			}`}
+			className={`h-full w-[35%] flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar transition-all duration-300 ease-in-out transform
+    ${open ? 'translate-x-0 opacity-100' : 'w-0 translate-x-full opacity-0'}`}
 		>
 			<div className='w-full flex flex-row justify-between items-center pb-1 px-5'>
 				<div className='w-fit flex flex-row justify-start items-baseline gap-1'>

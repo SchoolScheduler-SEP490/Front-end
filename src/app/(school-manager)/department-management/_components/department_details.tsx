@@ -56,18 +56,15 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 
 	return (
 		<div
-			className={`h-[100vh] w-[30%] flex flex-col justify-start items-center pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar ${
-				open
-					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
-					: 'hidden'
-			}`}
+			className={`h-[100vh] w-[30%] flex flex-col justify-start items-center pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar transition-all duration-300 ease-in-out transform
+    ${open ? 'translate-x-0 opacity-100' : 'w-0 translate-x-full opacity-0'}`}
 		>
 			<div className='w-full bg-white sticky top-0 left-0 pt-[2vh]'>
 				<div className='w-full flex flex-row justify-between items-center pb-1 px-5 '>
 					<div className='w-fit flex flex-row justify-start items-baseline gap-1'>
 						<Typography
 							variant='h6'
-							className='text-title-small-strong font-normal w-full text-left max-w-[70%] text-ellipsis text-nowrap overflow-hidden'
+							className='text-title-small-strong font-normal w-full text-left text-ellipsis text-nowrap overflow-hidden'
 						>
 							Thông tin Tổ bộ môn
 						</Typography>
@@ -169,37 +166,6 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 					{existingTeachers && existingTeachers.length === 0 && (
 						<h2 className='text-body-small italic opacity-80'>
 							Chưa có giáo viên trong tổ bộ môn
-						</h2>
-					)}
-				</div>
-				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Môn học</h4>
-					{/* {existingTeachers ? (
-						<ul className='list-disc pl-6 w-full'>
-							{existingTeachers.map(
-								(teacher: IDropdownOption<number>, index: number) => (
-									<li key={teacher.label + index}>{teacher.label}</li>
-								)
-							)}
-						</ul>
-					) : (
-						<ul className='list-disc pl-6 w-full'>
-							{[1, 2, 3, 4].map((item) => (
-								<li key={item}>
-									<Skeleton
-										className='!text-body-large-strong'
-										animation='wave'
-										variant='text'
-										sx={{ width: '80%' }}
-									/>
-								</li>
-							))}
-						</ul>
-					)} */}
-					{/* {existingTeachers && existingTeachers.length === 0 && ( */}
-					{true && (
-						<h2 className='text-body-small italic opacity-80'>
-							Môn học chưa được áp dụng cho tổ bộ môn
 						</h2>
 					)}
 				</div>
