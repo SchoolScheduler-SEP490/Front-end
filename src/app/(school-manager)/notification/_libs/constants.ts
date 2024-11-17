@@ -21,3 +21,11 @@ export interface INotificationResponse {
         items: INotificationItem[];
     }
 }
+
+export interface ISendNotification {
+  title: string;
+  message: string;
+  type: "HeThong";
+  link: string;
+  "notification-url": string;
+}

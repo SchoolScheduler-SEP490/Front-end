@@ -3,13 +3,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { SignalRService } from "../_services/signalRService";
 import { INotificationItem } from "../_libs/constants";
-import { getNotification } from "../_libs/apiNotification";
+import { getNotification, getUnreadCount, markAllNotificationsAsRead, markNotificationAsRead } from "../_libs/apiNotification";
 
 interface NotificationContextType {
   notifications: INotificationItem[];
   unreadCount: number;
+  sessionToken: string;
   fetchNotifications: () => Promise<void>;
   markAsRead: (notificationUrl: string) => void;
+  fetchUnreadCount: () => Promise<void>;
+  markAllAsRead: () => Promise<void>;
 }
 
 interface NotificationProviderProps {
@@ -26,9 +29,16 @@ export const NotificationProvider = ({
   accountId,
 }: NotificationProviderProps) => {
   const [notifications, setNotifications] = useState<INotificationItem[]>([]);
-  const [signalRService, setSignalRService] = useState<SignalRService | null>(
-    null
-  );
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
+  const fetchUnreadCount = async () => {
+    const count = await getUnreadCount(sessionToken, accountId);
+    setUnreadCount(count);
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+  }, []);
 
   const fetchNotifications = async () => {
     if (!sessionToken || !accountId) return;
@@ -46,40 +56,52 @@ export const NotificationProvider = ({
   useEffect(() => {
     if (sessionToken) {
       const service = new SignalRService(sessionToken);
-      setSignalRService(service);
       service.startConnection();
 
       service.addNotificationListener((notification: INotificationItem) => {
+        console.log("New notification received:", notification);
         setNotifications((prev) => [notification, ...prev]);
+        // Call function fetchUnreadCount() to update unread notification in real-time
+        fetchUnreadCount();
       });
 
       fetchNotifications();
+      fetchUnreadCount();
 
       return () => {
         service.stopConnection();
       };
     }
-  }, [sessionToken, accountId]);
+  }, [sessionToken]);
 
-  const markAsRead = (notificationUrl: string) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification["notification-url"] === notificationUrl
-          ? { ...notification, "is-read": true }
-          : notification
-      )
+  const markAsRead = async (notificationUrl: string) => {
+    await markNotificationAsRead(sessionToken, accountId);
+    setNotifications(prev =>
+        prev.map(notification =>
+            notification["notification-url"] === notificationUrl
+                ? { ...notification, "is-read": true }
+                : notification
+        )
     );
+    fetchUnreadCount();
   };
 
-  const unreadCount = notifications.filter((n) => !n["is-read"]).length;
+  const markAllAsRead = async () => {
+    await markAllNotificationsAsRead(sessionToken, accountId);
+    setNotifications(prev => prev.map(notification => ({ ...notification, "is-read": true })));
+    fetchUnreadCount();
+};
 
   return (
     <NotificationContext.Provider
       value={{
         notifications,
         unreadCount,
+        sessionToken,
         fetchNotifications,
         markAsRead,
+        markAllAsRead,
+        fetchUnreadCount,
       }}
     >
       {children}
