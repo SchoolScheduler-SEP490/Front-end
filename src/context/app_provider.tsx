@@ -90,7 +90,7 @@ export default function AppProvider({
 		{
 			revalidateOnReconnect: true,
 			revalidateOnMount: true,
-			revalidateOnFocus: false,
+			revalidateOnFocus: true,
 			refreshInterval: 480000,
 			shouldRetryOnError: false,
 		}
