@@ -1,29 +1,32 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { getCreateSubjectGroupApi } from '../_libs/apis';
-import { ICreateSubjectGroupRequest } from '../_libs/constants';
+import { getUpdateCurriculumApi } from '../_libs/apis';
+import { IUpdateCurriculumRequest } from '../_libs/constants';
 
-interface ICreateSubjectProps {
+interface IUpdateCurriculumProps {
 	schoolId: number;
 	schoolYearId: number;
+	subjectGroupId: number;
 	sessionToken: string;
-	formData: ICreateSubjectGroupRequest;
+	formData: IUpdateCurriculumRequest;
 }
 
-const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {
-	const { schoolId, formData, sessionToken, schoolYearId } = props;
-	const endpoint = getCreateSubjectGroupApi({ schoolId, schoolYearId });
+const useUpdateCurriculum = async (props: IUpdateCurriculumProps) => {
+	const { subjectGroupId, formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getUpdateCurriculumApi({ schoolId, schoolYearId, subjectGroupId });
 	let response;
 
-	async function createSubject(url: string) {
+	async function updateCurriculum(url: string) {
 		const response = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
-			method: 'POST',
-			body: JSON.stringify(formData),
+			method: 'PATCH',
+			body: JSON.stringify({
+				...formData,
+			}),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -34,12 +37,12 @@ const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {
 
 	try {
 		// Sử dụng mutate với POST request
-		response = await mutate(endpoint, createSubject(endpoint), {
+		response = await mutate(endpoint, updateCurriculum(endpoint), {
 			revalidate: true,
 		});
 		useNotify({
 			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-			type: response?.status === 201 ? 'success' : 'error',
+			type: response?.status === 200 ? 'success' : 'error',
 		});
 		return response;
 	} catch (err: any) {
@@ -50,4 +53,4 @@ const useCreateSubjectGroup = async (props: ICreateSubjectProps) => {
 	}
 };
 
-export default useCreateSubjectGroup;
+export default useUpdateCurriculum;

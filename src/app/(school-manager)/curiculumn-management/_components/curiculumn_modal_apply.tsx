@@ -17,10 +17,10 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { TransitionGroup } from 'react-transition-group';
-import useApplySubjectGroup from '../_hooks/useApplySG';
-import useFetchSGClass from '../_hooks/useFetchClass';
-import { IApplySubjectGroupRequest, ISGClassResponse, IVulnerableClass } from '../_libs/constants';
-import ApllyConfirmationModal from './subject_group_modal_confirm';
+import useFetchCurriculumClass from '../_hooks/useFetchClass';
+import { IApplyCurriculumRequest, ISGClassResponse, IVulnerableClass } from '../_libs/constants';
+import ApllyConfirmationModal from './curiculumn_modal_confirm';
+import useApplyCurriculum from '../_hooks/useApplyCurriculum';
 
 const style = {
 	position: 'absolute',
@@ -72,7 +72,7 @@ function renderUnselectedItem({
 			<ListItemText primary={item.name} />
 			<p className='text-body-small italic opacity-60'>
 				{item['subject-group-id'] === null
-					? 'Chưa áp dụng Tổ hợp'
+					? 'Chưa áp dụng Khung chương trình'
 					: item['subject-group-name']}
 			</p>
 		</ListItem>
@@ -107,17 +107,17 @@ function renderSelectedItem({ item, handleRemoveItem }: RenderSelectedItemOption
 			<ListItemText primary={item.name} />
 			<p className='text-body-small italic opacity-60'>
 				{item['subject-group-id'] === null
-					? 'Chưa áp dụng Tổ hợp'
+					? 'Chưa áp dụng Khung chương trình'
 					: item['subject-group-name']}
 			</p>
 		</ListItem>
 	);
 }
 
-const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
+const ApplyCurriculumModal = (props: ISGApplyModalProps) => {
 	const { open, setOpen, grade, subjectGroupName, subjectGroupId } = props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-	const { data, isValidating, error, mutate } = useFetchSGClass({
+	const { data, isValidating, error, mutate } = useFetchCurriculumClass({
 		sessionToken,
 		schoolId,
 		pageSize: 1000,
@@ -204,14 +204,14 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 	};
 
 	const handleUpdateSubmit = async () => {
-		await useApplySubjectGroup({
+		await useApplyCurriculum({
 			sessionToken: sessionToken,
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
 			formData: {
 				'class-ids': selectedClasses.map((item) => item.id),
 				'subject-group-id': subjectGroupId,
-			} as IApplySubjectGroupRequest,
+			} as IApplyCurriculumRequest,
 		});
 		handleClose();
 		setIsConfirmOpen(false);
@@ -250,7 +250,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Áp dụng Tổ hợp môn
+						Áp dụng Khung chương trình
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -337,7 +337,7 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 					open={isConfirmOpen}
 					setOpen={setIsConfirmOpen}
 					vulnerableClasses={vulnerableClasses}
-					newSubjectGroup={subjectGroupName}
+					newCurriculum={subjectGroupName}
 					handleConfirm={handleUpdateSubmit}
 				/>
 			</Box>
@@ -345,4 +345,4 @@ const ApplySubjectGroupModal = (props: ISGApplyModalProps) => {
 	);
 };
 
-export default ApplySubjectGroupModal;
+export default ApplyCurriculumModal;

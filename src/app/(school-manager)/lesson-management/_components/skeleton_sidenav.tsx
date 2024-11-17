@@ -3,9 +3,7 @@ import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import { Skeleton } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import MuiAccordionSummary, {
-	AccordionSummaryProps,
-} from '@mui/material/AccordionSummary';
+import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 
@@ -42,11 +40,11 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 	borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
 
-const SubjectGroupSideNavSkeleton = () => {
+const CurriculumSideNavSkeleton = () => {
 	const [expanded, setExpanded] = useState<string[]>(['panel']);
-	const [selectedSubjectGroup, setSelectedSubjectGroup] = useState<string>('');
+	const [selectedCurriculum, setSelectedCurriculum] = useState<string>('');
 
-	const handleSelectSubjectGroup = (url: string) => {
+	const handleSelectCurriculum = (url: string) => {
 		// Implement logics here
 	};
 
@@ -62,7 +60,7 @@ const SubjectGroupSideNavSkeleton = () => {
 	return (
 		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
 			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
-				Tổ hợp môn
+				Khung chương trình
 			</h1>
 			{[1, 2, 3].map((item) => (
 				<Accordion
@@ -82,25 +80,17 @@ const SubjectGroupSideNavSkeleton = () => {
 							<div
 								key={subjectGroup.name}
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-5 pr-3 gap-5 rounded-[3px] hover:cursor-pointer 
-									${
-										selectedSubjectGroup === subjectGroup.url
-											? 'bg-basic-gray-active '
-											: 'hover:bg-basic-gray-hover'
-									}`}
-								onClick={() => handleSelectSubjectGroup(subjectGroup.url)}
+									${selectedCurriculum === subjectGroup.url ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
+								onClick={() => handleSelectCurriculum(subjectGroup.url)}
 							>
 								<p
 									className={`text-body-medium font-normal w-full ${
-										selectedSubjectGroup === subjectGroup.url
+										selectedCurriculum === subjectGroup.url
 											? ' !font-semibold'
 											: ''
 									}`}
 								>
-									<Skeleton
-										className='!w-full'
-										animation='wave'
-										variant='text'
-									/>
+									<Skeleton className='!w-full' animation='wave' variant='text' />
 								</p>
 							</div>
 						))}
@@ -111,4 +101,4 @@ const SubjectGroupSideNavSkeleton = () => {
 	);
 };
 
-export default SubjectGroupSideNavSkeleton;
+export default CurriculumSideNavSkeleton;

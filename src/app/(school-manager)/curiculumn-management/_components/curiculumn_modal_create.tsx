@@ -25,23 +25,23 @@ import { useFormik } from 'formik';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { KeyedMutator } from 'swr';
-import useCreateSubjectGroup from '../_hooks/useCreateSG';
 import useFetchSubjectOptions from '../_hooks/useFetchSubjectOptions';
 import {
-	ICreateSubjectGroupRequest,
+	ICreateCurriculumRequest,
 	ISchoolYearResponse,
 	ISubjectOptionResponse,
 } from '../_libs/constants';
-import { createSubjectGroupSchema } from '../_libs/subject_group_schema';
+import { curriculumSchema } from '../_libs/curiculumn_schema';
 import { IDropdownOption } from '../../_utils/contants';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
+import useCreateCurriculum from '../_hooks/useCreateCurriculum';
 
 const style = {
 	position: 'absolute',
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: '40vw',
+	width: '50vw',
 	height: 'fit-content',
 	bgcolor: 'background.paper',
 };
@@ -75,7 +75,7 @@ function getStyles(
 	};
 }
 
-const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
+const CreateCurriculumModal = (props: IAddSubjectModalProps) => {
 	const { open, setOpen, subjectGroupMutator } = props;
 	const theme = useTheme();
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
@@ -107,11 +107,11 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 		setOpen(false);
 	};
 
-	const handleFormSubmit = async (body: ICreateSubjectGroupRequest) => {
-		await useCreateSubjectGroup({
+	const handleFormSubmit = async (body: ICreateCurriculumRequest) => {
+		await useCreateCurriculum({
 			formData: {
 				...body,
-			} as ICreateSubjectGroupRequest,
+			} as ICreateCurriculumRequest,
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
 			sessionToken: sessionToken,
@@ -122,15 +122,12 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 
 	const formik = useFormik({
 		initialValues: {
-			'group-name': '',
-			'group-code': '',
-			'group-description': '',
+			'curriculum-name': '',
 			grade: 0,
-			'school-year-id': 0,
 			'elective-subject-ids': [],
 			'specialized-subject-ids': [],
-		} as ICreateSubjectGroupRequest,
-		validationSchema: createSubjectGroupSchema,
+		} as ICreateCurriculumRequest,
+		validationSchema: curriculumSchema,
 		onSubmit: async (formData) => {
 			// Add additional logic here
 		},
@@ -223,7 +220,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Thêm tổ hợp môn
+						Thêm Khung chương trình
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -238,89 +235,25 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 				>
 					<div className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>Tên tổ hợp</h3>
+							<h3 className=' h-full flex justify-start pt-4'>
+								Tên Khung chương trình
+							</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
-								label='Nhập tên tổ hợp'
-								id='group-name'
-								name='group-name'
-								value={formik.values['group-name']}
-								onChange={formik.handleChange('group-name')}
+								label='Nhập tên Khung chương trình'
+								id='curriculum-name'
+								name='curriculum-name'
+								value={formik.values['curriculum-name']}
+								onChange={formik.handleChange('curriculum-name')}
 								onBlur={formik.handleBlur}
 								error={
-									formik.touched['group-name'] &&
-									Boolean(formik.errors['group-name'])
+									formik.touched['curriculum-name'] &&
+									Boolean(formik.errors['curriculum-name'])
 								}
 								helperText={
-									formik.touched['group-name'] && formik.errors['group-name']
-								}
-								slotProps={{
-									input: {
-										endAdornment: (
-											<Image
-												className='opacity-30 mx-2 select-none'
-												src='/images/icons/text-formatting.png'
-												alt='email'
-												width={20}
-												height={20}
-											/>
-										),
-									},
-								}}
-							/>
-						</div>
-						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>Mã tổ hợp</h3>
-							<TextField
-								className='w-[70%]'
-								variant='standard'
-								id='group-code'
-								name='group-code'
-								label='Nhập mã tổ hợp'
-								value={formik.values['group-code']}
-								onChange={formik.handleChange('group-code')}
-								onBlur={formik.handleBlur}
-								error={
-									formik.touched['group-code'] &&
-									Boolean(formik.errors['group-code'])
-								}
-								helperText={
-									formik.touched['group-code'] && formik.errors['group-code']
-								}
-								slotProps={{
-									input: {
-										endAdornment: (
-											<Image
-												className='opacity-30 mx-2 select-none'
-												src='/images/icons/text-formatting.png'
-												alt='email'
-												width={20}
-												height={20}
-											/>
-										),
-									},
-								}}
-							/>
-						</div>
-						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>Mô tả</h3>
-							<TextField
-								className='w-[70%]'
-								variant='standard'
-								id='group-description'
-								name='group-description'
-								label='Nhập mô tả tổ hợp'
-								value={formik.values['group-description']}
-								onChange={formik.handleChange('group-description')}
-								onBlur={formik.handleBlur}
-								error={
-									formik.touched['group-description'] &&
-									Boolean(formik.errors['group-description'])
-								}
-								helperText={
-									formik.touched['group-description'] &&
-									formik.errors['group-description']
+									formik.touched['curriculum-name'] &&
+									formik.errors['curriculum-name']
 								}
 								slotProps={{
 									input: {
@@ -483,55 +416,6 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 								)}
 							</FormControl>
 						</div>
-						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start '>Năm học áp dụng</h3>
-							<FormControl sx={{ width: '70%' }}>
-								<InputLabel id='school-year-label' variant='standard'>
-									Thêm năm học áp dụng
-								</InputLabel>
-								<Select
-									labelId='school-year-label'
-									id='school-year'
-									variant='standard'
-									value={
-										formik.values['school-year-id'] === 0
-											? ''
-											: formik.values['school-year-id']
-									}
-									onChange={(event) =>
-										formik.setFieldValue('school-year-id', event.target.value)
-									}
-									onBlur={formik.handleBlur('school-year-id')}
-									error={
-										formik.touched['school-year-id'] &&
-										Boolean(formik.errors['school-year-id'])
-									}
-									MenuProps={MenuProps}
-									sx={{ width: '100%' }}
-								>
-									{schoolYearOptions?.length === 0 && (
-										<MenuItem disabled value={0}>
-											Không tìm thấy năm học
-										</MenuItem>
-									)}
-									{schoolYearOptions.map((item, index) => (
-										<MenuItem
-											key={item.label + index}
-											value={item.value}
-											style={getStyles(item, optionalSubjects, theme)}
-										>
-											{item.label}
-										</MenuItem>
-									))}
-								</Select>
-								{formik.touched['school-year-id'] &&
-									formik.errors['school-year-id'] && (
-										<FormHelperText error variant='standard'>
-											{formik.errors['school-year-id']}
-										</FormHelperText>
-									)}
-							</FormControl>
-						</div>
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
@@ -541,7 +425,7 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 						/>
 						<ContainedButton
-							title='Thêm Tổ hợp'
+							title='Thêm'
 							disableRipple
 							type='submit'
 							disabled={!formik.isValid}
@@ -554,4 +438,4 @@ const CreateSubjectGroupModal = (props: IAddSubjectModalProps) => {
 	);
 };
 
-export default CreateSubjectGroupModal;
+export default CreateCurriculumModal;

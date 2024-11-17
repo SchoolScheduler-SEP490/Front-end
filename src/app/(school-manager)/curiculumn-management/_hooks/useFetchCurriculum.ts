@@ -1,10 +1,10 @@
 import useSWR from 'swr';
-import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
-import { getFetchSubjectGroupApi } from '../_libs/apis';
+import { IFetchCurriculumBodyProps } from '../_libs/constants';
+import { getFetchCurriculumApi } from '../_libs/apis';
 
-const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
+const useFetchCurriculumData = (props: IFetchCurriculumBodyProps) => {
 	const { sessionToken } = props;
-	const endpoint = getFetchSubjectGroupApi(props);
+	const endpoint = getFetchCurriculumApi(props);
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -29,5 +29,5 @@ const useFetchSGData = (props: IFetchSubjectGroupBodyProps) => {
 	return { data, error, isLoading, isValidating, mutate };
 };
 
-export default useFetchSGData;
+export default useFetchCurriculumData;
 // Fix done

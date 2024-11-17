@@ -10,32 +10,32 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
 import LessonQuickApplyModal from './_components/lesson_modal_quick_apply';
-import SubjectGroupSideNav from './_components/lesson_sidenav';
+import CurriculumSideNav from './_components/lesson_sidenav';
 import LessonTable from './_components/lesson_table';
-import SubjectGroupSideNavSkeleton from './_components/skeleton_sidenav';
+import CurriculumSideNavSkeleton from './_components/skeleton_sidenav';
 import LessonTableSkeleton from './_components/skeleton_table';
 import useFetchQuickAssignment from './_hooks/useFetchQuickAssignment';
-import useFetchSGTableData from './_hooks/useFetchSGTableData';
-import useFetchSGSidenav from './_hooks/useFetchSubjectGroup';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
+	ICurriculumObjectResponse,
+	ICurriculumSidenavData,
 	ILessonTableData,
 	IQuickAssignResponse,
-	ISubjectGroupObjectResponse,
-	ISubjectGroupSidenavData,
 	ISubjectInGroup,
 	TermSeperatedAssignedObject,
 } from './_libs/constants';
+import useFetchCurriculumSidenav from './_hooks/useFetchCuriculumn';
+import useFetchCurriculumTableData from './_hooks/useFetchCuriculumnTableData';
 
 export default function SMLesson() {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 
-	const [selectedSubjectGroup, setSelectedSubjectGroup] = useState<number>(0);
+	const [selectedCurriculum, setSelectedCurriculum] = useState<number>(0);
 	const [selectedTermId, setSelectedTermId] = useState<number>(0);
-	const [subjectGroupSidenavData, setSubjectGroupSidenavData] = useState<
-		ISubjectGroupSidenavData[]
-	>([]);
+	const [subjectGroupSidenavData, setCurriculumSidenavData] = useState<ICurriculumSidenavData[]>(
+		[]
+	);
 
 	const [lessonTableData, setLessonTableData] = useState<ILessonTableData[]>([]);
 	const [termDropdownData, setTermDropdownData] = useState<IDropdownOption<number>[]>([]);
@@ -44,9 +44,9 @@ export default function SMLesson() {
 
 	const [isQuickAssignmentApplied, setQuickAssignmentApplied] = useState<boolean>(false);
 	const [quickAssignedData, setQuickAssignedData] = useState<TermSeperatedAssignedObject>({});
-	const [applicableSubjectGroups, setApplicableSubjectGroups] = useState<
-		IDropdownOption<number>[]
-	>([]);
+	const [applicableCurriculums, setApplicableCurriculums] = useState<IDropdownOption<number>[]>(
+		[]
+	);
 
 	const {
 		data: quickApplyData,
@@ -60,10 +60,10 @@ export default function SMLesson() {
 	});
 	const {
 		data: subjectGroupData,
-		mutate: updateSubjectGroup,
-		isValidating: isSubjectGroupValidating,
+		mutate: updateCurriculum,
+		isValidating: isCurriculumValidating,
 		error: subjectGroupError,
-	} = useFetchSGSidenav({
+	} = useFetchCurriculumSidenav({
 		sessionToken: sessionToken,
 		schoolId: schoolId,
 		pageIndex: 1,
@@ -73,13 +73,13 @@ export default function SMLesson() {
 	const {
 		data: subjectGroupTableResponse,
 		error: subjectTableError,
-		isValidating: isSubjectGroupTableValidating,
-		mutate: updateSubjectGroupTable,
-	} = useFetchSGTableData({
+		isValidating: isCurriculumTableValidating,
+		mutate: updateCurriculumTable,
+	} = useFetchCurriculumTableData({
 		sessionToken: sessionToken,
 		schoolId: Number(schoolId),
 		schoolYearId: selectedSchoolYearId,
-		subjectGroupId: selectedSubjectGroup,
+		subjectGroupId: selectedCurriculum,
 	});
 	const {
 		data: termData,
@@ -93,34 +93,34 @@ export default function SMLesson() {
 	});
 
 	useEffect(() => {
-		setSubjectGroupSidenavData([]);
-		setApplicableSubjectGroups([]);
-		updateSubjectGroup();
+		setCurriculumSidenavData([]);
+		setApplicableCurriculums([]);
+		updateCurriculum();
 		if (subjectGroupData?.status === 200) {
-			const tmpData: ISubjectGroupSidenavData[] = useSidenavDataConverter(
-				subjectGroupData.result.items as ISubjectGroupObjectResponse[]
+			const tmpData: ICurriculumSidenavData[] = useSidenavDataConverter(
+				subjectGroupData.result.items as ICurriculumObjectResponse[]
 			);
 			if (tmpData.length > 0) {
-				setSubjectGroupSidenavData(tmpData);
-				setSelectedSubjectGroup(tmpData[0].items[0].value);
+				setCurriculumSidenavData(tmpData);
+				setSelectedCurriculum(tmpData[0].items[0].value);
 			}
-			const tmpApplicableSubjectGroups: IDropdownOption<number>[] =
+			const tmpApplicableCurriculums: IDropdownOption<number>[] =
 				subjectGroupData.result.items.map(
-					(item: ISubjectGroupObjectResponse) =>
+					(item: ICurriculumObjectResponse) =>
 						({
 							label: item['group-name'],
 							value: item.id,
 						} as IDropdownOption<number>)
 				);
-			if (tmpApplicableSubjectGroups.length > 0) {
-				setApplicableSubjectGroups(tmpApplicableSubjectGroups);
+			if (tmpApplicableCurriculums.length > 0) {
+				setApplicableCurriculums(tmpApplicableCurriculums);
 			}
 		}
 	}, [subjectGroupData]);
 
 	useEffect(() => {
 		setLessonTableData([]);
-		updateSubjectGroupTable();
+		updateCurriculumTable();
 		if (subjectGroupTableResponse?.status === 200) {
 			var tmpSpecializedData: { name: string; id: number }[] = [];
 			subjectGroupTableResponse.result['subject-specializedt-views'].map(
@@ -198,9 +198,9 @@ export default function SMLesson() {
 		setTermDropdownData([]);
 		setLessonTableData([]);
 		setSelectedTermId(0);
-		updateSubjectGroup({ schoolYearId: selectedSchoolYearId });
+		updateCurriculum({ schoolYearId: selectedSchoolYearId });
 		updateTerm({ schoolYearId: selectedSchoolYearId });
-		updateSubjectGroupTable({ schoolYearId: selectedSchoolYearId });
+		updateCurriculumTable({ schoolYearId: selectedSchoolYearId });
 		setIsErrorShown(false);
 	}, [selectedSchoolYearId]);
 
@@ -223,7 +223,7 @@ export default function SMLesson() {
 				setIsErrorShown(true);
 			}
 		}
-	}, [isSubjectGroupValidating, isSubjectGroupTableValidating, isTermValidating]);
+	}, [isCurriculumValidating, isCurriculumTableValidating, isTermValidating]);
 
 	// Process quick assignment data
 	useEffect(() => {
@@ -244,7 +244,7 @@ export default function SMLesson() {
 	}, [isQuickAssignmentApplied, quickApplyData, selectedTermId]);
 
 	// Loading components
-	if (isSubjectGroupValidating || isSubjectGroupTableValidating) {
+	if (isCurriculumValidating || isCurriculumTableValidating) {
 		return (
 			<div
 				className={`w-[${
@@ -259,12 +259,12 @@ export default function SMLesson() {
 					</div>
 				</SMHeader>
 				<div className='w-full h-full flex flex-row justify-start items-start'>
-					{isSubjectGroupValidating ? (
-						<SubjectGroupSideNavSkeleton />
+					{isCurriculumValidating ? (
+						<CurriculumSideNavSkeleton />
 					) : (
-						<SubjectGroupSideNav
-							selectedSubjectGroup={selectedSubjectGroup}
-							setSelectedSubjectGroup={setSelectedSubjectGroup}
+						<CurriculumSideNav
+							selectedCurriculum={selectedCurriculum}
+							setSelectedCurriculum={setSelectedCurriculum}
 							subjectGroup={subjectGroupSidenavData}
 						/>
 					)}
@@ -288,9 +288,9 @@ export default function SMLesson() {
 				</div>
 			</SMHeader>
 			<div className='w-full h-full flex flex-row justify-start items-start'>
-				<SubjectGroupSideNav
-					selectedSubjectGroup={selectedSubjectGroup}
-					setSelectedSubjectGroup={setSelectedSubjectGroup}
+				<CurriculumSideNav
+					selectedCurriculum={selectedCurriculum}
+					setSelectedCurriculum={setSelectedCurriculum}
 					subjectGroup={subjectGroupSidenavData}
 				/>
 				<LessonTable
@@ -298,8 +298,8 @@ export default function SMLesson() {
 					termData={termDropdownData}
 					selectedTermId={selectedTermId}
 					setSelectedTermId={setSelectedTermId}
-					selectedSubjectGroupId={selectedSubjectGroup}
-					mutator={updateSubjectGroupTable}
+					selectedCurriculumId={selectedCurriculum}
+					mutator={updateCurriculumTable}
 					isQuickAssignmentApplied={isQuickAssignmentApplied}
 					setQuickAssignmentApplied={setQuickAssignmentApplied}
 					toggleQuickApply={toggleQuickApply}
@@ -310,7 +310,7 @@ export default function SMLesson() {
 				setOpen={setQuickAssignmentApplied}
 				data={quickAssignedData}
 				isLoading={isQuickAssignLoading}
-				applicableSubjectGroups={applicableSubjectGroups}
+				applicableCurriculums={applicableCurriculums}
 			/>
 		</div>
 	);

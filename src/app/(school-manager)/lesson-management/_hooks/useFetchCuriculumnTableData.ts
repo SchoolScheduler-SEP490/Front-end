@@ -1,17 +1,16 @@
 import useSWR from 'swr';
-import { getFetchSubjectGroupDetailApi } from '../_libs/apis';
-import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
+import { getFetchCurriculumDetailApi } from '../_libs/apis';
 
-interface IFetchSubjectGroupDetailProps {
+interface IFetchCurriculumDetailProps {
 	sessionToken: string;
 	schoolId: number;
 	schoolYearId: number;
 	subjectGroupId: number;
 }
 
-const useFetchSGTableData = (props: IFetchSubjectGroupDetailProps) => {
+const useFetchCurriculumTableData = (props: IFetchCurriculumDetailProps) => {
 	const { sessionToken, subjectGroupId, schoolId, schoolYearId } = props;
-	const endpoint = getFetchSubjectGroupDetailApi({ subjectGroupId, schoolId, schoolYearId });
+	const endpoint = getFetchCurriculumDetailApi({ subjectGroupId, schoolId, schoolYearId });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -36,4 +35,4 @@ const useFetchSGTableData = (props: IFetchSubjectGroupDetailProps) => {
 	return { data, error, isLoading, isValidating, mutate };
 };
 
-export default useFetchSGTableData;
+export default useFetchCurriculumTableData;

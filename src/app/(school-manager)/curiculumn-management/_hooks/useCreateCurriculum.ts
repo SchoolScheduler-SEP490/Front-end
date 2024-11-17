@@ -1,28 +1,28 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { getApplySubjectGroupApi } from '../_libs/apis';
-import { IApplySubjectGroupRequest } from '../_libs/constants';
+import { getCreateCurriculumApi } from '../_libs/apis';
+import { ICreateCurriculumRequest } from '../_libs/constants';
 
-interface IUpdateSubjectProps {
-	sessionToken: string;
+interface ICreateSubjectProps {
 	schoolId: number;
 	schoolYearId: number;
-	formData: IApplySubjectGroupRequest;
+	sessionToken: string;
+	formData: ICreateCurriculumRequest;
 }
 
-const useApplySubjectGroup = async (props: IUpdateSubjectProps) => {
-	const { formData, sessionToken, schoolId, schoolYearId } = props;
-	const endpoint = getApplySubjectGroupApi({ schoolId, schoolYearId });
+const useCreateCurriculum = async (props: ICreateSubjectProps) => {
+	const { schoolId, formData, sessionToken, schoolYearId } = props;
+	const endpoint = getCreateCurriculumApi({ schoolId, schoolYearId });
 	let response;
 
-	async function updateSubject(url: string) {
+	async function createSubject(url: string) {
 		const response = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
-			method: 'PATCH',
+			method: 'POST',
 			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
@@ -34,12 +34,12 @@ const useApplySubjectGroup = async (props: IUpdateSubjectProps) => {
 
 	try {
 		// Sử dụng mutate với POST request
-		response = await mutate(endpoint, updateSubject(endpoint), {
+		response = await mutate(endpoint, createSubject(endpoint), {
 			revalidate: true,
 		});
 		useNotify({
 			message: TRANSLATOR[response?.message || ''] ?? 'Có lỗi xảy ra',
-			type: response?.status === 200 ? 'success' : 'error',
+			type: response?.status === 201 ? 'success' : 'error',
 		});
 		return response;
 	} catch (err: any) {
@@ -50,4 +50,4 @@ const useApplySubjectGroup = async (props: IUpdateSubjectProps) => {
 	}
 };
 
-export default useApplySubjectGroup;
+export default useCreateCurriculum;

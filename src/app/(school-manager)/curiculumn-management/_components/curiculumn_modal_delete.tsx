@@ -6,7 +6,7 @@ import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
 import { KeyedMutator } from 'swr';
-import { getDeleteSubjectGroupApi } from '../_libs/apis';
+import { getDeleteCurriculumApi } from '../_libs/apis';
 
 const style = {
 	position: 'absolute',
@@ -26,7 +26,7 @@ interface ISubjectDeleteModalProps {
 	mutate: KeyedMutator<any>;
 }
 
-const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
+const DeleteCurriculumModal = (props: ISubjectDeleteModalProps) => {
 	const { open, setOpen, subjectGroupName, subjectGroupId, mutate } = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
@@ -35,7 +35,7 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 	};
 
 	const handleDeleteSubject = async () => {
-		const endpoint = getDeleteSubjectGroupApi({
+		const endpoint = getDeleteCurriculumApi({
 			subjectGroupId,
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
@@ -57,7 +57,7 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 		} else {
 			await mutate();
 			useNotify({
-				message: TRANSLATOR[data.message ?? ''] ?? 'Xóa Tổ hợp môn thành công',
+				message: TRANSLATOR[data.message ?? ''] ?? 'Xóa Khung chương trình thành công',
 				type: 'success',
 			});
 		}
@@ -82,7 +82,7 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 						component='h2'
 						className='text-title-large-strong font-semibold'
 					>
-						Xóa tổ hợp môn
+						Xóa Khung chương trình môn
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -90,12 +90,12 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 				</div>
 				<div className='p-4 pl-5'>
 					<Typography className='text-title-small-strong'>
-						Bạn có chắc muốn xóa Tổ hợp <strong>{subjectGroupName}</strong>?
+						Bạn có chắc muốn xóa Khung chương trình <strong>{subjectGroupName}</strong>?
 					</Typography>
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
-						title='Xóa tổ hợp'
+						title='Xóa Khung chương trình'
 						disableRipple
 						onClick={handleDeleteSubject}
 						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'
@@ -112,4 +112,4 @@ const DeleteSubjectGroupModal = (props: ISubjectDeleteModalProps) => {
 	);
 };
 
-export default DeleteSubjectGroupModal;
+export default DeleteCurriculumModal;

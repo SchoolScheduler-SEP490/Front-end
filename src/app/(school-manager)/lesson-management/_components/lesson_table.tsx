@@ -31,7 +31,7 @@ import { IDropdownOption } from '../../_utils/contants';
 import useUpdateLesson from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_modal_cancel';
-import SubjectGroupTable from '../../subject-group-management/_components/subject_group_table';
+import CurriculumTable from '../../curiculumn-management/_components/curiculumn_table';
 
 interface ISumObject {
 	'main-slot-per-week': number;
@@ -283,7 +283,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface ILessonTableProps {
 	subjectTableData: ILessonTableData[];
 	termData: IDropdownOption<number>[];
-	selectedSubjectGroupId: number;
+	selectedCurriculumId: number;
 	mutator: KeyedMutator<any>;
 	selectedTermId: number;
 	setSelectedTermId: Dispatch<SetStateAction<number>>;
@@ -294,7 +294,7 @@ interface ILessonTableProps {
 const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	const {
 		subjectTableData,
-		selectedSubjectGroupId,
+		selectedCurriculumId,
 		mutator,
 		termData,
 		selectedTermId,
@@ -494,7 +494,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
 			termId: selectedTermId,
-			subjectGroupId: selectedSubjectGroupId,
+			subjectGroupId: selectedCurriculumId,
 			formData: editingObjects,
 		});
 		setIsEditing(false);
@@ -604,7 +604,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 							variant='contained'
 							onClick={handleQuickAssign}
 							color='inherit'
-							disabled={selectedSubjectGroupId === 0}
+							disabled={selectedCurriculumId === 0}
 							sx={{
 								bgcolor: '#175b8e',
 								color: 'white',
@@ -625,7 +625,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 								<TableRow>
 									<TableCell colSpan={8} align='center'>
 										<h1 className='text-body-large-strong italic text-basic-gray'>
-											Tổ hợp không có dữ liệu
+											Khung chương trình không có dữ liệu
 										</h1>
 									</TableCell>
 								</TableRow>

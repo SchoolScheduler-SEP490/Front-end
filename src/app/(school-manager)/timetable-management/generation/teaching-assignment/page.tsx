@@ -31,7 +31,7 @@ export default function SMTeachingAssignment() {
 
 	// Selected
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
-	const [selectedSubjectGroupName, setSelectedSubjectGroupName] = useState<string>('');
+	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
 
@@ -143,7 +143,7 @@ export default function SMTeachingAssignment() {
 			if (tmpData.length > 0) {
 				setSidenavData(tmpData);
 				setSelectedClassId(tmpData[0].items[0].value);
-				setSelectedSubjectGroupName(tmpData[0].items[0].extra);
+				setSelectedCurriculumName(tmpData[0].items[0].extra);
 			}
 		}
 	}, [classData]);
@@ -198,7 +198,7 @@ export default function SMTeachingAssignment() {
 						<TeachingAssignmentSideNav
 							selectedClass={selectedClassId}
 							setSelectedClass={setSelectedClassId}
-							setSelectedSubjectGroupName={setSelectedSubjectGroupName}
+							setSelectedCurriculumName={setSelectedCurriculumName}
 							classData={sidenavData}
 						/>
 					)}
@@ -229,7 +229,7 @@ export default function SMTeachingAssignment() {
 				<TeachingAssignmentSideNav
 					selectedClass={selectedClassId}
 					setSelectedClass={setSelectedClassId}
-					setSelectedSubjectGroupName={setSelectedSubjectGroupName}
+					setSelectedCurriculumName={setSelectedCurriculumName}
 					classData={sidenavData}
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start pt-[2vh] gap-5 overflow-y-scroll no-scrollbar'>
@@ -238,7 +238,7 @@ export default function SMTeachingAssignment() {
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
-						selectedSubjectGroupName={selectedSubjectGroupName}
+						selectedCurriculumName={selectedCurriculumName}
 						isApplyModalOpen={isApplyModalOpen}
 						setIsApplyModalOpen={setIsApplyModalOpen}
 					/>

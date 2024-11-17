@@ -1,11 +1,11 @@
-import { IFetchSubjectGroupBodyProps } from './constants';
+import { IFetchCurriculumBodyProps } from './constants';
 
 const api = process.env.NEXT_PUBLIC_API_URL;
 
-interface IFetchSubjectGroupBodyApiProps extends IFetchSubjectGroupBodyProps {
+interface IFetchCurriculumBodyApiProps extends IFetchCurriculumBodyProps {
 	localApi?: string;
 }
-export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) => {
+export const getFetchCurriculumApi = (props: IFetchCurriculumBodyApiProps) => {
 	const {
 		localApi,
 		pageIndex,
@@ -36,7 +36,7 @@ export const getFetchSchoolYearApi = (localApi?: string) => {
 	return `${localApi ?? api}/api/school-years`;
 };
 
-export const getFetchSubjectGroupDetailApi = ({
+export const getFetchCurriculumDetailApi = ({
 	localApi,
 	subjectGroupId,
 	schoolId,

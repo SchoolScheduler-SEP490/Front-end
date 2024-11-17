@@ -17,38 +17,32 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
-import { ISubjectGroupTableData } from '../_libs/constants';
+import { ICurriculumTableData } from '../_libs/constants';
 
 type Order = 'asc' | 'desc';
 
 interface HeadCell {
 	disablePadding: boolean;
-	id: keyof ISubjectGroupTableData;
+	id: keyof ICurriculumTableData;
 	label: string;
 	centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
 	{
-		id: 'id' as keyof ISubjectGroupTableData,
+		id: 'id' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
 		label: 'STT',
 	},
 	{
-		id: 'subjectGroupName' as keyof ISubjectGroupTableData,
+		id: 'subjectGroupName' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
-		label: 'Tên khối',
+		label: 'Tên Khung chương trình',
 	},
 	{
-		id: 'subjectGroupCode' as keyof ISubjectGroupTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Mã tổ hợp',
-	},
-	{
-		id: 'grade' as keyof ISubjectGroupTableData,
+		id: 'grade' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
 		label: 'Khối áp dụng',
@@ -57,10 +51,7 @@ const headCells: readonly HeadCell[] = [
 
 // For extrafunction of Table head (filter, sort, etc.)
 interface EnhancedTableProps {
-	onRequestSort: (
-		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectGroupTableData
-	) => void;
+	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof ICurriculumTableData) => void;
 	order: Order;
 	orderBy: string;
 	rowCount: number;
@@ -68,7 +59,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { order, orderBy, rowCount, onRequestSort } = props;
 	const createSortHandler =
-		(property: keyof ISubjectGroupTableData) => (event: React.MouseEvent<unknown>) => {
+		(property: keyof ICurriculumTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -111,7 +102,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 	);
 }
 
-const SubjectGroupTableSkeleton = () => {
+const CurriculumTableSkeleton = () => {
 	return (
 		<div className='w-full h-fit flex flex-row justify-center items-center gap-6 px-1 pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
@@ -126,7 +117,7 @@ const SubjectGroupTableSkeleton = () => {
 						]}
 					>
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Tổ hợp môn
+							Khung chương trình
 						</h2>
 						<div className='w-fit h-fit flex flex-row justify-center items-center'>
 							<Tooltip title='Thêm Môn học'>
@@ -161,9 +152,6 @@ const SubjectGroupTableSkeleton = () => {
 											>
 												<Skeleton animation='wave' variant='text' />{' '}
 											</TableCell>
-											<TableCell align='left' width={300}>
-												<Skeleton animation='wave' variant='text' />
-											</TableCell>
 											<TableCell align='left'>
 												<Skeleton animation='wave' variant='text' />
 											</TableCell>
@@ -175,13 +163,12 @@ const SubjectGroupTableSkeleton = () => {
 												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell width={80}>
-												<IconButton color='success' sx={{ zIndex: 10 }}>
+												<IconButton color='error' sx={{ zIndex: 10 }}>
 													<Image
-														src='/images/icons/menu.png'
-														alt='notification-icon'
-														unoptimized={true}
-														width={20}
-														height={20}
+														src='/images/icons/delete.png'
+														alt='Xóa tổ bộ môn'
+														width={15}
+														height={15}
 													/>
 												</IconButton>
 											</TableCell>
@@ -210,4 +197,4 @@ const SubjectGroupTableSkeleton = () => {
 	);
 };
 
-export default SubjectGroupTableSkeleton;
+export default CurriculumTableSkeleton;

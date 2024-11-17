@@ -3,14 +3,14 @@ import { getFetchDepartmentApi } from '../_libs/apis';
 import { IPaginatedResponse } from '@/utils/constants';
 import { IDepartmentResponse } from '../_libs/constants';
 
-interface IFetchSubjectGroupDetailProps {
+interface IFetchCurriculumDetailProps {
 	sessionToken: string;
 	schoolId: number;
 	pageIndex: number;
 	pageSize: number;
 }
 
-const useFetchDepartment = (props: IFetchSubjectGroupDetailProps) => {
+const useFetchDepartment = (props: IFetchCurriculumDetailProps) => {
 	const { sessionToken, pageIndex, pageSize, schoolId } = props;
 	const endpoint = getFetchDepartmentApi({ schoolId, pageIndex, pageSize });
 

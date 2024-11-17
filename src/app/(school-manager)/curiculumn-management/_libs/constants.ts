@@ -1,25 +1,18 @@
-export interface ISubjectGroup {
+export interface ICurriculumResponse {
 	id: number;
-	'group-code': string;
-	'group-name': string;
-	'school-id': number;
-	'school-name': string;
-	'group-description': string;
-	grade: number;
-	'subject-group-type-name': string | null;
-	'school-year-id': number;
+	'curriculum-name': string;
+	grade: string;
 }
-// Table SubjectGroup Data
-export interface ISubjectGroupTableData {
+// Table Curriculum Data
+export interface ICurriculumTableData {
 	id: number;
-	subjectGroupName: string;
-	subjectGroupCode: string;
+	curriculumName: string;
 	grade: number;
-	subjectGroupKey: number;
+	curriculumKey: number;
 }
 
 // Fetcher Props
-export interface IFetchSubjectGroupBodyProps {
+export interface IFetchCurriculumBodyProps {
 	sessionToken: string;
 	pageSize: number;
 	pageIndex: number;
@@ -30,35 +23,32 @@ export interface IFetchSubjectGroupBodyProps {
 	deletedIncluded?: boolean;
 }
 
-//Create SubjectGroup Data
-export interface ICreateSubjectGroupRequest {
-	'group-name': string;
-	'group-code': string;
-	'group-description': string;
+//Create Curriculum Data
+export interface ICreateCurriculumRequest {
+	'curriculum-name': string;
 	grade: number;
-	'school-year-id': number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
 }
 
-// Update SubjectGroup Data
-export interface IUpdateSubjectGroupRequest {
-	'group-name': string;
-	'group-code': string;
-	'group-description': string;
+// Update Curriculum Data
+export interface IUpdateCurriculumRequest {
+	'curriculum-name': string;
 	grade: number;
-	'is-deleted'?: boolean;
-	'school-year-id': number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
 }
 
 export interface ISubjectOptionResponse {
 	id: number;
+	'school-year-id': number;
+	'school-year-code': string;
 	'subject-name': string;
 	abbreviation: string;
 	'is-required': boolean;
 	description: string;
+	'total-slot-in-year': number;
+	'slot-specialized': number;
 	'create-date': string;
 	'update-date': string;
 	'is-deleted': boolean;
@@ -72,31 +62,27 @@ export interface ISchoolYearResponse {
 	'school-year-code': string;
 }
 
-export interface ISubjectGroupDetailResponse {
+export interface ICurriculumDetailResponse {
 	id: number;
-	'group-code': string;
-	'group-name': string;
-	'school-id': number;
-	'group-description': string;
+	'curriculum-name': string;
 	grade: string;
 	'subject-selective-views': ISubjectInGroup[];
 	'subject-specializedt-views': ISubjectInGroup[];
 	'subject-required-views': ISubjectInGroup[];
-	'student-class-views': { 'student-class-name': string }[];
-	'subject-group-type-name': string | null;
-	'school-year-id': number;
-	'school-year': string;
+	'student-class-group-view-names': string[];
 }
 
 export interface ISubjectInGroup {
 	id: number;
+	'subject-id': number;
 	'subject-name': string;
 	abbreviation: string;
+	'subject-in-group-type': number;
 	'is-required': boolean;
 	description: string;
 	'main-slot-per-week': number;
 	'sub-slot-per-week': number;
-	'tootal-slot-per-week': number;
+	'total-slot-per-week': number;
 	'is-specialized': boolean;
 	'is-double-period': boolean;
 	'slot-per-term': number;
@@ -104,6 +90,8 @@ export interface ISubjectInGroup {
 	'total-slot-in-year': number;
 	'slot-specialized': number;
 	'subject-group-type': string;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }
 
 export interface ISGClassResponse {
@@ -128,7 +116,7 @@ export interface ISGClassResponse {
 export interface IClassApplyOption {
 	classId: string;
 	className: string;
-	existingSubjectGroup: string | null;
+	existingCurriculum: string | null;
 }
 
 export interface IVulnerableClass {
@@ -136,7 +124,7 @@ export interface IVulnerableClass {
 	existingGroupName: string;
 }
 
-export interface IApplySubjectGroupRequest {
+export interface IApplyCurriculumRequest {
 	'class-ids': number[];
 	'subject-group-id': number;
 }

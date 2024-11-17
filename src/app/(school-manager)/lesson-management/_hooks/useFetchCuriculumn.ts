@@ -1,10 +1,10 @@
 import useSWR from 'swr';
-import { IFetchSubjectGroupBodyProps } from '../_libs/constants';
-import { getFetchSubjectGroupApi } from '../_libs/apis';
+import { IFetchCurriculumBodyProps } from '../_libs/constants';
+import { getFetchCurriculumApi } from '../_libs/apis';
 
-const useFetchSGSidenav = (props: IFetchSubjectGroupBodyProps) => {
+const useFetchCurriculumSidenav = (props: IFetchCurriculumBodyProps) => {
 	const { sessionToken } = props;
-	const endpoint = getFetchSubjectGroupApi(props);
+	const endpoint = getFetchCurriculumApi(props);
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -29,4 +29,4 @@ const useFetchSGSidenav = (props: IFetchSubjectGroupBodyProps) => {
 	return { data, mutate, isLoading, isValidating, error };
 };
 
-export default useFetchSGSidenav;
+export default useFetchCurriculumSidenav;

@@ -1,31 +1,15 @@
 import * as yup from 'yup';
 
-export const createSubjectGroupSchema = yup.object().shape({
-	'group-name': yup
+export const curriculumSchema = yup.object().shape({
+	'curriculum-name': yup
 		.string()
-		.required('Tên Tổ hợp môn là bắt buộc')
-		.max(50, 'Tên Tổ hợp môn tối đa 50 ký tự'),
-
-	'group-code': yup
-		.string()
-		.required('Mã Tổ hợp môn là bắt buộc')
-		.matches(/^[A-Z0-9À-ỹ- ]+$/, 'Mã Tổ hợp môn phải là chữ cái in hoa và số')
-		.max(10, 'Mã Tổ hợp môn tối đa 10 ký tự'),
-
-	'group-description': yup
-		.string()
-		.nullable()
-		.max(255, 'Mô tả Tổ hợp môn tối đa 255 ký tự'),
+		.required('Tên Khung chương trình là bắt buộc')
+		.max(50, 'Tên Khung chương trình tối đa 50 ký tự'),
 
 	grade: yup
 		.number()
 		.oneOf([10, 11, 12], 'Khối lớp không hợp lệ')
 		.required('Khối lớp là bắt buộc'),
-
-	'school-year-id': yup
-		.number()
-		.min(0, 'Cần phải nhập thông tin năm học')
-		.required('Cần phải nhập thông tin năm học'),
 
 	'elective-subject-ids': yup
 		.array()

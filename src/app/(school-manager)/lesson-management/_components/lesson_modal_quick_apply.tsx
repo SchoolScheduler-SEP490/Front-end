@@ -249,11 +249,11 @@ interface IQuickApplyModalProps {
 	setOpen: Dispatch<SetStateAction<boolean>>;
 	data: TermSeperatedAssignedObject;
 	isLoading: boolean;
-	applicableSubjectGroups: IDropdownOption<number>[];
+	applicableCurriculums: IDropdownOption<number>[];
 }
 
 const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
-	const { open, setOpen, data, isLoading, applicableSubjectGroups } = props;
+	const { open, setOpen, data, isLoading, applicableCurriculums } = props;
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = useState<IQuickAssignRequest[]>([]);
 	const [vulnarableIndexes, setVulnarableIndexes] = useState<number[]>([]);
@@ -715,7 +715,7 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton
-						title='chọn tổ hợp áp dụng'
+						title='chọn Khung chương trình áp dụng'
 						disableRipple
 						disabled={vulnarableIndexes.length > 0}
 						onClick={() => setIsConfirmOpen(true)}

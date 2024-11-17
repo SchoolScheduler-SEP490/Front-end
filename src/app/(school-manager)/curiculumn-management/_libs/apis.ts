@@ -1,12 +1,12 @@
-import { IFetchSubjectGroupBodyProps } from './constants';
+import { IFetchCurriculumBodyProps } from './constants';
 
 const api = process.env.NEXT_PUBLIC_API_URL;
 
 // Fetch Subject Group API
-interface IFetchSubjectGroupBodyApiProps extends IFetchSubjectGroupBodyProps {
+interface IFetchCurriculumBodyApiProps extends IFetchCurriculumBodyProps {
 	localApi?: string;
 }
-export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) => {
+export const getFetchCurriculumApi = (props: IFetchCurriculumBodyApiProps) => {
 	const {
 		localApi,
 		pageIndex,
@@ -30,7 +30,7 @@ export const getFetchSubjectGroupApi = (props: IFetchSubjectGroupBodyApiProps) =
 	}).toString();
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups?${queryString}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum?${queryString}`;
 };
 
 // Fetch term API
@@ -45,7 +45,7 @@ export const getFetchTermApi = ({
 };
 
 // Create Subject Group API
-export const getCreateSubjectGroupApi = ({
+export const getCreateCurriculumApi = ({
 	localApi,
 	schoolId,
 	schoolYearId,
@@ -54,13 +54,11 @@ export const getCreateSubjectGroupApi = ({
 	schoolId: number;
 	schoolYearId: number;
 }) => {
-	return `${
-		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups`;
+	return `${localApi ?? api}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum`;
 };
 
 // Update Subject Group API
-export const getUpdateSubjectGroupApi = ({
+export const getUpdateCurriculumApi = ({
 	localApi,
 	subjectGroupId,
 	schoolId,
@@ -73,11 +71,11 @@ export const getUpdateSubjectGroupApi = ({
 }) => {
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${subjectGroupId}`;
 };
 
 // Update Subject Group API
-export const getDeleteSubjectGroupApi = ({
+export const getDeleteCurriculumApi = ({
 	localApi,
 	subjectGroupId,
 	schoolId,
@@ -90,7 +88,7 @@ export const getDeleteSubjectGroupApi = ({
 }) => {
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${subjectGroupId}`;
 };
 
 // Fetch Subject Option API
@@ -124,7 +122,7 @@ export const getFetchSubjectOptionsApi = ({
 	return `${localApi ?? api}/api/subjects?${queryString}`;
 };
 
-export const getFetchSubjectGroupDetailApi = ({
+export const getFetchCurriculumDetailApi = ({
 	localApi,
 	subjectGroupId,
 	schoolId,
@@ -137,7 +135,7 @@ export const getFetchSubjectGroupDetailApi = ({
 }) => {
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${subjectGroupId}`;
 };
 
 export const getFetchClassApi = ({
@@ -169,7 +167,7 @@ export const getFetchClassApi = ({
 	}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?${queryString}`;
 };
 
-export const getApplySubjectGroupApi = ({
+export const getApplyCurriculumApi = ({
 	localApi,
 	schoolId,
 	schoolYearId,

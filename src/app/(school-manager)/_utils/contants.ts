@@ -45,8 +45,8 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				icon: '/images/icons/books.png',
 			},
 			{
-				name: 'Tổ hợp môn',
-				url: '/subject-group-management',
+				name: 'Khung chương trình',
+				url: '/curiculumn-management',
 				icon: '/images/icons/stack.png',
 			},
 			{
@@ -107,4 +107,4 @@ export const TEACHER_SIDENAV = [
 	{
 		name: 'Thời khóa biểu',
 	},
-]
+];

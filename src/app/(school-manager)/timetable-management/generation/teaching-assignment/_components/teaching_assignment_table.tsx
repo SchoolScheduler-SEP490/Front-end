@@ -88,7 +88,7 @@ interface ITeachingAssignmentTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
-	selectedSubjectGroupName: string;
+	selectedCurriculumName: string;
 	isApplyModalOpen: boolean;
 	setIsApplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -99,7 +99,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		mutate,
 		isFilterable,
 		setIsFilterable,
-		selectedSubjectGroupName,
+		selectedCurriculumName,
 		isApplyModalOpen,
 		setIsApplyModalOpen,
 	} = props;
@@ -205,9 +205,9 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 								Phân công giảng dạy
 							</h2>
 							<h3 className='w-full flex flex-row justify-start items-baseline gap-2 text-body-small'>
-								Tổ hợp môn:
+								Khung chương trình:
 								<p className='text-body-small font-medium text-primary-500'>
-									{selectedSubjectGroupName}
+									{selectedCurriculumName}
 								</p>
 							</h3>
 						</div>
@@ -262,7 +262,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 									<TableRow>
 										<TableCell colSpan={4} align='center'>
 											<h1 className='text-body-large-strong italic text-basic-gray'>
-												Lớp học chưa áp dụng Tổ hợp
+												Lớp học chưa áp dụng Khung chương trình
 											</h1>
 										</TableCell>
 									</TableRow>

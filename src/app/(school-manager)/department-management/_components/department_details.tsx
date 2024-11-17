@@ -11,14 +11,12 @@ import Image from 'next/image';
 interface IDepartmentDetailsProps {
 	open: boolean;
 	setOpen: Dispatch<SetStateAction<boolean>>;
-	isUpdateDepartmentOpen: boolean;
 	setUpdateDepartmentOpen: Dispatch<SetStateAction<boolean>>;
 	departmentData: IDepartmentResponse;
 }
 
 const DepartmentDetails = (props: IDepartmentDetailsProps) => {
-	const { departmentData, open, setOpen, isUpdateDepartmentOpen, setUpdateDepartmentOpen } =
-		props;
+	const { departmentData, open, setOpen, setUpdateDepartmentOpen } = props;
 	const { schoolId, sessionToken } = useAppContext();
 
 	const [existingTeachers, setExistingTeachers] = useState<IDropdownOption<number>[] | undefined>(
@@ -69,7 +67,7 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 					<div className='w-fit flex flex-row justify-start items-baseline gap-1'>
 						<Typography
 							variant='h6'
-							className='text-title-small-strong font-normal w-full text-left'
+							className='text-title-small-strong font-normal w-full text-left max-w-[70%] text-ellipsis text-nowrap overflow-hidden'
 						>
 							Thông tin Tổ bộ môn
 						</Typography>
@@ -81,6 +79,7 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 								<Image
 									src='/images/icons/compose.png'
 									alt='Chỉnh sửa'
+									unoptimized={true}
 									width={17}
 									height={17}
 								/>

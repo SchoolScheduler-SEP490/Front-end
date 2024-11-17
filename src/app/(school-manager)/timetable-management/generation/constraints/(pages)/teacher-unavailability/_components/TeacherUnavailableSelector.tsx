@@ -149,7 +149,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 					variant='contained'
 					// onClick={handleQuickAssign}
 					color='inherit'
-					// disabled={selectedSubjectGroupId === 0}
+					// disabled={selectedCurriculumId === 0}
 					sx={{
 						bgcolor: '#175b8e',
 						color: 'white',

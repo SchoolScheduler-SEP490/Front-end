@@ -9,7 +9,7 @@ interface IClassDataProps {
 	schoolYearId: number;
 	grade: string;
 }
-const useFetchSGClass = ({
+const useFetchCurriculumClass = ({
 	sessionToken,
 	schoolId,
 	pageSize,
@@ -46,5 +46,5 @@ const useFetchSGClass = ({
 	});
 	return { data, error, isValidating, mutate };
 };
-export default useFetchSGClass;
+export default useFetchCurriculumClass;
 // Fix done

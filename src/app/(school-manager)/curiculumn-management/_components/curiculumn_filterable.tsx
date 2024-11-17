@@ -14,7 +14,7 @@ import {
 import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
 
-interface ISubjectGroupFilterableProps {
+interface ICurriculumFilterableProps {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	yearStudyOptions: IDropdownOption<number>[];
@@ -23,7 +23,7 @@ interface ISubjectGroupFilterableProps {
 	mutate?: KeyedMutator<any>;
 }
 
-const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
+const CurriculumFilterable = (props: ICurriculumFilterableProps) => {
 	const { open, setOpen, selectedYearId, setSelectedYearId, yearStudyOptions } = props;
 
 	const handleClose = () => {
@@ -86,4 +86,4 @@ const SubjectGroupFilterable = (props: ISubjectGroupFilterableProps) => {
 	);
 };
 
-export default SubjectGroupFilterable;
+export default CurriculumFilterable;

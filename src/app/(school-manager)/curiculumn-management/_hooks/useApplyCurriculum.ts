@@ -1,32 +1,29 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { getUpdateSubjectGroupApi } from '../_libs/apis';
-import { IUpdateSubjectGroupRequest } from '../_libs/constants';
+import { getApplyCurriculumApi } from '../_libs/apis';
+import { IApplyCurriculumRequest } from '../_libs/constants';
 
 interface IUpdateSubjectProps {
+	sessionToken: string;
 	schoolId: number;
 	schoolYearId: number;
-	subjectGroupId: number;
-	sessionToken: string;
-	formData: IUpdateSubjectGroupRequest;
+	formData: IApplyCurriculumRequest;
 }
 
-const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
-	const { subjectGroupId, formData, sessionToken, schoolId, schoolYearId } = props;
-	const endpoint = getUpdateSubjectGroupApi({ schoolId, schoolYearId, subjectGroupId });
+const useApplyCurriculum = async (props: IUpdateSubjectProps) => {
+	const { formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getApplyCurriculumApi({ schoolId, schoolYearId });
 	let response;
 
-	async function updateSubjectGroup(url: string) {
+	async function updateSubject(url: string) {
 		const response = await fetch(url, {
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
 				'Content-Type': 'application/json',
 			},
 			method: 'PATCH',
-			body: JSON.stringify({
-				...formData,
-			}),
+			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
 		if (!response.ok) {
@@ -37,7 +34,7 @@ const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
 
 	try {
 		// Sử dụng mutate với POST request
-		response = await mutate(endpoint, updateSubjectGroup(endpoint), {
+		response = await mutate(endpoint, updateSubject(endpoint), {
 			revalidate: true,
 		});
 		useNotify({
@@ -53,4 +50,4 @@ const useUpdateSubjectGroup = async (props: IUpdateSubjectProps) => {
 	}
 };
 
-export default useUpdateSubjectGroup;
+export default useApplyCurriculum;

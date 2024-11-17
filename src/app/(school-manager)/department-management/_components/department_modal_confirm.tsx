@@ -15,13 +15,13 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ISubjectGroupConfirmModalProps {
+interface ICurriculumConfirmModalProps {
 	handleConfirm: () => void;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const CreateConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
+const CreateConfirmationModal = (props: ICurriculumConfirmModalProps) => {
 	const { handleConfirm, setOpen, open } = props;
 
 	const handleClose = () => {

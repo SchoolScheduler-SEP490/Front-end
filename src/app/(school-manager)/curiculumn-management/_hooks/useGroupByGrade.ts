@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { GroupedClasses } from '../_libs/constants';
 
 interface StudentClass {

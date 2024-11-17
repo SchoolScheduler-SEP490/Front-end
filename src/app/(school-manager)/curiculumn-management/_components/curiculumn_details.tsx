@@ -1,11 +1,33 @@
 import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import CloseIcon from '@mui/icons-material/Close';
-import { Divider, IconButton, Skeleton, Typography } from '@mui/material';
+import {
+	Divider,
+	IconButton,
+	Skeleton,
+	styled,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
+	Typography,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
-import useFetchSGDetail from '../_hooks/useFetchSGDetail';
-import { GroupedClasses, ISubjectGroupDetailResponse } from '../_libs/constants';
+import { GroupedClasses, ICurriculumDetailResponse } from '../_libs/constants';
 import useGroupByGrade from '../_hooks/useGroupByGrade';
+import useFetchCurriculumDetails from '../_hooks/useFetchCuriculumnDetail';
+import { CLASSGROUP_STRING_TYPE, CLASSGROUP_TRANSLATOR } from '@/utils/constants';
+import Image from 'next/image';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 11,
+	},
+}));
 
 const GRADE_COLOR: { [key: number]: string } = {
 	10: '#ff6b35',
@@ -17,16 +39,17 @@ interface ISubjectDetailsProps {
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	subjectGroupId: number;
+	setIsUpdateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
-	const { open, setOpen, subjectGroupId } = props;
+const CurriculumDetails = (props: ISubjectDetailsProps) => {
+	const { open, setOpen, subjectGroupId, setIsUpdateModalOpen } = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
-	const [subjectGroupDetails, setSubjectDetails] = useState<ISubjectGroupDetailResponse | null>(
+	const [subjectGroupDetails, setSubjectDetails] = useState<ICurriculumDetailResponse | null>(
 		null
 	);
 	const [availableClasses, setAvailableClasses] = useState<GroupedClasses | null>(null);
-	const { data, mutate } = useFetchSGDetail({
+	const { data, mutate } = useFetchCurriculumDetails({
 		sessionToken,
 		subjectGroupId,
 		schoolId: Number(schoolId),
@@ -35,6 +58,10 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 
 	const handleClose = () => {
 		setOpen(false);
+	};
+
+	const handleUpdateCurriculum = () => {
+		setIsUpdateModalOpen(true);
 	};
 
 	useEffect(() => {
@@ -50,19 +77,38 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 
 	return (
 		<div
-			className={`h-full w-[30%] flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar ${
+			className={`h-full w-[35%] flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar ${
 				open
 					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
 					: 'hidden'
 			}`}
 		>
 			<div className='w-full flex flex-row justify-between items-center pb-1 px-5'>
-				<Typography
-					variant='h6'
-					className='text-title-small-strong font-normal w-full text-left'
-				>
-					Thông tin Tổ hợp
-				</Typography>
+				<div className='w-fit flex flex-row justify-start items-baseline gap-1'>
+					<LightTooltip title='Thông tin Khung chương trình' placement='bottom' arrow>
+						<Typography
+							variant='h6'
+							className='text-title-small-strong font-normal w-full text-left text-ellipsis text-nowrap overflow-hidden'
+							sx={{}}
+						>
+							Thông tin Khung chương trình
+						</Typography>
+					</LightTooltip>
+					<LightTooltip title='Chỉnh sửa thông tin bộ môn'>
+						<IconButton
+							onClick={handleUpdateCurriculum}
+							className='translate-y-[1px] opacity-80'
+						>
+							<Image
+								src='/images/icons/compose.png'
+								alt='Chỉnh sửa'
+								unoptimized={true}
+								width={17}
+								height={17}
+							/>
+						</IconButton>
+					</LightTooltip>
+				</div>
 				<IconButton onClick={handleClose} className='translate-x-2'>
 					<CloseIcon />
 				</IconButton>
@@ -70,10 +116,10 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 			<Divider variant='fullWidth' orientation='horizontal' sx={{ width: '100%' }} />
 			<div className='w-full h-fit p-5 flex flex-col justify-start items-start gap-2'>
 				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Tên tổ hợp</h4>
-					{subjectGroupDetails?.['group-name'] ? (
+					<h4 className='text-body-small text-basic-gray'>Tên Khung chương trình</h4>
+					{subjectGroupDetails?.['curriculum-name'] ? (
 						<h2 className='text-body-large-strong'>
-							{subjectGroupDetails?.['group-name']}
+							{subjectGroupDetails?.['curriculum-name']}
 						</h2>
 					) : (
 						<Skeleton
@@ -85,10 +131,23 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					)}
 				</div>
 				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Mã tổ hợp</h4>
-					{subjectGroupDetails?.['group-code'] ? (
-						<h2 className='text-body-large-strong'>
-							{subjectGroupDetails?.['group-code']}
+					<h4 className='text-body-small text-basic-gray'>Khối áp dụng</h4>
+					{subjectGroupDetails?.grade ? (
+						<h2
+							className='text-body-large-strong'
+							style={{
+								color: GRADE_COLOR[
+									CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]
+								],
+							}}
+						>
+							{
+								CLASSGROUP_STRING_TYPE.find(
+									(item) =>
+										item.value ===
+										CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]
+								)?.key
+							}
 						</h2>
 					) : (
 						<Skeleton
@@ -132,7 +191,7 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					)}
 					{availableClasses && Object.keys(availableClasses).length === 0 && (
 						<h2 className='text-body-small italic opacity-80'>
-							Chưa có lớp áp dụng tổ hợp
+							Chưa có lớp áp dụng Khung chương trình
 						</h2>
 					)}
 				</div>
@@ -170,7 +229,7 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					{subjectGroupDetails?.['subject-selective-views'] &&
 						subjectGroupDetails?.['subject-selective-views'].length === 0 && (
 							<h2 className='text-body-small italic opacity-80'>
-								Tổ hợp chưa áp dụng môn tự chọn
+								Khung chương trình chưa áp dụng môn tự chọn
 							</h2>
 						)}
 				</div>
@@ -208,24 +267,9 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 					{subjectGroupDetails?.['subject-specializedt-views'] &&
 						subjectGroupDetails?.['subject-specializedt-views'].length === 0 && (
 							<h2 className='text-body-small italic opacity-80'>
-								Tổ hợp chưa áp dụng môn chuyên đề
+								Khung chương trình chưa áp dụng môn chuyên đề
 							</h2>
 						)}
-				</div>
-				<div className='w-full flex flex-col justify-start items-start'>
-					<h4 className='text-body-small text-basic-gray'>Mô tả</h4>
-					{subjectGroupDetails?.['group-description'] ? (
-						<h2 className='text-body-large-strong'>
-							{subjectGroupDetails?.['group-description']}
-						</h2>
-					) : (
-						<Skeleton
-							className='!text-body-large-strong'
-							animation='wave'
-							variant='text'
-							sx={{ width: '50%' }}
-						/>
-					)}
 				</div>
 				<Divider
 					variant='middle'
@@ -237,4 +281,4 @@ const SubjectGroupDetails = (props: ISubjectDetailsProps) => {
 	);
 };
 
-export default SubjectGroupDetails;
+export default CurriculumDetails;

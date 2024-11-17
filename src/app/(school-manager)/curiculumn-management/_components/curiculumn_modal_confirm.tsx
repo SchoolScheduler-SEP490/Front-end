@@ -16,16 +16,16 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ISubjectGroupConfirmModalProps {
+interface ICurriculumConfirmModalProps {
 	vulnerableClasses: IVulnerableClass[];
 	handleConfirm: () => void;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	newSubjectGroup: string;
+	newCurriculum: string;
 }
 
-const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
-	const { vulnerableClasses, handleConfirm, setOpen, open, newSubjectGroup } = props;
+const ApllyConfirmationModal = (props: ICurriculumConfirmModalProps) => {
+	const { vulnerableClasses, handleConfirm, setOpen, open, newCurriculum } = props;
 
 	const handleClose = () => {
 		setOpen(false);
@@ -61,7 +61,7 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 					{vulnerableClasses.length > 0 && (
 						<div className='py-1'>
 							<h2 className='text-body-medium-strong font-normal text-tertiary-normal'>
-								Những lớp học sau sẽ được cập nhật tổ hợp môn
+								Những lớp học sau sẽ được cập nhật Khung chương trình môn
 							</h2>
 							<ul className='!list-disc pl-2'>
 								{vulnerableClasses.map((item, index) => (
@@ -78,7 +78,7 @@ const ApllyConfirmationModal = (props: ISubjectGroupConfirmModalProps) => {
 										</p>
 										<ArrowRightAltIcon />
 										<p className='text-body-small font-normal text-primary-500'>
-											{newSubjectGroup}
+											{newCurriculum}
 										</p>
 									</li>
 								))}

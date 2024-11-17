@@ -1,5 +1,5 @@
-// SubjectGroup Fetcher Props
-export interface IFetchSubjectGroupBodyProps {
+// Curriculum Fetcher Props
+export interface IFetchCurriculumBodyProps {
 	sessionToken: string;
 	pageSize: number;
 	pageIndex: number;
@@ -10,8 +10,8 @@ export interface IFetchSubjectGroupBodyProps {
 	deletedIncluded?: boolean;
 }
 
-//SubjectGroup Data response
-export interface ISubjectGroupObjectResponse {
+//Curriculum Data response
+export interface ICurriculumObjectResponse {
 	id: number;
 	'group-code': string;
 	'group-name': string;
@@ -23,7 +23,7 @@ export interface ISubjectGroupObjectResponse {
 	'school-year-id': number;
 }
 
-export interface ISubjectGroupSidenavData {
+export interface ICurriculumSidenavData {
 	title: string;
 	items: { key: string; value: number }[];
 }
@@ -47,7 +47,7 @@ export interface ILessonTableData {
 	isSpecializedSubject: boolean;
 }
 
-export interface ISubjectGroupDetailResponse {
+export interface ICurriculumDetailResponse {
 	id: number;
 	'group-code': string;
 	'group-name': string;

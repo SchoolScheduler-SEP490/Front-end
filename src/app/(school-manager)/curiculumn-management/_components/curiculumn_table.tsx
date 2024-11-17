@@ -4,7 +4,15 @@ import useNotify from '@/hooks/useNotify';
 import { CLASSGROUP_STRING_TYPE, ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Menu, MenuItem, Toolbar, Tooltip } from '@mui/material';
+import {
+	Menu,
+	MenuItem,
+	styled,
+	Toolbar,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -20,11 +28,23 @@ import { visuallyHidden } from '@mui/utils';
 import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
-import { ISubjectGroupTableData } from '../_libs/constants';
-import UpdateSubjectGroupModal from './subject-group_update_modal';
-import ApplySubjectGroupModal from './subject_group_modal_apply';
-import CreateSubjectGroupModal from './subject_group_modal_create';
-import DeleteSubjectGroupModal from './subject_group_modal_delete';
+import { ICurriculumTableData } from '../_libs/constants';
+import UpdateCurriculumModal from './curiculumn_modal_update';
+import ApplyCurriculumModal from './curiculumn_modal_apply';
+import CreateCurriculumModal from './curiculumn_modal_create';
+import DeleteCurriculumModal from './curiculumn_modal_delete';
+import LayersIcon from '@mui/icons-material/Layers';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 11,
+	},
+}));
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
 	if (b[orderBy] < a[orderBy]) {
@@ -49,32 +69,26 @@ function getComparator<Key extends keyof any>(
 
 interface HeadCell {
 	disablePadding: boolean;
-	id: keyof ISubjectGroupTableData;
+	id: keyof ICurriculumTableData;
 	label: string;
 	centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
 	{
-		id: 'id' as keyof ISubjectGroupTableData,
+		id: 'id' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
 		label: 'STT',
 	},
 	{
-		id: 'subjectGroupName' as keyof ISubjectGroupTableData,
+		id: 'subjectGroupName' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
-		label: 'Tên tổ hợp',
+		label: 'Tên Khung chương trình',
 	},
 	{
-		id: 'subjectGroupCode' as keyof ISubjectGroupTableData,
-		centered: false,
-		disablePadding: false,
-		label: 'Mã tổ hợp',
-	},
-	{
-		id: 'grade' as keyof ISubjectGroupTableData,
+		id: 'grade' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
 		label: 'Khối áp dụng',
@@ -83,10 +97,7 @@ const headCells: readonly HeadCell[] = [
 
 // For extrafunction of Table head (filter, sort, etc.)
 interface EnhancedTableProps {
-	onRequestSort: (
-		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectGroupTableData
-	) => void;
+	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof ICurriculumTableData) => void;
 	order: Order;
 	orderBy: string;
 	rowCount: number;
@@ -94,7 +105,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
 	const { order, orderBy, rowCount, onRequestSort } = props;
 	const createSortHandler =
-		(property: keyof ISubjectGroupTableData) => (event: React.MouseEvent<unknown>) => {
+		(property: keyof ICurriculumTableData) => (event: React.MouseEvent<unknown>) => {
 			onRequestSort(event, property);
 		};
 
@@ -137,8 +148,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 	);
 }
 
-interface ISubjectGroupTableProps {
-	subjectGroupTableData: ISubjectGroupTableData[];
+interface ICurriculumTableProps {
+	subjectGroupTableData: ICurriculumTableData[];
 	page: number;
 	setPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
@@ -147,24 +158,20 @@ interface ISubjectGroupTableProps {
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
-	selectedSubjectGroupId: number;
-	setSelectedSubjectGroupId: React.Dispatch<React.SetStateAction<number>>;
+	selectedCurriculumId: number;
+	setSelectedCurriculumId: React.Dispatch<React.SetStateAction<number>>;
 	isOpenViewDetails: boolean;
 	setOpenViewDetails: React.Dispatch<React.SetStateAction<boolean>>;
+	isUpdateModalOpen: boolean;
+	setUpdateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-const dropdownOptions: ICommonOption[] = [
-	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
-	{ img: '/images/icons/checklist.png', title: 'Áp dụng Tổ hợp môn' },
-	{ img: '/images/icons/delete.png', title: 'Xóa Tổ hợp môn' },
-];
 
 const GRADE_COLOR: { [key: number]: string } = {
 	10: '#ff6b35',
 	11: 'black',
 	12: '#004e89',
 };
-const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
+const CurriculumTable = (props: ICurriculumTableProps) => {
 	const {
 		subjectGroupTableData,
 		page,
@@ -175,58 +182,36 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 		mutate,
 		isFilterable,
 		setIsFilterable,
-		selectedSubjectGroupId,
-		setSelectedSubjectGroupId,
+		selectedCurriculumId,
+		setSelectedCurriculumId,
 		isOpenViewDetails,
 		setOpenViewDetails,
+		isUpdateModalOpen,
+		setUpdateModalOpen,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
-	const [orderBy, setOrderBy] = React.useState<keyof ISubjectGroupTableData>('grade');
-	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const [orderBy, setOrderBy] = React.useState<keyof ICurriculumTableData>('grade');
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
 	const [iApplyModalOpen, setIApplyModalOpen] = React.useState<boolean>(false);
-	const [selectedRow, setSelectedRow] = React.useState<ISubjectGroupTableData | undefined>();
-
-	const open = Boolean(anchorEl);
+	const [selectedRow, setSelectedRow] = React.useState<ICurriculumTableData | undefined>();
 
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);
 	};
 
-	const handleClick = (
+	const handleDeleteClick = (
 		event: React.MouseEvent<HTMLButtonElement>,
-		row: ISubjectGroupTableData
+		row: ICurriculumTableData
 	) => {
-		setAnchorEl((event.target as HTMLElement) ?? null);
+		event.stopPropagation();
 		setSelectedRow(row);
+		setIsDeleteModalOpen(true);
 	};
 
-	const handleMenuItemClick = (index: number) => {
-		switch (index) {
-			case 0:
-				setIUpdateModalOpen(true);
-				break;
-			case 1:
-				setIApplyModalOpen(true);
-				break;
-			case 2:
-				setIsDeleteModalOpen(true);
-				break;
-			default:
-				useNotify({
-					message: 'Chức năng đang được phát triển',
-					type: 'warning',
-				});
-				break;
-		}
-		setAnchorEl(null);
-	};
-
-	const handleViewDetails = (row: ISubjectGroupTableData) => {
-		setSelectedSubjectGroupId(row.subjectGroupKey);
+	const handleViewDetails = (row: ICurriculumTableData) => {
+		setSelectedCurriculumId(row.curriculumKey);
 		setOpenViewDetails(true);
 	};
 
@@ -236,7 +221,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 
 	const handleRequestSort = (
 		event: React.MouseEvent<unknown>,
-		property: keyof ISubjectGroupTableData
+		property: keyof ICurriculumTableData
 	) => {
 		const isAsc = orderBy === property && order === 'asc';
 		setOrder(isAsc ? 'desc' : 'asc');
@@ -274,19 +259,19 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 						]}
 					>
 						<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-							Tổ hợp môn
+							Khung chương trình
 						</h2>
 						<div className='w-fit h-fit flex flex-row justify-center items-center'>
-							<Tooltip title='Thêm Môn học'>
+							<LightTooltip title='Thêm Môn học'>
 								<IconButton onClick={handleAddSubject}>
 									<AddIcon />
 								</IconButton>
-							</Tooltip>
-							<Tooltip title='Lọc danh sách'>
+							</LightTooltip>
+							<LightTooltip title='Áp dụng Khung chương trình' arrow>
 								<IconButton onClick={handleFilterable}>
-									<FilterListIcon />
+									<LayersIcon />
 								</IconButton>
-							</Tooltip>
+							</LightTooltip>
 						</div>
 					</Toolbar>
 					<TableContainer>
@@ -302,7 +287,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 									<TableRow>
 										<TableCell colSpan={6} align='center'>
 											<h1 className='text-body-large-strong italic text-basic-gray'>
-												Tổ hợp chưa có dữ liệu
+												Khung chương trình chưa có dữ liệu
 											</h1>
 										</TableCell>
 									</TableRow>
@@ -318,7 +303,7 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											key={row.id}
 											sx={[
 												{ userSelect: 'none' },
-												selectedSubjectGroupId === row.subjectGroupKey &&
+												selectedCurriculumId === row.curriculumKey &&
 													isOpenViewDetails && {
 														backgroundColor: '#f5f5f5',
 													},
@@ -335,7 +320,6 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											</TableCell>
 											<TableCell
 												align='left'
-												width={300}
 												sx={{
 													whiteSpace: 'nowrap',
 													overflow: 'hidden',
@@ -344,16 +328,10 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 												}}
 												onClick={() => handleViewDetails(row)}
 											>
-												{row.subjectGroupName}
-											</TableCell>
-											<TableCell align='left'>
-												{row.subjectGroupCode
-													? row.subjectGroupCode
-													: '- - - - -'}
+												{row.curriculumName}
 											</TableCell>
 											<TableCell
 												align='left'
-												width={200}
 												className='!font-semibold'
 												sx={{ color: GRADE_COLOR[row.grade] }}
 											>
@@ -365,60 +343,19 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton
-													color='success'
+													color='error'
 													sx={{ zIndex: 10 }}
-													id={`basic-button${
-														row.subjectGroupCode + index
-													}`}
-													aria-controls={
-														open ? `basic-menu${index}` : undefined
+													onClick={(event) =>
+														handleDeleteClick(event, row)
 													}
-													aria-haspopup='true'
-													aria-expanded={open ? 'true' : undefined}
-													onClick={(event) => handleClick(event, row)}
 												>
 													<Image
-														src='/images/icons/menu.png'
-														alt='notification-icon'
-														unoptimized={true}
-														width={20}
-														height={20}
+														src='/images/icons/delete.png'
+														alt='Xóa tổ bộ môn'
+														width={15}
+														height={15}
 													/>
 												</IconButton>
-												<Menu
-													id={row.subjectGroupCode + 'menu' + index}
-													anchorEl={anchorEl}
-													elevation={1}
-													open={open}
-													onClose={() => setAnchorEl(null)}
-													MenuListProps={{
-														'aria-labelledby': `${
-															row.subjectGroupCode + 'menu' + index
-														}`,
-													}}
-												>
-													{dropdownOptions.map((option, i) => (
-														<MenuItem
-															key={option.title + i}
-															onClick={() => handleMenuItemClick(i)}
-															className={`flex flex-row items-center ${
-																i === dropdownOptions.length - 1 &&
-																'hover:bg-basic-negative-hover hover:text-basic-negative'
-															}`}
-														>
-															<Image
-																className='mr-4'
-																src={option.img}
-																alt={option.title}
-																width={15}
-																height={15}
-															/>
-															<h2 className='text-body-medium'>
-																{option.title}
-															</h2>
-														</MenuItem>
-													))}
-												</Menu>
 											</TableCell>
 										</TableRow>
 									);
@@ -450,33 +387,33 @@ const SubjectGroupTable = (props: ISubjectGroupTableProps) => {
 					/>
 				</Paper>
 			</Box>
-			<CreateSubjectGroupModal
+			<CreateCurriculumModal
 				open={isAddModalOpen}
 				setOpen={setIsAddModalOpen}
 				subjectGroupMutator={mutate}
 			/>
-			<DeleteSubjectGroupModal
+			<DeleteCurriculumModal
 				open={isDeleteModalOpen}
 				setOpen={setIsDeleteModalOpen}
-				subjectGroupName={selectedRow?.subjectGroupCode ?? 'Không xác định'}
-				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
+				subjectGroupName={selectedRow?.curriculumName ?? 'Không xác định'}
+				subjectGroupId={selectedRow?.curriculumKey ?? 0}
 				mutate={mutate}
 			/>
-			<UpdateSubjectGroupModal
-				open={iUpdateModalOpen}
-				setOpen={setIUpdateModalOpen}
-				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
+			<UpdateCurriculumModal
+				open={isUpdateModalOpen}
+				setOpen={setUpdateModalOpen}
+				subjectGroupId={selectedCurriculumId}
 				subjectGroupMutator={mutate}
 			/>
-			<ApplySubjectGroupModal
+			<ApplyCurriculumModal
 				open={iApplyModalOpen}
 				setOpen={setIApplyModalOpen}
 				grade={selectedRow?.grade.toString() ?? '0'}
-				subjectGroupName={selectedRow?.subjectGroupName ?? 'Không xác định'}
-				subjectGroupId={selectedRow?.subjectGroupKey ?? 0}
+				subjectGroupName={selectedRow?.curriculumName ?? 'Không xác định'}
+				subjectGroupId={selectedRow?.curriculumKey ?? 0}
 			/>
 		</div>
 	);
 };
 
-export default SubjectGroupTable;
+export default CurriculumTable;

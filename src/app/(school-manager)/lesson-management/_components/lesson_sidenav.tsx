@@ -7,7 +7,7 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { ISubjectGroupSidenavData } from '../_libs/constants';
+import { ICurriculumSidenavData } from '../_libs/constants';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -44,19 +44,19 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 	borderTop: '1px solid rgba(0, 0, 0, .125)',
 }));
 
-interface SubjectGroupSidenavProps {
-	subjectGroup: ISubjectGroupSidenavData[];
-	selectedSubjectGroup: number;
-	setSelectedSubjectGroup: React.Dispatch<React.SetStateAction<number>>;
+interface CurriculumSidenavProps {
+	subjectGroup: ICurriculumSidenavData[];
+	selectedCurriculum: number;
+	setSelectedCurriculum: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
-	const { subjectGroup, selectedSubjectGroup, setSelectedSubjectGroup } = props;
+const CurriculumSideNav = (props: CurriculumSidenavProps) => {
+	const { subjectGroup, selectedCurriculum, setSelectedCurriculum } = props;
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
 
-	const handleSelectSubjectGroup = (target: number) => {
+	const handleSelectCurriculum = (target: number) => {
 		// Implement logics here
-		setSelectedSubjectGroup(target);
+		setSelectedCurriculum(target);
 	};
 
 	const toggleDropdown =
@@ -71,19 +71,21 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 	useEffect(() => {
 		subjectGroup.map((item, index) => {
 			item.items.map((subItem) => {
-				if (subItem.value === selectedSubjectGroup) {
+				if (subItem.value === selectedCurriculum) {
 					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
 				}
 			});
 		});
-	}, [selectedSubjectGroup]);
+	}, [selectedCurriculum]);
 
 	return (
 		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
-			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>Tổ hợp môn</h1>
+			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>
+				Khung chương trình
+			</h1>
 			{subjectGroup.length === 0 && (
 				<p className='text-body-medium w-full pl-3 py-3 text-left italic'>
-					Năm học chưa có Tổ hợp môn
+					Năm học chưa có Khung chương trình
 				</p>
 			)}
 			{subjectGroup.map((item, index) => (
@@ -106,17 +108,17 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 								key={subjectGroup.key + id}
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
 									${
-										selectedSubjectGroup === subjectGroup.value
+										selectedCurriculum === subjectGroup.value
 											? 'bg-basic-gray-active '
 											: 'hover:bg-basic-gray-hover'
 									}`}
-								onClick={() => handleSelectSubjectGroup(subjectGroup.value)}
+								onClick={() => handleSelectCurriculum(subjectGroup.value)}
 							>
 								<p
 									className={`${
 										inter.className
 									} antialiased text-body-medium font-normal opacity-90 ${
-										selectedSubjectGroup === subjectGroup.value
+										selectedCurriculum === subjectGroup.value
 											? ' !font-medium'
 											: ''
 									}`}
@@ -132,4 +134,4 @@ const SubjectGroupSideNav = (props: SubjectGroupSidenavProps) => {
 	);
 };
 
-export default SubjectGroupSideNav;
+export default CurriculumSideNav;
