@@ -3,6 +3,7 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
 import React from 'react';
+import { IVulnerableClass } from '../_libs/constants';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 
 const style = {
@@ -16,13 +17,15 @@ const style = {
 };
 
 interface ICurriculumConfirmModalProps {
+	vulnerableClasses: IVulnerableClass[];
 	handleConfirm: () => void;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	newCurriculum: string;
 }
 
-const CreateConfirmationModal = (props: ICurriculumConfirmModalProps) => {
-	const { handleConfirm, setOpen, open } = props;
+const ApllyConfirmationModal = (props: ICurriculumConfirmModalProps) => {
+	const { vulnerableClasses, handleConfirm, setOpen, open, newCurriculum } = props;
 
 	const handleClose = () => {
 		setOpen(false);
@@ -53,8 +56,35 @@ const CreateConfirmationModal = (props: ICurriculumConfirmModalProps) => {
 				</div>
 				<div className='w-full h-fit px-5 py-[3vh]'>
 					<h2 className='text-title-small font-normal w-full text-left'>
-						Xác nhận lưu những thay đổi?
+						Xác nhận lưu những thay đổi
 					</h2>
+					{vulnerableClasses.length > 0 && (
+						<div className='py-1'>
+							<h2 className='text-body-medium-strong font-normal text-tertiary-normal'>
+								Những lớp học sau sẽ được cập nhật Khung chương trình môn
+							</h2>
+							<ul className='!list-disc pl-2'>
+								{vulnerableClasses.map((item, index) => (
+									<li
+										key={index}
+										className='flex flex-row py-1 justify-start items-center gap-2'
+									>
+										<FiberManualRecordIcon sx={{ fontSize: '10px' }} />
+										<p className='text-body-small font-normal'>
+											{item.className}:
+										</p>
+										<p className='text-body-small font-normal text-basic-negative'>
+											{item.existingGroupName}
+										</p>
+										<ArrowRightAltIcon />
+										<p className='text-body-small font-normal text-primary-500'>
+											{newCurriculum}
+										</p>
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
 				</div>
 				<div
 					id='modal-footer'
@@ -79,4 +109,4 @@ const CreateConfirmationModal = (props: ICurriculumConfirmModalProps) => {
 	);
 };
 
-export default CreateConfirmationModal;
+export default ApllyConfirmationModal;

@@ -115,7 +115,7 @@ const SMSidenav = () => {
 								id={`panel${index}d-header`}
 								className='!text-primary-500 !bg-basic-gray-hover'
 							>
-								<Typography>{item.category}</Typography>
+								<Typography sx={{ userSelect: 'none' }}>{item.category}</Typography>
 							</AccordionSummary>
 							<AccordionDetails className='w-full !p-2'>
 								{item.items.map((subItem: ISMNavigation) => (
@@ -134,7 +134,7 @@ const SMSidenav = () => {
 											height={23}
 										/>
 										<p
-											className={`text-body-medium font-normal ${
+											className={`text-body-medium font-normal select-none ${
 												currentPath.startsWith(subItem.url)
 													? ' !font-semibold'
 													: ''

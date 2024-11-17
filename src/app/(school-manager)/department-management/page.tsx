@@ -135,7 +135,6 @@ export default function SMDepartment() {
 				<DepartmentDetails
 					open={isDepartmentDetailsOpen}
 					setOpen={setIsDepartmentDetailsOpen}
-					isUpdateDepartmentOpen={isUpdateModalOpen}
 					setUpdateDepartmentOpen={setIsUpdateModalOpen}
 					departmentData={
 						departmentData?.result.items.find(

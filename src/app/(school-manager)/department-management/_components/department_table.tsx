@@ -1,9 +1,8 @@
 'use client';
-import useNotify from '@/hooks/useNotify';
 import { ICommonOption } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
 import TuneIcon from '@mui/icons-material/Tune';
-import { Menu, MenuItem, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Toolbar, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -150,7 +149,7 @@ interface IDepartmentTableProps {
 
 const dropdownOptions: ICommonOption[] = [
 	{ img: '/images/icons/compose.png', title: 'Chỉnh sửa thông tin' },
-	{ img: '/images/icons/delete.png', title: 'Xóa Tổ hợp môn' },
+	{ img: '/images/icons/delete.png', title: 'Xóa Khung chương trình' },
 ];
 
 const DepartmentTable = (props: IDepartmentTableProps) => {

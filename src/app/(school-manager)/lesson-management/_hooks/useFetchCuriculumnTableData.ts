@@ -1,18 +1,16 @@
 import useSWR from 'swr';
-import { getFetchDepartmentApi } from '../_libs/apis';
-import { IPaginatedResponse } from '@/utils/constants';
-import { IDepartmentResponse } from '../_libs/constants';
+import { getFetchCurriculumDetailApi } from '../_libs/apis';
 
 interface IFetchCurriculumDetailProps {
 	sessionToken: string;
 	schoolId: number;
-	pageIndex: number;
-	pageSize: number;
+	schoolYearId: number;
+	subjectGroupId: number;
 }
 
-const useFetchDepartment = (props: IFetchCurriculumDetailProps) => {
-	const { sessionToken, pageIndex, pageSize, schoolId } = props;
-	const endpoint = getFetchDepartmentApi({ schoolId, pageIndex, pageSize });
+const useFetchCurriculumTableData = (props: IFetchCurriculumDetailProps) => {
+	const { sessionToken, subjectGroupId, schoolId, schoolYearId } = props;
+	const endpoint = getFetchCurriculumDetailApi({ subjectGroupId, schoolId, schoolYearId });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {
@@ -24,7 +22,7 @@ const useFetchDepartment = (props: IFetchCurriculumDetailProps) => {
 		if (!response.ok) {
 			throw new Error(data);
 		}
-		return data as IPaginatedResponse<IDepartmentResponse>;
+		return data;
 	}
 
 	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
@@ -37,4 +35,4 @@ const useFetchDepartment = (props: IFetchCurriculumDetailProps) => {
 	return { data, error, isLoading, isValidating, mutate };
 };
 
-export default useFetchDepartment;
+export default useFetchCurriculumTableData;

@@ -92,22 +92,22 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	//Subject group messages
 	'The school year does not exist.': 'Không tìm thấy năm học',
-	'Add subject group success.': 'Thêm Tổ hợp môn thành công',
-	'Subject group type not exist.': 'Loại tổ hợp môn không tồn tại',
-	'Subject group name or code already exist.': 'Tên hoặc mã tổ hợp môn đã tồn tại',
-	'Update subject group success.': 'Cập nhật Tổ hợp môn thành công',
-	'Delete subject group success.': 'Xóa Tổ hợp môn thành công',
-	'Subject group not exist.': 'Không tìm thấy Tổ hợp môn',
-	'Get subject group list has no items': 'Chưa có môn học trong năm học được chọn',
-	'Get subject group list successful': 'Lấy danh sách Tổ hợp môn thành công',
+	'Add curriculum success.': 'Thêm Khung chương trình thành công',
+	'Subject group type not exist.': 'Loại Khung chương trình môn không tồn tại',
+	'Subject group name or code already exist.': 'Tên hoặc mã Khung chương trình môn đã tồn tại',
+	'Update curriculum success.': 'Cập nhật Khung chương trình thành công',
+	'Delete curriculum success.': 'Xóa Khung chương trình thành công',
+	'Subject group not exist.': 'Không tìm thấy Khung chương trình',
+	'Get curriculum list has no items': 'Chưa có môn học trong năm học được chọn',
+	'Get curriculum list successful': 'Lấy danh sách Khung chương trình thành công',
 	'Subject group has assign, can not update grade.':
-		'Tổ hợp môn đã được gán, không thể cập nhật khối lớp',
-	'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.':
-		'Để tạo tổ hợp môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.',
+		'Khung chương trình đã được gán, không thể cập nhật khối lớp',
+	'Để tạo Khung chương trình môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.':
+		'Để tạo Khung chương trình môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.',
 
 	// Subject in group messages
 	'Update subject in group success.': 'Cập nhật Tiết học thành công',
-	'The subject group assign success.': 'Áp dụng Tổ hợp môn thành công',
+	'The curriculum assign success.': 'Áp dụng Khung chương trình thành công',
 
 	// Teaching assignment messages
 	'Add teaching assignment success.': 'Phân công giảng dạy thành công',
