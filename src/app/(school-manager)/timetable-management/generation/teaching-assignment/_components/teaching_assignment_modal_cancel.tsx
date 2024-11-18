@@ -27,6 +27,9 @@ const CancelAssignTeacherModal = (props: ICancelAssignTeacherModalProps) => {
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			keepMounted
 			open={open}
 			onClose={handleClose}

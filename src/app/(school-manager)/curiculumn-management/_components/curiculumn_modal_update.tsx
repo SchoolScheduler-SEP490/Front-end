@@ -233,6 +233,9 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

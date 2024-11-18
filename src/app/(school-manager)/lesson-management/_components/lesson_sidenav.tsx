@@ -45,13 +45,13 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }));
 
 interface CurriculumSidenavProps {
-	subjectGroup: ICurriculumSidenavData[];
+	curriculum: ICurriculumSidenavData[];
 	selectedCurriculum: number;
 	setSelectedCurriculum: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const CurriculumSideNav = (props: CurriculumSidenavProps) => {
-	const { subjectGroup, selectedCurriculum, setSelectedCurriculum } = props;
+	const { curriculum: subjectGroup, selectedCurriculum, setSelectedCurriculum } = props;
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
 
 	const handleSelectCurriculum = (target: number) => {

@@ -1,25 +1,21 @@
 import useNotify from '@/hooks/useNotify';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { mutate } from 'swr';
-import { getUpdateCurriculumDetailsApi } from '../_libs/apis';
-import { IUpdateSubjectInGroupRequest } from '../_libs/constants';
+import { IQuickAssignRequestBody } from '../_libs/constants';
+import { getQuickAssignCurriculumDetailsApi } from '../_libs/apis';
 
 interface IUpdateSubjectProps {
 	sessionToken: string;
 	schoolId: number;
 	schoolYearId: number;
-	subjectGroupId: number;
-	termId?: number;
-	formData: IUpdateSubjectInGroupRequest[];
+	formData: IQuickAssignRequestBody;
 }
 
-const useUpdateCurriculumDetails = async (props: IUpdateSubjectProps) => {
-	const { formData, sessionToken, schoolId, schoolYearId, subjectGroupId, termId } = props;
-	const endpoint = getUpdateCurriculumDetailsApi({
+const useQuickAssignCurriculumDetails = async (props: IUpdateSubjectProps) => {
+	const { formData, sessionToken, schoolId, schoolYearId } = props;
+	const endpoint = getQuickAssignCurriculumDetailsApi({
 		schoolId,
 		schoolYearId,
-		subjectGroupId,
-		termId,
 	});
 	let response;
 
@@ -55,6 +51,7 @@ const useUpdateCurriculumDetails = async (props: IUpdateSubjectProps) => {
 			type: 'error',
 		});
 	}
+	return response;
 };
 
-export default useUpdateCurriculumDetails;
+export default useQuickAssignCurriculumDetails;

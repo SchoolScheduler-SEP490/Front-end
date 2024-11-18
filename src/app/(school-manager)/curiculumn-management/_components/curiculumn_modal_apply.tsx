@@ -32,86 +32,12 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-const Div = styled('div')(({ theme }) => ({
-	...theme.typography.button,
-	backgroundColor: theme.palette.background.paper,
-	padding: theme.spacing(1),
-}));
-
 interface ISGApplyModalProps {
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	grade: string;
 	subjectGroupName: string;
 	subjectGroupId: number;
-}
-
-interface RenderUnselectedItemOptions {
-	item: ISGClassResponse;
-	handleMouseDown: (row: ISGClassResponse) => void;
-	handleMouseEnter: (row: ISGClassResponse) => void;
-	isSelected: boolean;
-}
-
-function renderUnselectedItem({
-	item,
-	handleMouseDown,
-	handleMouseEnter,
-	isSelected,
-}: RenderUnselectedItemOptions) {
-	return (
-		<ListItem
-			onMouseDown={() => handleMouseDown(item)}
-			onMouseEnter={() => handleMouseEnter(item)}
-			sx={[
-				{ cursor: 'pointer', userSelect: 'none' },
-				isSelected && { bgcolor: 'action.selected' },
-			]}
-		>
-			<Checkbox checked={isSelected} />
-			<ListItemText primary={item.name} />
-			<p className='text-body-small italic opacity-60'>
-				{item['subject-group-id'] === null
-					? 'Chưa áp dụng Khung chương trình'
-					: item['subject-group-name']}
-			</p>
-		</ListItem>
-	);
-}
-
-interface RenderSelectedItemOptions {
-	item: ISGClassResponse;
-	handleRemoveItem: (item: ISGClassResponse) => void;
-}
-
-function renderSelectedItem({ item, handleRemoveItem }: RenderSelectedItemOptions) {
-	return (
-		<ListItem
-			secondaryAction={
-				<IconButton
-					edge='end'
-					aria-label='delete'
-					color='error'
-					title='Delete'
-					onClick={() => handleRemoveItem(item)}
-				>
-					<DeleteIcon />
-				</IconButton>
-			}
-			sx={[
-				{ cursor: 'pointer', userSelect: 'none' },
-				item['subject-group-id'] !== null && { bgcolor: '#fff0eb' },
-			]}
-		>
-			<Checkbox checked />
-			<ListItemText primary={item.name} />
-			<p className='text-body-small italic opacity-60'>
-				{item['subject-group-id'] === null
-					? 'Chưa áp dụng Khung chương trình'
-					: item['subject-group-name']}
-			</p>
-		</ListItem>
-	);
 }
 
 const ApplyCurriculumModal = (props: ISGApplyModalProps) => {
@@ -126,81 +52,17 @@ const ApplyCurriculumModal = (props: ISGApplyModalProps) => {
 		grade,
 	});
 
-	const [classOptions, setClassOptions] = useState<ISGClassResponse[]>([]);
 	const [selectedClasses, setSelectedClasses] = useState<ISGClassResponse[]>([]);
-	const [tmpSelectedClasses, setTmpSelectedClasses] = useState<ISGClassResponse[]>([]);
 	const [vulnerableClasses, setVulnerableClasses] = useState<IVulnerableClass[]>([]);
-	const [isSelecting, setIsSelecting] = useState<boolean>(false);
 	const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (open) {
-			mutate();
-			if (data?.status === 200) {
-				var sgAvailableClasses: ISGClassResponse[] = [];
-				var sgExistedClasses: ISGClassResponse[] = [];
-				data.result.items.map((item: ISGClassResponse) => {
-					if (item['subject-group-id'] === null) {
-						sgAvailableClasses.push(item);
-					} else {
-						sgExistedClasses.push(item);
-					}
-				});
-				setClassOptions([...sgAvailableClasses, ...sgExistedClasses]);
-			}
-		}
+		// Data handling logics here
 	}, [data, open]);
 
 	const handleClose = () => {
 		setOpen(false);
-		setIsSelecting(false);
 		setSelectedClasses([]);
-		setTmpSelectedClasses([]);
-	};
-
-	const handleAddClass = () => {
-		if (tmpSelectedClasses.length > 0) {
-			setSelectedClasses((prev: ISGClassResponse[]) => [...prev, ...tmpSelectedClasses]);
-			setClassOptions((prev: ISGClassResponse[]) =>
-				prev.filter((item) => !tmpSelectedClasses.includes(item))
-			);
-			``;
-			setTmpSelectedClasses([]);
-		}
-	};
-
-	const handleRemoveClass = (item: ISGClassResponse) => {
-		setSelectedClasses((prev: ISGClassResponse[]) =>
-			prev.filter((selectedItem) => selectedItem !== item)
-		);
-		setClassOptions((prev: ISGClassResponse[]) =>
-			useFilterArray([...prev, item], ['name']).sort((a, b) => a.name.localeCompare(b.name))
-		);
-	};
-
-	const handleMouseDown = (row: ISGClassResponse) => {
-		setIsSelecting(true);
-		const updatedSelectedRows = new Set<ISGClassResponse>(tmpSelectedClasses);
-		if (updatedSelectedRows.has(row)) {
-			updatedSelectedRows.delete(row);
-		} else {
-			updatedSelectedRows.add(row);
-		}
-		setTmpSelectedClasses(Array.from(updatedSelectedRows));
-	};
-	const handleMouseUp = () => {
-		setIsSelecting(false);
-	};
-	const handleMouseEnter = (row: ISGClassResponse) => {
-		if (isSelecting) {
-			const updatedSelectedRows = new Set(tmpSelectedClasses);
-			if (updatedSelectedRows.has(row)) {
-				updatedSelectedRows.delete(row);
-			} else {
-				updatedSelectedRows.add(row);
-			}
-			setTmpSelectedClasses(Array.from(updatedSelectedRows));
-		}
 	};
 
 	const handleUpdateSubmit = async () => {
@@ -239,6 +101,9 @@ const ApplyCurriculumModal = (props: ISGApplyModalProps) => {
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'
 			aria-describedby='keep-mounted-modal-description'
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 		>
 			<Box sx={style}>
 				<div
@@ -256,64 +121,7 @@ const ApplyCurriculumModal = (props: ISGApplyModalProps) => {
 						<CloseIcon />
 					</IconButton>
 				</div>
-				<div className='p-3 w-full h-[60vh] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
-					<div>
-						<div className='relative !w-[38vw] flex flex-col justify-center items-center'>
-							<Div>Danh sách lớp đã chọn</Div>
-							{selectedClasses.length === 0 && (
-								<h2 className='italic text-body-small opacity-70'>
-									Chưa có lớp nào được chọn
-								</h2>
-							)}
-						</div>
-						<List>
-							<TransitionGroup className='flex flex-col justify-start items-center'>
-								{selectedClasses.map((item, index) => (
-									<Collapse key={index} sx={{ width: '70%' }}>
-										{renderSelectedItem({
-											item,
-											handleRemoveItem: handleRemoveClass,
-										})}
-									</Collapse>
-								))}
-							</TransitionGroup>
-						</List>
-					</div>
-					<div className='w-full h-[1px] px-5 bg-basic-gray-active my-3' />
-					<div>
-						<div className='relative !w-[38vw] flex flex-col justify-center items-center'>
-							<Div>Danh sách lớp có thể áp dụng</Div>
-							{classOptions.length === 0 && (
-								<h2 className='italic text-body-small opacity-70'>
-									Không có lớp áp dụng phù hợp
-								</h2>
-							)}
-							<ContainedButton
-								title='Thêm'
-								styles='!py-1 !absolute !right-0 top-[50%] !translate-y-[-50%] '
-								onClick={handleAddClass}
-							/>
-						</div>
-						<List>
-							<TransitionGroup className='flex flex-col justify-start items-center'>
-								{classOptions.map((item, index) => (
-									<Collapse
-										key={index}
-										sx={{ width: '60%' }}
-										onMouseUp={handleMouseUp}
-									>
-										{renderUnselectedItem({
-											item,
-											handleMouseDown,
-											handleMouseEnter,
-											isSelected: tmpSelectedClasses.includes(item),
-										})}
-									</Collapse>
-								))}
-							</TransitionGroup>
-						</List>
-					</div>
-				</div>
+				<div className='w-full h-[40vh] p-3'></div>
 				<div
 					id='modal-footer'
 					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'

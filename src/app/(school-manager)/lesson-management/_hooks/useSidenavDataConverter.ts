@@ -17,7 +17,7 @@ const useSidenavDataConverter = (data: ICurriculumObjectResponse[]): ICurriculum
 			};
 		}
 		acc[grade].items.push({
-			key: item['group-name'],
+			key: item['curriculum-name'],
 			value: item.id,
 		});
 		return acc;

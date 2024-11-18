@@ -1,4 +1,5 @@
 import ContainedButton from '@/commons/button-contained';
+import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
 import CloseIcon from '@mui/icons-material/Close';
@@ -21,15 +22,26 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import { ChangeEvent, Dispatch, Fragment, memo, SetStateAction, useEffect, useState } from 'react';
 import {
+	ChangeEvent,
+	Dispatch,
+	Fragment,
+	memo,
+	SetStateAction,
+	useCallback,
+	useEffect,
+	useState,
+} from 'react';
+import useQuickAssignCurriculumDetails from '../_hooks/useQuickAssign';
+import {
+	ICurriculumSidenavData,
 	ILessonTableData,
 	IQuickAssignRequest,
 	IQuickAssignResponse,
 	TermSeperatedAssignedObject,
 } from '../_libs/constants';
-import QuickApplyConfirmationModal from './lesson_modal_apply_confirm';
-import { IDropdownOption } from '../../_utils/contants';
+import CurriculumApplyModal from './lesson_modal_curriculum_apply';
+import { KeyedMutator } from 'swr';
 
 const style = {
 	position: 'absolute',
@@ -40,13 +52,6 @@ const style = {
 	height: 'fit-content',
 	bgcolor: 'background.paper',
 };
-
-interface ISumObject {
-	'main-slot-per-week': number;
-	'sub-slot-per-week': number;
-	'main-minimum-couple': number;
-	'sub-minimum-couple': number;
-}
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -249,29 +254,74 @@ interface IQuickApplyModalProps {
 	setOpen: Dispatch<SetStateAction<boolean>>;
 	data: TermSeperatedAssignedObject;
 	isLoading: boolean;
-	applicableCurriculums: IDropdownOption<number>[];
+	applicableCurriculum: ICurriculumSidenavData[];
+	mutator: KeyedMutator<any>;
 }
 
 const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
-	const { open, setOpen, data, isLoading, applicableCurriculums } = props;
+	const { open, setOpen, data, isLoading, applicableCurriculum, mutator } = props;
+	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [editingObjects, setEditingObjects] = useState<IQuickAssignRequest[]>([]);
+	const [selectedCurriculumIds, setSelectedCurriculumIds] = useState<number[]>([]);
 	const [vulnarableIndexes, setVulnarableIndexes] = useState<number[]>([]);
-	const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
+	const [isApplyCurriculum, setIsApplyCurriculum] = useState<boolean>(false);
+	const [expandedTerms, setExpandedTerms] = useState<string[]>([]);
 
-	const handleConfirmQuickApply = () => {
-		setIsConfirmOpen(false);
+	const handleConfirmQuickApply = async () => {
+		setIsApplyCurriculum(false);
+		const response = await useQuickAssignCurriculumDetails({
+			schoolId: Number(schoolId),
+			schoolYearId: selectedSchoolYearId,
+			sessionToken,
+			formData: {
+				'curriculum-apply-ids': selectedCurriculumIds,
+				'subject-assignment-configs': editingObjects,
+			},
+		});
+		if (response.status === 200) {
+			mutator();
+			handleClose();
+		}
 	};
 
 	const handleClose = () => {
 		setOpen(false);
+		setEditingObjects([]);
+		setVulnarableIndexes([]);
+		setIsEditing(false);
+		setSelectedCurriculumIds([]);
 	};
+
+	const handleToggleExpandTerm = (termId: string) => {
+		if (expandedTerms.includes(termId)) {
+			setExpandedTerms((prev) => prev.filter((item) => item !== termId));
+		} else {
+			setExpandedTerms((prev) => [...prev, termId]);
+		}
+	};
+
+	useEffect(() => {
+		if (open) {
+			const tmpExpandedTerms: string[] = [];
+			Object.entries(data).map(([key]) => {
+				tmpExpandedTerms.push(key);
+			});
+			setExpandedTerms(tmpExpandedTerms);
+		}
+	}, [open, data]);
 
 	// Validate thông tin người dùng nhập
 	useEffect(() => {
 		// Kiểm tra điều kiện của từng môn học
 		if (editingObjects.length !== 0) {
 			editingObjects.map((obj) => {
+				if (obj['main-minimum-couple'] > 0 || obj['sub-minimum-couple'] > 0) {
+					obj['is-double-period'] = true;
+				} else if (obj['main-minimum-couple'] === 0 && obj['sub-minimum-couple'] === 0) {
+					obj['is-double-period'] = false;
+				}
+
 				var isVulnerableObj = false;
 				// Nào có tiết đôi thì minimum couple k để trống
 				if (obj['is-double-period']) {
@@ -340,22 +390,24 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 		setEditingObjects(updateEditingObjects(editingObject));
 	};
 
-	const handleUpdateLesson = (
-		target: keyof IQuickAssignRequest,
-		value: string | boolean,
-		row: IQuickAssignResponse,
-		sumIndex: number
-	) => {
-		if (!isEditing) setIsEditing(true);
-		if (typeof value === 'string') {
-			updateNumericValue(target, Number(value), row, sumIndex);
-		} else if (typeof value === 'boolean') {
-			const editingObject = getEditingObject(row);
-			(editingObject as any)[target] = value;
-			setEditingObjects(updateEditingObjects(editingObject));
-		}
-	};
-
+	const handleUpdateLesson = useCallback(
+		(
+			target: keyof IQuickAssignRequest,
+			value: string | boolean,
+			row: IQuickAssignResponse,
+			sumIndex: number
+		) => {
+			if (!isEditing) setIsEditing(true);
+			if (typeof value === 'string') {
+				updateNumericValue(target, Number(value), row, sumIndex);
+			} else if (typeof value === 'boolean') {
+				const editingObject = getEditingObject(row);
+				(editingObject as any)[target] = value;
+				setEditingObjects(updateEditingObjects(editingObject));
+			}
+		},
+		[isEditing, editingObjects]
+	);
 	// Helper functions for clarity
 	const getEditingObject = (row: IQuickAssignResponse): IQuickAssignRequest => {
 		return (
@@ -370,257 +422,14 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 		return useFilterArray([...editingObjects, editingObject], ['subject-id', 'term-id']);
 	};
 
-	const Row = memo(
-		(props: { rows: IQuickAssignResponse[]; termLabel: string; labelIndex: number }) => {
-			const { rows, termLabel, labelIndex } = props;
-			const [open, setOpen] = useState(true);
-
-			return (
-				<Fragment>
-					<TableRow
-						sx={{ '& > *': { borderBottom: 'unset' }, backgroundColor: '#f5f5f5' }}
-					>
-						<TableCell colSpan={1} width={50}>
-							<IconButton
-								aria-label='expand row'
-								size='small'
-								onClick={() => setOpen(!open)}
-							>
-								{open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-							</IconButton>
-						</TableCell>
-						<TableCell colSpan={1} width={280}>
-							<Typography fontSize={15} width={280}>
-								{termLabel}
-							</Typography>
-						</TableCell>
-						{[1, 2, 3, 4, 5].map((id) => (
-							<TableCell align='center' key={id}></TableCell>
-						))}
-					</TableRow>
-					{rows.map((row, index) => {
-						const labelId = `enhanced-table-checkbox-${index}`;
-						const editedObject: IQuickAssignRequest | undefined =
-							editingObjects.find(
-								(item) =>
-									item['subject-id'] === row['subject-id'] &&
-									item['term-id'] === row['term-id']
-							) ?? undefined;
-						return (
-							<TableRow
-								sx={[
-									{ '& > *': { borderBottom: 'unset' } },
-									editedObject !== undefined && {
-										bgcolor: vulnarableIndexes.includes(
-											Number(
-												`${editedObject['subject-id']}${editedObject['term-id']}`
-											)
-										)
-											? 'rgba(245, 75, 75, .2)'
-											: '#edf1f5',
-									},
-								]}
-							>
-								<TableCell
-									style={{
-										paddingBottom: 0,
-										paddingTop: 0,
-										paddingLeft: 0,
-										paddingRight: 0,
-									}}
-									colSpan={7}
-								>
-									<Collapse in={open} timeout='auto' unmountOnExit={false}>
-										<TableCell
-											component='th'
-											id={labelId}
-											scope='row'
-											padding='normal'
-											align='center'
-											width={50}
-										>
-											{index + 1}
-										</TableCell>
-										<TableCell align='left' width={300}>
-											<Typography fontSize={15} width={300}>
-												{row['subject-name']}
-											</Typography>
-										</TableCell>
-										<TableCell align='center'>
-											<TextField
-												variant='standard'
-												type='number'
-												onFocus={(event) => event.target.select()}
-												sx={{
-													width: '60%',
-													'& .MuiInputBase-input': {
-														textAlign: 'center',
-													},
-													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
-														{
-															position: 'absolute',
-															right: '0',
-															top: '50%',
-															transform: 'translateY(-50%)',
-															zIndex: 10,
-														},
-												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
-													handleUpdateLesson(
-														'main-slot-per-week',
-														event.target.value.replace(/^0+/, ''),
-														row,
-														labelIndex
-													)
-												}
-												value={
-													!editedObject
-														? row['main-slot-per-week']
-														: editedObject['main-slot-per-week']
-												}
-												id='fullWidth'
-											/>
-										</TableCell>
-										<TableCell align='center'>
-											<TextField
-												variant='standard'
-												type='number'
-												onFocus={(event) => event.target.select()}
-												sx={{
-													width: '60%',
-													'& .MuiInputBase-input': {
-														textAlign: 'center',
-													},
-													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
-														{
-															position: 'absolute',
-															right: '0',
-															top: '50%',
-															transform: 'translateY(-50%)',
-															zIndex: 10,
-														},
-												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
-													handleUpdateLesson(
-														'main-minimum-couple',
-														event.target.value.replace(/^0+/, ''),
-														row,
-														labelIndex
-													)
-												}
-												value={
-													!editedObject
-														? row['main-minimum-couple']
-														: editedObject['main-minimum-couple']
-												}
-												id='fullWidth'
-											/>
-										</TableCell>
-
-										<TableCell align='center'>
-											<TextField
-												variant='standard'
-												type='number'
-												onFocus={(event) => event.target.select()}
-												sx={{
-													width: '60%',
-													'& .MuiInputBase-input': {
-														textAlign: 'center',
-													},
-													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
-														{
-															position: 'absolute',
-															right: '0',
-															top: '50%',
-															zIndex: 10,
-														},
-												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
-													handleUpdateLesson(
-														'sub-slot-per-week',
-														event.target.value.replace(/^0+/, ''),
-														row,
-														labelIndex
-													)
-												}
-												value={
-													!editedObject
-														? row['sub-slot-per-week']
-														: Number(editedObject['sub-slot-per-week'])
-												}
-												id='fullWidth'
-											/>
-										</TableCell>
-										<TableCell align='center'>
-											<TextField
-												variant='standard'
-												type='number'
-												onFocus={(event) => event.target.select()}
-												sx={{
-													width: '60%',
-													'& .MuiInputBase-input': {
-														textAlign: 'center',
-													},
-													'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
-														{
-															position: 'absolute',
-															right: '0',
-															top: '50%',
-															zIndex: 10,
-														},
-												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
-													handleUpdateLesson(
-														'sub-minimum-couple',
-														event.target.value.replace(/^0+/, ''),
-														row,
-														labelIndex
-													)
-												}
-												value={
-													!editedObject
-														? row['sub-minimum-couple']
-														: Number(editedObject['sub-minimum-couple'])
-												}
-												id='fullWidth'
-											/>
-										</TableCell>
-
-										<TableCell align='center' width={100}>
-											<Checkbox
-												color='default'
-												onChange={(
-													event: ChangeEvent<HTMLInputElement>
-												) => {
-													handleUpdateLesson(
-														'is-double-period',
-														event.target.checked,
-														row,
-														labelIndex
-													);
-												}}
-												checked={
-													!editedObject
-														? row['is-double-period']
-														: editedObject['is-double-period']
-												}
-												inputProps={{
-													'aria-labelledby': labelId,
-												}}
-											/>
-										</TableCell>
-									</Collapse>
-								</TableCell>
-							</TableRow>
-						);
-					})}
-				</Fragment>
-			);
-		}
-	);
-
 	return (
-		<Modal open={open} onClose={handleClose} disableEnforceFocus>
+		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
+			open={open}
+			onClose={handleClose}
+		>
 			<Box sx={style}>
 				<div
 					id='modal-header'
@@ -695,12 +504,337 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 										</TableRow>
 									)}
 									{Object.entries(data).map(([key, values], index) => (
-										<Row
-											rows={values}
-											termLabel={key}
-											key={key + index}
-											labelIndex={index}
-										/>
+										<Fragment key={index}>
+											<TableRow
+												sx={{
+													'& > *': {
+														borderBottom: 'unset',
+														userSelect: 'none',
+														cursor: 'pointer',
+													},
+													backgroundColor: '#f5f5f5',
+												}}
+												onClick={() => handleToggleExpandTerm(key)}
+											>
+												<TableCell colSpan={1} width={50}>
+													<IconButton
+														aria-label='expand row'
+														size='small'
+													>
+														{expandedTerms.includes(key) ? (
+															<KeyboardArrowUpIcon />
+														) : (
+															<KeyboardArrowDownIcon />
+														)}
+													</IconButton>
+												</TableCell>
+												<TableCell colSpan={1} width={280}>
+													<Typography fontSize={15} width={280}>
+														{key}
+													</Typography>
+												</TableCell>
+												{[1, 2, 3, 4, 5].map((id) => (
+													<TableCell align='center' key={id}></TableCell>
+												))}
+											</TableRow>
+											{values.map((row, ind) => {
+												const labelId = `enhanced-table-checkbox-${ind}`;
+												const editedObject:
+													| IQuickAssignRequest
+													| undefined =
+													editingObjects.find(
+														(item) =>
+															item['subject-id'] ===
+																row['subject-id'] &&
+															item['term-id'] === row['term-id']
+													) ?? undefined;
+												return (
+													<TableRow
+														sx={[
+															{ '& > *': { borderBottom: 'unset' } },
+															editedObject !== undefined && {
+																bgcolor: vulnarableIndexes.includes(
+																	Number(
+																		`${editedObject['subject-id']}${editedObject['term-id']}`
+																	)
+																)
+																	? 'rgba(245, 75, 75, .2)'
+																	: '#edf1f5',
+															},
+														]}
+													>
+														<TableCell
+															style={{
+																paddingBottom: 0,
+																paddingTop: 0,
+																paddingLeft: 0,
+																paddingRight: 0,
+															}}
+															colSpan={7}
+														>
+															<Collapse
+																in={expandedTerms.includes(key)}
+																timeout='auto'
+																unmountOnExit={false}
+															>
+																<TableCell
+																	component='th'
+																	id={labelId}
+																	scope='row'
+																	padding='normal'
+																	align='center'
+																	width={50}
+																>
+																	{ind + 1}
+																</TableCell>
+																<TableCell align='left' width={300}>
+																	<Typography
+																		fontSize={15}
+																		width={300}
+																	>
+																		{row['subject-name']}
+																	</Typography>
+																</TableCell>
+																<TableCell align='center'>
+																	<TextField
+																		variant='standard'
+																		type='number'
+																		onFocus={(event) =>
+																			event.target.select()
+																		}
+																		sx={{
+																			width: '60%',
+																			'& .MuiInputBase-input':
+																				{
+																					textAlign:
+																						'center',
+																				},
+																			'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+																				{
+																					position:
+																						'absolute',
+																					right: '0',
+																					top: '50%',
+																					transform:
+																						'translateY(-50%)',
+																					zIndex: 10,
+																				},
+																		}}
+																		onChange={(
+																			event: ChangeEvent<HTMLInputElement>
+																		) =>
+																			handleUpdateLesson(
+																				'main-slot-per-week',
+																				event.target.value.replace(
+																					/^0+/,
+																					''
+																				),
+																				row,
+																				index
+																			)
+																		}
+																		value={
+																			!editedObject
+																				? row[
+																						'main-slot-per-week'
+																				  ]
+																				: editedObject[
+																						'main-slot-per-week'
+																				  ]
+																		}
+																		id='fullWidth'
+																	/>
+																</TableCell>
+																<TableCell align='center'>
+																	<TextField
+																		variant='standard'
+																		type='number'
+																		onFocus={(event) =>
+																			event.target.select()
+																		}
+																		sx={{
+																			width: '60%',
+																			'& .MuiInputBase-input':
+																				{
+																					textAlign:
+																						'center',
+																				},
+																			'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+																				{
+																					position:
+																						'absolute',
+																					right: '0',
+																					top: '50%',
+																					transform:
+																						'translateY(-50%)',
+																					zIndex: 10,
+																				},
+																		}}
+																		onChange={(
+																			event: ChangeEvent<HTMLInputElement>
+																		) =>
+																			handleUpdateLesson(
+																				'main-minimum-couple',
+																				event.target.value.replace(
+																					/^0+/,
+																					''
+																				),
+																				row,
+																				index
+																			)
+																		}
+																		value={
+																			!editedObject
+																				? row[
+																						'main-minimum-couple'
+																				  ]
+																				: editedObject[
+																						'main-minimum-couple'
+																				  ]
+																		}
+																		id='fullWidth'
+																	/>
+																</TableCell>
+
+																<TableCell align='center'>
+																	<TextField
+																		variant='standard'
+																		type='number'
+																		onFocus={(event) =>
+																			event.target.select()
+																		}
+																		sx={{
+																			width: '60%',
+																			'& .MuiInputBase-input':
+																				{
+																					textAlign:
+																						'center',
+																				},
+																			'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+																				{
+																					position:
+																						'absolute',
+																					right: '0',
+																					top: '50%',
+																					zIndex: 10,
+																				},
+																		}}
+																		onChange={(
+																			event: ChangeEvent<HTMLInputElement>
+																		) =>
+																			handleUpdateLesson(
+																				'sub-slot-per-week',
+																				event.target.value.replace(
+																					/^0+/,
+																					''
+																				),
+																				row,
+																				index
+																			)
+																		}
+																		value={
+																			!editedObject
+																				? row[
+																						'sub-slot-per-week'
+																				  ]
+																				: Number(
+																						editedObject[
+																							'sub-slot-per-week'
+																						]
+																				  )
+																		}
+																		id='fullWidth'
+																	/>
+																</TableCell>
+																<TableCell align='center'>
+																	<TextField
+																		variant='standard'
+																		type='number'
+																		onFocus={(event) =>
+																			event.target.select()
+																		}
+																		sx={{
+																			width: '60%',
+																			'& .MuiInputBase-input':
+																				{
+																					textAlign:
+																						'center',
+																				},
+																			'& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button':
+																				{
+																					position:
+																						'absolute',
+																					right: '0',
+																					top: '50%',
+																					zIndex: 10,
+																				},
+																		}}
+																		onChange={(
+																			event: ChangeEvent<HTMLInputElement>
+																		) =>
+																			handleUpdateLesson(
+																				'sub-minimum-couple',
+																				event.target.value.replace(
+																					/^0+/,
+																					''
+																				),
+																				row,
+																				index
+																			)
+																		}
+																		value={
+																			!editedObject
+																				? row[
+																						'sub-minimum-couple'
+																				  ]
+																				: Number(
+																						editedObject[
+																							'sub-minimum-couple'
+																						]
+																				  )
+																		}
+																		id='fullWidth'
+																	/>
+																</TableCell>
+
+																<TableCell
+																	align='center'
+																	width={100}
+																>
+																	<Checkbox
+																		color='default'
+																		onChange={(
+																			event: ChangeEvent<HTMLInputElement>
+																		) => {
+																			handleUpdateLesson(
+																				'is-double-period',
+																				event.target
+																					.checked,
+																				row,
+																				index
+																			);
+																		}}
+																		checked={
+																			!editedObject
+																				? row[
+																						'is-double-period'
+																				  ]
+																				: editedObject[
+																						'is-double-period'
+																				  ]
+																		}
+																		inputProps={{
+																			'aria-labelledby':
+																				labelId,
+																		}}
+																	/>
+																</TableCell>
+															</Collapse>
+														</TableCell>
+													</TableRow>
+												);
+											})}
+										</Fragment>
 									))}
 								</TableBody>
 							</Table>
@@ -715,17 +849,20 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton
-						title='chọn Khung chương trình áp dụng'
+						title='chọn Khung chương trình'
 						disableRipple
-						disabled={vulnarableIndexes.length > 0}
-						onClick={() => setIsConfirmOpen(true)}
+						disabled={editingObjects.length === 0 || vulnarableIndexes.length !== 0}
+						onClick={() => setIsApplyCurriculum(true)}
 						styles='bg-primary-300 text-white !py-1 px-4'
 					/>
 				</div>
-				<QuickApplyConfirmationModal
-					open={isConfirmOpen}
-					setOpen={setIsConfirmOpen}
+				<CurriculumApplyModal
+					open={isApplyCurriculum}
+					setOpen={setIsApplyCurriculum}
 					handleConfirm={handleConfirmQuickApply}
+					applicableCurriculum={applicableCurriculum}
+					selectedCurriculumIds={selectedCurriculumIds}
+					setSelectedCurriculumIds={setSelectedCurriculumIds}
 				/>
 			</Box>
 		</Modal>

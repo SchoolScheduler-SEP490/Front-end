@@ -55,8 +55,8 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 
 	return (
 		<div
-			className={`h-full w-[30%] flex flex-col justify-start items-center pt-[2vh] border-l-2 border-basic-gray-active transition-all duration-300 ease-in-out transform
-    ${open ? 'translate-x-0 opacity-100' : 'w-0 translate-x-full opacity-0'}`}
+			className={`h-full flex flex-col justify-start items-center pt-[2vh] border-l-2 border-basic-gray-active transition-all duration-300 ease-in-out transform
+    ${open ? ' w-[30%] translate-x-0 opacity-100' : ' w-0 translate-x-full opacity-0'}`}
 		>
 			<div className='w-full flex flex-row justify-between items-center pb-1 px-5'>
 				<Typography

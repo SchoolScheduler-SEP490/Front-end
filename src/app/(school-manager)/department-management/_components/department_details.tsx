@@ -56,8 +56,8 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 
 	return (
 		<div
-			className={`h-[100vh] w-[30%] flex flex-col justify-start items-center pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar transition-all duration-300 ease-in-out transform
-    ${open ? 'translate-x-0 opacity-100' : 'w-0 translate-x-full opacity-0'}`}
+			className={`h-[100vh] flex flex-col justify-start items-center pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar transition-all duration-300 ease-in-out transform
+    ${open ? ' w-[30%] translate-x-0 opacity-100' : ' w-0 translate-x-full opacity-0'}`}
 		>
 			<div className='w-full bg-white sticky top-0 left-0 pt-[2vh]'>
 				<div className='w-full flex flex-row justify-between items-center pb-1 px-5 '>

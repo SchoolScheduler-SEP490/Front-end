@@ -23,7 +23,6 @@ export default function SMSubject() {
 	const [subjectGroupTableData, setCurriculumTableData] = React.useState<ICurriculumTableData[]>(
 		[]
 	);
-	const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
 	const [selectedCurriculumId, setSelectedCurriculumId] = React.useState<number>(0);
 	const [isDetailOpen, setIsDetailOpen] = React.useState<boolean>(false);
 	const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState<boolean>(false);
@@ -143,8 +142,6 @@ export default function SMSubject() {
 			>
 				<div className='w-[70%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
 					<CurriculumTable
-						isFilterable={false}
-						setIsFilterable={setIsFilterable}
 						subjectGroupTableData={subjectGroupTableData ?? []}
 						page={page}
 						setPage={setPage}
