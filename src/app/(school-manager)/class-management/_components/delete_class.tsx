@@ -36,7 +36,7 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
   const handleDeleteClass = async () => {
     const success = await deleteClass(classId);
     if (success) {
-      mutate();
+      await mutate();
       handleClose();
     }
   };
@@ -48,6 +48,9 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
       onClose={handleClose}
       aria-labelledby="keep-mounted-modal-title"
       aria-describedby="keep-mounted-modal-description"
+      disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
     >
       <Box sx={style}>
         <div

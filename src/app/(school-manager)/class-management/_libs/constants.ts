@@ -5,7 +5,7 @@ export interface IClassTableData {
   homeroomTeacherName: string;
   schoolYear: string;
   mainSession: string;
-  subjectGroup: string;
+  room: string;
 }
 export interface IClass {
   id: number;
@@ -14,7 +14,7 @@ export interface IClass {
   "homeroom-teacher-name": string;
   "school-year-code"?: string;
   "main-session-text": string;
-  "subject-group-name": string;
+  "room-name": string;
 }
 export interface ISchoolYear {
   id: number;
@@ -29,7 +29,7 @@ export interface IAddClassData {
   "main-session": number;
   "is-full-day": boolean;
   grade: string;
-  "subject-group-code": string;
+  "room-code": string;
 }
 export interface ITeacher {
   id: number;
@@ -41,13 +41,11 @@ export interface ITeacher {
 export interface IUpdateClassData {
   name: string;
   "homeroom-teacher-id": number;
-  "school-id": number;
   "school-year-id": number;
   "main-session": string;
   "is-full-day": boolean;
-  "period-count": number;
   grade: number;
-  "subject-group-id": number;
+  "room-id": number;
 }
 
 export interface IDropdownOption<T> {
@@ -57,8 +55,12 @@ export interface IDropdownOption<T> {
 
 export interface ISubjectGroup {
   id: number;
-  "group-code": string;
   "group-name": string;
+  "student-class-group-code": string;
+  "group-description": string;
+  grade: number;
+  "school-year-id": number;
+  "school-id": number;
 }
 
 export interface IClassDetail {
@@ -105,3 +107,12 @@ export interface ISubjectAssignment {
   "assignment-details": ITeacherAssignment[];
   "total-slot-in-year": number;
 }
+
+export interface IRoom {
+  id: number;
+  name: string;
+  "room-type": string;
+  "room-code": string;
+  "building-id": number;
+  "availability-status": string; 
+} 

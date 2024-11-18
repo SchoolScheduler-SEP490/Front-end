@@ -21,14 +21,14 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { IClassDetail, ITeacher, IUpdateClassData } from "../_libs/constants";
+import { IClassDetail, IRoom, ITeacher, IUpdateClassData } from "../_libs/constants";
 import { updateClassSchema } from "../_libs/class_schema";
 import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 import { ISubjectGroup } from "../_libs/constants";
-import { getSubjectGroup, getTeacherName } from "../_libs/apiClass";
+import { getRooms, getSubjectGroup, getTeacherName } from "../_libs/apiClass";
 
 interface UpdateClassFormProps {
   open: boolean;
@@ -58,24 +58,23 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
   const [teachers, setTeachers] = useState<ITeacher[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [classData, setClassData] = useState<IClassDetail | null>(null);
+  const [rooms, setRooms] = useState<IRoom[]>([]);
 
   const formik = useFormik({
     initialValues: {
       name: "",
       "homeroom-teacher-id": 0,
-      "school-id": schoolId,
       "school-year-id": selectedSchoolYearId,
       "main-session": "",
       "is-full-day": false,
-      "period-count": 0,
       grade: 0,
-      "subject-group-id": 0,
+      "room-id": 0,
     },
     validationSchema: updateClassSchema,
     onSubmit: async (values) => {
       const updatedValues: IUpdateClassData = {
         ...values,
-        "school-id": Number(values["school-id"]),
+        "school-year-id": selectedSchoolYearId,
       };
       const success = await editClass(classId, updatedValues);
       if (success) {
@@ -83,6 +82,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           message: "Cập nhật lớp học thành công.",
           type: "success",
         });
+        mutate();
         handleClose();
       } else {
         useNotify({
@@ -90,8 +90,8 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           type: "error",
         });
       }
-    },
-  });
+
+    },  });
 
   useEffect(() => {
     if (!open) {
@@ -118,13 +118,11 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           formik.setValues({
             name: data.result.name,
             "homeroom-teacher-id": data.result["homeroom-teacher-id"],
-            "school-id": schoolId,
             "school-year-id": selectedSchoolYearId,
             "main-session": data.result["main-session"].toString(),
             "is-full-day": data.result["is-full-day"],
-            "period-count": data.result["period-count"],
             grade: gradeNumber,
-            "subject-group-id": data.result["subject-group-id"],
+            "room-id": data.result["room-id"],
           });
         }
         setIsLoading(false);
@@ -154,10 +152,18 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
       }
     };
 
+    const loadRoomName = async () => {
+      const response = await getRooms(sessionToken, schoolId);
+      if (response.status === 200) {
+        setRooms(response.result.items);
+      }
+    }
+
     if (open && isLoading) {
       loadClassData();
       loadSubjectGroups();
       loadTeacherName();
+      loadRoomName();
     }
   }, [open, isLoading, classId, sessionToken, schoolId, selectedSchoolYearId]);
 
@@ -265,37 +271,34 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
             </Grid>
 
             <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Số tiết học
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    type="number"
-                    name="period-count"
-                    value={formik.values["period-count"]}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched["period-count"] &&
-                      Boolean(formik.errors["period-count"])
-                    }
-                    helperText={
-                      formik.touched["period-count"] &&
-                      formik.errors["period-count"]
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
+  <Grid container spacing={2}>
+    <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
+      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+        Phòng học
+      </Typography>
+    </Grid>
+    <Grid item xs={9}>
+      <FormControl fullWidth>
+        <Select
+          variant="standard"
+          name="room-id"
+          value={formik.values["room-id"]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          MenuProps={MenuProps}
+        >
+          <MenuItem value={0}>--Chọn phòng học--</MenuItem>
+          {rooms.map((room) => (
+            <MenuItem key={room.id} value={room.id}>
+              {room.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
+  </Grid>
+</Grid>
+
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
@@ -344,51 +347,6 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                       formik.errors["homeroom-teacher-id"] && (
                         <FormHelperText error>
                           {formik.errors["homeroom-teacher-id"]}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tổ hợp môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["subject-group-id"] &&
-                      Boolean(formik.errors["subject-group-id"])
-                    }
-                  >
-                    <Select
-                      labelId="subject-group-label"
-                      id="subject-group-id"
-                      name="subject-group-id"
-                      variant="standard"
-                      value={formik.values["subject-group-id"] || ""}
-                      onChange={formik.handleChange}
-                      MenuProps={MenuProps}
-                    >
-                      {subjectGroups.map((group) => (
-                        <MenuItem key={group.id} value={group.id}>
-                          {group["group-name"]}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["subject-group-id"] &&
-                      formik.errors["subject-group-id"] && (
-                        <FormHelperText>
-                          {formik.errors["subject-group-id"]}
                         </FormHelperText>
                       )}
                   </FormControl>

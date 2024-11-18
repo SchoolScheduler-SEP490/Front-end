@@ -69,13 +69,13 @@ const headCells: readonly HeadCell[] = [
     centered: true,
   },
   {
-    id: "homeroomTeacherName" as keyof IClassTableData,
-    label: "GVCN",
-    centered: true,
+    id: "room" as keyof IClassTableData,
+    label: "Phòng học",
+    centered: false,
   },
   {
-    id: "subjectGroup" as keyof IClassTableData,
-    label: "Tổ hợp môn",
+    id: "homeroomTeacherName" as keyof IClassTableData,
+    label: "GVCN",
     centered: false,
   },
   {
@@ -337,11 +337,9 @@ const ClassTable = (props: IClassTableProps) => {
                             )?.key
                           : "-"}
                       </TableCell>
-                      <TableCell align="center">
-                        {row.homeroomTeacherName}
-                      </TableCell>
+                      <TableCell align="left">{row.room}</TableCell>
                       <TableCell align="left">
-                        {row.subjectGroup}
+                        {row.homeroomTeacherName}
                       </TableCell>
                       <TableCell align="center">{row.schoolYear}</TableCell>
                       <TableCell align="center">{row.mainSession}</TableCell>

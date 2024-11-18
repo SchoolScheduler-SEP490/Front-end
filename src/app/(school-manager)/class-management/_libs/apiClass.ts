@@ -143,7 +143,7 @@ export const getSubjectGroup = async (
   selectedSchoolYearId: number
 ) => {
     const initialResponse = await fetch(
-      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=20`,
+      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/class-groups?includeDeleted=false&pageIndex=1&pageSize=20`,
       {
         method: "GET",
         headers: {
@@ -155,7 +155,7 @@ export const getSubjectGroup = async (
     const initialData = await initialResponse.json();
     const totalCount = initialData.result["total-item-count"];
     const response = await fetch(
-      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
+      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/class-groups?includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
       {
         method: "GET",
         headers: {
@@ -185,5 +185,37 @@ export const getTeacherAssignment = async (
     }
   )
   const data = await response.json();
+  return data;
+}
+
+export const getRooms = async (
+  sessionToken: string,
+  schoolId: string,
+) => {
+  const initialResponse = await fetch(
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch(
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  data.result.items = data.result.items.filter((room: { "is-deleted": boolean }) => !room["is-deleted"]);  
   return data;
 }

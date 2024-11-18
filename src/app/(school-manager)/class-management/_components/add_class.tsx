@@ -21,9 +21,14 @@ import { useFormik } from "formik";
 import { classSchema } from "../_libs/class_schema";
 import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
-import { IAddClassData, ISubjectGroup, ITeacher } from "../_libs/constants";
+import {
+  IAddClassData,
+  IRoom,
+  ISubjectGroup,
+  ITeacher,
+} from "../_libs/constants";
 import useAddClass from "../_hooks/useAddClass";
-import { getSubjectGroup, getTeacherName } from "../_libs/apiClass";
+import { getRooms, getSubjectGroup, getTeacherName } from "../_libs/apiClass";
 import { CLASSGROUP_STRING_TYPE, SUBJECT_GROUP_TYPE } from "@/utils/constants";
 
 interface AddClassFormProps {
@@ -47,6 +52,7 @@ const AddClassModal = (props: AddClassFormProps) => {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [subjectGroups, setSubjectGroups] = React.useState<ISubjectGroup[]>([]);
+  const [rooms, setRooms] = React.useState<IRoom[]>([]);
 
   React.useEffect(() => {
     const loadTeachers = async () => {
@@ -60,13 +66,27 @@ const AddClassModal = (props: AddClassFormProps) => {
 
   React.useEffect(() => {
     const loadSubjectGroup = async () => {
-      const data = await getSubjectGroup(sessionToken, schoolId, selectedSchoolYearId);
+      const data = await getSubjectGroup(
+        sessionToken,
+        schoolId,
+        selectedSchoolYearId
+      );
       if (data?.status === 200 && data.result?.items) {
         setSubjectGroups(data.result.items);
       }
     };
 
     loadSubjectGroup();
+  }, [schoolId, sessionToken]);
+
+  React.useEffect(() => {
+    const loadRooms = async () => {
+      const data = await getRooms(sessionToken, schoolId);
+      if (data.result?.items) {
+        setRooms(data.result.items);
+      }
+    };
+    loadRooms();
   }, [schoolId, sessionToken]);
 
   const handleFormSubmit = async (body: IAddClassData) => {
@@ -92,22 +112,24 @@ const AddClassModal = (props: AddClassFormProps) => {
       "main-session": "",
       "is-full-day": false,
       grade: "",
-      "subject-group-code": ""
+      "room-code": "",
     },
     validationSchema: classSchema,
     onSubmit: async (values) => {
       const formData: IAddClassData = {
         name: values.name,
-        "homeroom-teacher-abbreviation": values["homeroom-teacher-abbreviation"],
+        "homeroom-teacher-abbreviation":
+          values["homeroom-teacher-abbreviation"],
         "main-session": Number(values["main-session"]),
         "is-full-day": values["is-full-day"],
         grade: values.grade,
-        "subject-group-code": values["subject-group-code"]
+        "room-code": values["room-code"],
       };
       await handleFormSubmit(formData);
-    }
+    },
   });
-  
+
+  console.log(formik.values);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -212,6 +234,51 @@ const AddClassModal = (props: AddClassFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Phòng học
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["room-code"] &&
+                      Boolean(formik.errors["room-code"])
+                    }
+                  >
+                    <Select
+                      variant="standard"
+                      name="room-code"
+                      value={formik.values["room-code"]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={MenuProps}
+                    >
+                      <MenuItem value="">--Chọn phòng học--</MenuItem>
+                      {rooms.map((room) => (
+                        <MenuItem key={room.id} value={room["room-code"]}>
+                          {room.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["room-code"] &&
+                      formik.errors["room-code"] && (
+                        <FormHelperText>
+                          {formik.errors["room-code"]}
+                        </FormHelperText>
+                      )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                     Giáo viên chủ nhiệm
                   </Typography>
                 </Grid>
@@ -249,50 +316,6 @@ const AddClassModal = (props: AddClassFormProps) => {
                       formik.errors["homeroom-teacher-abbreviation"] && (
                         <FormHelperText className="m-0">
                           {formik.errors["homeroom-teacher-abbreviation"]}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tổ hợp môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["subject-group-code"] &&
-                      Boolean(formik.errors["subject-group-code"])
-                    }
-                  >
-                    <Select
-                      variant="standard"
-                      name="subject-group-code"
-                      value={formik.values["subject-group-code"]}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    >
-                      <MenuItem value="">--Chọn tổ bộ môn--</MenuItem>
-                      {subjectGroups.map((group) => (
-                        <MenuItem key={group.id} value={group["group-code"]}>
-                          {group["group-name"]}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["subject-group-code"] &&
-                      formik.errors["subject-group-code"] && (
-                        <FormHelperText className="m-0">
-                          {formik.errors["subject-group-code"]}
                         </FormHelperText>
                       )}
                   </FormControl>
