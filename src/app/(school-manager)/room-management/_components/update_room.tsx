@@ -94,13 +94,16 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
 
   useEffect(() => {
     const fetchRoomById = async () => {
-      const response = await fetch(`${api}/api/schools/${schoolId}/rooms/${roomId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const response = await fetch(
+        `${api}/api/schools/${schoolId}/rooms/${roomId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
       const data = await response.json();
       if (data.status === 200) {
         console.log("Raw API response:", data.result);
@@ -123,16 +126,16 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
     };
 
     const getBuildings = async () => {
-      const buildingData = await fetchBuildingName(
-        sessionToken,
-        schoolId,
-      );
+      const buildingData = await fetchBuildingName(sessionToken, schoolId);
       if (buildingData?.status === 200) {
         setBuildings(buildingData.result.items);
       }
     };
     const loadSubjects = async () => {
-      const subjectData = await getSubjectName(sessionToken, selectedSchoolYearId);
+      const subjectData = await getSubjectName(
+        sessionToken,
+        selectedSchoolYearId
+      );
       if (subjectData?.status === 200) {
         setSubjects(subjectData.result.items);
         console.log("Subjects loaded:", subjectData.result.items);
@@ -283,45 +286,47 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
               </Grid>
             </Grid>
 
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Môn học
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl fullWidth>
-                    <Select
-                      variant="standard"
-                      multiple
-                      name="subject-ids"
-                      value={formik.values["subject-ids"] || []}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
+            {formik.values["room-type"] === "PRACTICE_ROOM" && (
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid
+                    item
+                    xs={3}
+                    sx={{ display: "flex", alignItems: "center" }}
+                  >
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      Môn học
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={9}>
+                    <FormControl fullWidth>
+                      <Select
+                        variant="standard"
+                        multiple
+                        name="subject-ids"
+                        value={formik.values["subject-ids"] || []}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 150,
+                              overflow: "auto",
+                            },
                           },
-                        },
-                      }}
-                    >
-                      {subjects.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.id}>
-                          {`${subject["subject-name"]} (${subject.abbreviation})`}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                        }}
+                      >
+                        {subjects.map((subject) => (
+                          <MenuItem key={subject.id} value={subject.id}>
+                            {`${subject["subject-name"]} (${subject.abbreviation})`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
+            )}
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
@@ -385,7 +390,7 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
                     >
                       <MenuItem value="">--Chọn phòng học--</MenuItem>
                       <MenuItem value="PRACTICE_ROOM">Phòng thực hành</MenuItem>
-                      <MenuItem value="LECTURE_ROOM">Phòng học</MenuItem>
+                      <MenuItem value="LECTURE_ROOM">Phòng học lý thuyết</MenuItem>
                     </Select>
 
                     {formik.touched["room-type"] &&
