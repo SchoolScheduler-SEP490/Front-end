@@ -105,9 +105,7 @@ const AddRoomModal = (props: AddRoomFormProps) => {
     onSubmit: async (formData) => {
       handleFormSubmit({
         ...formData,
-        "room-type": (formData["room-type"] as ERoomType)
-          ? "PRACTICE_ROOM"
-          : "LECTURE_ROOM",
+        "room-type": formData["room-type"],
         "subjects-abreviation": Array.isArray(formData["subjects-abreviation"])
           ? formData["subjects-abreviation"]
           : [formData["subjects-abreviation"]],
