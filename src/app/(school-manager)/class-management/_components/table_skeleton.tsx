@@ -43,13 +43,13 @@ const headCells: readonly HeadCell[] = [
     centered: false,
   },
   {
-    id: "homeroomTeacherName" as keyof IClassTableData,
-    label: "GVCN",
+    id: "room" as keyof IClassTableData,
+    label: "Phòng học",
     centered: false,
   },
   {
-    id: "subjectGroup" as keyof IClassTableData,
-    label: "Tổ hợp môn",
+    id: "homeroomTeacherName" as keyof IClassTableData,
+    label: "GVCN",
     centered: false,
   },
   {
