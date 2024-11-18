@@ -204,6 +204,9 @@ const CreateCurriculumModal = (props: IAddSubjectModalProps) => {
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			keepMounted
 			open={open}
 			onClose={handleClose}

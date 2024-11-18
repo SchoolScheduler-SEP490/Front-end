@@ -33,7 +33,7 @@ export default function SMLesson() {
 
 	const [selectedCurriculum, setSelectedCurriculum] = useState<number>(0);
 	const [selectedTermId, setSelectedTermId] = useState<number>(0);
-	const [subjectGroupSidenavData, setCurriculumSidenavData] = useState<ICurriculumSidenavData[]>(
+	const [curriculumSidenavData, setCurriculumSidenavData] = useState<ICurriculumSidenavData[]>(
 		[]
 	);
 
@@ -108,7 +108,7 @@ export default function SMLesson() {
 				subjectGroupData.result.items.map(
 					(item: ICurriculumObjectResponse) =>
 						({
-							label: item['group-name'],
+							label: item['curriculum-name'],
 							value: item.id,
 						} as IDropdownOption<number>)
 				);
@@ -148,6 +148,7 @@ export default function SMLesson() {
 								tmpSpecializedData?.some((spec) => spec?.id === item.id) ?? false,
 							mainMinimumCouple: 0,
 							subMinimumCouple: 0,
+							slotPerTerm: item['slot-per-term'],
 						} as ILessonTableData);
 					}
 				}
@@ -168,6 +169,7 @@ export default function SMLesson() {
 								tmpSpecializedData?.some((spec) => spec?.id === item.id) ?? false,
 							mainMinimumCouple: item['main-minimum-couple'],
 							subMinimumCouple: item['sub-minimum-couple'],
+							slotPerTerm: item['slot-per-term'],
 						} as ILessonTableData);
 					}
 				}
@@ -265,7 +267,7 @@ export default function SMLesson() {
 						<CurriculumSideNav
 							selectedCurriculum={selectedCurriculum}
 							setSelectedCurriculum={setSelectedCurriculum}
-							subjectGroup={subjectGroupSidenavData}
+							curriculum={curriculumSidenavData}
 						/>
 					)}
 					<LessonTableSkeleton />
@@ -291,7 +293,7 @@ export default function SMLesson() {
 				<CurriculumSideNav
 					selectedCurriculum={selectedCurriculum}
 					setSelectedCurriculum={setSelectedCurriculum}
-					subjectGroup={subjectGroupSidenavData}
+					curriculum={curriculumSidenavData}
 				/>
 				<LessonTable
 					subjectTableData={lessonTableData}
@@ -310,7 +312,8 @@ export default function SMLesson() {
 				setOpen={setQuickAssignmentApplied}
 				data={quickAssignedData}
 				isLoading={isQuickAssignLoading}
-				applicableCurriculums={applicableCurriculums}
+				applicableCurriculum={curriculumSidenavData}
+				mutator={updateCurriculumTable}
 			/>
 		</div>
 	);

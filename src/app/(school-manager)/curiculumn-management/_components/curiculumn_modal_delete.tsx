@@ -66,6 +66,9 @@ const DeleteCurriculumModal = (props: ISubjectDeleteModalProps) => {
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			keepMounted
 			open={open}
 			onClose={handleClose}

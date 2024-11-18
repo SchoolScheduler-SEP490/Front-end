@@ -28,10 +28,9 @@ import TableRow from '@mui/material/TableRow';
 import { ChangeEvent, Dispatch, FC, MouseEvent, SetStateAction, useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
-import useUpdateLesson from '../_hooks/useUpdateLesson';
+import useUpdateCurriculumDetails from '../_hooks/useUpdateLesson';
 import { ILessonTableData, IUpdateSubjectInGroupRequest } from '../_libs/constants';
 import CancelUpdateLessonModal from './lesson_modal_cancel';
-import CurriculumTable from '../../curiculumn-management/_components/curiculumn_table';
 
 interface ISumObject {
 	'main-slot-per-week': number;
@@ -370,10 +369,10 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 				}
 
 				if (isVulnerableObj) {
-					setVulnarableIndexes((prev) => [...prev, obj['subject-in-group-id']]);
+					setVulnarableIndexes((prev) => [...prev, obj['curriculum-detail-id']]);
 				} else {
 					setVulnarableIndexes((prev) =>
-						prev.filter((item) => item !== obj['subject-in-group-id'])
+						prev.filter((item) => item !== obj['curriculum-detail-id'])
 					);
 				}
 			});
@@ -429,20 +428,21 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			setIsEditing(true);
 		}
 		var editingObject: IUpdateSubjectInGroupRequest;
-		if (editingObjects.some((item) => item['subject-in-group-id'] === row.id)) {
+		if (editingObjects.some((item) => item['curriculum-detail-id'] === row.id)) {
 			// Update existing editing data
 			editingObject = editingObjects.find(
-				(item) => item['subject-in-group-id'] === row.id
+				(item) => item['curriculum-detail-id'] === row.id
 			) as IUpdateSubjectInGroupRequest;
 		} else {
 			// Create new editing data
 			editingObject = {
-				'subject-in-group-id': row.id,
+				'curriculum-detail-id': row.id,
 				'is-double-period': row.isDouleSlot,
 				'main-slot-per-week': row.mainTotalSlotPerWeek,
 				'sub-slot-per-week': row.subTotalSlotPerWeek,
 				'main-minimum-couple': row.mainMinimumCouple,
 				'sub-minimum-couple': row.subMinimumCouple,
+				'slot-per-term': row.slotPerTerm,
 			};
 		}
 
@@ -472,7 +472,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 		}
 		const newEditingObjects = useFilterArray(
 			[...editingObjects, editingObject],
-			['subject-in-group-id']
+			['curriculum-detail-id']
 		);
 
 		setEditingObjects(newEditingObjects);
@@ -489,7 +489,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 	};
 
 	const handleConfirmUpdate = async () => {
-		await useUpdateLesson({
+		await useUpdateCurriculumDetails({
 			sessionToken: sessionToken,
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
@@ -576,7 +576,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						</Menu>
 					</div>
 					<div className='h-fit w-fit flex flex-row justify-center items-center gap-2 pr-2'>
-						{isEditing && (
+						{isEditing ? (
 							<>
 								<Tooltip
 									title={
@@ -599,22 +599,23 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 									</IconButton>
 								</Tooltip>
 							</>
+						) : (
+							<Button
+								variant='contained'
+								onClick={handleQuickAssign}
+								color='inherit'
+								disabled={selectedCurriculumId === 0}
+								sx={{
+									bgcolor: '#175b8e',
+									color: 'white',
+									borderRadius: 0,
+									width: 150,
+									boxShadow: 'none',
+								}}
+							>
+								xếp tiết nhanh
+							</Button>
 						)}
-						<Button
-							variant='contained'
-							onClick={handleQuickAssign}
-							color='inherit'
-							disabled={selectedCurriculumId === 0}
-							sx={{
-								bgcolor: '#175b8e',
-								color: 'white',
-								borderRadius: 0,
-								width: 150,
-								boxShadow: 'none',
-							}}
-						>
-							xếp tiết nhanh
-						</Button>
 					</div>
 				</Toolbar>
 				<TableContainer>
@@ -634,7 +635,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 								const labelId = `enhanced-table-checkbox-${index}`;
 								const editedObject: IUpdateSubjectInGroupRequest | undefined =
 									editingObjects.find(
-										(item) => item['subject-in-group-id'] === row.id
+										(item) => item['curriculum-detail-id'] === row.id
 									) ?? undefined;
 
 								return (
@@ -646,7 +647,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 										sx={[
 											editedObject !== undefined && {
 												bgcolor: vulnarableIndexes.includes(
-													editedObject['subject-in-group-id']
+													editedObject['curriculum-detail-id']
 												)
 													? 'rgba(245, 75, 75, .2)'
 													: '#edf1f5',

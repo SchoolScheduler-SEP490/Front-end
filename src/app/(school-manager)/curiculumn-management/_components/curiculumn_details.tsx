@@ -77,11 +77,8 @@ const CurriculumDetails = (props: ISubjectDetailsProps) => {
 
 	return (
 		<div
-			className={`h-full w-[35%] flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar ${
-				open
-					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
-					: 'hidden'
-			}`}
+			className={`h-full  flex flex-col justify-start items-center pt-[2vh] pb-[5vh] border-l-2 border-basic-gray-active overflow-y-scroll no-scrollbar transition-all duration-300 ease-in-out transform
+    ${open ? ' w-[35%] translate-x-0 opacity-100' : ' w-0 translate-x-full opacity-0'}`}
 		>
 			<div className='w-full flex flex-row justify-between items-center pb-1 px-5'>
 				<div className='w-fit flex flex-row justify-start items-baseline gap-1'>
@@ -266,6 +263,44 @@ const CurriculumDetails = (props: ISubjectDetailsProps) => {
 					)}
 					{subjectGroupDetails?.['subject-specializedt-views'] &&
 						subjectGroupDetails?.['subject-specializedt-views'].length === 0 && (
+							<h2 className='text-body-small italic opacity-80'>
+								Khung chương trình chưa áp dụng môn chuyên đề
+							</h2>
+						)}
+				</div>
+				<div className='w-full flex flex-col justify-start items-start'>
+					<h4 className='text-body-small text-basic-gray'>Môn bắt buộc</h4>
+					{subjectGroupDetails?.['subject-required-views'] ? (
+						<ul className='list-disc pl-6 w-full'>
+							{useFilterArray(subjectGroupDetails?.['subject-required-views'], [
+								'subject-name',
+							]).map((item, index) => (
+								<li className='w-full h-fit' key={item.abbreviation + index}>
+									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
+										<p className='max-w-[90%]'>{item['subject-name']}</p>
+										<p className='text-body-medium opacity-80'>
+											{item['total-slot-in-year']}
+										</p>
+									</div>
+								</li>
+							))}
+						</ul>
+					) : (
+						<ul className='list-disc pl-6 w-full'>
+							{[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+								<li key={item}>
+									<Skeleton
+										className='!text-body-large-strong'
+										animation='wave'
+										variant='text'
+										sx={{ width: '80%' }}
+									/>
+								</li>
+							))}
+						</ul>
+					)}
+					{subjectGroupDetails?.['subject-required-views'] &&
+						subjectGroupDetails?.['subject-required-views'].length === 0 && (
 							<h2 className='text-body-small italic opacity-80'>
 								Khung chương trình chưa áp dụng môn chuyên đề
 							</h2>

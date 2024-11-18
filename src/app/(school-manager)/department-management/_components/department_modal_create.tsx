@@ -449,6 +449,9 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

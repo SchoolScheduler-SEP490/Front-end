@@ -156,8 +156,6 @@ interface ICurriculumTableProps {
 	setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
 	totalRows?: number;
 	mutate: KeyedMutator<any>;
-	isFilterable: boolean;
-	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedCurriculumId: number;
 	setSelectedCurriculumId: React.Dispatch<React.SetStateAction<number>>;
 	isOpenViewDetails: boolean;
@@ -175,13 +173,11 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 	const {
 		subjectGroupTableData,
 		page,
-		rowsPerPage,
 		setPage,
+		rowsPerPage,
 		setRowsPerPage,
 		totalRows,
 		mutate,
-		isFilterable,
-		setIsFilterable,
 		selectedCurriculumId,
 		setSelectedCurriculumId,
 		isOpenViewDetails,
@@ -194,11 +190,10 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 	const [orderBy, setOrderBy] = React.useState<keyof ICurriculumTableData>('grade');
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-	const [iApplyModalOpen, setIApplyModalOpen] = React.useState<boolean>(false);
 	const [selectedRow, setSelectedRow] = React.useState<ICurriculumTableData | undefined>();
 
-	const handleFilterable = () => {
-		setIsFilterable(!isFilterable);
+	const handleApplyCurriculum = () => {
+		// Add apply logics here
 	};
 
 	const handleDeleteClick = (
@@ -238,7 +233,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 
 	const emptyRows =
 		subjectGroupTableData.length < rowsPerPage && rowsPerPage < 10
-			? rowsPerPage - subjectGroupTableData.length + 1
+			? rowsPerPage - subjectGroupTableData.length
 			: 0;
 
 	const visibleRows = React.useMemo(
@@ -268,7 +263,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 								</IconButton>
 							</LightTooltip>
 							<LightTooltip title='Áp dụng Khung chương trình' arrow>
-								<IconButton onClick={handleFilterable}>
+								<IconButton onClick={handleApplyCurriculum}>
 									<LayersIcon />
 								</IconButton>
 							</LightTooltip>
@@ -404,13 +399,6 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 				setOpen={setUpdateModalOpen}
 				subjectGroupId={selectedCurriculumId}
 				subjectGroupMutator={mutate}
-			/>
-			<ApplyCurriculumModal
-				open={iApplyModalOpen}
-				setOpen={setIApplyModalOpen}
-				grade={selectedRow?.grade.toString() ?? '0'}
-				subjectGroupName={selectedRow?.curriculumName ?? 'Không xác định'}
-				subjectGroupId={selectedRow?.curriculumKey ?? 0}
 			/>
 		</div>
 	);

@@ -13,14 +13,8 @@ export interface IFetchCurriculumBodyProps {
 //Curriculum Data response
 export interface ICurriculumObjectResponse {
 	id: number;
-	'group-code': string;
-	'group-name': string;
-	'school-id': number;
-	'school-name': string;
-	'group-description': string | null;
+	'curriculum-name': string;
 	grade: string;
-	'subject-group-type-name': string | null;
-	'school-year-id': number;
 }
 
 export interface ICurriculumSidenavData {
@@ -45,6 +39,7 @@ export interface ILessonTableData {
 	isDouleSlot: boolean;
 	isRequiredSubject: boolean;
 	isSpecializedSubject: boolean;
+	slotPerTerm: number;
 }
 
 export interface ICurriculumDetailResponse {
@@ -85,10 +80,10 @@ export interface ISubjectInGroup {
 }
 
 export interface IUpdateSubjectInGroupRequest {
-	'subject-in-group-id': number;
+	'curriculum-detail-id': number;
 	'main-slot-per-week': number;
 	'sub-slot-per-week': number;
-	'slot-per-term'?: number;
+	'slot-per-term': number;
 	'is-double-period': boolean;
 	'main-minimum-couple': number;
 	'sub-minimum-couple': number;
@@ -120,6 +115,11 @@ export interface IQuickAssignRequest {
 	'sub-minimum-couple': number;
 	'term-id': number;
 	'term-name': string;
+}
+
+export interface IQuickAssignRequestBody {
+	'subject-assignment-configs': IQuickAssignRequest[];
+	'curriculum-apply-ids': number[];
 }
 
 export interface TermSeperatedAssignedObject {

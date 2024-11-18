@@ -171,6 +171,9 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 
 	return (
 		<Modal
+			disableEnforceFocus
+			disableAutoFocus
+			disableRestoreFocus
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

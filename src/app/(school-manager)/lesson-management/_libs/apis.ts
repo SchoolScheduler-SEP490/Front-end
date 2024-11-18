@@ -29,7 +29,7 @@ export const getFetchCurriculumApi = (props: IFetchCurriculumBodyApiProps) => {
 	}).toString();
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups?${queryString}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum?${queryString}`;
 };
 
 export const getFetchSchoolYearApi = (localApi?: string) => {
@@ -49,10 +49,10 @@ export const getFetchCurriculumDetailApi = ({
 }) => {
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}`;
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${subjectGroupId}`;
 };
 
-export const getUpdateLessonApi = ({
+export const getUpdateCurriculumDetailsApi = ({
 	localApi,
 	schoolId,
 	schoolYearId,
@@ -67,7 +67,7 @@ export const getUpdateLessonApi = ({
 }) => {
 	return `${
 		localApi ?? api
-	}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/${subjectGroupId}/subject-in-groups${
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculums/${subjectGroupId}/curriculum-details${
 		termId ? `?termId=${termId}` : ''
 	}`;
 };
@@ -79,5 +79,15 @@ export const getQuickAssignmentApi = ({
 	schoolId: number;
 	schoolYearId: number;
 }) => {
-	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/subject-groups/quick-assign-period-data`;
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/quick-assign-period-data`;
+};
+
+export const getQuickAssignCurriculumDetailsApi = ({
+	schoolId,
+	schoolYearId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/quick-assign-period`;
 };
