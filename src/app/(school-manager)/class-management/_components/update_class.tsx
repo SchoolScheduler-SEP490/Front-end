@@ -21,14 +21,25 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { IClassDetail, IRoom, ITeacher, IUpdateClassData } from "../_libs/constants";
+import {
+  IClassDetail,
+  IExistingClass,
+  IRoom,
+  ITeacher,
+  IUpdateClassData,
+} from "../_libs/constants";
 import { updateClassSchema } from "../_libs/class_schema";
 import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 import { ISubjectGroup } from "../_libs/constants";
-import { getRooms, getSubjectGroup, getTeacherName } from "../_libs/apiClass";
+import {
+  getExistingClasses,
+  getRooms,
+  getSubjectGroup,
+  getTeacherName,
+} from "../_libs/apiClass";
 
 interface UpdateClassFormProps {
   open: boolean;
@@ -59,6 +70,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [classData, setClassData] = useState<IClassDetail | null>(null);
   const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [existingClasses, setExistingClasses] = useState<IExistingClass[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -71,6 +83,34 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
       "room-id": 0,
     },
     validationSchema: updateClassSchema,
+    // validate when input change
+    validate: (values) => {
+      const errors: { [key: string]: string } = {};
+      if (
+        existingClasses.some((c) => c.name === values.name && c.id !== classId)
+      ) {
+        errors.name = "Tên lớp học đã tồn tại";
+      }
+      if (
+        existingClasses.some(
+          (c) => c["room-id"] === values["room-id"] && c.id !== classId
+        )
+      ) {
+        errors["room-id"] = "Phòng học đã được sử dụng cho lớp khác";
+        console.log("Validation Errors:", errors);
+      }
+      if (
+        existingClasses.some(
+          (c) =>
+            c["homeroom-teacher-id"] === values["homeroom-teacher-id"] &&
+            c.id !== classId
+        )
+      ) {
+        errors["homeroom-teacher-id"] =
+          "Giáo viên chủ nhiệm đã được phân công cho lớp khác";
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       const updatedValues: IUpdateClassData = {
         ...values,
@@ -90,8 +130,8 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           type: "error",
         });
       }
-
-    },  });
+    },
+  });
 
   useEffect(() => {
     if (!open) {
@@ -157,13 +197,29 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
       if (response.status === 200) {
         setRooms(response.result.items);
       }
-    }
+    };
+
+    const loadExistingClasses = async () => {
+      try {
+        const response = await getExistingClasses(
+          schoolId,
+          selectedSchoolYearId,
+          sessionToken
+        );
+        if (response.status === 200) {
+          setExistingClasses(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing classes:", error);
+      }
+    };
 
     if (open && isLoading) {
       loadClassData();
       loadSubjectGroups();
       loadTeacherName();
       loadRoomName();
+      loadExistingClasses();
     }
   }, [open, isLoading, classId, sessionToken, schoolId, selectedSchoolYearId]);
 
@@ -271,34 +327,48 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
             </Grid>
 
             <Grid item xs={12}>
-  <Grid container spacing={2}>
-    <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
-      <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-        Phòng học
-      </Typography>
-    </Grid>
-    <Grid item xs={9}>
-      <FormControl fullWidth>
-        <Select
-          variant="standard"
-          name="room-id"
-          value={formik.values["room-id"]}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          MenuProps={MenuProps}
-        >
-          <MenuItem value={0}>--Chọn phòng học--</MenuItem>
-          {rooms.map((room) => (
-            <MenuItem key={room.id} value={room.id}>
-              {room.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-  </Grid>
-</Grid>
-
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Phòng học
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["room-id"] &&
+                      Boolean(formik.errors["room-id"])
+                    }
+                  >
+                    <Select
+                      variant="standard"
+                      name="room-id"
+                      value={formik.values["room-id"]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={MenuProps}
+                    >
+                      <MenuItem value={0}>--Chọn phòng học--</MenuItem>
+                      {rooms.map((room) => (
+                        <MenuItem key={room.id} value={room.id}>
+                          {room.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["room-id"] && formik.errors["room-id"] && (
+                      <FormHelperText sx={{ margin: 0 }} error>
+                        {formik.errors["room-id"]}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
 
             <Grid item xs={12}>
               <Grid container spacing={2}>
@@ -312,21 +382,19 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <FormControl fullWidth>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["homeroom-teacher-id"] &&
+                      Boolean(formik.errors["homeroom-teacher-id"])
+                    }
+                  >
                     <Select
                       variant="standard"
                       name="homeroom-teacher-id"
                       value={formik.values["homeroom-teacher-id"]}
-                      onChange={(event) => {
-                        formik.setFieldValue(
-                          "homeroom-teacher-id",
-                          event.target.value
-                        );
-                      }}
-                      error={
-                        formik.touched["homeroom-teacher-id"] &&
-                        Boolean(formik.errors["homeroom-teacher-id"])
-                      }
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -336,7 +404,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                         },
                       }}
                     >
-                      <MenuItem value="">--Chọn giáo viên--</MenuItem>
+                      <MenuItem value={0}>--Chọn giáo viên--</MenuItem>
                       {teachers.map((teacher) => (
                         <MenuItem key={teacher.id} value={teacher.id}>
                           {`${teacher["first-name"]} ${teacher["last-name"]} (${teacher.abbreviation})`}
@@ -345,7 +413,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                     </Select>
                     {formik.touched["homeroom-teacher-id"] &&
                       formik.errors["homeroom-teacher-id"] && (
-                        <FormHelperText error>
+                        <FormHelperText sx={{ margin: 0 }} error>
                           {formik.errors["homeroom-teacher-id"]}
                         </FormHelperText>
                       )}

@@ -25,7 +25,7 @@ export interface ISchoolYear {
 
 export interface IAddClassData {
   name: string;
-  "homeroom-teacher-abbreviation"?: string;
+  "homeroom-teacher-abbreviation": string;
   "main-session": number;
   "is-full-day": boolean;
   grade: string;
@@ -80,7 +80,7 @@ export interface IClassDetail {
   "create-date": string;
   "update-date": string;
   "is-deleted": boolean;
-  "school-year": ISchoolYear; 
+  "school-year": ISchoolYear;
 }
 
 export interface ISchoolYear {
@@ -91,14 +91,14 @@ export interface ISchoolYear {
 }
 
 export interface ITeacherAssignment {
-  "term-id": number,
-  "term-name": string,
-  "teacher-id": number,
-  "teacher-first-name": string,
-  "teacher-last-name": string,
-  "total-period": number,
-  "start-week": number,
-  "end-week": number
+  "term-id": number;
+  "term-name": string;
+  "teacher-id": number;
+  "teacher-first-name": string;
+  "teacher-last-name": string;
+  "total-period": number;
+  "start-week": number;
+  "end-week": number;
 }
 
 export interface ISubjectAssignment {
@@ -114,5 +114,22 @@ export interface IRoom {
   "room-type": string;
   "room-code": string;
   "building-id": number;
-  "availability-status": string; 
-} 
+  "availability-status": string;
+}
+export interface IExistingClass {
+  id: number;
+  name: string;
+  "homeroom-teacher-abbreviation": string;
+  "room-code": string;
+  "room-id": number;
+  "homeroom-teacher-id": number;
+}
+
+export interface IClassResponse {
+  status: number;
+  message: string;
+  result: {
+    items: IExistingClass[];
+    "total-item-count": number;
+  };
+}

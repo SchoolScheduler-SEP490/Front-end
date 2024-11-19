@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -23,12 +23,18 @@ import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
 import {
   IAddClassData,
+  IExistingClass,
   IRoom,
   ISubjectGroup,
   ITeacher,
 } from "../_libs/constants";
 import useAddClass from "../_hooks/useAddClass";
-import { getRooms, getSubjectGroup, getTeacherName } from "../_libs/apiClass";
+import {
+  getExistingClasses,
+  getRooms,
+  getSubjectGroup,
+  getTeacherName,
+} from "../_libs/apiClass";
 import { CLASSGROUP_STRING_TYPE, SUBJECT_GROUP_TYPE } from "@/utils/constants";
 
 interface AddClassFormProps {
@@ -53,6 +59,7 @@ const AddClassModal = (props: AddClassFormProps) => {
   const [teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [subjectGroups, setSubjectGroups] = React.useState<ISubjectGroup[]>([]);
   const [rooms, setRooms] = React.useState<IRoom[]>([]);
+  const [existingClasses, setExistingClasses] = React.useState<IExistingClass[]>([]);
 
   React.useEffect(() => {
     const loadTeachers = async () => {
@@ -105,6 +112,25 @@ const AddClassModal = (props: AddClassFormProps) => {
     onClose(false);
   };
 
+  // load existing classes compared to the new class
+  useEffect(() => {
+    const loadExistingClasses = async () => {
+      try {
+        const response = await getExistingClasses(
+          schoolId,
+          selectedSchoolYearId,
+          sessionToken
+        );
+        if (response.status === 200) {
+          setExistingClasses(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing classes:", error);
+      }
+    };
+    loadExistingClasses();
+  }, [schoolId, selectedSchoolYearId, sessionToken]);
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -114,7 +140,7 @@ const AddClassModal = (props: AddClassFormProps) => {
       grade: "",
       "room-code": "",
     },
-    validationSchema: classSchema,
+    validationSchema: classSchema(existingClasses),
     onSubmit: async (values) => {
       const formData: IAddClassData = {
         name: values.name,
@@ -262,7 +288,7 @@ const AddClassModal = (props: AddClassFormProps) => {
                     </Select>
                     {formik.touched["room-code"] &&
                       formik.errors["room-code"] && (
-                        <FormHelperText>
+                        <FormHelperText sx={{ margin: 0 }} error>
                           {formik.errors["room-code"]}
                         </FormHelperText>
                       )}
