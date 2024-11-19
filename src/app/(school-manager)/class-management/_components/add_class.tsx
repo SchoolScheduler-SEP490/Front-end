@@ -155,8 +155,6 @@ const AddClassModal = (props: AddClassFormProps) => {
     },
   });
 
-  console.log(formik.values);
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
