@@ -44,8 +44,8 @@ export const classSchema = (existingClasses: IExistingClass[]) =>
         "Phòng học đã được sử dụng cho lớp khác",
         function (value) {
           if (!value) return true;
-          return existingClasses.some(
-            (existingClass) => existingClass["room-code"] === value
+          return !existingClasses.some(
+            (existingClass) => existingClass["room-name"] === value
           );
         }
       ),
@@ -65,5 +65,4 @@ export const updateClassSchema = yup.object().shape({
   grade: yup.number().required("Vui lòng chọn khối lớp"),
 
   ["room-id"]: yup.number().required("Vui lòng chọn phòng học"),
-
 });

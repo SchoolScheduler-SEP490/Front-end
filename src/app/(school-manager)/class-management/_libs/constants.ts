@@ -123,6 +123,7 @@ export interface IExistingClass {
   "room-code": string;
   "room-id": number;
   "homeroom-teacher-id": number;
+  "room-name": string;
 }
 
 export interface IClassResponse {
