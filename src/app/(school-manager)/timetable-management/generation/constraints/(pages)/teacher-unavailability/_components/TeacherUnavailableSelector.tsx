@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { TIMETABLE_SLOTS, WEEK_DAYS } from '../../../_libs/constants';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -223,7 +224,10 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 													>
 														<Collapse in={isSelected} timeout={200}>
 															<Typography fontSize={13}>
-																{isSelected ? '✗' : ''}
+																<ClearIcon
+																	fontSize='small'
+																	sx={{ opacity: 0.6 }}
+																/>
 															</Typography>
 														</Collapse>
 													</TableCell>

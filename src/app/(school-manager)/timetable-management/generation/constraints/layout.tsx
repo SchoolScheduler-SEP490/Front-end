@@ -1,6 +1,6 @@
 'use client';
 
-import { toggleMenu } from '@/context/school_manager_slice';
+import { toggleMenu } from '@/context/slice_school_manager';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ConstraintsSidenav from './_components/constraints_sidenav';

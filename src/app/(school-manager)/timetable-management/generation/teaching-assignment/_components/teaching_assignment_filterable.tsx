@@ -53,7 +53,7 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 
 	return (
 		<div
-			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] gap-3 ${
+			className={`h-full w-[23%] flex flex-col justify-start items-center pt-[4vh] gap-3 ${
 				open
 					? 'visible animate-fade-left animate-once animate-duration-500 animate-ease-out'
 					: 'hidden'

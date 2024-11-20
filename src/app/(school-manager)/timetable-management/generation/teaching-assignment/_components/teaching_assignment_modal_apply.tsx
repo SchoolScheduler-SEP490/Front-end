@@ -10,6 +10,7 @@ import useCheckAutoAssignAvailability from '../_hooks/useCheckAvailability';
 import { getAutoAssignmentApi } from '../_libs/apis';
 import {
 	ENTITY_TARGET,
+	IAutoTeacherAssignmentResponse,
 	ITeachingAssignmentAvailabilityResponse as ITAAvailabilityResponse,
 } from '../_libs/constants';
 
@@ -23,12 +24,6 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-const Div = styled('div')(({ theme }) => ({
-	...theme.typography.button,
-	backgroundColor: theme.palette.background.paper,
-	padding: theme.spacing(1),
-}));
-
 function findRemovedElements(oldArray: string[], newArray: string[]): string[] {
 	const newSet = new Set(newArray);
 	return oldArray.filter((item) => !newSet.has(item));
@@ -37,10 +32,12 @@ function findRemovedElements(oldArray: string[], newArray: string[]): string[] {
 interface IApplyModalProps {
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setAutomationResult: React.Dispatch<React.SetStateAction<IAutoTeacherAssignmentResponse[]>>;
+	setModifyingResultModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
-	const { open, setOpen } = props;
+const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
+	const { open, setOpen, setAutomationResult, setModifyingResultModalOpen } = props;
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 	const [errorObject, setErrorObject] = useState<ITAAvailabilityResponse | undefined>(undefined);
 
@@ -50,7 +47,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 	);
 	const [isAutomationAvaialable, setIsAutomationAvailable] = useState<boolean>(false);
 
-	const { data, mutate, isValidating } = useCheckAutoAssignAvailability({
+	const { data } = useCheckAutoAssignAvailability({
 		schoolId: Number(schoolId),
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
@@ -69,13 +66,18 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 			},
 		});
 		const data = await response?.json();
-		useNotify({
-			message:
-				response?.status === 200
-					? 'Phân công tự động thành công'
-					: 'Phân công tự động thất bại',
-			type: response?.status === 200 ? 'success' : 'error',
-		});
+		if (data?.status === 200) {
+			setAutomationResult(data.result as IAutoTeacherAssignmentResponse[]);
+			setModifyingResultModalOpen(true);
+			handleClose();
+			useNotify({
+				message:
+					response.status === 200
+						? 'Phân công tự động thành công'
+						: 'Phân công tự động thất bại',
+				type: response.status === 200 ? 'success' : 'error',
+			});
+		}
 		if (data?.status === 400) {
 			setErrorObject({ ...data.result } as ITAAvailabilityResponse);
 		}
@@ -145,7 +147,7 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 			disableAutoFocus
 			disableRestoreFocus
 			open={open}
-			// onClose={handleClose}
+			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'
 			aria-describedby='keep-mounted-modal-description'
 		>
@@ -265,4 +267,4 @@ const TeachingAssignmentApplyModal = (props: IApplyModalProps) => {
 	);
 };
 
-export default TeachingAssignmentApplyModal;
+export default TeachingAssignmentAutoApplyModal;

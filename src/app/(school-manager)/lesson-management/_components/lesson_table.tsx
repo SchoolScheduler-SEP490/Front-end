@@ -336,6 +336,13 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			editingObjects.map((obj) => {
 				var isVulnerableObj = false;
 				// Nào có tiết đôi thì minimum couple k để trống
+
+				if (obj['main-minimum-couple'] > 0 || obj['sub-minimum-couple'] > 0) {
+					obj['is-double-period'] = true;
+				} else if (obj['main-minimum-couple'] === 0 && obj['sub-minimum-couple'] === 0) {
+					obj['is-double-period'] = false;
+				}
+
 				if (obj['is-double-period']) {
 					if (obj['main-minimum-couple'] === 0 && obj['sub-minimum-couple'] === 0) {
 						isVulnerableObj = true;
@@ -417,7 +424,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 			});
 			setSumObject(totalSlot);
 		}
-	}, [subjectTableData, isEditing]);
+	}, [subjectTableData]);
 
 	const handleUpdateLesson = (
 		target: keyof IUpdateSubjectInGroupRequest,
@@ -609,7 +616,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 									bgcolor: '#175b8e',
 									color: 'white',
 									borderRadius: 0,
-									width: 150,
+									minWidth: 180,
 									boxShadow: 'none',
 								}}
 							>
@@ -702,13 +709,24 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												onChange={(
+													event: ChangeEvent<HTMLInputElement>
+												) => {
+													event.target.select();
+													let value = event.target.value;
+
+													// Loại bỏ số 0 ở đầu nếu giá trị lớn hơn 0
+													if (value.length > 1 && value.startsWith('0')) {
+														value = value.replace(/^0+/, '');
+													}
+
+													event.target.value = value;
 													handleUpdateLesson(
 														'main-slot-per-week',
-														event.target.value.replace(/^0+/, ''),
+														value,
 														row
-													)
-												}
+													);
+												}}
 												value={
 													!editedObject
 														? row.mainTotalSlotPerWeek
@@ -736,13 +754,24 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												onChange={(
+													event: ChangeEvent<HTMLInputElement>
+												) => {
+													event.target.select();
+													let value = event.target.value;
+
+													// Loại bỏ số 0 ở đầu nếu giá trị lớn hơn 0
+													if (value.length > 1 && value.startsWith('0')) {
+														value = value.replace(/^0+/, '');
+													}
+
+													event.target.value = value;
 													handleUpdateLesson(
 														'main-minimum-couple',
-														event.target.value.replace(/^0+/, ''),
+														value,
 														row
-													)
-												}
+													);
+												}}
 												value={
 													!editedObject
 														? row.mainMinimumCouple
@@ -770,13 +799,24 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												onChange={(
+													event: ChangeEvent<HTMLInputElement>
+												) => {
+													event.target.select();
+													let value = event.target.value;
+
+													// Loại bỏ số 0 ở đầu nếu giá trị lớn hơn 0
+													if (value.length > 1 && value.startsWith('0')) {
+														value = value.replace(/^0+/, '');
+													}
+
+													event.target.value = value;
 													handleUpdateLesson(
 														'sub-slot-per-week',
-														event.target.value.replace(/^0+/, ''),
+														value,
 														row
-													)
-												}
+													);
+												}}
 												value={
 													!editedObject
 														? row.subTotalSlotPerWeek
@@ -803,13 +843,24 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 															zIndex: 10,
 														},
 												}}
-												onChange={(event: ChangeEvent<HTMLInputElement>) =>
+												onChange={(
+													event: ChangeEvent<HTMLInputElement>
+												) => {
+													event.target.select();
+													let value = event.target.value;
+
+													// Loại bỏ số 0 ở đầu nếu giá trị lớn hơn 0
+													if (value.length > 1 && value.startsWith('0')) {
+														value = value.replace(/^0+/, '');
+													}
+
+													event.target.value = value;
 													handleUpdateLesson(
 														'sub-minimum-couple',
-														event.target.value.replace(/^0+/, ''),
+														value,
 														row
-													)
-												}
+													);
+												}}
 												value={
 													!editedObject
 														? row.subMinimumCouple

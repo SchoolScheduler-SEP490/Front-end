@@ -3,7 +3,7 @@ import type {
 	schoolManagerStore,
 	SchoolManagerDispatch,
 	SchoolManagerState,
-} from '@/context/school_manager_store';
+} from '@/context/store_school_manager';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useSMDispatch = useDispatch.withTypes<SchoolManagerDispatch>();

@@ -25,7 +25,7 @@ import {
 	ITeacherAssignmentRequest,
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
-import TeachingAssignmentApplyModal from './teaching_assignment_modal_apply';
+import TeachingAssignmentAutoApplyModal from './teaching_assignment_modal_apply';
 import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 
@@ -94,15 +94,7 @@ interface ITeachingAssignmentTableProps {
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
-	const {
-		subjectData,
-		mutate,
-		isFilterable,
-		setIsFilterable,
-		selectedCurriculumName,
-		isApplyModalOpen,
-		setIsApplyModalOpen,
-	} = props;
+	const { subjectData, mutate, isFilterable, setIsFilterable, selectedCurriculumName } = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -134,10 +126,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 
 	const handleFilterable = () => {
 		setIsFilterable(!isFilterable);
-	};
-
-	const handleAutoAssign = () => {
-		setIsApplyModalOpen(true);
 	};
 
 	const handleConfirmCancelUpdate = () => {
@@ -185,7 +173,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	};
 
 	return (
-		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
+		<div className='relative w-[65%] h-fit max-h-[85vh] flex flex-row justify-center items-start pt-[4vh] px-1 overflow-y-scroll no-scrollbar'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar
@@ -212,35 +200,39 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 							</h3>
 						</div>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-							{isEditing ? (
-								<>
-									<Tooltip title='Lưu thay đổi'>
-										<IconButton color='success' onClick={handleConfirmUpdate}>
-											<AddTaskIcon />
-										</IconButton>
-									</Tooltip>
-									<Tooltip title='Hủy bỏ'>
-										<IconButton
-											onClick={handleConfirmCancelUpdate}
-											color='error'
-										>
-											<HighlightOffIcon />
-										</IconButton>
-									</Tooltip>
-								</>
-							) : (
-								<Tooltip title='Phân công tự động'>
-									<IconButton
-										id='filter-btn'
-										aria-controls={isFilterable ? 'basic-menu' : undefined}
-										aria-haspopup='true'
-										aria-expanded={isFilterable ? 'true' : undefined}
-										onClick={handleAutoAssign}
-									>
-										<LayersIcon fontSize='medium' />
-									</IconButton>
-								</Tooltip>
-							)}
+							{
+								isEditing && (
+									<>
+										<Tooltip title='Lưu thay đổi'>
+											<IconButton
+												color='success'
+												onClick={handleConfirmUpdate}
+											>
+												<AddTaskIcon />
+											</IconButton>
+										</Tooltip>
+										<Tooltip title='Hủy bỏ'>
+											<IconButton
+												onClick={handleConfirmCancelUpdate}
+												color='error'
+											>
+												<HighlightOffIcon />
+											</IconButton>
+										</Tooltip>
+									</>
+								)
+								// <Tooltip title='Phân công tự động'>
+								// 	<IconButton
+								// 		id='filter-btn'
+								// 		aria-controls={isFilterable ? 'basic-menu' : undefined}
+								// 		aria-haspopup='true'
+								// 		aria-expanded={isFilterable ? 'true' : undefined}
+								// 		onClick={handleAutoAssign}
+								// 	>
+								// 		<LayersIcon fontSize='medium' />
+								// 	</IconButton>
+								// </Tooltip>
+							}
 							<Tooltip title='Lọc danh sách'>
 								<IconButton
 									id='filter-btn'
@@ -375,7 +367,6 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 				setOpen={setIsCancelUpdateModalOpen}
 				handleApprove={handleCancelUpdateTeachingAssignment}
 			/>
-			<TeachingAssignmentApplyModal open={isApplyModalOpen} setOpen={setIsApplyModalOpen} />
 		</div>
 	);
 };

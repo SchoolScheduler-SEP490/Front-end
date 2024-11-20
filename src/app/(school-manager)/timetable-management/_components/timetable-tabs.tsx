@@ -18,8 +18,10 @@ const TimetableTabs = () => {
 
 	useEffect(() => {
 		if (pathName.length > 0) {
-			const currentTab: string = pathName.split('/')[pathName.split('/').length - 1];
-			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) => tab.value === currentTab);
+			const currentTab: string[] = pathName.split('/');
+			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) =>
+				currentTab.includes(tab.value)
+			);
 			setValue(tabIndex);
 		}
 	}, [pathName]);

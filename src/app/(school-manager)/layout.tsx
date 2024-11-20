@@ -1,7 +1,7 @@
 'use client';
 import SMSidenav from '@/commons/school_manager/sidenav';
 import { useAppContext } from '@/context/app_provider';
-import { schoolManagerStore } from '@/context/school_manager_store';
+import { schoolManagerStore } from '@/context/store_school_manager';
 import { notFound } from 'next/navigation';
 import { Provider } from 'react-redux';
 

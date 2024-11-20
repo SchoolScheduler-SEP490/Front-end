@@ -9,6 +9,8 @@ import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filtera
 import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
 import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
 import TeachingAssignmentFilterable from './_components/teaching_assignment_filterable';
+import TeachingAssignmentAdjustModal from './_components/teaching_assignment_modal_adjust';
+import TeachingAssignmentAutoApplyModal from './_components/teaching_assignment_modal_apply';
 import TeachingAssignmentSideNav from './_components/teaching_assignment_sidenav';
 import TeachingAssignmentTable from './_components/teaching_assignment_table';
 import useFetchClassData from './_hooks/useFetchClass';
@@ -16,6 +18,7 @@ import useFetchTeachingAssignment from './_hooks/useFetchTA';
 import useFetchTeacher from './_hooks/useFetchTeacher';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
+	IAutoTeacherAssignmentResponse,
 	IClassResponse,
 	ITeachingAssignmentResponse,
 	ITeachingAssignmentSidenavData,
@@ -33,12 +36,14 @@ export default function SMTeachingAssignment() {
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
-	const [isApplyModalOpen, setIsApplyModalOpen] = useState<boolean>(false);
+	const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState<boolean>(false);
+	const [isModifyingResultModalOpen, setModifyingResultModalOpen] = useState<boolean>(false);
 
 	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
 	const [sidenavData, setSidenavData] = useState<ITeachingAssignmentSidenavData[]>([]);
 	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>([]);
+	const [automationResult, setAutomationResult] = useState<IAutoTeacherAssignmentResponse[]>([]);
 
 	//Modal status
 	const [isFilterable, setIsFilterable] = useState<boolean>(true);
@@ -182,7 +187,6 @@ export default function SMTeachingAssignment() {
 				[...notAssignedList, ...assignedList],
 				['id']
 			).reverse();
-			console.log(JSON.stringify(tableData, null, 2));
 			setTableData(tableData);
 		}
 	}, [teachingAssignmentData, teacherData, selectedSchoolYearId]);
@@ -202,7 +206,7 @@ export default function SMTeachingAssignment() {
 							classData={sidenavData}
 						/>
 					)}
-					<div className='w-[85%] h-full flex justify-center items-start pt-[2vh] gap-5 overflow-y-scroll no-scrollbar'>
+					<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
 						<TeachingAssignmentTableSkeleton />
 						{termStudyOptions.length > 0 ? (
 							<TeachingAssignmentFilterable
@@ -211,8 +215,8 @@ export default function SMTeachingAssignment() {
 								selectedTermId={selectedTermId}
 								setSelectedTermId={setSelectedTermId}
 								termStudyOptions={termStudyOptions}
-								isApplyModalOpen={isApplyModalOpen}
-								setIsApplyModalOpen={setIsApplyModalOpen}
+								isApplyModalOpen={isAutoApplyModalOpen}
+								setIsApplyModalOpen={setIsAutoApplyModalOpen}
 							/>
 						) : (
 							<TeachingAssignmentFilterableSkeleton />
@@ -232,15 +236,15 @@ export default function SMTeachingAssignment() {
 					setSelectedCurriculumName={setSelectedCurriculumName}
 					classData={sidenavData}
 				/>
-				<div className='w-[85%] h-full flex justify-center items-start pt-[2vh] gap-5 overflow-y-scroll no-scrollbar'>
+				<div className='w-[85%] h-full flex justify-center items-start gap-5'>
 					<TeachingAssignmentTable
 						subjectData={tableData}
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
 						selectedCurriculumName={selectedCurriculumName}
-						isApplyModalOpen={isApplyModalOpen}
-						setIsApplyModalOpen={setIsApplyModalOpen}
+						isApplyModalOpen={isAutoApplyModalOpen}
+						setIsApplyModalOpen={setIsAutoApplyModalOpen}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}
@@ -248,8 +252,20 @@ export default function SMTeachingAssignment() {
 						selectedTermId={selectedTermId}
 						setSelectedTermId={setSelectedTermId}
 						termStudyOptions={termStudyOptions}
-						isApplyModalOpen={isApplyModalOpen}
-						setIsApplyModalOpen={setIsApplyModalOpen}
+						isApplyModalOpen={isAutoApplyModalOpen}
+						setIsApplyModalOpen={setIsAutoApplyModalOpen}
+					/>
+					<TeachingAssignmentAutoApplyModal
+						open={isAutoApplyModalOpen}
+						setOpen={setIsAutoApplyModalOpen}
+						setAutomationResult={setAutomationResult}
+						setModifyingResultModalOpen={setModifyingResultModalOpen}
+					/>
+					<TeachingAssignmentAdjustModal
+						open={isModifyingResultModalOpen}
+						setOpen={setModifyingResultModalOpen}
+						automationResult={automationResult}
+						sidenavData={sidenavData}
 					/>
 				</div>
 			</div>
