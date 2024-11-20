@@ -155,7 +155,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
           variant="h6"
           className="text-title-medium-strong font-normal opacity-60"
         >
-          Cập nhật tổ hợp
+          Cập nhật nhóm lớp
         </Typography>
         <IconButton onClick={() => onClose(false)}>
           <CloseIcon />
