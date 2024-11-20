@@ -73,7 +73,7 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
           setExistClassGroup(response.result.items);
         }
       } catch (error) {
-        console.error("Failed to load existing classes:", error);
+        console.error("Failed to load existing class group:", error);
       }
     }
     loadExistClassGroup();

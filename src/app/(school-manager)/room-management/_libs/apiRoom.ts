@@ -1,4 +1,4 @@
-import { IAddRoomData, IUpdateRoomData } from "./constants";
+import { IAddRoomData, IRoomResponse, IUpdateRoomData } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
@@ -156,3 +156,36 @@ export const updateRoom = async (
     return false;
   }
 };
+
+export const getExistingRoom = async (
+  schoolId: string,
+  sessionToken: string
+): Promise<IRoomResponse> => {
+
+  const initialResponse = await fetch (
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch (
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+}
