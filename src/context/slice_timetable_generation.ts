@@ -1,26 +1,30 @@
-import { IDataStoreObject } from '@/app/(school-manager)/timetable-management/_libs/constants';
+import { IConfigurationStoreObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ITimetableGenerationState {
+export interface ITimetableGenerationState {
+	timetableId: string;
+	fireStoreName: string;
 	isModifying: boolean;
-	dataStored: IDataStoreObject;
+	dataStored: IConfigurationStoreObject;
 }
 
 interface IUpdateDataStored {
-	target: keyof IDataStoreObject;
+	target: keyof IConfigurationStoreObject;
 	value: any;
 }
 
 const initialState: ITimetableGenerationState = {
+	timetableId: '',
+	fireStoreName: 'configurations',
 	isModifying: false,
-	dataStored: {} as IDataStoreObject,
+	dataStored: {} as IConfigurationStoreObject,
 };
 
 export const timetableGenerationSlice = createSlice({
 	name: 'schoolManager',
 	initialState,
 	reducers: {
-		setDataStored: (state, action: PayloadAction<IDataStoreObject>) => {
+		setDataStored: (state, action: PayloadAction<IConfigurationStoreObject>) => {
 			state.dataStored = action.payload;
 		},
 		setModifyingStatus: (state, action: PayloadAction<boolean>) => {
@@ -30,9 +34,20 @@ export const timetableGenerationSlice = createSlice({
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
 			state.isModifying = true;
 		},
+		updateFireStoreName: (state, action: PayloadAction<string>) => {
+			state.fireStoreName = action.payload;
+		},
+		setTimetableId: (state, action: PayloadAction<string>) => {
+			state.timetableId = action.payload;
+		},
 	},
 });
 
-export const { setDataStored, setModifyingStatus, updateDataStored } =
-	timetableGenerationSlice.actions;
+export const {
+	setDataStored,
+	setModifyingStatus,
+	updateDataStored,
+	updateFireStoreName,
+	setTimetableId,
+} = timetableGenerationSlice.actions;
 export default timetableGenerationSlice.reducer;

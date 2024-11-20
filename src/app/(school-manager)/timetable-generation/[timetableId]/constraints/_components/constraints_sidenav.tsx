@@ -1,18 +1,21 @@
-import { Accordion, AccordionDetails, AccordionSummary, Collapse, Typography } from '@mui/material';
-import { IConstraintsSidenavData } from '../_libs/constants';
-import { Dispatch, SetStateAction, useState } from 'react';
+'use client';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { inter } from '@/utils/fonts';
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { IConstraintsSidenavData } from '../_libs/constants';
 
 interface IConstraintsSidenavProps {
 	data: IConstraintsSidenavData[];
-	selectedConstraintId: number;
-	setSelectedConstraintId: Dispatch<SetStateAction<number>>;
 }
 const ConstraintsSidenav = (props: IConstraintsSidenavProps) => {
-	const { data, selectedConstraintId, setSelectedConstraintId } = props;
+	const { data } = props;
+	const pathName = usePathname();
+	const router = useRouter();
+	const currentPath = pathName.split('/')[4];
 
-	const [expanded, setExpanded] = useState<string[]>(['panel0']);
+	const [expanded, setExpanded] = useState<string[]>(['panel0', 'panel1']);
 
 	const toggleDropdown =
 		(panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -23,8 +26,8 @@ const ConstraintsSidenav = (props: IConstraintsSidenavProps) => {
 			}
 		};
 
-	const handleSelectConstraint = (constraintId: number) => {
-		setSelectedConstraintId(constraintId);
+	const handleSelectConstraint = (constraint: string) => {
+		router.replace(constraint);
 	};
 
 	return (
@@ -56,25 +59,23 @@ const ConstraintsSidenav = (props: IConstraintsSidenavProps) => {
 					<AccordionSummary
 						aria-controls={`panel${index}d-content`}
 						id={`panel${index}d-header`}
-						className='!text-black !bg-basic-gray-hover '
+						className='!text-black !bg-basic-gray-hover'
 					>
 						<Typography className='!text-body-large-strong'>{item.category}</Typography>
 					</AccordionSummary>
 					<AccordionDetails className='!w-full h-fit !p-0'>
-						{item.items.map((subItem: IDropdownOption<number>, id: number) => (
+						{item.items.map((subItem: IDropdownOption<string>, id: number) => (
 							<div
 								key={subItem.label + id}
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
-									${selectedConstraintId === subItem.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
+									${currentPath === subItem.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 								onClick={() => handleSelectConstraint(subItem.value)}
 							>
 								<p
 									className={`${
 										inter.className
 									} antialiased text-body-medium font-normal opacity-90 ${
-										selectedConstraintId === subItem.value
-											? ' !font-medium'
-											: ''
+										currentPath === subItem.value ? ' !font-medium' : ''
 									}`}
 								>
 									{subItem.label}

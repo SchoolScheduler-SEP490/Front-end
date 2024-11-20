@@ -178,10 +178,6 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 							<div key={entity + index}>
 								{errors.length > 0 && (
 									<div>
-										<h3 className='text-body-small italic opacity-80 py-2'>
-											(*) Vui lòng sửa những lỗi sau để có thể tiến hành phân
-											công tự động
-										</h3>
 										<div className='w-full flex flex-row justify-between items-baseline'>
 											<h3 className='text-body-large-strong font-medium'>
 												{entity}
