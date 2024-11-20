@@ -17,12 +17,21 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { IBuilding, ISubject, IUpdateRoomData } from "../_libs/constants";
+import {
+  IBuilding,
+  IExistingRoom,
+  ISubject,
+  IUpdateRoomData,
+} from "../_libs/constants";
 import { updateRoomSchema } from "../_libs/room_schema";
 import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateRoom } from "../_hooks/useUpdateRoom";
-import { fetchBuildingName, getSubjectName } from "../_libs/apiRoom";
+import {
+  fetchBuildingName,
+  getExistingRoom,
+  getSubjectName,
+} from "../_libs/apiRoom";
 
 interface UpdateRoomFormProps {
   open: boolean;
@@ -53,6 +62,7 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
   );
   const [buildings, setBuildings] = React.useState<IBuilding[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
+  const [existRoom, setExistRoom] = React.useState<IExistingRoom[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -63,6 +73,20 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
       "room-type": oldData["room-type"] || "",
     },
     validationSchema: updateRoomSchema,
+    validate: (values) => {
+      const errors: { [key: string]: string } = {};
+      if (existRoom.some((c) => c.name === values.name && c.id !== roomId)) {
+        errors.name = "Tên phòng học đã tồn tại";
+      }
+      if (
+        existRoom.some(
+          (c) => c["room-code"] === values["room-code"] && c.id !== roomId
+        )
+      ) {
+        errors["room-code"] = "Mã phòng học đã tồn tại";
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       const updatedRoomData: IUpdateRoomData = {
         name: values.name,
@@ -142,10 +166,22 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
       }
     };
 
+    const loadExistRoom = async () => {
+      try {
+        const response = await getExistingRoom(schoolId, sessionToken);
+        if (response.status === 200) {
+          setExistRoom(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing rooms:", error);
+      }
+    };
+
     if (open) {
       fetchRoomById();
       getBuildings();
       loadSubjects();
+      loadExistRoom();
     }
   }, [open, roomId, sessionToken, schoolId]);
 
@@ -390,7 +426,9 @@ const UpdateRoomModal = (props: UpdateRoomFormProps) => {
                     >
                       <MenuItem value="">--Chọn phòng học--</MenuItem>
                       <MenuItem value="PRACTICE_ROOM">Phòng thực hành</MenuItem>
-                      <MenuItem value="LECTURE_ROOM">Phòng học lý thuyết</MenuItem>
+                      <MenuItem value="LECTURE_ROOM">
+                        Phòng học lý thuyết
+                      </MenuItem>
                     </Select>
 
                     {formik.touched["room-type"] &&

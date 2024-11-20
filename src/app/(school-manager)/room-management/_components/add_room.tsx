@@ -21,13 +21,20 @@ import { useFormik } from "formik";
 import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
 import { roomSchema } from "../_libs/room_schema";
-import { IAddRoomData, IBuilding, IRoom, ISubject } from "../_libs/constants";
-import useAddRoom from "../_hooks/useAddRoom";
-import { fetchBuildingName, getSubjectName } from "../_libs/apiRoom";
 import {
-  ERoomType,
-  ROOM_TYPE_TRANSLATOR,
-} from "@/utils/constants";
+  IAddRoomData,
+  IBuilding,
+  IExistingRoom,
+  IRoom,
+  ISubject,
+} from "../_libs/constants";
+import useAddRoom from "../_hooks/useAddRoom";
+import {
+  fetchBuildingName,
+  getExistingRoom,
+  getSubjectName,
+} from "../_libs/apiRoom";
+import { ERoomType, ROOM_TYPE_TRANSLATOR } from "@/utils/constants";
 
 interface AddRoomFormProps {
   open: boolean;
@@ -53,6 +60,7 @@ const AddRoomModal = (props: AddRoomFormProps) => {
   const [buildings, setBuildings] = React.useState<IBuilding[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const { addNewRoom } = useAddRoom();
+  const [existRoom, setExistRoom] = React.useState<IExistingRoom[]>([]);
 
   React.useEffect(() => {
     const loadBuildingName = async () => {
@@ -79,12 +87,26 @@ const AddRoomModal = (props: AddRoomFormProps) => {
     loadSubjects();
   }, [sessionToken, selectedSchoolYearId]);
 
+  React.useEffect(() => {
+    const loadExistRoom = async () => {
+      try {
+        const response = await getExistingRoom(schoolId, sessionToken);
+        if (response.status === 200) {
+          setExistRoom(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing rooms:", error);
+      }
+    };
+    loadExistRoom();
+  }, [schoolId, sessionToken]);
+
   const handleFormSubmit = async (formData: IAddRoomData) => {
     const success = await addNewRoom(formData);
     handleClose();
     if (success) {
       mutate();
-    } 
+    }
   };
 
   const handleClose = () => {
@@ -101,7 +123,7 @@ const AddRoomModal = (props: AddRoomFormProps) => {
       "room-type": "",
       "subjects-abreviation": [],
     },
-    validationSchema: roomSchema,
+    validationSchema: roomSchema(existRoom),
     onSubmit: async (formData) => {
       handleFormSubmit({
         ...formData,
@@ -342,69 +364,72 @@ const AddRoomModal = (props: AddRoomFormProps) => {
                 </Grid>
               </Grid>
             </Grid>
-            
+
             {formik.values["room-type"] === "PRACTICE_ROOM" && (
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Môn học áp dụng
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["subjects-abreviation"] &&
-                      Boolean(formik.errors["subjects-abreviation"])
-                    }
+              <Grid item xs={12}>
+                <Grid container spacing={2}>
+                  <Grid
+                    item
+                    xs={3}
+                    sx={{ display: "flex", alignItems: "center" }}
                   >
-                    <Select
-                      variant="standard"
-                      multiple
-                      name="subjects-abreviation"
-                      value={
-                        Array.isArray(formik.values["subjects-abreviation"])
-                          ? formik.values["subjects-abreviation"]
-                          : [formik.values["subjects-abreviation"]]
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      Môn học áp dụng
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={9}>
+                    <FormControl
+                      fullWidth
+                      error={
+                        formik.touched["subjects-abreviation"] &&
+                        Boolean(formik.errors["subjects-abreviation"])
                       }
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        formik.setFieldValue(
-                          "subjects-abreviation",
-                          Array.isArray(value) ? value : [value]
-                        );
-                      }}
-                      onBlur={formik.handleBlur}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
-                          },
-                        },
-                      }}
                     >
-                      {subjects.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.abbreviation}>
-                          {`${subject["subject-name"]} - ${subject.abbreviation}`}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["subjects-abreviation"] &&
-                      formik.errors["subjects-abreviation"] && (
-                        <FormHelperText className="m-0">
-                          {formik.errors["subjects-abreviation"]}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
+                      <Select
+                        variant="standard"
+                        multiple
+                        name="subjects-abreviation"
+                        value={
+                          Array.isArray(formik.values["subjects-abreviation"])
+                            ? formik.values["subjects-abreviation"]
+                            : [formik.values["subjects-abreviation"]]
+                        }
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          formik.setFieldValue(
+                            "subjects-abreviation",
+                            Array.isArray(value) ? value : [value]
+                          );
+                        }}
+                        onBlur={formik.handleBlur}
+                        MenuProps={{
+                          PaperProps: {
+                            style: {
+                              maxHeight: 150,
+                              overflow: "auto",
+                            },
+                          },
+                        }}
+                      >
+                        {subjects.map((subject) => (
+                          <MenuItem
+                            key={subject.id}
+                            value={subject.abbreviation}
+                          >
+                            {`${subject["subject-name"]} - ${subject.abbreviation}`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {formik.touched["subjects-abreviation"] &&
+                        formik.errors["subjects-abreviation"] && (
+                          <FormHelperText className="m-0">
+                            {formik.errors["subjects-abreviation"]}
+                          </FormHelperText>
+                        )}
+                    </FormControl>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
             )}
           </Grid>
         </DialogContent>
