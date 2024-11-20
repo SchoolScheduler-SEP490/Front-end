@@ -68,6 +68,7 @@ export default function SMConstraintLayout({
 				'fixed-periods-para': [],
 				'no-assign-periods-para': [],
 				'free-timetable-periods-para': [],
+				'class-combinations': [],
 				'applied-curriculum-id': 0,
 				'max-period-per-session': 0,
 				'min-period-per-session': 0,

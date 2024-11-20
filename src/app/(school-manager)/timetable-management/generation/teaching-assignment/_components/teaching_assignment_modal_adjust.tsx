@@ -10,7 +10,7 @@ import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import React, { useEffect, useState } from 'react';
-import { IDataStoreObject, ITeachingAssignmentObject } from '../../../_libs/constants';
+import { ITeachingAssignmentObject } from '../../../_libs/constants';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	IAssignmentResponse,
@@ -19,11 +19,6 @@ import {
 	ITeachingAssignmentSidenavData,
 } from '../_libs/constants';
 import TeachingAssignmentSideNav from './teaching_assignment_sidenav';
-import { usePartialUpdateDocument } from '@/hooks/firebase/usePartialUpdateDocument';
-import { useGetCollection } from '@/hooks/firebase/useGetCollection';
-import { existsSync } from 'fs';
-import { useAddDocument } from '@/hooks/firebase/useAddDocument';
-import useNotify from '@/hooks/useNotify';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
