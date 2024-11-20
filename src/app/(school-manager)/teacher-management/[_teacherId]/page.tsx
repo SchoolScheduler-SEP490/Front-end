@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { ITeacherDetail } from "../_libs/constants";
 import SMHeader from "@/commons/school_manager/header";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Avatar, Grid, IconButton } from "@mui/material";
+import { Avatar, Button, Grid, IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   TEACHER_GENDER,
@@ -79,16 +79,9 @@ export default function TeacherDetails() {
             activeTab={activeTab}
             handleTabChange={handleTabChange}
           />
-          <div className="flex-1 p-6 overflow-auto">
+          <div className="flex-1 overflow-auto w-screen">
             {activeTab === 0 && (
               <div className="w-full p-7">
-                <div className="flex justify-end">
-                  <ContainedButton
-                    onClick={() => setOpenUpdateModal(true)}
-                    title="Chỉnh sửa thông tin"
-                    styles="bg-primary-300 text-white !py-1 px-4"
-                  />
-                </div>
                 <UpdateTeacherModal
                   open={openUpdateModal}
                   onClose={setOpenUpdateModal}
@@ -99,44 +92,55 @@ export default function TeacherDetails() {
                   <Grid
                     container
                     spacing={2}
-                    className="flex justify-evenly mx-auto my-auto"
+                    className="flex self-center mx-auto my-auto"
                   >
                     <Grid item xs={12} md={5}>
-                      <Card className="w-fit shadow-md border border-gray-200 rounded-lg">
+                      <Card className="w-full shadow-md border border-gray-200 rounded-lg">
                         <CardContent>
-                          <div className="flex items-center mb-6">
-                            <Avatar
-                              alt={`${teacherData["first-name"]} ${teacherData["last-name"]}`}
-                              className="w-16 h-16 mr-4"
-                            />
-                            <div>
-                              <Typography
-                                variant="h6"
-                                className="text-gray-800 font-semibold"
-                              >
-                                {teacherData["first-name"]}{" "}
-                                {teacherData["last-name"]}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                className="text-gray-500"
-                              >
-                                {
-                                  TEACHER_ROLE_TRANSLATOR[
-                                    TEACHER_ROLE.find(
-                                      (role) =>
-                                        role.key === teacherData["teacher-role"]
-                                    )?.value || 1
-                                  ]
-                                }
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                className="text-gray-500"
-                              >
-                                Ho Chi Minh City
-                              </Typography>
+                          <div className="flex items-center mb-6 justify-between w-full">
+                            <div className="flex items-center">
+                              <Avatar
+                                alt={`${teacherData["first-name"]} ${teacherData["last-name"]}`}
+                                className="w-16 h-16 mr-4"
+                              />
+                              <div>
+                                <Typography
+                                  variant="h6"
+                                  className="text-gray-800 font-semibold"
+                                >
+                                  {teacherData["first-name"]}{" "}
+                                  {teacherData["last-name"]}
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  className="text-gray-500"
+                                >
+                                  {
+                                    TEACHER_ROLE_TRANSLATOR[
+                                      TEACHER_ROLE.find(
+                                        (role) =>
+                                          role.key ===
+                                          teacherData["teacher-role"]
+                                      )?.value || 1
+                                    ]
+                                  }
+                                </Typography>
+                                <Typography
+                                  variant="body2"
+                                  className="text-gray-500"
+                                >
+                                  Ho Chi Minh City
+                                </Typography>
+                              </div>
                             </div>
+
+                            <Button
+                              variant="text"
+                              onClick={() => setOpenUpdateModal(true)}
+                              className="text-primary-300 "
+                            >
+                              Cập nhật
+                            </Button>
                           </div>
 
                           <Divider className="my-4" />
@@ -296,8 +300,7 @@ export default function TeacherDetails() {
                 <h2 className="text-title-medium font-semibold mb-4">
                   Phân công giảng dạy
                 </h2>
-                <TeacherAssignment teacherId={teacherId}                
-                />
+                <TeacherAssignment teacherId={teacherId} />
               </div>
             )}
           </div>

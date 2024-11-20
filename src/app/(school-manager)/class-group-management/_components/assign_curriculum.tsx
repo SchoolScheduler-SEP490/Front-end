@@ -16,8 +16,8 @@ import { useFormik } from "formik";
 import { useAppContext } from "@/context/app_provider";
 import { KeyedMutator } from "swr";
 import useAssignCurriculum from "../_hooks/useAssignCurriculum";
-import { ICurriculum } from "../_libs/constants";
-import { getCurriculum } from "../_libs/apiClassGroup";
+import { IClassGroupDetail, ICurriculum } from "../_libs/constants";
+import { getClassGroupById, getCurriculum } from "../_libs/apiClassGroup";
 
 interface AssignCurriculumProps {
   open: boolean;
@@ -35,10 +35,16 @@ const AssignCurriculumModal = ({
   const { handleAssignCurriculum } = useAssignCurriculum();
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [curriculums, setCurriculums] = useState<ICurriculum[]>([]);
+  const [classGroupData, setClassGroupData] = useState<IClassGroupDetail | null>(null);
+  const hasClasses = classGroupData?.classes && classGroupData.classes.length > 0;
 
   useEffect(() => {
-    const fetchCurriculums = async () => {
+
+    const loadClassGroup = async () => {
       try {
+        const classGroup = await getClassGroupById(classGroupId, schoolId, selectedSchoolYearId, sessionToken);
+        setClassGroupData(classGroup);
+
         const response = await getCurriculum(sessionToken, schoolId, selectedSchoolYearId);
         if (response.status === 200) {
           setCurriculums(response.result.items);
@@ -46,18 +52,21 @@ const AssignCurriculumModal = ({
       } catch (error) {
         console.error('Failed to fetch curriculums:', error);
       }
-    };
+    }
 
     if (open) {
-      fetchCurriculums();
+      loadClassGroup();
     }
-  }, [open, schoolId, selectedSchoolYearId, sessionToken]);
+  }, [open, classGroupId, schoolId, selectedSchoolYearId, sessionToken]);
 
   const formik = useFormik({
     initialValues: {
       curriculumId: ""
     },
     onSubmit: async (values) => {
+      if (!hasClasses) {
+        return;
+      }
       const success = await handleAssignCurriculum(classGroupId, Number(values.curriculumId));
       if (success) {
         mutate();
@@ -86,6 +95,7 @@ const AssignCurriculumModal = ({
                   value={formik.values.curriculumId}
                   onChange={(e) => formik.setFieldValue("curriculumId", e.target.value)}
                   variant="standard"
+                  disabled={!hasClasses}
                 >
                   {curriculums.map((curriculum) => (
                     <MenuItem key={curriculum.id} value={curriculum.id}>
@@ -93,6 +103,11 @@ const AssignCurriculumModal = ({
                     </MenuItem>
                   ))}
                 </Select>
+                {!hasClasses && (
+                  <FormHelperText sx={{ margin: 0}} error>
+                    Vui lòng thêm lớp học trước khi chọn khung chương trình.
+                  </FormHelperText>
+                )}
               </FormControl>
             </Grid>
           </Grid>
@@ -101,6 +116,7 @@ const AssignCurriculumModal = ({
           <ContainedButton
             title="Phân công"
             type="submit"
+            disabled={!hasClasses || !formik.values.curriculumId}
             styles="bg-primary-300 text-white !py-1 px-4"
           />
           <ContainedButton

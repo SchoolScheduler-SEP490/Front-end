@@ -88,7 +88,7 @@ export default function SMClassGroup() {
           id: item.id,
           groupName: item["group-name"],
           studentClassGroupCode: item["student-class-group-code"],
-          grade: item.grade,
+          grade: Number(item.grade),
           curriculum: curriculums.find(c => c.id === item["curriculum-id"])?.["curriculum-name"] || item["curriculum-id"],
           createDate: item["create-date"],
           classes: item.classes || []
