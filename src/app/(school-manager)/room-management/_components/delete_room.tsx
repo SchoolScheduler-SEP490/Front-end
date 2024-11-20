@@ -46,6 +46,9 @@ const style = {
         onClose={handleClose}
         aria-labelledby="keep-mounted-modal-title"
         aria-describedby="keep-mounted-modal-description"
+        disableEnforceFocus
+        disableAutoFocus
+        disableRestoreFocus
       >
         <Box sx={style}>
           <div

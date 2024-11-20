@@ -17,52 +17,48 @@ import {
 import { visuallyHidden } from "@mui/utils";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { IClassTableData } from "../_libs/constants";
 import Image from "next/image";
+import { IClassGroupTableData } from "../_libs/constants";
 
 interface HeadCell {
-  id: keyof IClassTableData;
+  id: keyof IClassGroupTableData;
   label: string;
   centered: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: "id" as keyof IClassTableData,
+    id: "id" as keyof IClassGroupTableData,
     label: "STT",
     centered: false,
   },
   {
-    id: "className" as keyof IClassTableData,
-    label: "Tên lớp",
+    id: "groupName" as keyof IClassGroupTableData,
+    label: "Tên tổ hợp",
     centered: false,
   },
   {
-    id: "grade" as keyof IClassTableData,
+    id: "studentClassGroupCode" as keyof IClassGroupTableData,
+    label: "Mã nhóm lớp",
+    centered: true,
+  },
+  {
+    id: "grade" as keyof IClassGroupTableData,
     label: "Tên khối",
     centered: false,
   },
   {
-    id: "room" as keyof IClassTableData,
-    label: "Phòng học",
+    id: "curriculum" as keyof IClassGroupTableData,
+    label: "Khung chương trình",
     centered: false,
   },
   {
-    id: "homeroomTeacherName" as keyof IClassTableData,
-    label: "GVCN",
-    centered: false,
-  },
-  {
-    id: "schoolYear" as keyof IClassTableData,
-    label: "Năm học",
-    centered: false,
-  },
-  {
-    id: "mainSession" as keyof IClassTableData,
-    label: "Buổi chính khóa",
-    centered: false,
+    id: "createDate" as keyof IClassGroupTableData,
+    label: "Ngày tạo",
+    centered: true,
   },
 ];
+
 function EnhancedTableHead() {
   return (
     <TableHead>
@@ -95,7 +91,7 @@ function EnhancedTableHead() {
   );
 }
 
-const ClassTableSkeleton = () => {
+const ClassGroupTableSkeleton = () => {
   return (
     <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
       <Box sx={{ width: "100%" }}>
@@ -110,9 +106,9 @@ const ClassTableSkeleton = () => {
             ]}
           >
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
-              Lớp học
+              Nhóm lớp
             </h2>
-            <Tooltip title="Thêm lớp học">
+            <Tooltip title="Thêm nhóm lớp">
               <IconButton>
                 <AddIcon />
               </IconButton>
@@ -165,9 +161,6 @@ const ClassTableSkeleton = () => {
                       <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
-                      <TableCell align="left">
-                        <Skeleton animation="wave" variant="text" />
-                      </TableCell>
                       <TableCell width={80}>
                         <IconButton
                           color="success"
@@ -194,9 +187,9 @@ const ClassTableSkeleton = () => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            labelRowsPerPage='Số hàng'
-            labelDisplayedRows={({from, to, count}) => 
-                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            labelRowsPerPage="Số hàng"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
             }
             count={10}
             rowsPerPage={5}
@@ -209,5 +202,4 @@ const ClassTableSkeleton = () => {
     </div>
   );
 };
-
-export default ClassTableSkeleton;
+export default ClassGroupTableSkeleton;

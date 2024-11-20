@@ -21,14 +21,25 @@ import {
   FormHelperText,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { IClassDetail, ITeacher, IUpdateClassData } from "../_libs/constants";
+import {
+  IClassDetail,
+  IExistingClass,
+  IRoom,
+  ITeacher,
+  IUpdateClassData,
+} from "../_libs/constants";
 import { updateClassSchema } from "../_libs/class_schema";
 import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 import { ISubjectGroup } from "../_libs/constants";
-import { getSubjectGroup, getTeacherName } from "../_libs/apiClass";
+import {
+  getExistingClasses,
+  getRooms,
+  getSubjectGroup,
+  getTeacherName,
+} from "../_libs/apiClass";
 
 interface UpdateClassFormProps {
   open: boolean;
@@ -58,24 +69,52 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
   const [teachers, setTeachers] = useState<ITeacher[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [classData, setClassData] = useState<IClassDetail | null>(null);
+  const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [existingClasses, setExistingClasses] = useState<IExistingClass[]>([]);
 
   const formik = useFormik({
     initialValues: {
       name: "",
       "homeroom-teacher-id": 0,
-      "school-id": schoolId,
       "school-year-id": selectedSchoolYearId,
       "main-session": "",
       "is-full-day": false,
-      "period-count": 0,
       grade: 0,
-      "subject-group-id": 0,
+      "room-id": 0,
     },
     validationSchema: updateClassSchema,
+    // validate when input change
+    validate: (values) => {
+      const errors: { [key: string]: string } = {};
+      if (
+        existingClasses.some((c) => c.name === values.name && c.id !== classId)
+      ) {
+        errors.name = "Tên lớp học đã tồn tại";
+      }
+      if (
+        existingClasses.some(
+          (c) => c["room-id"] === values["room-id"] && c.id !== classId
+        )
+      ) {
+        errors["room-id"] = "Phòng học đã được sử dụng cho lớp khác";
+        console.log("Validation Errors:", errors);
+      }
+      if (
+        existingClasses.some(
+          (c) =>
+            c["homeroom-teacher-id"] === values["homeroom-teacher-id"] &&
+            c.id !== classId
+        )
+      ) {
+        errors["homeroom-teacher-id"] =
+          "Giáo viên chủ nhiệm đã được phân công cho lớp khác";
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       const updatedValues: IUpdateClassData = {
         ...values,
-        "school-id": Number(values["school-id"]),
+        "school-year-id": selectedSchoolYearId,
       };
       const success = await editClass(classId, updatedValues);
       if (success) {
@@ -83,6 +122,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           message: "Cập nhật lớp học thành công.",
           type: "success",
         });
+        mutate();
         handleClose();
       } else {
         useNotify({
@@ -118,13 +158,11 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           formik.setValues({
             name: data.result.name,
             "homeroom-teacher-id": data.result["homeroom-teacher-id"],
-            "school-id": schoolId,
             "school-year-id": selectedSchoolYearId,
             "main-session": data.result["main-session"].toString(),
             "is-full-day": data.result["is-full-day"],
-            "period-count": data.result["period-count"],
             grade: gradeNumber,
-            "subject-group-id": data.result["subject-group-id"],
+            "room-id": data.result["room-id"],
           });
         }
         setIsLoading(false);
@@ -154,10 +192,34 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
       }
     };
 
+    const loadRoomName = async () => {
+      const response = await getRooms(sessionToken, schoolId);
+      if (response.status === 200) {
+        setRooms(response.result.items);
+      }
+    };
+
+    const loadExistingClasses = async () => {
+      try {
+        const response = await getExistingClasses(
+          schoolId,
+          selectedSchoolYearId,
+          sessionToken
+        );
+        if (response.status === 200) {
+          setExistingClasses(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing classes:", error);
+      }
+    };
+
     if (open && isLoading) {
       loadClassData();
       loadSubjectGroups();
       loadTeacherName();
+      loadRoomName();
+      loadExistingClasses();
     }
   }, [open, isLoading, classId, sessionToken, schoolId, selectedSchoolYearId]);
 
@@ -272,27 +334,38 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Số tiết học
+                    Phòng học
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <TextField
-                    variant="standard"
+                  <FormControl
                     fullWidth
-                    type="number"
-                    name="period-count"
-                    value={formik.values["period-count"]}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     error={
-                      formik.touched["period-count"] &&
-                      Boolean(formik.errors["period-count"])
+                      formik.touched["room-id"] &&
+                      Boolean(formik.errors["room-id"])
                     }
-                    helperText={
-                      formik.touched["period-count"] &&
-                      formik.errors["period-count"]
-                    }
-                  />
+                  >
+                    <Select
+                      variant="standard"
+                      name="room-id"
+                      value={formik.values["room-id"]}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      MenuProps={MenuProps}
+                    >
+                      <MenuItem value={0}>--Chọn phòng học--</MenuItem>
+                      {rooms.map((room) => (
+                        <MenuItem key={room.id} value={room.id}>
+                          {room.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched["room-id"] && formik.errors["room-id"] && (
+                      <FormHelperText sx={{ margin: 0 }} error>
+                        {formik.errors["room-id"]}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
                 </Grid>
               </Grid>
             </Grid>
@@ -309,21 +382,19 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <FormControl fullWidth>
+                  <FormControl
+                    fullWidth
+                    error={
+                      formik.touched["homeroom-teacher-id"] &&
+                      Boolean(formik.errors["homeroom-teacher-id"])
+                    }
+                  >
                     <Select
                       variant="standard"
                       name="homeroom-teacher-id"
                       value={formik.values["homeroom-teacher-id"]}
-                      onChange={(event) => {
-                        formik.setFieldValue(
-                          "homeroom-teacher-id",
-                          event.target.value
-                        );
-                      }}
-                      error={
-                        formik.touched["homeroom-teacher-id"] &&
-                        Boolean(formik.errors["homeroom-teacher-id"])
-                      }
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       MenuProps={{
                         PaperProps: {
                           style: {
@@ -333,7 +404,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                         },
                       }}
                     >
-                      <MenuItem value="">--Chọn giáo viên--</MenuItem>
+                      <MenuItem value={0}>--Chọn giáo viên--</MenuItem>
                       {teachers.map((teacher) => (
                         <MenuItem key={teacher.id} value={teacher.id}>
                           {`${teacher["first-name"]} ${teacher["last-name"]} (${teacher.abbreviation})`}
@@ -342,53 +413,8 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                     </Select>
                     {formik.touched["homeroom-teacher-id"] &&
                       formik.errors["homeroom-teacher-id"] && (
-                        <FormHelperText error>
+                        <FormHelperText sx={{ margin: 0 }} error>
                           {formik.errors["homeroom-teacher-id"]}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tổ hợp môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["subject-group-id"] &&
-                      Boolean(formik.errors["subject-group-id"])
-                    }
-                  >
-                    <Select
-                      labelId="subject-group-label"
-                      id="subject-group-id"
-                      name="subject-group-id"
-                      variant="standard"
-                      value={formik.values["subject-group-id"] || ""}
-                      onChange={formik.handleChange}
-                      MenuProps={MenuProps}
-                    >
-                      {subjectGroups.map((group) => (
-                        <MenuItem key={group.id} value={group.id}>
-                          {group["group-name"]}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["subject-group-id"] &&
-                      formik.errors["subject-group-id"] && (
-                        <FormHelperText>
-                          {formik.errors["subject-group-id"]}
                         </FormHelperText>
                       )}
                   </FormControl>

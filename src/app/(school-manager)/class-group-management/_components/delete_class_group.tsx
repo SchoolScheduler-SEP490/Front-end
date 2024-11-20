@@ -2,9 +2,9 @@ import React from "react";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
 import ContainedButton from "@/commons/button-contained";
 import { KeyedMutator } from "swr";
-import useDeleteClass from "../_hooks/useDeleteClass";
 import { useAppContext } from "@/context/app_provider";
 import CloseIcon from "@mui/icons-material/Close";
+import useDeleteClassGroup from "../_hooks/useDeleteClassGroup";
 
 const style = {
   position: "absolute",
@@ -19,22 +19,21 @@ const style = {
 interface DeleteConfirmationModalProps {
   open: boolean;
   onClose: (close: boolean) => void;
-  className: string;
-  classId: number;
+  classGroupName: string;
+  classGroupId: number;
   mutate: KeyedMutator<any>;
 }
 
-const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
-  const { open, onClose, className, classId, mutate } = props;
-  const { sessionToken } = useAppContext();
-  const { deleteClass } = useDeleteClass();
+const DeleteClassGroupModal = (props: DeleteConfirmationModalProps) => {
+  const { open, onClose, classGroupName, classGroupId, mutate } = props;
+  const { handleDeleteClassGroup } = useDeleteClassGroup();
 
   const handleClose = () => {
     onClose(false);
   };
 
-  const handleDeleteClass = async () => {
-    const success = await deleteClass(classId);
+  const deleteClassGroup = async () => {
+    const success = await handleDeleteClassGroup(classGroupId);
     if (success) {
       await mutate();
       handleClose();
@@ -49,8 +48,8 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
       aria-labelledby="keep-mounted-modal-title"
       aria-describedby="keep-mounted-modal-description"
       disableEnforceFocus
-			disableAutoFocus
-			disableRestoreFocus
+      disableAutoFocus
+      disableRestoreFocus
     >
       <Box sx={style}>
         <div
@@ -62,7 +61,7 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
             component="h2"
             className="text-title-large-strong font-semibold"
           >
-            Xóa lớp học
+            Xóa nhóm lớp
           </Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
@@ -70,15 +69,15 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
         </div>
         <div className="p-4 pl-5">
           <Typography className="text-title-small-strong">
-            Bạn có chắc muốn xóa lớp học <strong>{className}</strong> không?
-            Thao tác này không thể hoàn tác.
+            Bạn có chắc muốn xóa nhóm lớp <strong>{classGroupName}</strong>{" "}
+            không? Thao tác này không thể hoàn tác.
           </Typography>
         </div>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Xóa lớp học"
+            title="Xóa nhóm lớp"
             disableRipple
-            onClick={handleDeleteClass}
+            onClick={deleteClassGroup}
             styles="bg-red-200 text-basic-negative text-normal !py-1 px-4"
           />
           <ContainedButton
@@ -92,4 +91,4 @@ const DeleteClassModal = (props: DeleteConfirmationModalProps) => {
     </Modal>
   );
 };
-export default DeleteClassModal;
+export default DeleteClassGroupModal;

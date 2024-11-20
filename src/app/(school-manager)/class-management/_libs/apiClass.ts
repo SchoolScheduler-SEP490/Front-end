@@ -1,4 +1,4 @@
-import { IAddClassData, IUpdateClassData } from "./constants";
+import { IAddClassData, IClassResponse, IUpdateClassData } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
@@ -136,37 +136,36 @@ export const updateClass = async (
   }
 };
 
-
 export const getSubjectGroup = async (
   sessionToken: string,
   schoolId: string,
   selectedSchoolYearId: number
 ) => {
-    const initialResponse = await fetch(
-      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=20`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
-    const initialData = await initialResponse.json();
-    const totalCount = initialData.result["total-item-count"];
-    const response = await fetch(
-      `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/subject-groups?includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
+  const initialResponse = await fetch(
+    `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/class-groups?includeDeleted=false&pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+  const response = await fetch(
+    `${api}/api/schools/${schoolId}/academic-years/${selectedSchoolYearId}/class-groups?includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
 
-    const data = await response.json();
-    return data;
+  const data = await response.json();
+  return data;
 };
 
 export const getTeacherAssignment = async (
@@ -175,7 +174,8 @@ export const getTeacherAssignment = async (
   schoolId: string,
   schoolYearId: number
 ) => {
-  const response = await fetch (`${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/${id}/assignments-in-class`, 
+  const response = await fetch(
+    `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes/${id}/assignments-in-class`,
     {
       method: "GET",
       headers: {
@@ -183,7 +183,57 @@ export const getTeacherAssignment = async (
         Authorization: `Bearer ${sessionToken}`,
       },
     }
-  )
+  );
   const data = await response.json();
   return data;
-}
+};
+
+export const getRooms = async (sessionToken: string, schoolId: string) => {
+  const initialResponse = await fetch(
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch(
+    `${api}/api/schools/${schoolId}/rooms?pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+};
+
+// get all classes existing in the school
+export const getExistingClasses = async (
+  schoolId: string,
+  schoolYearId: number,
+  sessionToken: string
+): Promise<IClassResponse> => {
+  const url = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?includeDeleted=false&pageSize=100`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${sessionToken}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+  return data;
+};

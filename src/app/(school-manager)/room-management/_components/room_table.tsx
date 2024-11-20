@@ -162,7 +162,7 @@ interface IRoomTableProps {
 }
 const dropdownOptions: ICommonOption[] = [
   { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
-  { img: "/images/icons/delete.png", title: "Xóa lớp học" },
+  { img: "/images/icons/delete.png", title: "Xóa phòng học" },
 ];
 
 const RoomTable = (props: IRoomTableProps) => {
