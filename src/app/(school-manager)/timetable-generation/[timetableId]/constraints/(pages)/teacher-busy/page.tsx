@@ -2,8 +2,8 @@
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useState } from 'react';
-import TeacherUnavailableSelector from './_components/TeacherUnavailableSelector';
-import TeacherUnavailableResult from './_components/TeacherUnavailableResult';
+import TeacherUnavailableSelector from './_components/teacher_unavailable_selector';
+import TeacherUnavailableResult from './_components/teacher_unavailable_result';
 
 const samepleTeacherData: IDropdownOption<number>[] = [
 	{ label: 'Nguyen Ha Thanh Mai (maihnt)', value: 1 },

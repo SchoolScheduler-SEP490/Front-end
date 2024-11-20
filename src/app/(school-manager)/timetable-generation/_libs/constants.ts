@@ -1,6 +1,7 @@
 import { IDropdownOption } from '../../_utils/contants';
 
 export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
+	{ label: 'Gộp nhiều lớp chung tiết', value: 'class-combination' },
 	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
 	{ label: 'Tạo ràng buộc', value: 'constraints' },
 	{ label: 'Sắp Thời khóa biểu', value: 'timetable-configuration' },
@@ -39,15 +40,17 @@ export interface IClassCombinationObject {
 	'subject-id': number;
 	'class-ids': number[];
 	'room-id': number;
-	session: string;
+	session: EClassSession;
 }
 
-export interface IDataStoreObject {
+export enum EClassSession {
+	'Morning',
+	'Afternoon',
+}
+
+export interface IConfigurationStoreObject {
 	id?: string;
-	'school-id': number;
-	'year-id': number;
-	'term-id': number;
-	'schedule-id': number;
+	'timetable-id': string;
 	'max-period-per-session': number;
 	'min-period-per-session': number;
 	'applied-curriculum-id': number;
@@ -56,4 +59,21 @@ export interface IDataStoreObject {
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'class-combinations': IClassCombinationObject[];
+}
+
+export interface ITimetableStoreObject {
+	id?: string;
+	'timetable-name': string;
+	'timetable-abbreviation': string;
+	'school-id': number;
+	'year-id': number;
+	'term-id': number;
+	'config-id': string;
+	status: ETimetableStatus;
+}
+
+export enum ETimetableStatus {
+	Published = 'Công bố',
+	Pending = 'Chờ duyệt',
+	Inactived = 'Vô hiệu',
 }

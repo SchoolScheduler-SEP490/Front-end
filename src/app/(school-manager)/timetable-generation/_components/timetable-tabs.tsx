@@ -36,9 +36,16 @@ const TimetableTabs = () => {
 
 	return (
 		<div className='w-full h-fit border-b-1 border-basic-gray flex flex-row justify-center'>
-			<Tabs value={value} onChange={handleChange} aria-label='basic tabs example'>
+			<Tabs
+				value={value}
+				onChange={handleChange}
+				aria-label='basic tabs example'
+				variant='scrollable'
+				scrollButtons
+				allowScrollButtonsMobile
+			>
 				{TIMETABLE_GENERATION_TABS.map((tab, index) => (
-					<Tab key={index} label={tab.label} {...a11yProps(index)} />
+					<Tab key={index} label={`${index + 1}. ${tab.label}`} {...a11yProps(index)} />
 				))}
 			</Tabs>
 		</div>

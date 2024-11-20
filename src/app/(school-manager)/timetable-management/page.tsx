@@ -23,7 +23,7 @@ import { visuallyHidden } from '@mui/utils';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { usePathname, useRouter } from 'next/navigation';
-import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
+import { TIMETABLE_GENERATION_TABS } from '../timetable-generation/_libs/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleMenu } from '@/context/slice_school_manager';
 
@@ -323,7 +323,7 @@ export default function SMLanding() {
 		if (!isMenuOpen) {
 			dispatch(toggleMenu());
 		}
-		router.push(pathName + '/generation/' + TIMETABLE_GENERATION_TABS[0].value);
+		router.push('timetable-generation');
 	};
 
 	return (

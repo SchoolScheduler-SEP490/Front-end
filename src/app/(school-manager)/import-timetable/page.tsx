@@ -1,9 +1,8 @@
-import ContainedButton from '@/commons/button-contained';
 import SMHeader from '@/commons/school_manager/header';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
 import { Button } from '@mui/material';
 import Image from 'next/image';
-import UploadIcon from '@mui/icons-material/Upload';
-import DownloadIcon from '@mui/icons-material/Download';
 
 export default function Home() {
 	return (

@@ -2,7 +2,7 @@ import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 
 export interface IConstraintsSidenavData {
 	category: string;
-	items: IDropdownOption<number>[];
+	items: IDropdownOption<string>[];
 }
 
 export const TIMETABLE_SLOTS = [
