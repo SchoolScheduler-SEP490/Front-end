@@ -1,30 +1,34 @@
-import React, { useEffect } from "react";
+"use client";
+
+import ContainedButton from "@/commons/button-contained";
+import { useAppContext } from "@/context/app_provider";
+import useNotify from "@/hooks/useNotify";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Dialog,
-  DialogContent,
-  TextField,
   FormControl,
-  Grid,
-  Typography,
-  Select,
-  MenuItem,
   IconButton,
+  MenuItem,
+  TextField,
+  Typography,
+  DialogContent,
+  Grid,
   FormHelperText,
+  Select,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import ContainedButton from "@/commons/button-contained";
 import { useFormik } from "formik";
-import { classGroupSchema } from "../_libs/class_group_schema";
+import { IClassGroupDetail, IExistingClassGroup } from "../_libs/constants";
+import { useUpdateClassGroup } from "../_hooks/useUpdateClassGroup";
+import { updateClassGroupSchema } from "../_libs/class_group_schema";
+import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
-import { useAppContext } from "@/context/app_provider";
-import { IAddClassGroup, IExistingClassGroup } from "../_libs/constants";
-import useAddClassGroup from "../_hooks/useAddClassGroup";
-import { CLASSGROUP_STRING_TYPE, CLASSGROUP_TRANSLATOR } from "@/utils/constants";
-import { getExistingClassGroup } from "../_libs/apiClassGroup";
+import { getClassGroupById, getExistingClassGroup } from "../_libs/apiClassGroup";
+import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 
-interface AddClassGroupFormProps {
+interface UpdateClassGroupFormProps {
   open: boolean;
   onClose: (close: boolean) => void;
+  classGroupId: number;
   mutate: KeyedMutator<any>;
 }
 
@@ -40,28 +44,84 @@ const MenuProps = {
   },
 };
 
-const AddClassGroupModal = (props: AddClassGroupFormProps) => {
-  const { open, onClose, mutate } = props;
-  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
+  const { open, onClose, classGroupId, mutate } = props;
+  const { sessionToken, selectedSchoolYearId, schoolId } = useAppContext();
+  const { editClassGroup, isUpdating } = useUpdateClassGroup(mutate);
+  const [isLoading, setIsLoading] = useState(true);
+  const [classGroupData, setClassGroupData] =
+    useState<IClassGroupDetail | null>(null);
   const [existClassGroup, setExistClassGroup] = React.useState<IExistingClassGroup[]>([]);
 
-  const handleFormSubmit = async (body: IAddClassGroup) => {
-    await useAddClassGroup({
-      schoolId: schoolId,
-      sessionToken: sessionToken,
-      formData: [body],
-      schoolYearId: selectedSchoolYearId,
-    });
-    mutate();
-    handleClose();
-  };
+  const hasClasses =
+    classGroupData?.classes && classGroupData.classes.length > 0;
 
-  const handleClose = () => {
-    formik.handleReset(formik.initialValues);
-    onClose(false);
-  };
+  const formik = useFormik({
+    initialValues: {
+      "group-name": "",
+      "group-description": "",
+      "student-class-group-code": "",
+      grade: 0,
+    },
+    validationSchema: updateClassGroupSchema,
+    validate: (values) => {
+      const errors: { [key: string]: string } = {};
+      if (
+        existClassGroup.some((c) => c["group-name"] === values["group-name"] && c.id !== classGroupId)
+      ) {
+        errors["group-name"] = "Tên tổ hợp đã tồn tại";
+      }
+      if (
+        existClassGroup.some((c) => c["student-class-group-code"] === values["student-class-group-code"] && c.id !== classGroupId)
+      ) {
+        errors["student-class-group-code"] = "Mã nhóm lớp đã tồn tại";
+      }
+      return errors;
+    },
+    onSubmit: async (values) => {
+      const success = await editClassGroup(classGroupId, values);
+      if (success) {
+        useNotify({
+          message: "Cập nhật nhóm lớp thành công.",
+          type: "success",
+        });
+        handleClose();
+        mutate();
+      } else {
+        useNotify({
+          message: "Cập nhật nhóm lơp thất bại.",
+          type: "error",
+        });
+      }
+    },
+  });
 
   useEffect(() => {
+    const loadClassGroup = async () => {
+      if (!classGroupId) return;
+
+      try {
+        const data = await getClassGroupById(
+          classGroupId,
+          schoolId,
+          selectedSchoolYearId,
+          sessionToken
+        );
+
+        setClassGroupData(data);
+        formik.setValues({
+          "group-name": data["group-name"],
+          "group-description": data["group-description"],
+          "student-class-group-code": data["student-class-group-code"],
+          grade: data.grade,
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading class group:", error);
+        setIsLoading(false);
+      }
+    };
+
     const loadExistClassGroup = async () => {
       try {
         const response = await getExistingClassGroup (
@@ -76,48 +136,31 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
         console.error("Failed to load existing classes:", error);
       }
     }
-    loadExistClassGroup();
-  }, [schoolId, selectedSchoolYearId, sessionToken])
 
-  const formik = useFormik({
-    initialValues: {
-      "group-name": "",
-      "group-description": "",
-      "student-class-group-code": "",
-      grade: "",
-    },
-    validationSchema: classGroupSchema(existClassGroup),
-    onSubmit: async (values) => {
-      const formData: IAddClassGroup = {
-        "group-name": values["group-name"],
-        "group-description": values["group-description"],
-        "student-class-group-code": values["student-class-group-code"],
-        grade: `GRADE_${values.grade}`,
-      };
-      await handleFormSubmit(formData);
-    },
-  });
-  
-  console.log(formik.values);
+    if (open) {
+      loadClassGroup();
+      loadExistClassGroup();
+    }
+  }, [open, classGroupId, schoolId, selectedSchoolYearId, sessionToken]);
+
+  const handleClose = () => {
+    formik.resetForm();
+    onClose(false);
+  };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <div
-        id="modal-header"
-        className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
-      >
+    <Dialog open={open} onClose={() => onClose(false)} maxWidth="sm" fullWidth>
+      <div className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3">
         <Typography
           variant="h6"
-          component="h2"
           className="text-title-medium-strong font-normal opacity-60"
         >
-          Thêm nhóm lớp
+          Cập nhật tổ hợp
         </Typography>
-        <IconButton onClick={handleClose}>
+        <IconButton onClick={() => onClose(false)}>
           <CloseIcon />
         </IconButton>
       </div>
-
       <form onSubmit={formik.handleSubmit}>
         <DialogContent>
           <Grid container spacing={2}>
@@ -150,7 +193,13 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                       formik.touched["group-name"] &&
                       formik.errors["group-name"]
                     }
+                    disabled={hasClasses}
                   />
+                  {hasClasses && (
+                    <FormHelperText sx={{ margin: 0 }} error>
+                      Không thể thay đổi tên tổ hợp khi đã có lớp học.
+                    </FormHelperText>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -184,7 +233,13 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                       formik.touched["group-description"] &&
                       formik.errors["group-description"]
                     }
+                    disabled={hasClasses}
                   />
+                  {hasClasses && (
+                    <FormHelperText sx={{ margin: 0 }} error>
+                      Không thể thay đổi mô tả khi đã có lớp học.
+                    </FormHelperText>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -218,7 +273,13 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                       formik.touched["student-class-group-code"] &&
                       formik.errors["student-class-group-code"]
                     }
+                    disabled={hasClasses}
                   />
+                  {hasClasses && (
+                    <FormHelperText sx={{ margin: 0 }} error>
+                      Không thể thay đổi mã nhóm lớp khi đã có lớp học.
+                    </FormHelperText>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -252,6 +313,7 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                         formik.touched.grade && Boolean(formik.errors.grade)
                       }
                       MenuProps={MenuProps}
+                      disabled={hasClasses}
                       sx={{ width: "100%" }}
                     >
                       {CLASSGROUP_STRING_TYPE.map((item) => (
@@ -260,6 +322,11 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                         </MenuItem>
                       ))}
                     </Select>
+                    {hasClasses && (
+                      <FormHelperText sx={{ margin: 0 }} error>
+                        Không thể thay đổi khối khi đã có lớp học.
+                      </FormHelperText>
+                    )}
                     {formik.touched.grade && formik.errors.grade && (
                       <FormHelperText error variant="standard">
                         {formik.errors.grade}
@@ -273,16 +340,14 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Thêm nhóm lớp"
-            disableRipple
+            title="Cập nhật"
             type="submit"
-            disabled={!formik.isValid}
+            disabled={ hasClasses || !formik.isValid || isUpdating}
             styles="bg-primary-300 text-white !py-1 px-4"
           />
           <ContainedButton
             title="Huỷ"
-            onClick={handleClose}
-            disableRipple
+            onClick={() => onClose(false)}
             styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
         </div>
@@ -290,4 +355,4 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
     </Dialog>
   );
 };
-export default AddClassGroupModal;
+export default UpdateClassGroupModal;

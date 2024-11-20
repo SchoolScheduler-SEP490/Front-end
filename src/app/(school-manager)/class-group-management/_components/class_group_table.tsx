@@ -31,6 +31,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import AssignClassModal from "./assign_class";
 import AssignCurriculumModal from "./assign_curriculum";
+import UpdateClassGroupModal from "./update_class_group";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -165,6 +166,7 @@ interface IClassGroupTableProps {
 const dropdownOptions: ICommonOption[] = [
   { img: "/images/icons/desk.png", title: "Thêm lớp áp dụng" },
   { img: "/images/icons/stack.png", title: "Thêm khung chương trình" },
+  { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
   { img: "/images/icons/delete.png", title: "Xóa nhóm lớp" },
 ];
 
@@ -225,6 +227,9 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
         setOpenCurriculumModal(true);
         break;
       case 2:
+        setOpenUpdateModal(true);
+        break;
+      case 3:
         setOpenDeleteModal(true);
         break;
       default:
@@ -363,7 +368,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                         <TableCell align="left">
                           {row.studentClassGroupCode}
                         </TableCell>
-                        <TableCell align="left">{row.grade}</TableCell>
+                        <TableCell align="left">{`Khối ${row.grade}`}</TableCell>
                         <TableCell align="left">{row.curriculum}</TableCell>
                         <TableCell align="center">
                           {dayjs(row.createDate).format("DD-MM-YYYY")}
@@ -493,6 +498,12 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
             open={openCurriculumModal}
             onClose={() => setOpenCurriculumModal(false)}
             classGroupId={selectedRow?.id || 0}
+            mutate={mutate}
+          />
+          <UpdateClassGroupModal
+            open={openUpdateModal}
+            onClose={setOpenUpdateModal}
+            classGroupId={selectedRow?.id ?? 0}
             mutate={mutate}
           />
         </Paper>

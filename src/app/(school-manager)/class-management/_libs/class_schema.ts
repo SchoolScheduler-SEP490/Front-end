@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { IExistingClass, IRoom } from "./constants";
+import { IExistingClass } from "./constants";
 
 // uniqueness checks on the class name and homeroom teacher assignments and room.
 export const classSchema = (existingClasses: IExistingClass[]) =>
