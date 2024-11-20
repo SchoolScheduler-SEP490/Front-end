@@ -1,3 +1,7 @@
-const FreeTimetablePeriodsPage = () => {
-	return <div>free-timetable-periods</div>;
-};
+export default function FreeTimetablePeriodsPage() {
+	return (
+		<div>
+			<p>free-timetable-periods</p>
+		</div>
+	);
+}

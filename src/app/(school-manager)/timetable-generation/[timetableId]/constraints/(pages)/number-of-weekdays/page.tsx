@@ -1,3 +1,7 @@
-const NumberOfWeekdaysPage = () => {
-	return <div>NumberOfWeekdays</div>;
-};
+export default function NumberOfWeekdaysPage() {
+	return (
+		<div>
+			<p>NumberOfWeekdays</p>
+		</div>
+	);
+}
