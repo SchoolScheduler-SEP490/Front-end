@@ -35,17 +35,25 @@ export interface IFreePeriodObject {
 	'class-id': number;
 }
 
+export interface IClassCombinationObject {
+	'subject-id': number;
+	'class-ids': number[];
+	'room-id': number;
+	session: string;
+}
+
 export interface IDataStoreObject {
 	id?: string;
 	'school-id': number;
 	'year-id': number;
-	'term-id'?: number;
-	'schedule-id'?: number;
-	'max-period-per-session'?: number;
-	'min-period-per-session'?: number;
-	'applied-curriculum-id'?: number;
-	'teacher-assignments'?: ITeachingAssignmentObject[];
-	'fixed-periods-para'?: IFixedPeriodObject[];
-	'no-assign-periods-para'?: INoAssignPeriodObject[];
-	'free-timetable-periods-para'?: IFreePeriodObject[];
+	'term-id': number;
+	'schedule-id': number;
+	'max-period-per-session': number;
+	'min-period-per-session': number;
+	'applied-curriculum-id': number;
+	'teacher-assignments': ITeachingAssignmentObject[];
+	'fixed-periods-para': IFixedPeriodObject[];
+	'no-assign-periods-para': INoAssignPeriodObject[];
+	'free-timetable-periods-para': IFreePeriodObject[];
+	'class-combinations': IClassCombinationObject[];
 }
