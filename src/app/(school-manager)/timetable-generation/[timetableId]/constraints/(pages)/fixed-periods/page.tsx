@@ -1,3 +1,7 @@
-const FixedPeriodsPage = () => {
-	return <div>fixed-periods</div>;
-};
+export default function FixedPeriodsPage() {
+	return (
+		<div>
+			<p>fixed-periods</p>
+		</div>
+	);
+}

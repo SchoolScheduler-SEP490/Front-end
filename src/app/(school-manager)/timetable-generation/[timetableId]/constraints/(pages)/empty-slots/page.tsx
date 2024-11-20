@@ -1,3 +1,7 @@
-const EmptySlotsPage = () => {
-	return <div>Empty slots</div>;
-};
+export default function EmptySlotsPage() {
+	return (
+		<div>
+			<p>Empty slots</p>
+		</div>
+	);
+}

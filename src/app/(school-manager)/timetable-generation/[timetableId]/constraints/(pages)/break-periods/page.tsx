@@ -1,3 +1,7 @@
-const BreakPeriodsPage = () => {
-	return <div>break-periods</div>;
-};
+export default function BreakPeriodsPage() {
+	return (
+		<div>
+			<p>break-periods</p>
+		</div>
+	);
+}
