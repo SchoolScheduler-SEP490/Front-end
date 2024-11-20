@@ -63,3 +63,18 @@ export interface IRoom {
 	"update-date": string;
 	"is-deleted": boolean;
   } 
+
+  export interface IExistingRoom {
+	id: number;
+	name: string;
+	"room-code": string;
+  }
+
+  export interface IRoomResponse {
+	status: number;
+	message: string;
+	result: {
+	  items: IExistingRoom[];
+	  "total-item-count": number;
+	};
+  }

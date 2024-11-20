@@ -133,7 +133,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
           setExistClassGroup(response.result.items);
         }
       } catch (error) {
-        console.error("Failed to load existing classes:", error);
+        console.error("Failed to load existing class group:", error);
       }
     }
 
@@ -155,7 +155,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
           variant="h6"
           className="text-title-medium-strong font-normal opacity-60"
         >
-          Cập nhật tổ hợp
+          Cập nhật nhóm lớp
         </Typography>
         <IconButton onClick={() => onClose(false)}>
           <CloseIcon />
