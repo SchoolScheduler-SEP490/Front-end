@@ -70,7 +70,7 @@ function EnhancedTableHead() {
 
 const TeachingAssignmentTableSkeleton = () => {
 	return (
-		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[2vh]'>
+		<div className='relative w-[65%] h-fit flex flex-row justify-center items-center pt-[4vh]'>
 			<Box sx={{ width: '100%' }}>
 				<Paper sx={{ width: '100%', mb: 2 }}>
 					<Toolbar

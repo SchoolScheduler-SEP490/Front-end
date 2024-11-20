@@ -100,8 +100,8 @@ const headCells: readonly HeadCell[] = [
 
 const EnhancedTableHead = memo(() => {
 	return (
-		<TableHead sx={{ position: 'sticky', top: 0, left: 0 }}>
-			<TableRow>
+		<TableHead sx={{ position: 'sticky', top: 0, left: 0, zIndex: 10 }}>
+			<TableRow sx={{ backgroundColor: 'white' }}>
 				<TableCell
 					rowSpan={2}
 					align={headCells[0].centered ? 'center' : 'left'}
@@ -113,6 +113,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -128,6 +129,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 						headCells[1].centered ? { paddingLeft: '3%' } : {},
 					]}
@@ -146,6 +148,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -162,6 +165,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -177,6 +181,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 					width={100}
@@ -194,6 +199,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -209,6 +215,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -224,6 +231,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -239,6 +247,7 @@ const EnhancedTableHead = memo(() => {
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
 							borderTop: '1px solid #f0f0f0',
+							backgroundColor: 'white',
 						},
 					]}
 				>
@@ -485,9 +494,9 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 					</div>
 				) : (
 					<div className='w-full h-[65vh] relative flex flex-row justify-start items-start overflow-y-scroll no-scrollbar'>
-						<TableContainer>
+						<TableContainer sx={{ maxHeight: '65vh', overflowY: 'auto' }}>
 							<Table
-								sx={{ minWidth: 750 }}
+								sx={{ minWidth: 750, position: 'relative' }}
 								stickyHeader
 								aria-label='sticky table'
 								size='small'
@@ -534,7 +543,15 @@ const LessonQuickApplyModal = (props: IQuickApplyModalProps) => {
 													</Typography>
 												</TableCell>
 												{[1, 2, 3, 4, 5].map((id) => (
-													<TableCell align='center' key={id}></TableCell>
+													<TableCell
+														align='center'
+														key={id}
+														colSpan={1}
+														sx={{
+															borderBottom:
+																'1px solid rgba(224, 224, 224, 1)', // Hoặc màu mà bạn muốn
+														}}
+													></TableCell>
 												))}
 											</TableRow>
 											{values.map((row, ind) => {

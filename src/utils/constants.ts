@@ -1,3 +1,5 @@
+import { WhereFilterOp } from 'firebase/firestore';
+
 export interface INavigation {
 	name: string;
 	url: string;
@@ -170,3 +172,9 @@ export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	1: 'Nam',
 	2: 'Nữ',
 };
+
+export interface QueryCondition {
+	field: string;
+	operator: WhereFilterOp;
+	value: any;
+}

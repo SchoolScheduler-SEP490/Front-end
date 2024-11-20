@@ -1,6 +1,8 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import { ITeachingAssignmentObject } from '../../../_libs/constants';
 
 export interface IClassResponse {
+	id: number;
 	name: string;
 	'homeroom-teacher-id': number;
 	'homeroom-teacher-name': string;
@@ -10,12 +12,15 @@ export interface IClassResponse {
 	grade: string;
 	'is-full-day': boolean;
 	'period-count': number;
-	'subject-group-id': number;
-	'subject-group-name': string;
+	'subject-group-id': number | null;
+	'student-class-group-name': string;
+	'curriculum-id': number | null;
+	'curriculum-name': string | null;
 	'school-year-id': number;
-	id: number;
+	'room-id': number;
+	'room-name': string;
 	'create-date': string;
-	'update-date': string | null;
+	'update-date': string;
 	'is-deleted': boolean;
 }
 
@@ -121,3 +126,34 @@ export const ENTITY_TARGET: { [key: string]: string } = {
 	'Năm học': '',
 	'Môn học': '/teacher-management',
 };
+
+export interface IAssignmentResponse {
+	'period-count': number;
+	'student-class-id': number;
+	'assignment-type': string;
+	'subject-id': number;
+	'subject-name': string;
+	'teacher-id': number;
+	'teacher-first-name': string;
+	'teacher-last-name': string;
+	'teacher-abbreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface ITeachingPeriodCountResponse {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abbreviation': string;
+	'total-periods-per-week': number;
+}
+
+export interface IAutoTeacherAssignmentResponse {
+	'assignment-minimal-data': ITeachingAssignmentObject[];
+	assignments: IAssignmentResponse[];
+	'teacher-periods-count': ITeachingPeriodCountResponse[];
+	'term-id': number;
+	'term-name': string;
+}

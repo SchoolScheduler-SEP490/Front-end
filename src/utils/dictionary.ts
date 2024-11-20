@@ -104,6 +104,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 		'Khung chương trình đã được gán, không thể cập nhật khối lớp',
 	'Để tạo Khung chương trình môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.':
 		'Để tạo Khung chương trình môn cần chọn 4 môn tự chọn và 3 môn chuyên đề.',
+	'curriculum has assign, can not update grade.': 'Không thể cập nhật do KCT đã được áp dụng',
 
 	// Subject in group messages
 	'Update subject in group success.': 'Cập nhật Tiết học thành công',

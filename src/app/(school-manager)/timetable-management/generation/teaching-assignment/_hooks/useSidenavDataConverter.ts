@@ -46,7 +46,7 @@ const useSidenavDataConverter = (data: IClassResponse[]): ITeachingAssignmentSid
 			acc[grade].items.push({
 				key: item.name,
 				value: item.id,
-				extra: item['subject-group-name'],
+				extra: item['curriculum-name'] ?? '',
 			});
 			return acc;
 		},

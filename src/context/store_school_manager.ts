@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { schoolManagerSlice } from './school_manager_slice';
+import { schoolManagerSlice } from './slice_school_manager';
+import { timetableGenerationSlice } from './slice_timetable_generation';
 
 export const schoolManagerStore = configureStore({
 	reducer: {
 		schoolManager: schoolManagerSlice.reducer,
+		timetableGeneration: timetableGenerationSlice.reducer,
 	},
 });
 
