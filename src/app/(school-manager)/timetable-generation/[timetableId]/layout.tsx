@@ -47,7 +47,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 	const [value, setValue] = useState<number>(0);
 	const [timetableId, setPathTimetableId] = useState<string>(pathName.split('/')[2]);
-	const { isModifying, fireStoreName }: ITimetableGenerationState = useSelector(
+	const { dataStored, isModifying, fireStoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 

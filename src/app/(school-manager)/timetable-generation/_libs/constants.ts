@@ -39,13 +39,14 @@ export interface IFreePeriodObject {
 export interface IClassCombinationObject {
 	'subject-id': number;
 	'class-ids': number[];
-	'room-id': number;
+	'room-id'?: number;
 	session: EClassSession;
+	'teacher-id': number | null;
 }
 
 export enum EClassSession {
-	'Morning',
-	'Afternoon',
+	Morning = 'Morning',
+	Afternoon = 'Afternoon',
 }
 
 export interface IConfigurationStoreObject {
