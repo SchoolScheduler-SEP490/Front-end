@@ -137,7 +137,7 @@ const ClassCombinationSelector = (props: ClassCombinationSelectorProps) => {
 					sx={{ borderRadius: 0, boxShadow: 'none', paddingY: '3px' }}
 					onClick={handleSavechanges}
 				>
-					Lưu thay đổi
+					Thêm lớp gộp
 				</Button>
 			</div>
 			<div className='w-full h-fit flex flex-row justify-center items-center gap-[3vw]'>

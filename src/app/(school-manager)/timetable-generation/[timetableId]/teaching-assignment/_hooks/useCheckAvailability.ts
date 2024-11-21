@@ -1,6 +1,9 @@
 import { ICommonResponse } from '@/utils/constants';
 import { headers } from 'next/headers';
-import { ITeachingAssignmentAvailabilityResponse } from '../_libs/constants';
+import {
+	IAutoTeacherAssingmentRequest,
+	ITeachingAssignmentAvailabilityResponse,
+} from '../_libs/constants';
 import { getCheckAutoAssignAvailabilityApi } from '../_libs/apis';
 import useSWR from 'swr';
 
@@ -9,6 +12,7 @@ interface IAvailabilityCheckProps {
 	schoolYearId: number;
 	schoolId: number;
 	revalidate: boolean;
+	body: IAutoTeacherAssingmentRequest;
 }
 
 const useCheckAutoAssignAvailability = ({
@@ -16,12 +20,16 @@ const useCheckAutoAssignAvailability = ({
 	schoolYearId,
 	schoolId,
 	revalidate,
+	body,
 }: IAvailabilityCheckProps) => {
 	const fetcher = async (url: string) => {
 		const response = await fetch(url, {
+			method: 'PATCH',
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
+				'Content-Type': 'application/json',
 			},
+			body: JSON.stringify(body),
 		});
 
 		const data = await response.json();

@@ -319,6 +319,7 @@ export default function SMTeachingAssignment() {
 						setAutomationResult={setAutomationResult}
 						setModifyingResultModalOpen={setModifyingResultModalOpen}
 						assignedTeachers={editingObjects}
+						dataStored={dataStored}
 					/>
 					<TeachingAssignmentAdjustModal
 						open={isModifyingResultModalOpen}
