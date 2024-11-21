@@ -254,40 +254,6 @@ export default function TeacherDetails() {
                           </Grid>
 
                           <Divider className="my-4" />
-
-                          <Typography
-                            variant="h6"
-                            className="text-gray-800 font-semibold mb-4"
-                          >
-                            Thông tin giảng dạy
-                          </Typography>
-                          <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                              <Typography
-                                variant="body2"
-                                className="text-gray-500 mb-4"
-                              >
-                                <strong className="text-gray-800">
-                                  Dạy môn:
-                                </strong>{" "}
-                                {teacherData["teachable-subjects"]
-                                  .map((subject) => subject["subject-name"])
-                                  .join(" - ")}
-                              </Typography>
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Typography
-                                variant="body2"
-                                className="text-gray-500 mb-4"
-                              >
-                                <strong className="text-gray-800">
-                                  Tổ bộ môn:
-                                </strong>{" "}
-                                {teacherData["department-name"]}
-                              </Typography>
-                            </Grid>
-                          </Grid>
                         </CardContent>
                       </Card>
                     </Grid>
@@ -296,8 +262,8 @@ export default function TeacherDetails() {
               </div>
             )}
             {activeTab === 1 && (
-              <div>
-                <h2 className="text-title-medium font-semibold mb-4">
+              <div className="p-7">
+                <h2 className="text-title-medium font-semibold mb-4 text-center">
                   Phân công giảng dạy
                 </h2>
                 <TeacherAssignment teacherId={teacherId} />

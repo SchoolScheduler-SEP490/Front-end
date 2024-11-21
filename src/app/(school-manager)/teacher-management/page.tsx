@@ -6,11 +6,12 @@ import TeacherTable from './_components/teacher_table';
 import useTeacherData from './_hooks/useTeacherData';
 import TeacherTableSkeleton from './_components/table_skeleton';
 import { useAppContext } from '@/context/app_provider';
-import { ITeacher, ITeacherTableData } from './_libs/constants';
+import { IDepartment, ITeacher, ITeacherTableData } from './_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import { TEACHER_STATUS } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { useSelector } from 'react-redux';
+import { getDepartmentName } from './_libs/apiTeacher';
 
 export default function SMTeacher() {
 	const [page, setPage] = React.useState<number>(0);
@@ -28,6 +29,7 @@ export default function SMTeacher() {
 
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
 	const [teacherTableData, setTeacherTableData] = React.useState<ITeacherTableData[]>([]);
+	const [departments, setDepartments] = React.useState<IDepartment[]>([]);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -39,26 +41,36 @@ export default function SMTeacher() {
 	}, [selectedSchoolYearId]);
 
 	React.useEffect(() => {
+
+		const loadDepartments = async () => {
+		  const data = await getDepartmentName(schoolId, sessionToken);
+		  if (data.result?.items) {
+			setDepartments(data.result.items);
+		  }
+		};
+		loadDepartments();
+	  }, [schoolId, sessionToken]);
+
+	React.useEffect(() => {
 		mutate();
 		setIsErrorShown(false);
 		if (data?.status === 200) {
 			setTotalRows(data.result['total-item-count']);
-			const teacherData: ITeacherTableData[] = data.result.items.map((item: ITeacher) => ({
-				id: item.id,
-				teacherName: `${item['first-name']} ${item['last-name']}`,
-				nameAbbreviation: item.abbreviation,
-				subjectDepartment: item['department-name'],
-				teachableSubjects:
-					Array.isArray(item['teachable-subjects']) &&
-					item['teachable-subjects'].length > 0
-						? item['teachable-subjects']
-								.map((subject) => subject['subject-name'])
-								.join(', ')
-						: '-',
-				email: item.email,
-				phoneNumber: item.phone || 'N/A',
-				status: item.status,
-			}));
+			const teacherData: ITeacherTableData[] = data.result.items.map((item: ITeacher) => {
+				const department = departments.find(d => d.id === item['department-id']);
+				return {
+				  id: item.id,
+				  teacherName: `${item['first-name']} ${item['last-name']}`,
+				  nameAbbreviation: item.abbreviation,
+				  subjectDepartment: department?.name || 'N/A',
+				  teachableSubjects: Array.isArray(item['teachable-subjects']) 
+					? item['teachable-subjects'].map(subject => subject['subject-name']).join(', ')
+					: '-',
+				  email: item.email,
+				  phoneNumber: item.phone || 'N/A',
+				  status: item.status,
+				};
+			  });
 			setTeacherTableData(teacherData);
 		}
 	}, [data]);

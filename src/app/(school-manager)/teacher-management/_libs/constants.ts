@@ -41,7 +41,6 @@ export interface IUpdateTeacherRequestBody {
   status: string;
   phone: string;
   "is-deleted": boolean;
-  "teachable-subjects": IUpdateTeachableSubject[];
 }
 export interface IUpdateTeachableSubject {
   "subject-abreviation": string;
