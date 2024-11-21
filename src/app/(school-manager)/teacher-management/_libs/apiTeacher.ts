@@ -4,8 +4,8 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
 export const deleteTeacherById = async (
   id: number,
+  schoolId: string,
   sessionToken: string,
-  schoolId: string
 ): Promise<void> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");

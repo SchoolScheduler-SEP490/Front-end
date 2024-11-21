@@ -30,11 +30,7 @@ export const teacherSchema = yup.object().shape({
     .max(10, "Số điện thoại phải có đúng 10 số."),
 
   ["main-subject"]: yup.object().shape({
-    ["subject-abreviation"]: yup.string().required("Vui lòng chọn môn học."),
-    grades: yup
-      .array()
-      .min(1, "Vui lòng chọn ít nhất một khối.")
-      .required("Vui lòng chọn khối."),
+    ["subject-abreviation"]: yup.string().required("Vui lòng chọn môn học.")
   }),
 });
 
