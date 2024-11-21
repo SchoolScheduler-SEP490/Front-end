@@ -83,15 +83,6 @@ const TeachingAssignmentSideNav = (props: TeachingAssignmentSidenavProps) => {
 	return (
 		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
 			<h1 className='text-body-large-strong w-full pl-3 py-3 text-left'>Lớp học</h1>
-			<Button
-				variant='contained'
-				fullWidth
-				// onClick={handleAutoAssignment}
-				color='inherit'
-				sx={{ bgcolor: '#175b8e', color: 'white', borderRadius: 0, boxShadow: 'none' }}
-			>
-				Gộp lớp chung tiết
-			</Button>
 			{classData.length === 0 && (
 				<p className='text-body-medium w-full pl-3 py-3 text-left italic'>
 					Năm học chưa có lớp học

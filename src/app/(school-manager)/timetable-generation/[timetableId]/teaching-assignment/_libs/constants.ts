@@ -1,5 +1,5 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { ITeachingAssignmentObject } from '../../../_libs/constants';
+import { IClassCombinationObject, ITeachingAssignmentObject } from '../../../_libs/constants';
 
 export interface IClassResponse {
 	id: number;
@@ -156,4 +156,14 @@ export interface IAutoTeacherAssignmentResponse {
 	'teacher-periods-count': ITeachingPeriodCountResponse[];
 	'term-id': number;
 	'term-name': string;
+}
+
+export interface IAutoTeacherAssingmentRequest {
+	'fixed-assignment':
+		| {
+				'teacher-id': number;
+				'assignment-id': number;
+		  }[]
+		| null;
+	'class-combinations': IClassCombinationObject[] | null;
 }

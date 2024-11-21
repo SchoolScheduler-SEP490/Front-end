@@ -1,11 +1,11 @@
 'use client';
 
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
 import useFilterArray from '@/hooks/useFilterArray';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import LayersIcon from '@mui/icons-material/Layers';
 import { Autocomplete, TextField, Toolbar, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
@@ -25,9 +25,7 @@ import {
 	ITeacherAssignmentRequest,
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
-import TeachingAssignmentAutoApplyModal from './teaching_assignment_modal_apply';
 import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
-import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -89,16 +87,23 @@ interface ITeachingAssignmentTableProps {
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 	selectedCurriculumName: string;
-	isApplyModalOpen: boolean;
-	setIsApplyModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	editingObjects: ITeacherAssignmentRequest[];
+	setEditingObjects: React.Dispatch<React.SetStateAction<ITeacherAssignmentRequest[]>>;
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
-	const { subjectData, mutate, isFilterable, setIsFilterable, selectedCurriculumName } = props;
+	const {
+		subjectData,
+		mutate,
+		isFilterable,
+		setIsFilterable,
+		selectedCurriculumName,
+		editingObjects,
+		setEditingObjects,
+	} = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
-	const [editingObjects, setEditingObjects] = useState<ITeacherAssignmentRequest[]>([]);
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(
 		subjectData[0]?.subjectKey ?? 0
@@ -274,7 +279,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 											sx={[
 												{ cursor: 'pointer', userSelect: 'none' },
 												editedObject !== undefined && {
-													bgcolor: '#fff0eb',
+													bgcolor: '#e6edf3',
 												},
 											]}
 										>

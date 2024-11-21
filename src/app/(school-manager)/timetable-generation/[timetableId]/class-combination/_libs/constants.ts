@@ -1,3 +1,6 @@
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import { IClassCombinationObject } from '../../../_libs/constants';
+
 export interface IClassResponse {
 	id: number;
 	name: string;
@@ -35,4 +38,52 @@ export interface ISubjectResponse {
 	'school-year-code': string;
 	'total-slot-in-year': number;
 	'slot-specialized': number;
+}
+
+export interface IClassCombinationResponse {
+	id: number;
+	name: string;
+}
+
+export interface IExtendedClassCombination extends IClassCombinationObject {
+	'subject-name': string;
+	'class-names': string[];
+	'room-name'?: string;
+	'teacher-name': IDropdownOption<number>;
+}
+
+export interface ITeachableResponse {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abreviation': string;
+	'subject-id': number;
+	'subject-name': string;
+	'subject-abreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface ITeacherResponse {
+	id: number;
+	'first-name': string;
+	'last-name': string;
+	abbreviation: string;
+	email: string;
+	gender: string;
+	'department-id': number;
+	'department-name': string;
+	'date-of-birth': string;
+	'teacher-role': string;
+	status: number;
+	'is-deleted': boolean;
+	phone: string;
+	'teachable-subjects': ITeachableSubject[];
+}
+
+export interface ITeachableSubject {
+	'subject-id': number;
+	'subject-name': string;
+	abbreviation: string;
 }

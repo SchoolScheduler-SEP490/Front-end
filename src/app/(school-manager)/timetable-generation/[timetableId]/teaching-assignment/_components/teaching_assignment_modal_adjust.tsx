@@ -10,7 +10,7 @@ import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import React, { useEffect, useState } from 'react';
-import { ITeachingAssignmentObject } from '../../../_libs/constants';
+import { IConfigurationStoreObject, ITeachingAssignmentObject } from '../../../_libs/constants';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	IAssignmentResponse,
@@ -19,6 +19,13 @@ import {
 	ITeachingAssignmentSidenavData,
 } from '../_libs/constants';
 import TeachingAssignmentSideNav from './teaching_assignment_sidenav';
+import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
+import { useSelector } from 'react-redux';
+import { doc, setDoc } from 'firebase/firestore';
+import { firestore } from '@/utils/firebaseConfig';
+import { useSMDispatch } from '@/hooks/useStore';
+import useNotify from '@/hooks/useNotify';
+import { KeyedMutator } from 'swr';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -83,18 +90,22 @@ interface IApplyModalProps {
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	automationResult: IAutoTeacherAssignmentResponse[];
 	sidenavData: ITeachingAssignmentSidenavData[];
+	updateTeachingAssignment: KeyedMutator<any>;
 }
 
 const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
-	const { open, setOpen, automationResult, sidenavData } = props;
+	const { open, setOpen, automationResult, sidenavData, updateTeachingAssignment } = props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-	const tableName: string = 'configurations';
+	const { dataStored, fireStoreName }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
+	const dispatch = useSMDispatch();
 
 	const [editingObjects, setEditingObjects] = useState<ITeachingAssignmentObject[]>([]);
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedAssignments, setSelectedAssignments] = useState<ITermSeperatedAssignment[]>([]);
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
-	const [expanded, setExpanded] = useState<string[]>([]);
+	const [expanded, setExpanded] = useState<string[]>(['panel0', 'panel1']);
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(0);
 
@@ -106,6 +117,17 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleSaveUpdates = async () => {
 		// Save data to Firebase
+		if (dataStored && fireStoreName && dataStored.id) {
+			const docRef = doc(firestore, fireStoreName, dataStored.id);
+			await setDoc(docRef, {
+				...dataStored,
+				'teacher-assignments': editingObjects,
+			} as IConfigurationStoreObject);
+			dispatch(updateDataStored({ target: 'teacher-assignments', value: editingObjects }));
+			useNotify({ message: 'Phân công giáo viên thành công', type: 'success' });
+			updateTeachingAssignment();
+			handleClose();
+		}
 	};
 
 	// Data chuẩn để lưu vào Firebase

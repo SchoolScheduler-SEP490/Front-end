@@ -10,7 +10,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { ITeachingAssignmentTableData } from '../_libs/constants';
-import LayersIcon from '@mui/icons-material/Layers';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -89,11 +88,6 @@ const TeachingAssignmentTableSkeleton = () => {
 							<Skeleton animation='wave' variant='text' sx={{ width: '40%' }} />
 						</div>
 						<div className='h-fit w-fit flex flex-row justify-center items-center gap-2'>
-							<Tooltip title='Phân công tự động'>
-								<IconButton>
-									<LayersIcon fontSize='medium' />
-								</IconButton>
-							</Tooltip>
 							<Tooltip title='Lọc danh sách'>
 								<IconButton>
 									<FilterListIcon />

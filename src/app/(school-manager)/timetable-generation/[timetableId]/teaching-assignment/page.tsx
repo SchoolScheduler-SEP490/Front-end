@@ -10,7 +10,7 @@ import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
 import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
 import TeachingAssignmentFilterable from './_components/teaching_assignment_filterable';
 import TeachingAssignmentAdjustModal from './_components/teaching_assignment_modal_adjust';
-import TeachingAssignmentAutoApplyModal from './_components/teaching_assignment_modal_apply';
+import TeachingAssignmentAutoApplyModal from './_components/teaching_assignment_modal_auto';
 import TeachingAssignmentSideNav from './_components/teaching_assignment_sidenav';
 import TeachingAssignmentTable from './_components/teaching_assignment_table';
 import useFetchClassData from './_hooks/useFetchClass';
@@ -20,33 +20,41 @@ import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	IAutoTeacherAssignmentResponse,
 	IClassResponse,
+	ITeacherAssignmentRequest,
+	ITeacherResponse,
 	ITeachingAssignmentResponse,
 	ITeachingAssignmentSidenavData,
 	ITeachingAssignmentTableData,
 	ITermResponse,
 } from './_libs/constants';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSelector } from 'react-redux';
 
 interface ISortableDropdown<T> extends IDropdownOption<T> {
 	criteria: string | number;
 }
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
+	const { dataStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
 
 	// Selected
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
-	const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState<boolean>(false);
-	const [isModifyingResultModalOpen, setModifyingResultModalOpen] = useState<boolean>(false);
 
 	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
 	const [sidenavData, setSidenavData] = useState<ITeachingAssignmentSidenavData[]>([]);
 	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>([]);
 	const [automationResult, setAutomationResult] = useState<IAutoTeacherAssignmentResponse[]>([]);
+	const [editingObjects, setEditingObjects] = useState<ITeacherAssignmentRequest[]>([]);
 
 	//Modal status
 	const [isFilterable, setIsFilterable] = useState<boolean>(true);
+	const [isModifyingResultModalOpen, setModifyingResultModalOpen] = useState<boolean>(false);
+	const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState<boolean>(false);
 
 	// Fetch data
 	const {
@@ -156,18 +164,42 @@ export default function SMTeachingAssignment() {
 	// Process data after fetching teaching assignment data
 	useEffect(() => {
 		updateTeachingAssignment();
+		updateTeacher();
 		setTableData([]);
 		if (teachingAssignmentData?.status === 200 && teacherData?.status === 200) {
 			const assignedList: ITeachingAssignmentTableData[] = teachingAssignmentData.result[
 				'teacher-assignt-view'
 			].map((item: ITeachingAssignmentResponse) => {
+				const existingAssignment =
+					editingObjects.find((assignment) => assignment.id === item.id) ??
+					dataStored['teacher-assignments'].find(
+						(assignment) => assignment.id === item.id
+					);
+				if (existingAssignment !== undefined) {
+					const existingTeacher: ITeacherResponse = teacherData.result.items.find(
+						(teacher: ITeacherResponse) =>
+							teacher.id === existingAssignment['teacher-id']
+					);
+					return {
+						id: item.id,
+						subjectName: item['subject-name'],
+						teacherName: existingAssignment
+							? {
+									label: `${existingTeacher['first-name']} ${existingTeacher['last-name']} (${existingTeacher.abbreviation})`,
+									value: existingAssignment['teacher-id'],
+							  }
+							: {
+									label: '- - -',
+									value: 0,
+							  },
+						totalSlotPerWeek: item['period-count'],
+						subjectKey: item['subject-id'],
+					} as ITeachingAssignmentTableData;
+				}
 				return {
 					id: item.id,
 					subjectName: item['subject-name'],
-					teacherName: {
-						label: `${item['teacher-first-name']} ${item['teacher-last-name']} (${item['teacher-abbreviation']})`,
-						value: item['teacher-id'],
-					},
+					teacherName: { label: '- - -', value: 0 },
 					totalSlotPerWeek: item['period-count'],
 					subjectKey: item['subject-id'],
 				} as ITeachingAssignmentTableData;
@@ -175,6 +207,32 @@ export default function SMTeachingAssignment() {
 			const notAssignedList: ITeachingAssignmentTableData[] = teachingAssignmentData.result[
 				'teacher-not-assignt-view'
 			].map((item: ITeachingAssignmentResponse) => {
+				const existingAssignment =
+					editingObjects.find((assignment) => assignment.id === item.id) ??
+					dataStored['teacher-assignments'].find(
+						(assignment) => assignment.id === item.id
+					);
+				if (existingAssignment !== undefined) {
+					const existingTeacher: ITeacherResponse = teacherData.result.items.find(
+						(teacher: ITeacherResponse) =>
+							teacher.id === existingAssignment['teacher-id']
+					);
+					return {
+						id: item.id,
+						subjectName: item['subject-name'],
+						teacherName: existingAssignment
+							? {
+									label: `${existingTeacher['first-name']} ${existingTeacher['last-name']} (${existingTeacher.abbreviation})`,
+									value: existingAssignment['teacher-id'],
+							  }
+							: {
+									label: '- - -',
+									value: 0,
+							  },
+						totalSlotPerWeek: item['period-count'],
+						subjectKey: item['subject-id'],
+					} as ITeachingAssignmentTableData;
+				}
 				return {
 					id: item.id,
 					subjectName: item['subject-name'],
@@ -189,7 +247,7 @@ export default function SMTeachingAssignment() {
 			).reverse();
 			setTableData(tableData);
 		}
-	}, [teachingAssignmentData, teacherData, selectedSchoolYearId]);
+	}, [teachingAssignmentData, teacherData, selectedSchoolYearId, selectedClassId]);
 
 	// Render skeleton if data while fetching data
 	if (isClassValidating || isTeachingAssignmentValidating || isTeacherValidating) {
@@ -243,8 +301,8 @@ export default function SMTeachingAssignment() {
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
 						selectedCurriculumName={selectedCurriculumName}
-						isApplyModalOpen={isAutoApplyModalOpen}
-						setIsApplyModalOpen={setIsAutoApplyModalOpen}
+						editingObjects={editingObjects}
+						setEditingObjects={setEditingObjects}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}
@@ -260,12 +318,14 @@ export default function SMTeachingAssignment() {
 						setOpen={setIsAutoApplyModalOpen}
 						setAutomationResult={setAutomationResult}
 						setModifyingResultModalOpen={setModifyingResultModalOpen}
+						assignedTeachers={editingObjects}
 					/>
 					<TeachingAssignmentAdjustModal
 						open={isModifyingResultModalOpen}
 						setOpen={setModifyingResultModalOpen}
 						automationResult={automationResult}
 						sidenavData={sidenavData}
+						updateTeachingAssignment={updateTeachingAssignment}
 					/>
 				</div>
 			</div>

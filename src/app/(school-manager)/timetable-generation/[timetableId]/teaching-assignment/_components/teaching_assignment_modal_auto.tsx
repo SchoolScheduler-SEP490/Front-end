@@ -1,18 +1,32 @@
+'use client';
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Divider, IconButton, Modal, styled, Typography } from '@mui/material';
+import {
+	Box,
+	CircularProgress,
+	circularProgressClasses,
+	Divider,
+	IconButton,
+	Modal,
+	styled,
+	Typography,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import useCheckAutoAssignAvailability from '../_hooks/useCheckAvailability';
 import { getAutoAssignmentApi } from '../_libs/apis';
 import {
 	ENTITY_TARGET,
 	IAutoTeacherAssignmentResponse,
+	IAutoTeacherAssingmentRequest,
 	ITeachingAssignmentAvailabilityResponse as ITAAvailabilityResponse,
+	ITeacherAssignmentRequest,
 } from '../_libs/constants';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSelector } from 'react-redux';
 
 const style = {
 	position: 'absolute',
@@ -34,12 +48,19 @@ interface IApplyModalProps {
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setAutomationResult: React.Dispatch<React.SetStateAction<IAutoTeacherAssignmentResponse[]>>;
 	setModifyingResultModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	assignedTeachers: ITeacherAssignmentRequest[];
 }
 
 const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
-	const { open, setOpen, setAutomationResult, setModifyingResultModalOpen } = props;
+	const { open, setOpen, setAutomationResult, setModifyingResultModalOpen, assignedTeachers } =
+		props;
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 	const [errorObject, setErrorObject] = useState<ITAAvailabilityResponse | undefined>(undefined);
+	const { dataStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
+	const [autoParams, setAutoParams] = useState<IAutoTeacherAssingmentRequest>();
+	const [isValidating, setIsValidating] = useState<boolean>(false);
 
 	// Object for saving errors that've been passed
 	const [recoveredObjects, setRecoveredObjects] = useState<ITAAvailabilityResponse>(
@@ -55,6 +76,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 	});
 
 	const handleAutoAssignment = async () => {
+		setIsValidating(true);
 		const endpoint = getAutoAssignmentApi({
 			schoolId: Number(schoolId),
 			schoolYearId: selectedSchoolYearId,
@@ -63,7 +85,9 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			method: 'PATCH',
 			headers: {
 				Authorization: `Bearer ${sessionToken}`,
+				'Content-Type': 'application/json',
 			},
+			body: JSON.stringify(autoParams),
 		});
 		const data = await response?.json();
 		if (data?.status === 200) {
@@ -80,8 +104,32 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 		}
 		if (data?.status === 400) {
 			setErrorObject({ ...data.result } as ITAAvailabilityResponse);
+			useNotify({
+				message: 'Phân công tự động thất bại',
+				type: 'error',
+			});
 		}
+		setIsValidating(false);
 	};
+
+	useEffect(() => {
+		if (dataStored) {
+			const tmpAutoParams: IAutoTeacherAssingmentRequest = {
+				'fixed-assignment':
+					assignedTeachers.length > 0
+						? assignedTeachers.map((teacher) => ({
+								'assignment-id': teacher.id,
+								'teacher-id': teacher['teacher-id'],
+						  }))
+						: null,
+				'class-combinations':
+					dataStored['class-combinations'].length > 0
+						? dataStored['class-combinations']
+						: null,
+			};
+			setAutoParams(tmpAutoParams);
+		}
+	}, [assignedTeachers, dataStored]);
 
 	useEffect(() => {
 		if (open) {
@@ -167,78 +215,119 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						<CloseIcon />
 					</IconButton>
 				</div>
-				<div className='w-full h-fit max-h-[50vh] p-3 overflow-y-scroll no-scrollbar'>
-					{isAutomationAvaialable && (
-						<h2 className='text-body-large-strong font-normal w-full text-left py-5'>
-							Phân công tự động cho toàn bộ giáo viên?
-						</h2>
-					)}
-					{errorObject &&
-						Object.entries(errorObject).map(([entity, errors], index) => (
-							<div key={entity + index}>
-								{errors.length > 0 && (
-									<div>
-										<div className='w-full flex flex-row justify-between items-baseline'>
-											<h3 className='text-body-large-strong font-medium'>
-												{entity}
-											</h3>
-											<a
-												href={ENTITY_TARGET[entity]}
-												target='_blank'
-												rel='noopener noreferrer'
-												className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
-											>
-												Sửa lỗi {entity}
-												<ArrowOutwardIcon
-													color='inherit'
-													sx={{ fontSize: 18, opacity: 0.8 }}
-												/>
-											</a>
+				{isValidating ? (
+					<div className='w-full h-fit max-h-[50vh] p-3 flex justify-center items-center overflow-y-scroll no-scrollbar'>
+						<Box sx={{ position: 'relative' }}>
+							<CircularProgress
+								variant='determinate'
+								sx={(theme) => ({
+									color: theme.palette.grey[200],
+									...theme.applyStyles('dark', {
+										color: theme.palette.grey[800],
+									}),
+								})}
+								size={40}
+								thickness={4}
+								{...props}
+								value={100}
+							/>
+							<CircularProgress
+								variant='indeterminate'
+								disableShrink
+								sx={(theme) => ({
+									color: '#004e89',
+									animationDuration: '550ms',
+									position: 'absolute',
+									left: 0,
+									[`& .${circularProgressClasses.circle}`]: {
+										strokeLinecap: 'round',
+									},
+									...theme.applyStyles('dark', {
+										color: '#308fe8',
+									}),
+								})}
+								size={40}
+								thickness={4}
+								{...props}
+							/>
+						</Box>
+					</div>
+				) : (
+					<div className='w-full h-fit max-h-[50vh] p-3 overflow-y-scroll no-scrollbar'>
+						{isAutomationAvaialable && (
+							<h2 className='text-body-large-strong font-normal w-full text-left py-5'>
+								Phân công tự động cho toàn bộ giáo viên?
+							</h2>
+						)}
+						{errorObject &&
+							Object.entries(errorObject).map(([entity, errors], index) => (
+								<div key={entity + index}>
+									{errors.length > 0 && (
+										<div>
+											<div className='w-full flex flex-row justify-between items-baseline'>
+												<h3 className='text-body-large-strong font-medium'>
+													{entity}
+												</h3>
+												<a
+													href={ENTITY_TARGET[entity]}
+													target='_blank'
+													rel='noopener noreferrer'
+													className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
+												>
+													Sửa lỗi {entity}
+													<ArrowOutwardIcon
+														color='inherit'
+														sx={{ fontSize: 18, opacity: 0.8 }}
+													/>
+												</a>
+											</div>
+											<ul className='list-disc pl-5 pb-3'>
+												{errors.map((error: string, index: number) => (
+													<>
+														{recoveredObjects &&
+														recoveredObjects[
+															entity as keyof ITAAvailabilityResponse
+														]?.includes(error) ? (
+															// Success case
+															<li
+																key={error + index}
+																className='text-body-small font-regular py-1 text-basic-positive'
+															>
+																<div className='w-[90%] flex flex-row justify-between items-stretch'>
+																	<h1 className='w-[80%]'>
+																		{error}
+																	</h1>
+																	<CheckIcon
+																		color='success'
+																		fontSize='small'
+																	/>
+																</div>
+															</li>
+														) : (
+															// Error case
+															<li
+																key={index}
+																className='text-body-small font-regular py-1 text-basic-negative'
+															>
+																<div className='w-[90%] flex flex-row justify-between items-stretch'>
+																	<h1>{error}</h1>
+																	<CloseIcon
+																		color='error'
+																		fontSize='small'
+																	/>
+																</div>
+															</li>
+														)}
+													</>
+												))}
+											</ul>
+											<Divider variant='middle' />
 										</div>
-										<ul className='list-disc pl-5 pb-3'>
-											{errors.map((error: string, index: number) => (
-												<>
-													{recoveredObjects &&
-													recoveredObjects[
-														entity as keyof ITAAvailabilityResponse
-													]?.includes(error) ? (
-														// Success case
-														<li
-															key={error + index}
-															className='text-body-small font-regular py-1 text-basic-positive'
-														>
-															<div className='w-[90%] flex flex-row justify-between items-stretch'>
-																<h1 className='w-[80%]'>{error}</h1>
-																<CheckIcon
-																	color='success'
-																	fontSize='small'
-																/>
-															</div>
-														</li>
-													) : (
-														// Error case
-														<li
-															key={index}
-															className='text-body-small font-regular py-1 text-basic-negative'
-														>
-															<div className='w-[90%] flex flex-row justify-between items-stretch'>
-																<h1>{error}</h1>
-																<CloseIcon
-																	color='error'
-																	fontSize='small'
-																/>
-															</div>
-														</li>
-													)}
-												</>
-											))}
-										</ul>
-										<Divider variant='middle' />
-									</div>
-								)}
-							</div>
-						))}
-				</div>
+									)}
+								</div>
+							))}
+					</div>
+				)}
 				<div
 					id='modal-footer'
 					className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'
@@ -247,6 +336,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						title='Huỷ'
 						onClick={handleClose}
 						disableRipple
+						disabled={!isValidating}
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton

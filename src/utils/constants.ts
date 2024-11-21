@@ -99,6 +99,11 @@ export const CLASSGROUP_TRANSLATOR: { [key: string]: number } = {
 	GRADE_11: 11,
 	GRADE_12: 12,
 };
+export const CLASSGROUP_TRANSLATOR_REVERSED: { [key: number]: string } = {
+	10: 'GRADE_10',
+	11: 'GRADE_11',
+	12: 'GRADE_12',
+};
 
 export enum ERoomType {
 	PRACTICE_ROOM = 'PRACTICE_ROOM',
