@@ -3,7 +3,7 @@ export interface IClassGroupTableData {
   groupName: string;
   studentClassGroupCode: string;
   grade: number;
-  curriculum: number;
+  curriculum: string | number;
   createDate: string;
   classes: IClass[];
 }

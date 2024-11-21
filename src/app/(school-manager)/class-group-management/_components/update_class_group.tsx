@@ -193,13 +193,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
                       formik.touched["group-name"] &&
                       formik.errors["group-name"]
                     }
-                    disabled={hasClasses}
                   />
-                  {hasClasses && (
-                    <FormHelperText sx={{ margin: 0 }} error>
-                      Không thể thay đổi tên tổ hợp khi đã có lớp học.
-                    </FormHelperText>
-                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -233,13 +227,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
                       formik.touched["group-description"] &&
                       formik.errors["group-description"]
                     }
-                    disabled={hasClasses}
                   />
-                  {hasClasses && (
-                    <FormHelperText sx={{ margin: 0 }} error>
-                      Không thể thay đổi mô tả khi đã có lớp học.
-                    </FormHelperText>
-                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -342,7 +330,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
           <ContainedButton
             title="Cập nhật"
             type="submit"
-            disabled={ hasClasses || !formik.isValid || isUpdating}
+            disabled={ !formik.isValid || isUpdating}
             styles="bg-primary-300 text-white !py-1 px-4"
           />
           <ContainedButton

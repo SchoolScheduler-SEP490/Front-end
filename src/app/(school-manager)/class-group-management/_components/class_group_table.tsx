@@ -15,6 +15,7 @@ import {
   TableSortLabel,
   Toolbar,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import { visuallyHidden } from "@mui/utils";
@@ -66,7 +67,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "groupName" as keyof IClassGroupTableData,
-    label: "Tên tổ hợp",
+    label: "Tên nhóm lớp",
     centered: false,
   },
   {
@@ -161,6 +162,9 @@ interface IClassGroupTableProps {
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
   totalRows?: number;
   mutate: KeyedMutator<any>;
+  isFilterable: boolean;
+  setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedGrade: number | null; 
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -179,6 +183,9 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     setRowsPerPage,
     totalRows,
     mutate,
+    isFilterable,
+		setIsFilterable,
+    selectedGrade, 
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
@@ -205,6 +212,11 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedRow(row);
+  };
+
+  const handleFilterable = () => {
+    setIsFilterable(!isFilterable);
+    mutate();
   };
 
   const handleRequestSort = (
@@ -280,7 +292,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
   };
 
   return (
-    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
+    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <Toolbar
@@ -301,7 +313,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Lọc danh sách">
-              <IconButton>
+              <IconButton onClick={handleFilterable} >
                 <FilterListIcon />
               </IconButton>
             </Tooltip>
@@ -324,7 +336,9 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                   <TableRow>
                     <TableCell colSpan={8} align="center">
                       <h1 className="text-body-large-strong italic text-basic-gray">
-                        Nhóm lớp chưa có dữ liệu
+                      {selectedGrade !== null 
+                      ? `Nhóm lớp chưa có dữ liệu khối ${selectedGrade}`
+                      : "Nhóm lớp chưa có dữ liệu"}
                       </h1>
                     </TableCell>
                   </TableRow>
