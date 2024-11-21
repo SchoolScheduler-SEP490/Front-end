@@ -24,7 +24,10 @@ import { useAppContext } from "@/context/app_provider";
 import { IAddTeacherData, IDepartment, ISubject } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
 import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  APPROPRIATE_LEVEL,
   CLASSGROUP_STRING_TYPE,
   CLASSGROUP_TRANSLATOR,
   TEACHER_GENDER,
@@ -59,6 +62,8 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
+  const [expandedGrade, setExpandedGrade] = React.useState<string | null>(null);
+  const [gradeFields, setGradeFields] = React.useState([{ id: 0 }]);
 
   React.useEffect(() => {
     const loadDepartments = async () => {
@@ -100,21 +105,21 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
   };
 
   // Update the formik initialValues
-  const formik = useFormik({
+  const formik = useFormik<IAddTeacherData>({
     initialValues: {
       "first-name": "",
       "last-name": "",
       abbreviation: "",
       email: "",
-      gender: "Male",
+      gender: "",
       "department-code": "",
       "date-of-birth": "",
-      "teacher-role": "TEACHER",
-      status: "Active",
+      "teacher-role": "",
+      status: "",
       phone: "",
       "main-subject": {
         "subject-abreviation": "",
-        grades: [],
+        "list-approriate-level-by-grades": [],
         "is-main": true,
       },
     },
@@ -125,7 +130,8 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
         "main-subject": {
           "subject-abreviation":
             formData["main-subject"]["subject-abreviation"],
-          grades: formData["main-subject"].grades,
+          "list-approriate-level-by-grades":
+            formData["main-subject"]["list-approriate-level-by-grades"],
           "is-main": true,
         },
       });
@@ -444,48 +450,137 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                 <Grid
                   item
                   xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Khối
+                    Khối và trình độ
                   </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["main-subject"]?.grades &&
-                      Boolean(formik.errors["main-subject"]?.grades)
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      setGradeFields([
+                        ...gradeFields,
+                        { id: gradeFields.length },
+                      ])
                     }
                   >
-                    <Select
-                      variant="standard"
-                      name="main-subject.grades"
-                      multiple
-                      value={formik.values["main-subject"].grades}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        formik.setFieldValue(
-                          "main-subject.grades",
-                          typeof value === "string" ? value.split(",") : value
-                        );
-                      }}
-                      onBlur={formik.handleBlur}
-                      MenuProps={MenuProps}
-                    >
-                      {CLASSGROUP_STRING_TYPE.map((grade) => (
-                        <MenuItem key={grade.key} value={grade.value}>
-                          {grade.key}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["main-subject"]?.grades &&
-                      formik.errors["main-subject"]?.grades && (
-                        <FormHelperText sx={{ margin: 0 }}>
-                          {formik.errors["main-subject"].grades}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Grid>
+                <Grid item xs={9}> 
+                {gradeFields.map((field, index) => (
+                  
+                  <div key={field.id} className="mb-4 flex gap-4 items-center">
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <Select
+                          variant="standard"
+                          value={
+                            formik.values["main-subject"][
+                              "list-approriate-level-by-grades"
+                            ][index]?.grade || ""
+                          }
+                          onChange={(event) => {
+                            const selectedGrade = event.target.value;
+                            const currentGrades = [
+                              ...formik.values["main-subject"][
+                                "list-approriate-level-by-grades"
+                              ],
+                            ];
+
+                            if (currentGrades[index]) {
+                              currentGrades[index] = {
+                                ...currentGrades[index],
+                                grade: selectedGrade,
+                              };
+                            } else {
+                              currentGrades[index] = {
+                                grade: selectedGrade,
+                                "appropriate-level": "",
+                              };
+                            }
+
+                            formik.setFieldValue(
+                              "main-subject.list-approriate-level-by-grades",
+                              currentGrades
+                            );
+                          }}
+                        >
+                          {CLASSGROUP_STRING_TYPE.map((grade) => (
+                            <MenuItem
+                              key={grade.key}
+                              value={`GRADE_${grade.value}`}
+                            >
+                              {grade.key}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <FormControl fullWidth>
+                        <Select
+                          variant="standard"
+                          value={
+                            formik.values["main-subject"][
+                              "list-approriate-level-by-grades"
+                            ][index]?.["appropriate-level"] || ""
+                          }
+                          onChange={(event) => {
+                            const selectedLevel = event.target.value;
+                            const currentGrades = [
+                              ...formik.values["main-subject"][
+                                "list-approriate-level-by-grades"
+                              ],
+                            ];
+
+                            if (currentGrades[index]) {
+                              currentGrades[index] = {
+                                ...currentGrades[index],
+                                "appropriate-level": selectedLevel,
+                              };
+                            }
+
+                            formik.setFieldValue(
+                              "main-subject.list-approriate-level-by-grades",
+                              currentGrades
+                            );
+                          }}
+                        >
+                          {APPROPRIATE_LEVEL.map((level) => (
+                            <MenuItem key={level.value} value={level.value}>
+                              {level.key}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    {index > 0 && (
+                      <IconButton
+                        onClick={() => {
+                          const newFields = gradeFields.filter(
+                            (_, i) => i !== index
+                          );
+                          setGradeFields(newFields);
+                          const currentGrades = [
+                            ...formik.values["main-subject"][
+                              "list-approriate-level-by-grades"
+                            ],
+                          ];
+                          currentGrades.splice(index, 1);
+                          formik.setFieldValue(
+                            "main-subject.list-approriate-level-by-grades",
+                            currentGrades
+                          );
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </div>
+                ))}
                 </Grid>
               </Grid>
             </Grid>

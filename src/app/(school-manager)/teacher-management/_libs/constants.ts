@@ -41,7 +41,6 @@ export interface IUpdateTeacherRequestBody {
   status: string;
   phone: string;
   "is-deleted": boolean;
-  "teachable-subjects": IUpdateTeachableSubject[];
 }
 export interface IUpdateTeachableSubject {
   "subject-abreviation": string;
@@ -65,10 +64,14 @@ export interface IAddTeacherData {
 
 export interface IMainSubject {
   "subject-abreviation": string;
-  grades: string[];
+  "list-approriate-level-by-grades": IAppropriateLevel[];
   "is-main": boolean;
 }
 
+export interface IAppropriateLevel {
+  "appropriate-level": string;
+  grade: string;
+}
 export interface IDepartment {
   id: number;
   name: string;

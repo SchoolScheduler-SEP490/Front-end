@@ -4,8 +4,8 @@ const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
   
 export const deleteTeacherById = async (
   id: number,
+  schoolId: string,
   sessionToken: string,
-  schoolId: string
 ): Promise<void> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
@@ -56,11 +56,10 @@ export const deleteTeacherById = async (
   };  
 
   export const updateTeacher = async (
-    api: string,
     id: number,
-    sessionToken: string,
     schoolId: string,
     teacherData: IUpdateTeacherRequestBody,
+    sessionToken: string,
   ): Promise<boolean> => {
     if (!sessionToken) {
       console.error('Session token is not found. Please log in.');
@@ -73,7 +72,7 @@ export const deleteTeacherById = async (
   
     try {
       const response = await fetch(url, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${sessionToken}`,

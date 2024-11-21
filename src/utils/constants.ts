@@ -183,3 +183,12 @@ export interface QueryCondition {
 	operator: WhereFilterOp;
 	value: any;
 }
+
+export const APPROPRIATE_LEVEL: { key: string, value: number }[] = [
+	{ key: 'Không đạt', value: 1 },
+	{ key: 'Cơ bản', value: 2 },
+	{ key: 'Đạt', value: 3 },
+	{ key: 'Nâng cao', value: 4 },
+	{ key: 'Thành thạo', value: 5 },
+
+]
