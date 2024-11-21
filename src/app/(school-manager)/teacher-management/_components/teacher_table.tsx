@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import { ITeacherTableData } from "../_libs/constants";
+import { IDepartment, ITeacherTableData } from "../_libs/constants";
 import DeleteConfirmationModal from "./delete_teacher";
 import Image from "next/image";
 import AddIcon from "@mui/icons-material/Add";
