@@ -65,10 +65,14 @@ export interface IAddTeacherData {
 
 export interface IMainSubject {
   "subject-abreviation": string;
-  grades: string[];
+  "list-approriate-level-by-grades": IAppropriateLevel[];
   "is-main": boolean;
 }
 
+export interface IAppropriateLevel {
+  "appropriate-level": string;
+  grade: string;
+}
 export interface IDepartment {
   id: number;
   name: string;

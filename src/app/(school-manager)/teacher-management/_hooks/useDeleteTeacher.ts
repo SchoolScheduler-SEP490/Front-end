@@ -1,31 +1,29 @@
-import useNotify from '@/hooks/useNotify';
-import { deleteTeacherById } from '../_libs/apiTeacher';
+import useNotify from "@/hooks/useNotify";
+import { deleteTeacherById } from "../_libs/apiTeacher";
+import { useAppContext } from "@/context/app_provider";
 
-interface IDeleteTeacherProps {
-  teacherId: number;
-  sessionToken: string;
-  schoolId: string;
-}
+const useDeleteTeacher = () => {
+  const { sessionToken, schoolId } = useAppContext();
 
-const useDeleteTeacher = async ({ teacherId, sessionToken, schoolId }: IDeleteTeacherProps) => {
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
+  const deleteTeacher = async (teacherId: number) => {
+    try {
+      await deleteTeacherById(teacherId, schoolId, sessionToken);
+      useNotify({
+        message: "Xóa giáo viên thành công!",
+        type: "success",
+      });
+      return true;
+    } catch (error) {
+      console.error(`Failed to delete teacher with ID: ${teacherId}`, error);
+      useNotify({
+        message: "Xóa giáo viên thất bại. Vui lòng thử lại!",
+        type: "error",
+      });
+      return false;
+    }
+  };
 
-  try {
-    await deleteTeacherById(teacherId, schoolId, sessionToken);
-    console.log(`Successfully deleted teacher with ID: ${teacherId}`);
-    useNotify({
-      message: 'Xóa giáo viên thành công',
-      type: 'success',
-    });
-    return true;
-  } catch (err) {
-    console.error(`Failed to delete teacher with ID: ${teacherId}`, err);
-    useNotify({
-      message: 'Xóa giáo viên thất bại. Vui lòng thử lại.',
-      type: 'error',
-    });
-    return false;
-  }
+  return { deleteTeacher };
 };
 
 export default useDeleteTeacher;
