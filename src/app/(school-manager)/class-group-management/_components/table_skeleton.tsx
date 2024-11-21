@@ -34,7 +34,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "groupName" as keyof IClassGroupTableData,
-    label: "Tên tổ hợp",
+    label: "Tên nhóm lớp",
     centered: false,
   },
   {

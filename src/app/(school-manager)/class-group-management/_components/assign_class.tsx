@@ -104,6 +104,14 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
                       onChange={(e) => formik.setFieldValue("class-ids", e.target.value)}
                       onBlur={formik.handleBlur("class-ids")}
                       variant="standard"
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 150,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
                     >
                       {availableClasses.map((classItem) => (
                         <MenuItem key={classItem.id} value={classItem.id}>
