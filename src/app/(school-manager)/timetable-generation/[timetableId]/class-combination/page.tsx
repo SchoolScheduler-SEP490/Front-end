@@ -198,8 +198,8 @@ const ClassCombination = (props: ClassCombinationProps) => {
 				} as IExtendedClassCombination;
 			});
 			setResults(tmpExtendedResults);
-			setIsResultLoading(false);
 		}
+		setIsResultLoading(false);
 	}, [dataStored, classData, teacherData]);
 
 	// Lưu thay đổi lên Firebase

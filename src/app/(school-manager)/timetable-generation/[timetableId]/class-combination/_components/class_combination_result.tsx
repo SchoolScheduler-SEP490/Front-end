@@ -120,6 +120,19 @@ const ClassCombinationResult = (props: ClassCombinationResultProps) => {
 								</TableCell>
 							</TableRow>
 						)}
+						{classCombinations.length === 0 && !isLoading && (
+							<TableRow
+								style={{
+									userSelect: 'none',
+								}}
+							>
+								<TableCell colSpan={6}>
+									<h2 className='italic text-body-small opacity-60 w-full text-center py-2'>
+										Chưa có lớp gộp nào được tạo
+									</h2>
+								</TableCell>
+							</TableRow>
+						)}
 						{classCombinations.map((row: IExtendedClassCombination, index: number) => (
 							<TableRow key={index}>
 								<TableCell width={50} sx={{ textAlign: 'center' }}>

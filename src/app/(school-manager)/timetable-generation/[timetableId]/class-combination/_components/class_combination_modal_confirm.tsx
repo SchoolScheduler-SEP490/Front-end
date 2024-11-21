@@ -1,11 +1,6 @@
 import ContainedButton from '@/commons/button-contained';
-import { useAppContext } from '@/context/app_provider';
-import useNotify from '@/hooks/useNotify';
-import { ICommonResponse } from '@/utils/constants';
-import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
-import { KeyedMutator } from 'swr';
 
 const style = {
 	position: 'absolute',
@@ -63,7 +58,7 @@ const ClassCombinationConfirmModal = (props: ISubjectDeleteModalProps) => {
 				</div>
 				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 					<ContainedButton
-						title='Xóa Tổ bộ môn'
+						title='Xóa lớp gộp'
 						disableRipple
 						onClick={handleConfirmDelete}
 						styles='bg-red-200 text-basic-negative text-normal !py-1 px-4'

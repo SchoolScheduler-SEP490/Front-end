@@ -118,12 +118,12 @@ export default function Home() {
 				);
 				if (!studyOptions.some((item) => item.value === editingObject['term-id'])) {
 					handleUpdateTimetable('term-id', studyOptions[0].value);
+				} else {
+					useNotify({
+						type: 'error',
+						message: 'Không có học kỳ cho năm học này',
+					});
 				}
-			} else {
-				useNotify({
-					type: 'error',
-					message: 'Không có học kỳ cho năm học này',
-				});
 			}
 		}
 	}, [editingObject['year-id']]);
