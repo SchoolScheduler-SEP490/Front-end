@@ -14,18 +14,12 @@ interface INotifyProps {
 	autoClose?: number;
 }
 
-const useNotify = ({
-	message,
-	type,
-	autoClose,
-	position,
-	variant,
-}: INotifyProps): void => {
+const useNotify = ({ message, type, autoClose, position, variant }: INotifyProps): void => {
 	switch (type) {
 		case 'success':
 			toast.success(message, {
 				position: position || 'top-right',
-				autoClose: autoClose || 5000,
+				autoClose: autoClose || 3000,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
@@ -38,20 +32,21 @@ const useNotify = ({
 		case 'error':
 			toast.error(message, {
 				position: position || 'top-right',
-				autoClose: autoClose || 5000,
+				autoClose: autoClose || 3000,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
 				draggable: true,
 				progress: undefined,
 				theme: variant || 'light',
+
 				transition: Bounce,
 			});
 			break;
 		case 'info':
 			toast.info(message, {
 				position: position || 'top-right',
-				autoClose: autoClose || 5000,
+				autoClose: autoClose || 3000,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
@@ -64,7 +59,7 @@ const useNotify = ({
 		case 'warning':
 			toast.warning(message, {
 				position: position || 'top-right',
-				autoClose: autoClose || 5000,
+				autoClose: autoClose || 3000,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,
@@ -77,7 +72,7 @@ const useNotify = ({
 		case 'default':
 			toast(message, {
 				position: position || 'top-right',
-				autoClose: autoClose || 5000,
+				autoClose: autoClose || 3000,
 				hideProgressBar: false,
 				closeOnClick: true,
 				pauseOnHover: true,

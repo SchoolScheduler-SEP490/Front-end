@@ -70,6 +70,8 @@ export interface ITimetableStoreObject {
 	'year-id': number;
 	'term-id': number;
 	'config-id': string;
+	'applied-week': number | null;
+	'ended-week': number | null;
 	status: ETimetableStatus;
 }
 

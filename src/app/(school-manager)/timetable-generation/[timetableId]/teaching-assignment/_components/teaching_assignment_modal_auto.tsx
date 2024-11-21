@@ -12,10 +12,10 @@ import {
 	Divider,
 	IconButton,
 	Modal,
-	styled,
 	Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { IConfigurationStoreObject } from '../../../_libs/constants';
 import useCheckAutoAssignAvailability from '../_hooks/useCheckAvailability';
 import { getAutoAssignmentApi } from '../_libs/apis';
 import {
@@ -25,8 +25,6 @@ import {
 	ITeachingAssignmentAvailabilityResponse as ITAAvailabilityResponse,
 	ITeacherAssignmentRequest,
 } from '../_libs/constants';
-import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
-import { useSelector } from 'react-redux';
 
 const style = {
 	position: 'absolute',
@@ -49,17 +47,25 @@ interface IApplyModalProps {
 	setAutomationResult: React.Dispatch<React.SetStateAction<IAutoTeacherAssignmentResponse[]>>;
 	setModifyingResultModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	assignedTeachers: ITeacherAssignmentRequest[];
+	dataStored: IConfigurationStoreObject;
 }
 
 const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
-	const { open, setOpen, setAutomationResult, setModifyingResultModalOpen, assignedTeachers } =
-		props;
+	const {
+		open,
+		setOpen,
+		setAutomationResult,
+		setModifyingResultModalOpen,
+		assignedTeachers,
+		dataStored,
+	} = props;
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 	const [errorObject, setErrorObject] = useState<ITAAvailabilityResponse | undefined>(undefined);
-	const { dataStored }: ITimetableGenerationState = useSelector(
-		(state: any) => state.timetableGeneration
-	);
-	const [autoParams, setAutoParams] = useState<IAutoTeacherAssingmentRequest>();
+
+	const [autoParams, setAutoParams] = useState<IAutoTeacherAssingmentRequest>({
+		'fixed-assignment': null,
+		'class-combinations': null,
+	});
 	const [isValidating, setIsValidating] = useState<boolean>(false);
 
 	// Object for saving errors that've been passed
@@ -73,6 +79,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
 		revalidate: !isAutomationAvaialable && open,
+		body: autoParams,
 	});
 
 	const handleAutoAssignment = async () => {
@@ -336,7 +343,6 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						title='Huỷ'
 						onClick={handleClose}
 						disableRipple
-						disabled={!isValidating}
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton

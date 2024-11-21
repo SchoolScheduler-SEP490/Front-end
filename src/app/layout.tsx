@@ -41,20 +41,20 @@ export default function RootLayout({
 			<body
 				className={`${inter.className} antialiased w-screen h-screen overflow-x-hidden scroll-smooth`}
 			>
-				<NotificationProvider 
-                    sessionToken={sessionToken?.value ?? ''} 
-                    accountId={Number(userData.accountId) ?? 0}
-                >
-				<AppProvider
-					inititalSessionToken={sessionToken?.value ?? ''}
-					inititalRefreshToken={refreshToken?.value ?? ''}
-					initUserRole={userRole?.value ?? ''}
-					initSchoolId={userData.schoolId ?? ''}
-					initSchoolName={userData.schoolName ?? ''}
-					initSelectedSchoolYearId={Number(selectedSchoolYearId?.value) ?? 0}
+				<NotificationProvider
+					sessionToken={sessionToken?.value ?? ''}
+					accountId={Number(userData.accountId) ?? 0}
 				>
-					{children}
-				</AppProvider>
+					<AppProvider
+						inititalSessionToken={sessionToken?.value ?? ''}
+						inititalRefreshToken={refreshToken?.value ?? ''}
+						initUserRole={userRole?.value ?? ''}
+						initSchoolId={userData.schoolId ?? ''}
+						initSchoolName={userData.schoolName ?? ''}
+						initSelectedSchoolYearId={Number(selectedSchoolYearId?.value) ?? 0}
+					>
+						{children}
+					</AppProvider>
 				</NotificationProvider>
 				<ToastContainer
 					position='top-right'
@@ -63,16 +63,15 @@ export default function RootLayout({
 					newestOnTop={false}
 					closeOnClick
 					rtl={false}
-					pauseOnFocusLoss
 					draggable
+					limit={2}
 					pauseOnHover
 					theme='light'
 					transition={Bounce}
+					pauseOnFocusLoss={false}
 				/>
 				<Analytics />
 				<SpeedInsights />
-
-
 			</body>
 		</html>
 	);
