@@ -16,7 +16,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { KeyedMutator } from 'swr';
 import useAssignTeacher from '../_hooks/useAssignTeacher';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
@@ -89,6 +89,7 @@ interface ITeachingAssignmentTableProps {
 	selectedCurriculumName: string;
 	editingObjects: ITeacherAssignmentRequest[];
 	setEditingObjects: React.Dispatch<React.SetStateAction<ITeacherAssignmentRequest[]>>;
+	selectedGrade: string;
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
@@ -100,6 +101,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		selectedCurriculumName,
 		editingObjects,
 		setEditingObjects,
+		selectedGrade,
 	} = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 
@@ -113,6 +115,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		schoolId: Number(schoolId),
 		subjectId: selectedSubjectId,
 		sessionToken,
+		grade: selectedGrade,
 	});
 
 	useEffect(() => {

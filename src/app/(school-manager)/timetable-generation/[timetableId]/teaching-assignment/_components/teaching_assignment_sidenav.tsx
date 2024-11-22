@@ -49,16 +49,24 @@ interface TeachingAssignmentSidenavProps {
 	selectedClass: number;
 	setSelectedClass: React.Dispatch<React.SetStateAction<number>>;
 	setSelectedCurriculumName: React.Dispatch<React.SetStateAction<string>>;
+	setSelectedGrade: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const TeachingAssignmentSideNav = (props: TeachingAssignmentSidenavProps) => {
-	const { classData, selectedClass, setSelectedClass, setSelectedCurriculumName } = props;
+	const {
+		classData,
+		selectedClass,
+		setSelectedClass,
+		setSelectedCurriculumName,
+		setSelectedGrade,
+	} = props;
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
 
-	const handleSelectCurriculum = (target: number, extra: string) => {
+	const handleSelectCurriculum = (target: number, extra: string, grade: string) => {
 		// Implement logics here
 		setSelectedClass(target);
 		setSelectedCurriculumName(extra);
+		setSelectedGrade(grade);
 	};
 
 	const toggleDropdown =
@@ -109,7 +117,11 @@ const TeachingAssignmentSideNav = (props: TeachingAssignmentSidenavProps) => {
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
 									${selectedClass === gradeClass.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 								onClick={() =>
-									handleSelectCurriculum(gradeClass.value, gradeClass.extra)
+									handleSelectCurriculum(
+										gradeClass.value,
+										gradeClass.extra,
+										grade.grade
+									)
 								}
 							>
 								<p

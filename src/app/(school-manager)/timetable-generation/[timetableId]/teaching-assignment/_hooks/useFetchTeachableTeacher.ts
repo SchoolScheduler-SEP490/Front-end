@@ -5,10 +5,11 @@ interface IFetchTeachableTeacherProps {
 	schoolId: number;
 	subjectId: number;
 	sessionToken: string;
+	grade: string;
 }
 const useFetchTeachableTeacher = (props: IFetchTeachableTeacherProps) => {
-	const { schoolId, subjectId, sessionToken } = props;
-	const endpoint = getFetchTeachableTeacherApi({ schoolId, subjectId });
+	const { schoolId, subjectId, sessionToken, grade } = props;
+	const endpoint = getFetchTeachableTeacherApi({ schoolId, subjectId, grade });
 
 	async function fetcher(url: string) {
 		const response = await fetch(url, {

@@ -1,3 +1,4 @@
+import { ITeachingAssignmentObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
@@ -10,9 +11,10 @@ import {
 	TableHead,
 	TableRow,
 } from '@mui/material';
+import { IExtendedTeachingAssignment } from '../_libs/constants';
 
 interface ITeacherUnavailableResultProps {
-	data: any[];
+	data: IExtendedTeachingAssignment[];
 }
 
 const TeacherUnavailableResult = (props: ITeacherUnavailableResultProps) => {
@@ -48,7 +50,7 @@ const TeacherUnavailableResult = (props: ITeacherUnavailableResultProps) => {
 							<TableRow key={teacher.id}>
 								<TableCell align='center'>{index + 1}</TableCell>
 								<TableCell align='left'>
-									{teacher.name} ({teacher.username})
+									{`${teacher.teacherObject['first-name']} ${teacher.teacherObject['last-name']} (${teacher.teacherObject.abbreviation})`}
 								</TableCell>
 								<TableCell align='center'>
 									<IconButton

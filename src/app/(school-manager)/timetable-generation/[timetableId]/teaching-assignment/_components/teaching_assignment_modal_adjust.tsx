@@ -91,10 +91,20 @@ interface IApplyModalProps {
 	automationResult: IAutoTeacherAssignmentResponse[];
 	sidenavData: ITeachingAssignmentSidenavData[];
 	updateTeachingAssignment: KeyedMutator<any>;
+	selectedGrade: string;
+	setSelectedGrade: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
-	const { open, setOpen, automationResult, sidenavData, updateTeachingAssignment } = props;
+	const {
+		open,
+		setOpen,
+		automationResult,
+		sidenavData,
+		updateTeachingAssignment,
+		selectedGrade,
+		setSelectedGrade,
+	} = props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const { dataStored, fireStoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
@@ -113,6 +123,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		schoolId: Number(schoolId),
 		subjectId: selectedSubjectId,
 		sessionToken,
+		grade: selectedGrade,
 	});
 
 	const handleSaveUpdates = async () => {
@@ -251,6 +262,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 						setSelectedClass={setSelectedClassId}
 						setSelectedCurriculumName={setSelectedCurriculumName}
 						classData={sidenavData}
+						setSelectedGrade={setSelectedGrade}
 					/>
 					<div className='w-full h-[60vh] pb-[1px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
 						{selectedAssignments.map(

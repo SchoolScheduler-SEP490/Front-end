@@ -41,6 +41,7 @@ const useSidenavDataConverter = (data: IClassResponse[]): ITeachingAssignmentSid
 				acc[grade] = {
 					title: gradeTitles[grade] || grade,
 					items: [],
+					grade,
 				};
 			}
 			acc[grade].items.push({

@@ -22,6 +22,7 @@ import {
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { TIMETABLE_SLOTS, WEEK_DAYS } from '../../../_libs/constants';
 import ClearIcon from '@mui/icons-material/Clear';
+import { IFilterableDropdownOption } from '../_libs/constants';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -51,17 +52,19 @@ interface CellState {
 }
 
 interface ITeacherUnavailableSelectorProps {
-	data: IDropdownOption<number>[];
+	teacherOptions: IFilterableDropdownOption<number>[];
+	departmentOptions: IDropdownOption<number>[];
 	selectedTeacherIds: number[];
 	setSelectedTeacherIds: Dispatch<SetStateAction<number[]>>;
 }
 
 const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => {
-	const { data, selectedTeacherIds, setSelectedTeacherIds } = props;
+	const { teacherOptions, selectedTeacherIds, setSelectedTeacherIds, departmentOptions } = props;
 	const theme = useTheme();
 
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [selectedCells, setSelectedCells] = useState<{ [key: string]: CellState }>({});
+	const [selectedaDeparmentId, setSelectedDepartmentId] = useState<number>(0);
 
 	const handleMouseDown = (cellId: string) => {
 		setIsSelecting(true);
@@ -70,6 +73,12 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 			[cellId]: { selected: !prev[cellId]?.selected },
 		}));
 	};
+
+	const filteredData = useMemo(() => {
+		return selectedaDeparmentId !== 0
+			? teacherOptions.filter((item) => item.filterableId === selectedaDeparmentId)
+			: teacherOptions;
+	}, [selectedaDeparmentId]);
 
 	const handleMouseEnter = (cellId: string) => {
 		if (isSelecting) {
@@ -93,20 +102,16 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 		setIsSelecting(false);
 	};
 
-	const handleSelectTeachers = (teacherId: number) => {
-		if (selectedTeacherIds.includes(teacherId)) {
-			setSelectedTeacherIds(selectedTeacherIds.filter((id) => id !== teacherId));
-		} else {
-			setSelectedTeacherIds([...selectedTeacherIds, teacherId]);
-		}
+	const handleSelectTeacher = (teacherIds: number[]) => {
+		setSelectedTeacherIds(teacherIds);
 	};
 
 	const selectedTeachersLabels = useMemo(() => {
-		return data
+		return teacherOptions
 			.filter((item) => selectedTeacherIds.includes(item.value))
 			.map((item) => item.label)
 			.join(', ');
-	}, [data, selectedTeacherIds]);
+	}, [teacherOptions, selectedTeacherIds]);
 
 	return (
 		<div className='w-[60%] h-[90vh] border-r-1 border-basic-gray-active px-[2vw] pt-[5vh] flex flex-col justify-start items-start gap-5'>
@@ -114,7 +119,37 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 				id='teacher-selector'
 				className='w-full h-[5vh] flex flex-row justify-between items-baseline'
 			>
-				<FormControl sx={{ width: '50%' }}>
+				<FormControl sx={{ width: '20%' }}>
+					<InputLabel id='teacher-selector-label' variant='standard'>
+						Chọn TBM
+					</InputLabel>
+					<Select
+						labelId='teacher-selector-label'
+						id='teacher-selector-select'
+						variant='standard'
+						value={selectedaDeparmentId}
+						onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
+						MenuProps={MenuProps}
+						sx={{ width: '100%' }}
+					>
+						{departmentOptions.length === 0 && (
+							<MenuItem disabled value={0}>
+								Không tìm thấy TBM
+							</MenuItem>
+						)}
+						{departmentOptions.map((option: IDropdownOption<number>, index: number) => (
+							<MenuItem
+								key={option.label + index}
+								value={option.value}
+								style={getStyles(option, teacherOptions, theme)}
+							>
+								<Checkbox checked={selectedTeacherIds.includes(option.value)} />
+								<ListItemText primary={option.label} />
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+				<FormControl sx={{ width: '40%' }}>
 					<InputLabel id='teacher-selector-label' variant='standard'>
 						Chọn giáo viên áp dụng
 					</InputLabel>
@@ -124,23 +159,23 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 						variant='standard'
 						value={selectedTeacherIds}
 						multiple
-						onChange={(e) => handleSelectTeachers(Number(e.target.value))}
+						onChange={(e) => handleSelectTeacher(e.target.value as number[])}
 						MenuProps={MenuProps}
 						sx={{ width: '100%' }}
 						renderValue={() => selectedTeachersLabels}
 					>
-						{data.length === 0 && (
+						{filteredData.length === 0 && (
 							<MenuItem disabled value={0}>
-								Không tìm thấy môn học
+								Không tìm thấy giáo viên
 							</MenuItem>
 						)}
-						{data.map((option: IDropdownOption<number>, index: number) => (
+						{filteredData.map((option: IDropdownOption<number>, index: number) => (
 							<MenuItem
 								key={option.label + index}
 								value={option.value}
-								style={getStyles(option, data, theme)}
+								style={getStyles(option, teacherOptions, theme)}
 							>
-								<Checkbox checked={selectedTeacherIds.indexOf(option.value) > -1} />
+								<Checkbox checked={selectedTeacherIds.includes(option.value)} />
 								<ListItemText primary={option.label} />
 							</MenuItem>
 						))}
@@ -167,7 +202,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 					component={Paper}
 					sx={{ maxWidth: 900, margin: 'auto', marginTop: 5 }}
 				>
-					<Table onMouseUp={handleMouseUp} size='small'>
+					<Table onMouseUp={handleMouseUp} size='small' onMouseLeave={handleMouseUp}>
 						<TableHead>
 							<TableRow>
 								<TableCell align='center' sx={{ fontWeight: 'bold', width: 80 }}>

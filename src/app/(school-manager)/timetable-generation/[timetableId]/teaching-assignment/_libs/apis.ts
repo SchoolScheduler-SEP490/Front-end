@@ -86,12 +86,16 @@ export const getFetchTeachableTeacherApi = ({
 	localApi,
 	schoolId,
 	subjectId,
+	grade,
 }: {
 	localApi?: string;
 	schoolId: number;
 	subjectId: number;
+	grade: string;
 }) => {
-	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects?eGrade=${grade}`;
 };
 
 export const getCheckAutoAssignAvailabilityApi = ({
