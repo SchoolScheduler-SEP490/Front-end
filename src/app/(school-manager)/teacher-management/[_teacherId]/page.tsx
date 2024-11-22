@@ -16,7 +16,6 @@ import {
 } from "@/utils/constants";
 import dayjs from "dayjs";
 import UpdateTeacherModal from "../_components/update_teacher";
-import ContainedButton from "@/commons/button-contained";
 import { Card, CardContent, Typography, Divider } from "@mui/material";
 import TeacherSidenav from "./sidenav";
 import TeacherAssignment from "./teacher_assignment";
@@ -31,7 +30,6 @@ export default function TeacherDetails() {
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
   const fetchTeacherDetails = React.useCallback(async () => {
     setIsLoading(true);
     const response = await fetch(
@@ -95,18 +93,18 @@ export default function TeacherDetails() {
                     className="!flex self-center mx-auto my-auto"
                   >
                     <Grid item xs={12} md={5}>
-                      <Card className="!w-full shadow-md border border-gray-200 rounded-lg">
+                      <Card className="!w-full !shadow-md !border !border-gray-200 !rounded-lg">
                         <CardContent>
                           <div className="flex items-center mb-6 justify-between w-full">
                             <div className="flex items-center">
                               <Avatar
                                 alt={`${teacherData["first-name"]} ${teacherData["last-name"]}`}
-                                className="!w-16 h-16 mr-4"
+                                className="!w-16 !h-16 !mr-4"
                               />
                               <div>
                                 <Typography
                                   variant="h6"
-                                  className="!text-gray-800 font-semibold"
+                                  className="!text-gray-800 !font-semibold"
                                 >
                                   {teacherData["first-name"]}{" "}
                                   {teacherData["last-name"]}
@@ -143,12 +141,12 @@ export default function TeacherDetails() {
                             </Button>
                           </div>
 
-                          <Divider className="my-4" />
+                          <Divider className="!my-4" />
 
                           {/* Personal Information Section */}
                           <Typography
                             variant="h6"
-                            className="!text-gray-800 font-semibold mb-4"
+                            className="!text-gray-800 !font-semibold !mb-4"
                           >
                             Thông tin cá nhân
                           </Typography>
@@ -156,7 +154,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">Họ:</strong>{" "}
                                 {teacherData["first-name"]}
@@ -165,7 +163,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">Tên:</strong>{" "}
                                 {teacherData["last-name"]}
@@ -174,7 +172,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">
                                   Email:
@@ -185,7 +183,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">
                                   Số điện thoại:
@@ -197,7 +195,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">
                                   Ngày sinh:
@@ -211,7 +209,7 @@ export default function TeacherDetails() {
                             <Grid item xs={6}>
                               <Typography
                                 variant="body2"
-                                className="!text-gray-500 mb-4"
+                                className="!text-gray-500 !mb-4"
                               >
                                 <strong className="text-gray-800">
                                   Giới tính:
@@ -231,7 +229,7 @@ export default function TeacherDetails() {
                                 className="!text-gray-500 mb-4"
                               >
                                 <strong className="text-gray-800">
-                                  Tên viết tắt:
+                                  Mã giáo viên:
                                 </strong>{" "}
                                 {teacherData.abbreviation}
                               </Typography>
@@ -263,7 +261,7 @@ export default function TeacherDetails() {
             )}
             {activeTab === 1 && (
               <div className="p-7">
-                <h2 className="text-title-medium font-semibold mb-4 text-center">
+                <h2 className="text-title-medium font-semibold mb-4">
                   Phân công giảng dạy
                 </h2>
                 <TeacherAssignment teacherId={teacherId} />

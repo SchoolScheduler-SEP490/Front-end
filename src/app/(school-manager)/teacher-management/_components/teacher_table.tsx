@@ -69,7 +69,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: "nameAbbreviation" as keyof ITeacherTableData,
     centered: false,
-    label: "Tên viết tắt",
+    label: "Mã giáo viên",
   },
   {
     id: "subjectDepartment" as keyof ITeacherTableData,
