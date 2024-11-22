@@ -51,19 +51,13 @@ export default function Home() {
 	const router = useRouter();
 	const pathName = usePathname();
 
+	const [selectedYearId, setSelectedYearId] = useState<number>(0);
+	const [selectedTermId, setSelectedTermId] = useState<number>(0);
+	const [timetableName, setTimetableName] = useState<string>('');
+	const [timetableAbbreviation, setTimetableAbbreviation] = useState<string>('');
+
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
-	const [editingObject, setEditingObject] = useState<ITimetableStoreObject>({
-		'timetable-name': '',
-		'timetable-abbreviation': '',
-		'school-id': 0,
-		'year-id': 0,
-		'term-id': 0,
-		'config-id': '',
-		'applied-week': null,
-		'ended-week': null,
-		status: ETimetableStatus.Pending,
-	});
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear();
 	const {
@@ -75,10 +69,6 @@ export default function Home() {
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
 	});
-
-	const handleUpdateTimetable = (target: keyof ITimetableStoreObject, value: any) => {
-		setEditingObject((prev) => ({ ...prev, [target]: value }));
-	};
 
 	// Process data
 	useEffect(() => {
@@ -95,15 +85,15 @@ export default function Home() {
 					(a.criteria as string).localeCompare(b.criteria as string)
 				)
 			);
-			handleUpdateTimetable('term-id', studyOptions[0].value);
+			setSelectedTermId(studyOptions[0].value);
 		}
 	}, [termData]);
 
 	useEffect(() => {
-		updateTerm({ schoolYearId: editingObject['year-id'] });
+		updateTerm({ schoolYearId: selectedYearId });
 		if (termData?.status === 200) {
 			const termInYear: ITermResponse[] = termData.result.items.filter(
-				(term: ITermResponse) => term['school-year-id'] === editingObject['year-id']
+				(term: ITermResponse) => term['school-year-id'] === selectedYearId
 			);
 			if (termInYear.length > 0) {
 				const studyOptions: ISortableDropdown<number>[] = termInYear.map(
@@ -118,8 +108,8 @@ export default function Home() {
 						(a.criteria as string).localeCompare(b.criteria as string)
 					)
 				);
-				if (!studyOptions.some((item) => item.value === editingObject['term-id'])) {
-					handleUpdateTimetable('term-id', studyOptions[0].value);
+				if (!studyOptions.some((item) => item.value === selectedTermId)) {
+					setSelectedTermId(studyOptions[0].value);
 				} else {
 					useNotify({
 						type: 'error',
@@ -128,40 +118,49 @@ export default function Home() {
 				}
 			}
 		}
-	}, [editingObject['year-id']]);
+	}, [selectedYearId]);
 
 	const handleCreateTimetable = async () => {
-		if (editingObject) {
-			// Tạo timetable object lên Firebase
-			var newConfigurationData: IConfigurationStoreObject = {
-				id: '',
-				'timetable-id': '',
-				'teacher-assignments': [],
-				'fixed-periods-para': [],
-				'no-assign-periods-para': [],
-				'free-timetable-periods-para': [],
-				'class-combinations': [],
-				'applied-curriculum-id': 0,
-				'max-period-per-session': 0,
-				'min-period-per-session': 0,
-				'days-in-week': 0,
-				'minimum-days-off': 0,
-				'required-break-periods': 0,
-			};
-			const timetableRef = await addDoc(collection(firestore, 'timetables'), editingObject);
-			const configRef = await addDoc(
-				collection(firestore, 'configurations'),
-				newConfigurationData
-			);
-			if (timetableRef.id && configRef.id) {
-				await updateDoc(timetableRef, { 'config-id': configRef.id });
-				await updateDoc(configRef, { 'timetable-id': timetableRef.id });
-				useNotify({
-					type: 'success',
-					message: 'Tạo thời khóa biểu thành công',
-				});
-				router.push(`${pathName}/${timetableRef.id}/${TIMETABLE_GENERATION_TABS[0].value}`);
-			}
+		// Tạo timetable object lên Firebase
+		var newTimetableData: ITimetableStoreObject = {
+			'timetable-name': timetableName,
+			'timetable-abbreviation': timetableAbbreviation,
+			'school-id': Number(schoolId),
+			'year-id': selectedSchoolYearId,
+			'term-id': selectedTermId,
+			'config-id': '',
+			'applied-week': null,
+			'ended-week': null,
+			status: ETimetableStatus.Pending,
+		};
+		var newConfigurationData: IConfigurationStoreObject = {
+			id: '',
+			'timetable-id': '',
+			'teacher-assignments': [],
+			'fixed-periods-para': [],
+			'no-assign-periods-para': [],
+			'free-timetable-periods-para': [],
+			'class-combinations': [],
+			'applied-curriculum-id': 0,
+			'max-period-per-session': 0,
+			'min-period-per-session': 0,
+			'days-in-week': 0,
+			'minimum-days-off': 0,
+			'required-break-periods': 0,
+		};
+		const timetableRef = await addDoc(collection(firestore, 'timetables'), newTimetableData);
+		const configRef = await addDoc(
+			collection(firestore, 'configurations'),
+			newConfigurationData
+		);
+		if (timetableRef.id && configRef.id) {
+			await updateDoc(timetableRef, { 'config-id': configRef.id });
+			await updateDoc(configRef, { 'timetable-id': timetableRef.id });
+			useNotify({
+				type: 'success',
+				message: 'Tạo thời khóa biểu thành công',
+			});
+			router.push(`${pathName}/${timetableRef.id}/${TIMETABLE_GENERATION_TABS[0].value}`);
 		}
 	};
 
@@ -175,7 +174,7 @@ export default function Home() {
 						parseInt(item['start-year']) <= currentYear &&
 						parseInt(item['end-year']) >= currentYear
 					) {
-						handleUpdateTimetable('year-id', item.id);
+						setSelectedYearId(item.id);
 					}
 					return {
 						label: `${item['start-year']} - ${item['end-year']}`,
@@ -208,13 +207,11 @@ export default function Home() {
 					<TextField
 						fullWidth
 						variant='standard'
-						id='email'
-						name='email'
+						id='timetableName'
+						name='timetableName'
 						label='Nhập tên Thời khóa biểu'
-						value={editingObject['timetable-name']}
-						onChange={(event) =>
-							handleUpdateTimetable('timetable-name', event.target.value)
-						}
+						value={timetableName}
+						onChange={(event) => setTimetableName(event.target.value)}
 						slotProps={{
 							input: {
 								endAdornment: (
@@ -232,13 +229,11 @@ export default function Home() {
 					<TextField
 						fullWidth
 						variant='standard'
-						id='email'
-						name='email'
+						id='abbreviation'
+						name='abbreviation'
 						label='Nhập mã Thời khóa biểu'
-						value={editingObject['timetable-abbreviation']}
-						onChange={(event) =>
-							handleUpdateTimetable('timetable-abbreviation', event.target.value)
-						}
+						value={timetableAbbreviation}
+						onChange={(event) => setTimetableAbbreviation(event.target.value)}
 						slotProps={{
 							input: {
 								endAdornment: (
@@ -261,19 +256,14 @@ export default function Home() {
 							labelId='school-year-label'
 							id='school-year'
 							variant='standard'
-							value={
-								editingObject['year-id'] === 0
-									? ''
-									: schoolYearIdOptions.find(
-											(item) => item.value === editingObject['year-id']
-									  )
-							}
-							onChange={(event) =>
-								handleUpdateTimetable('year-id', Number(event.target.value))
-							}
+							value={selectedYearId}
+							onChange={(event) => setSelectedYearId(Number(event.target.value))}
 							MenuProps={MenuProps}
 							renderValue={(selected) => {
-								return selected.label;
+								return (
+									schoolYearIdOptions.find((item) => item.value === selected)
+										?.label ?? ''
+								);
 							}}
 							sx={{ width: '100%', fontSize: '1.000rem' }}
 						>
@@ -286,9 +276,9 @@ export default function Home() {
 								<MenuItem key={item.label + index} value={item.value}>
 									<Checkbox
 										checked={
-											editingObject['year-id'] === 0
+											selectedYearId === 0
 												? false
-												: editingObject['year-id'] === item.value
+												: selectedYearId === item.value
 										}
 									/>
 									<ListItemText primary={item.label} />
@@ -304,19 +294,14 @@ export default function Home() {
 							labelId='school-term-label'
 							id='school-term'
 							variant='standard'
-							value={
-								editingObject['term-id'] === 0
-									? ''
-									: termIdOptions.find(
-											(item) => item.value === editingObject['term-id']
-									  )
-							}
-							onChange={(event) =>
-								handleUpdateTimetable('term-id', Number(event.target.value))
-							}
+							value={selectedTermId}
+							onChange={(event) => setSelectedTermId(Number(event.target.value))}
 							MenuProps={MenuProps}
 							renderValue={(selected) => {
-								return selected.label;
+								return (
+									termIdOptions.find((item) => item.value === selected)?.label ??
+									''
+								);
 							}}
 							sx={{ width: '100%', fontSize: '1.000rem' }}
 						>
@@ -329,9 +314,9 @@ export default function Home() {
 								<MenuItem key={item.label + index} value={item.value}>
 									<Checkbox
 										checked={
-											editingObject['term-id'] === 0
+											selectedTermId === 0
 												? false
-												: editingObject['term-id'] === item.value
+												: selectedTermId === item.value
 										}
 									/>
 									<ListItemText primary={item.label} />
