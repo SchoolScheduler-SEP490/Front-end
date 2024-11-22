@@ -41,6 +41,7 @@ export default function SMTeachingAssignment() {
 
 	// Selected
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
+	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 
@@ -157,6 +158,7 @@ export default function SMTeachingAssignment() {
 				setSidenavData(tmpData);
 				setSelectedClassId(tmpData[0].items[0].value);
 				setSelectedCurriculumName(tmpData[0].items[0].extra);
+				setSelectedGrade(tmpData[0].grade);
 			}
 		}
 	}, [classData]);
@@ -262,6 +264,7 @@ export default function SMTeachingAssignment() {
 							setSelectedClass={setSelectedClassId}
 							setSelectedCurriculumName={setSelectedCurriculumName}
 							classData={sidenavData}
+							setSelectedGrade={setSelectedGrade}
 						/>
 					)}
 					<div className='w-[85%] h-full flex justify-center items-start gap-5 overflow-y-scroll no-scrollbar'>
@@ -293,6 +296,7 @@ export default function SMTeachingAssignment() {
 					setSelectedClass={setSelectedClassId}
 					setSelectedCurriculumName={setSelectedCurriculumName}
 					classData={sidenavData}
+					setSelectedGrade={setSelectedGrade}
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start gap-5'>
 					<TeachingAssignmentTable
@@ -303,6 +307,7 @@ export default function SMTeachingAssignment() {
 						selectedCurriculumName={selectedCurriculumName}
 						editingObjects={editingObjects}
 						setEditingObjects={setEditingObjects}
+						selectedGrade={selectedGrade}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}
