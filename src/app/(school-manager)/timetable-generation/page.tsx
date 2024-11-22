@@ -60,6 +60,8 @@ export default function Home() {
 		'year-id': 0,
 		'term-id': 0,
 		'config-id': '',
+		'applied-week': null,
+		'ended-week': null,
 		status: ETimetableStatus.Pending,
 	});
 
@@ -142,6 +144,9 @@ export default function Home() {
 				'applied-curriculum-id': 0,
 				'max-period-per-session': 0,
 				'min-period-per-session': 0,
+				'days-in-week': 0,
+				'minimum-days-off': 0,
+				'required-break-periods': 0,
 			};
 			const timetableRef = await addDoc(collection(firestore, 'timetables'), editingObject);
 			const configRef = await addDoc(

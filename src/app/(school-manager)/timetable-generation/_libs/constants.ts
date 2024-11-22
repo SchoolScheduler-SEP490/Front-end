@@ -52,14 +52,18 @@ export enum EClassSession {
 export interface IConfigurationStoreObject {
 	id?: string;
 	'timetable-id': string;
-	'max-period-per-session': number;
-	'min-period-per-session': number;
-	'applied-curriculum-id': number;
-	'teacher-assignments': ITeachingAssignmentObject[];
 	'fixed-periods-para': IFixedPeriodObject[];
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
+	'teacher-assignments': ITeachingAssignmentObject[];
 	'class-combinations': IClassCombinationObject[];
+	'max-period-per-session': number;
+	'min-period-per-session': number;
+	'applied-curriculum-id': number;
+	'required-break-periods': number;
+	'minimum-days-off': number;
+	// 'term-id': number;
+	'days-in-week': number;
 }
 
 export interface ITimetableStoreObject {
