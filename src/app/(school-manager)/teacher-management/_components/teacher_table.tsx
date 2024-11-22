@@ -170,7 +170,6 @@ interface ITeacherTableProps {
 }
 
 const dropdownOptions: ICommonOption[] = [
-  { img: "/images/icons/compose.png", title: "Chỉnh sửa thông tin" },
   { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
 ];
 
@@ -226,9 +225,6 @@ const TeacherTable = (props: ITeacherTableProps) => {
     event.stopPropagation();
     switch (index) {
       case 0:
-        setOpenUpdateModal(true);
-        break;
-      case 1:
         setOpenDeleteModal(true);
         break;
       default:
