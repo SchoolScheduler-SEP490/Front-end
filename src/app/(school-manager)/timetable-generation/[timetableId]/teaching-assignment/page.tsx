@@ -332,6 +332,8 @@ export default function SMTeachingAssignment() {
 						automationResult={automationResult}
 						sidenavData={sidenavData}
 						updateTeachingAssignment={updateTeachingAssignment}
+						selectedGrade={selectedGrade}
+						setSelectedGrade={setSelectedGrade}
 					/>
 				</div>
 			</div>
