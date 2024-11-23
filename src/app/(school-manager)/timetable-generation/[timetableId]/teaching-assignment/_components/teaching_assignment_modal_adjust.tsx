@@ -106,7 +106,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		setSelectedGrade,
 	} = props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-	const { dataStored, fireStoreName }: ITimetableGenerationState = useSelector(
+	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 	const dispatch = useSMDispatch();
@@ -128,8 +128,8 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleSaveUpdates = async () => {
 		// Save data to Firebase
-		if (dataStored && fireStoreName && dataStored.id) {
-			const docRef = doc(firestore, fireStoreName, dataStored.id);
+		if (dataStored && dataFirestoreName && dataStored.id) {
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(docRef, {
 				...dataStored,
 				'teacher-assignments': editingObjects,

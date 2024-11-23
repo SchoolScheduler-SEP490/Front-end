@@ -1,12 +1,11 @@
 import { IDropdownOption } from '../../_utils/contants';
 
 export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
-	{ label: 'Gộp nhiều lớp chung tiết', value: 'class-combination' },
-	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
+	{ label: 'Thông tin chung', value: 'information' },
 	{ label: 'Tạo ràng buộc', value: 'constraints' },
-	{ label: 'Sắp Thời khóa biểu', value: 'timetable-configuration' },
-	{ label: 'Xem/Sửa Thời khóa biểu', value: 'timetable-adjustment' },
-	{ label: 'Xuất/Công bố Thời khóa biểu', value: 'timetable-export' },
+	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
+	{ label: 'Giáo viên - Tiết học', value: 'teachers-lessons' },
+	{ label: 'Tạo thời khóa biểu', value: 'timetable-generation' },
 ];
 
 // Phân công giáo viên
@@ -72,6 +71,8 @@ export interface ITimetableStoreObject {
 	'timetable-abbreviation': string;
 	'school-id': number;
 	'year-id': number;
+	'year-name': string;
+	'term-name': string;
 	'term-id': number;
 	'config-id': string;
 	'applied-week': number | null;

@@ -18,7 +18,7 @@ import {
 
 export default function TeacherUnavailability() {
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
-	const { dataStored, fireStoreName }: ITimetableGenerationState = useSelector(
+	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 
@@ -63,7 +63,7 @@ export default function TeacherUnavailability() {
 				setDepartmentOptions(useFilterArray(tmpDepartmentOptions, ['value']));
 			}
 
-			if (dataStored && dataStored?.id && fireStoreName) {
+			if (dataStored && dataStored?.id && dataFirestoreName) {
 				const tmpResults: IExtendedTeachingAssignment[] = dataStored[
 					'teacher-assignments'
 				].map((item: ITeachingAssignmentObject) => {

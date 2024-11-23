@@ -33,6 +33,7 @@ import { useSelector } from 'react-redux';
 interface ISortableDropdown<T> extends IDropdownOption<T> {
 	criteria: string | number;
 }
+
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
 	const { dataStored }: ITimetableGenerationState = useSelector(
@@ -90,11 +91,7 @@ export default function SMTeachingAssignment() {
 		pageSize: 1000,
 		pageIndex: 1,
 	});
-	const {
-		data: termData,
-		error: termFetchError,
-		mutate: updateTerm,
-	} = useFetchTerm({
+	const { data: termData, mutate: updateTerm } = useFetchTerm({
 		pageIndex: 1,
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,

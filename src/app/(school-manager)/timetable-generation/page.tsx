@@ -127,6 +127,9 @@ export default function Home() {
 			'timetable-abbreviation': timetableAbbreviation,
 			'school-id': Number(schoolId),
 			'year-id': selectedSchoolYearId,
+			'year-name':
+				schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
+			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
 			'term-id': selectedTermId,
 			'config-id': '',
 			'applied-week': null,
@@ -207,11 +210,11 @@ export default function Home() {
 					<TextField
 						fullWidth
 						variant='standard'
-						id='timetableName'
-						name='timetableName'
-						label='Nhập tên Thời khóa biểu'
-						value={timetableName}
-						onChange={(event) => setTimetableName(event.target.value)}
+						id='abbreviation'
+						name='abbreviation'
+						label='Nhập mã Thời khóa biểu'
+						value={timetableAbbreviation}
+						onChange={(event) => setTimetableAbbreviation(event.target.value)}
 						slotProps={{
 							input: {
 								endAdornment: (
@@ -229,11 +232,11 @@ export default function Home() {
 					<TextField
 						fullWidth
 						variant='standard'
-						id='abbreviation'
-						name='abbreviation'
-						label='Nhập mã Thời khóa biểu'
-						value={timetableAbbreviation}
-						onChange={(event) => setTimetableAbbreviation(event.target.value)}
+						id='timetableName'
+						name='timetableName'
+						label='Nhập tên Thời khóa biểu'
+						value={timetableName}
+						onChange={(event) => setTimetableName(event.target.value)}
 						slotProps={{
 							input: {
 								endAdornment: (
