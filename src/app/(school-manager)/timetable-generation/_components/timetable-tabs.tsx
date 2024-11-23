@@ -45,7 +45,7 @@ const TimetableTabs = () => {
 				allowScrollButtonsMobile
 			>
 				{TIMETABLE_GENERATION_TABS.map((tab, index) => (
-					<Tab key={index} label={`${index + 1}. ${tab.label}`} {...a11yProps(index)} />
+					<Tab key={index} label={`${index}. ${tab.label}`} {...a11yProps(index)} />
 				))}
 			</Tabs>
 		</div>

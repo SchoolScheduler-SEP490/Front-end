@@ -20,8 +20,8 @@ import {
 	useTheme,
 } from '@mui/material';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { TIMETABLE_SLOTS, WEEK_DAYS } from '../../../_libs/constants';
 import ClearIcon from '@mui/icons-material/Clear';
+import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

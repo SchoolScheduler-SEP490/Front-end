@@ -32,7 +32,7 @@ interface ClassCombinationProps {
 
 const ClassCombination = (props: ClassCombinationProps) => {
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
-	const { dataStored, fireStoreName }: ITimetableGenerationState = useSelector(
+	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 	const dispatch = useDispatch();
@@ -204,7 +204,7 @@ const ClassCombination = (props: ClassCombinationProps) => {
 
 	// Lưu thay đổi lên Firebase
 	const handleSaveChanges = async () => {
-		if (dataStored && fireStoreName && dataStored.id) {
+		if (dataStored && dataFirestoreName && dataStored.id) {
 			const newResults = [
 				...results,
 				{
@@ -214,7 +214,7 @@ const ClassCombination = (props: ClassCombinationProps) => {
 					session: selectedMainSession,
 				} as IClassCombinationObject,
 			];
-			const docRef = doc(firestore, fireStoreName, dataStored.id);
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(docRef, {
 				...dataStored,
 				'class-combinations': newResults,
@@ -227,7 +227,7 @@ const ClassCombination = (props: ClassCombinationProps) => {
 	};
 
 	const handleAssignTeacher = async (teacherId: number) => {
-		if (dataStored && fireStoreName && dataStored.id) {
+		if (dataStored && dataFirestoreName && dataStored.id) {
 			const newResults = results.map((item) => {
 				if (
 					item['subject-id'] === selectedResultRow?.['subject-id'] &&
@@ -240,7 +240,7 @@ const ClassCombination = (props: ClassCombinationProps) => {
 				}
 				return item;
 			});
-			const docRef = doc(firestore, fireStoreName, dataStored.id);
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(docRef, {
 				...dataStored,
 				'class-combinations': newResults,
@@ -250,13 +250,13 @@ const ClassCombination = (props: ClassCombinationProps) => {
 	};
 
 	const handleDeleteClassCombination = async () => {
-		if (dataStored && fireStoreName && dataStored.id) {
+		if (dataStored && dataFirestoreName && dataStored.id) {
 			const newResults = results.filter(
 				(item) =>
 					item['subject-id'] !== selectedResultRow?.['subject-id'] &&
 					item['class-ids'] !== selectedResultRow?.['class-ids']
 			);
-			const docRef = doc(firestore, fireStoreName, dataStored.id);
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(docRef, {
 				...dataStored,
 				'class-combinations': newResults,

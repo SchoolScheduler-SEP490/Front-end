@@ -1,11 +1,16 @@
-import { IConfigurationStoreObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import {
+	IConfigurationStoreObject,
+	ITimetableStoreObject,
+} from '@/app/(school-manager)/timetable-generation/_libs/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ITimetableGenerationState {
 	timetableId: string;
-	fireStoreName: string;
+	dataFirestoreName: string;
+	timetableFirestoreName: string;
 	isModifying: boolean;
 	dataStored: IConfigurationStoreObject;
+	timetableStored: ITimetableStoreObject;
 }
 
 interface IUpdateDataStored {
@@ -15,9 +20,11 @@ interface IUpdateDataStored {
 
 const initialState: ITimetableGenerationState = {
 	timetableId: '',
-	fireStoreName: 'configurations',
+	dataFirestoreName: 'configurations',
+	timetableFirestoreName: 'timetables',
 	isModifying: false,
 	dataStored: {} as IConfigurationStoreObject,
+	timetableStored: {} as ITimetableStoreObject,
 };
 
 export const timetableGenerationSlice = createSlice({
@@ -27,15 +34,15 @@ export const timetableGenerationSlice = createSlice({
 		setDataStored: (state, action: PayloadAction<IConfigurationStoreObject>) => {
 			state.dataStored = action.payload;
 		},
+		setTimetableStored: (state, action: PayloadAction<ITimetableStoreObject>) => {
+			state.timetableStored = action.payload;
+		},
 		setModifyingStatus: (state, action: PayloadAction<boolean>) => {
 			state.isModifying = action.payload;
 		},
 		updateDataStored: (state, action: PayloadAction<IUpdateDataStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
 			state.isModifying = true;
-		},
-		updateFireStoreName: (state, action: PayloadAction<string>) => {
-			state.fireStoreName = action.payload;
 		},
 		setTimetableId: (state, action: PayloadAction<string>) => {
 			state.timetableId = action.payload;
@@ -45,9 +52,9 @@ export const timetableGenerationSlice = createSlice({
 
 export const {
 	setDataStored,
+	setTimetableStored,
 	setModifyingStatus,
 	updateDataStored,
-	updateFireStoreName,
 	setTimetableId,
 } = timetableGenerationSlice.actions;
 export default timetableGenerationSlice.reducer;
