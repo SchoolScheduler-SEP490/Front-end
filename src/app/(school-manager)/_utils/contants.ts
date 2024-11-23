@@ -25,6 +25,11 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				icon: '/images/icons/timeline.png',
 			},
 			{
+				name: 'Thời khóa biểu GV',
+				url: '/teacher-timetable?teacherId=',
+				icon: '/images/icons/teacher-timetable.png',
+			},
+			{
 				name: 'Lịch sử dụng phòng',
 				url: '/timetable-management?room=',
 				icon: '/images/icons/availability.png',
@@ -32,7 +37,27 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		],
 	},
 	{
-		category: 'Đối tượng',
+		category: 'Lớp học',
+		items: [
+			{
+				name: 'Lớp đơn',
+				url: '/class-management',
+				icon: '/images/icons/classroom.png',
+			},
+			{
+				name: 'Lớp gộp',
+				url: '/combine-class-management',
+				icon: '/images/icons/training.png',
+			},
+			{
+				name: 'Nhóm lớp',
+				url: '/class-group-management',
+				icon: '/images/icons/multiple-users-silhouette.png',
+			},
+		]
+	},
+	{
+		category: 'Quản lý giáo viên',
 		items: [
 			{
 				name: 'Giáo viên',
@@ -44,6 +69,12 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				url: '/subject-management',
 				icon: '/images/icons/books.png',
 			},
+
+		]
+	},
+	{
+		category: 'Đối tượng',
+		items: [
 			{
 				name: 'Khung chương trình',
 				url: '/curiculumn-management',
@@ -58,16 +89,6 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				name: 'Tiết học',
 				url: '/lesson-management',
 				icon: '/images/icons/open-book.png',
-			},
-			{
-				name: 'Nhóm lớp',
-				url: '/class-group-management',
-				icon: '/images/icons/multiple-users-silhouette.png',
-			},
-			{
-				name: 'Lớp học',
-				url: '/class-management',
-				icon: '/images/icons/classroom.png',
 			},
 			{
 				name: 'Phòng học',
@@ -102,9 +123,9 @@ export const TEACHER_SIDENAV = [
 		name: 'Thông tin chung',
 	},
 	{
-		name: 'Phân công giảng dạy',
+		name: 'Chuyên môn giảng dạy '
 	},
 	{
-		name: 'Thời khóa biểu',
-	},
+		name: 'Bảng phân công giảng dạy',
+	}
 ];
