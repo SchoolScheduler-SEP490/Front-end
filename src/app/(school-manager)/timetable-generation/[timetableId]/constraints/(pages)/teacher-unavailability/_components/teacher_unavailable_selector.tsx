@@ -75,6 +75,10 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 	};
 
 	const filteredData = useMemo(() => {
+		setSelectedTeacherIds([]);
+		if (selectedaDeparmentId === -1) {
+			return teacherOptions;
+		}
 		return selectedaDeparmentId !== 0
 			? teacherOptions.filter((item) => item.filterableId === selectedaDeparmentId)
 			: teacherOptions;
@@ -131,10 +135,23 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 						onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
 						MenuProps={MenuProps}
 						sx={{ width: '100%' }}
+						renderValue={(selected) => {
+							if (selected === 0) {
+								return '  - - -'; // Hiển thị khi chọn giá trị "0"
+							}
+							const selectedOption = departmentOptions.find(
+								(option) => option.value === selected
+							);
+							return selectedOption ? selectedOption.label : 'Tất cả'; // Hiển thị label tương ứng
+						}}
 					>
-						{departmentOptions.length === 0 && (
+						{departmentOptions.length === 0 ? (
 							<MenuItem disabled value={0}>
 								Không tìm thấy TBM
+							</MenuItem>
+						) : (
+							<MenuItem value={-1} disabled={departmentOptions.length === 0}>
+								<ListItemText primary={'Chọn tất cả'} />
 							</MenuItem>
 						)}
 						{departmentOptions.map((option: IDropdownOption<number>, index: number) => (
@@ -143,7 +160,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 								value={option.value}
 								style={getStyles(option, teacherOptions, theme)}
 							>
-								<Checkbox checked={selectedTeacherIds.includes(option.value)} />
+								<Checkbox checked={selectedaDeparmentId === option.value} />
 								<ListItemText primary={option.label} />
 							</MenuItem>
 						))}
@@ -161,7 +178,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 						multiple
 						onChange={(e) => handleSelectTeacher(e.target.value as number[])}
 						MenuProps={MenuProps}
-						sx={{ width: '100%' }}
+						sx={{ width: '100%', maxWidth: '20vw' }}
 						renderValue={() => selectedTeachersLabels}
 					>
 						{filteredData.length === 0 && (

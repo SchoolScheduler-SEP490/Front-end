@@ -111,7 +111,9 @@ const StudentClassInformationTable = () => {
 										<Checkbox disabled checked={row['is-full-day']} />
 									</TableCell>
 									<TableCell>
-										{row['student-class-group-code'] ?? '- - -'}
+										{row['student-class-group-code'] !== null
+											? row['student-class-group-code']
+											: '- - -'}
 									</TableCell>
 									<TableCell>{row['curriculum-code'] ?? '- - -'}</TableCell>
 									<TableCell>{row['room-name'] ?? '- - -'}</TableCell>

@@ -54,6 +54,8 @@ const ConstraintsSidenav = (props: IConstraintsSidenavProps) => {
 							height: '1px',
 							backgroundColor: '#e0e0e0', // Keep the divider line with a light gray color
 						},
+						height: 'fit-content',
+						paddingY: 0,
 					}}
 				>
 					<AccordionSummary

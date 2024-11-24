@@ -2,8 +2,8 @@ import { IDropdownOption } from '../../_utils/contants';
 
 export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
 	{ label: 'Thông tin chung', value: 'information' },
-	{ label: 'Cấu hình chung', value: 'general-configurations' },
-	{ label: 'Tạo ràng buộc', value: 'constraints' },
+	// { label: 'Cấu hình chung', value: 'general-configurations' },
+	{ label: 'Cấu hình ràng buộc', value: 'constraints' },
 	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
 	{ label: 'Giáo viên - Tiết học', value: 'teachers-lessons' },
 	{ label: 'Tạo thời khóa biểu', value: 'timetable-generation' },
@@ -62,7 +62,6 @@ export interface IConfigurationStoreObject {
 	'applied-curriculum-id': number;
 	'required-break-periods': number;
 	'minimum-days-off': number;
-	// 'term-id': number;
 	'days-in-week': number;
 }
 

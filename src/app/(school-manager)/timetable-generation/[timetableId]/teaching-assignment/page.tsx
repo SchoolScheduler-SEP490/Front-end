@@ -1,10 +1,12 @@
 'use client';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filterable';
 import TeachingAssignmentSideNavSkeleton from './_components/skeleton_sidenav';
 import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
@@ -27,8 +29,6 @@ import {
 	ITeachingAssignmentTableData,
 	ITermResponse,
 } from './_libs/constants';
-import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
-import { useSelector } from 'react-redux';
 
 interface ISortableDropdown<T> extends IDropdownOption<T> {
 	criteria: string | number;
@@ -45,6 +45,8 @@ export default function SMTeachingAssignment() {
 	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
+	const [maxPeriodPerWeek, setMaxPeriodPerWeek] = useState<number>(17);
+	const [minPeriodPerWeek, setMinPeriodPerWeek] = useState<number>(10);
 
 	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);
@@ -273,8 +275,11 @@ export default function SMTeachingAssignment() {
 								selectedTermId={selectedTermId}
 								setSelectedTermId={setSelectedTermId}
 								termStudyOptions={termStudyOptions}
-								isApplyModalOpen={isAutoApplyModalOpen}
 								setIsApplyModalOpen={setIsAutoApplyModalOpen}
+								maxPeriodPerWeek={maxPeriodPerWeek}
+								minPeriodPerWeek={minPeriodPerWeek}
+								setMaxPeriodPerWeek={setMaxPeriodPerWeek}
+								setMinPeriodPerWeek={setMinPeriodPerWeek}
 							/>
 						) : (
 							<TeachingAssignmentFilterableSkeleton />
@@ -312,8 +317,11 @@ export default function SMTeachingAssignment() {
 						selectedTermId={selectedTermId}
 						setSelectedTermId={setSelectedTermId}
 						termStudyOptions={termStudyOptions}
-						isApplyModalOpen={isAutoApplyModalOpen}
 						setIsApplyModalOpen={setIsAutoApplyModalOpen}
+						maxPeriodPerWeek={maxPeriodPerWeek}
+						minPeriodPerWeek={minPeriodPerWeek}
+						setMaxPeriodPerWeek={setMaxPeriodPerWeek}
+						setMinPeriodPerWeek={setMinPeriodPerWeek}
 					/>
 					<TeachingAssignmentAutoApplyModal
 						open={isAutoApplyModalOpen}
@@ -322,6 +330,8 @@ export default function SMTeachingAssignment() {
 						setModifyingResultModalOpen={setModifyingResultModalOpen}
 						assignedTeachers={editingObjects}
 						dataStored={dataStored}
+						maxPeriodPerWeek={maxPeriodPerWeek}
+						minPeriodPerWeek={minPeriodPerWeek}
 					/>
 					<TeachingAssignmentAdjustModal
 						open={isModifyingResultModalOpen}

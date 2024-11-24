@@ -169,6 +169,8 @@ export interface IAutoTeacherAssignmentResponse {
 }
 
 export interface IAutoTeacherAssingmentRequest {
+	'max-periods-per-week': number;
+	'min-periods-per-week': number;
 	'fixed-assignment':
 		| {
 				'teacher-id': number;

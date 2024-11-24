@@ -110,9 +110,15 @@ const CurriculumInformationTable = () => {
 		updateClassGroup();
 		setCurriculumInformation([]);
 		if (detailedCurriculums.length > 0 && classGroupData?.status === 200) {
-			var tmpCurriculumInformationArr: ICurriculumInformationTableData[] = [];
+			let tmpCurriculumInformationArr: ICurriculumInformationTableData[] = [];
 			detailedCurriculums.forEach((cur: ICurriculumDetailResponse) => {
-				var tmpCurriculumInformation: ICurriculumInformationTableData = {
+				let classGroups: string[] = [];
+				classGroupData.result.items.map((classGroup: IClassGroupResponse) => {
+					if (classGroup['curriculum-id'] === cur.id) {
+						classGroups.push(classGroup['group-name']);
+					}
+				});
+				let tmpCurriculumInformation: ICurriculumInformationTableData = {
 					curriculumName: cur['curriculum-name'],
 					curriculumCode: cur['curriculum-code'],
 					curriculumId: cur.id,
@@ -123,13 +129,7 @@ const CurriculumInformationTable = () => {
 						'subject-id',
 					]).map((sub) => sub['subject-name']),
 					grade: cur.grade,
-					appliedClassGroups: classGroupData.result.items.map(
-						(classGroup: IClassGroupResponse) => {
-							if (classGroup['curriculum-id'] === cur.id) {
-								return classGroup['group-name'];
-							} else return undefined;
-						}
-					),
+					appliedClassGroups: classGroups,
 				};
 				tmpCurriculumInformationArr.push(tmpCurriculumInformation);
 			});
