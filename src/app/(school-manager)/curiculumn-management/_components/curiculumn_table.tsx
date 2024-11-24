@@ -1,18 +1,9 @@
 'use client';
 
-import useNotify from '@/hooks/useNotify';
-import { CLASSGROUP_STRING_TYPE, ICommonOption } from '@/utils/constants';
+import { CLASSGROUP_STRING_TYPE } from '@/utils/constants';
 import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import {
-	Menu,
-	MenuItem,
-	styled,
-	Toolbar,
-	Tooltip,
-	tooltipClasses,
-	TooltipProps,
-} from '@mui/material';
+import LayersIcon from '@mui/icons-material/Layers';
+import { styled, Toolbar, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
@@ -29,11 +20,10 @@ import Image from 'next/image';
 import * as React from 'react';
 import { KeyedMutator } from 'swr';
 import { ICurriculumTableData } from '../_libs/constants';
-import UpdateCurriculumModal from './curiculumn_modal_update';
-import ApplyCurriculumModal from './curiculumn_modal_apply';
 import CreateCurriculumModal from './curiculumn_modal_create';
 import DeleteCurriculumModal from './curiculumn_modal_delete';
-import LayersIcon from '@mui/icons-material/Layers';
+import { usePathname, useRouter } from 'next/navigation';
+import { PathnameContext } from 'next/dist/shared/lib/hooks-client-context.shared-runtime';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -158,10 +148,6 @@ interface ICurriculumTableProps {
 	mutate: KeyedMutator<any>;
 	selectedCurriculumId: number;
 	setSelectedCurriculumId: React.Dispatch<React.SetStateAction<number>>;
-	isOpenViewDetails: boolean;
-	setOpenViewDetails: React.Dispatch<React.SetStateAction<boolean>>;
-	isUpdateModalOpen: boolean;
-	setUpdateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const GRADE_COLOR: { [key: number]: string } = {
@@ -180,11 +166,9 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 		mutate,
 		selectedCurriculumId,
 		setSelectedCurriculumId,
-		isOpenViewDetails,
-		setOpenViewDetails,
-		isUpdateModalOpen,
-		setUpdateModalOpen,
 	} = props;
+	const router = useRouter();
+	const pathName = usePathname();
 
 	const [order, setOrder] = React.useState<Order>('asc');
 	const [orderBy, setOrderBy] = React.useState<keyof ICurriculumTableData>('grade');
@@ -207,7 +191,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 
 	const handleViewDetails = (row: ICurriculumTableData) => {
 		setSelectedCurriculumId(row.curriculumKey);
-		setOpenViewDetails(true);
+		router.push(pathName + '/' + row.curriculumKey);
 	};
 
 	const handleAddSubject = () => {
@@ -296,13 +280,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 											role='checkbox'
 											tabIndex={-1}
 											key={row.id}
-											sx={[
-												{ userSelect: 'none' },
-												selectedCurriculumId === row.curriculumKey &&
-													isOpenViewDetails && {
-														backgroundColor: '#f5f5f5',
-													},
-											]}
+											sx={[{ userSelect: 'none' }]}
 										>
 											<TableCell
 												component='th'
@@ -393,12 +371,6 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 				subjectGroupName={selectedRow?.curriculumName ?? 'Không xác định'}
 				subjectGroupId={selectedRow?.curriculumKey ?? 0}
 				mutate={mutate}
-			/>
-			<UpdateCurriculumModal
-				open={isUpdateModalOpen}
-				setOpen={setUpdateModalOpen}
-				subjectGroupId={selectedCurriculumId}
-				subjectGroupMutator={mutate}
 			/>
 		</div>
 	);

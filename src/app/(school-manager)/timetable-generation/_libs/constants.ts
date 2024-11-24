@@ -2,6 +2,7 @@ import { IDropdownOption } from '../../_utils/contants';
 
 export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
 	{ label: 'Thông tin chung', value: 'information' },
+	{ label: 'Cấu hình chung', value: 'general-configurations' },
 	{ label: 'Tạo ràng buộc', value: 'constraints' },
 	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
 	{ label: 'Giáo viên - Tiết học', value: 'teachers-lessons' },
