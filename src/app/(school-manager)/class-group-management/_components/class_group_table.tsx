@@ -15,7 +15,6 @@ import {
   TableSortLabel,
   Toolbar,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import { visuallyHidden } from "@mui/utils";
@@ -24,12 +23,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { KeyedMutator } from "swr";
 import { IClassGroupTableData } from "../_libs/constants";
 import { ICommonOption } from "@/utils/constants";
-import { useRouter } from "next/navigation";
-import dayjs from "dayjs";
 import AddClassGroupModal from "./add_class_group";
 import DeleteClassGroupModal from "./delete_class_group";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import AssignClassModal from "./assign_class";
 import AssignCurriculumModal from "./assign_curriculum";
 import UpdateClassGroupModal from "./update_class_group";
@@ -201,8 +196,6 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     IClassGroupTableData | undefined
   >();
   const open = Boolean(anchorEl);
-  const router = useRouter();
-  const [expandedGroups, setExpandedGroups] = React.useState<number[]>([]);
   const [openAssignModal, setOpenAssignModal] = React.useState<boolean>(false);
   const [openCurriculumModal, setOpenCurriculumModal] =
     React.useState<boolean>(false);
@@ -293,14 +286,6 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
 
   const handleOpenAddForm = () => setOpenAddForm(true);
 
-  const handleGroupClick = (groupId: number) => {
-    setExpandedGroups((prev) =>
-      prev.includes(groupId)
-        ? prev.filter((id) => id !== groupId)
-        : [...prev, groupId]
-    );
-  };
-
   return (
     <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
       <Box sx={{ width: "100%" }}>
@@ -356,7 +341,6 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                 {visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
-                    <React.Fragment key={row.id}>
                       <TableRow
                         hover
                         role="checkbox"
@@ -379,22 +363,8 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                           {index + 1 + page * rowsPerPage}
                         </TableCell>
 
-                        <TableCell
-                          onClick={() => handleGroupClick(row.id)}
-                          sx={{ cursor: "pointer" }}
-                        >
-                          <div className="flex items-center">
+                        <TableCell>
                             {row.groupName}
-                            {row.classes?.length > 0 && (
-                              <IconButton size="small">
-                                {expandedGroups.includes(row.id) ? (
-                                  <ExpandLessIcon />
-                                ) : (
-                                  <ExpandMoreIcon />
-                                )}
-                              </IconButton>
-                            )}
-                          </div>
                         </TableCell>
                         <TableCell align="left">
                           {row.studentClassGroupCode}
@@ -459,24 +429,6 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                           </Menu>
                         </TableCell>
                       </TableRow>
-                      {expandedGroups.includes(row.id) &&
-                        row.classes &&
-                        row.classes.map(
-                          (classItem: { id: number; name: string }) => (
-                            <TableRow
-                              key={classItem.id}
-                              sx={{ backgroundColor: "rgba(0, 0, 0, 0.04)" }}
-                            >
-                              <TableCell />
-                              <TableCell colSpan={6}>
-                                <div className="pl-8 py-2">
-                                  {classItem.name}
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          )
-                        )}
-                    </React.Fragment>
                   );
                 })}
                 {emptyRows > 0 && (
