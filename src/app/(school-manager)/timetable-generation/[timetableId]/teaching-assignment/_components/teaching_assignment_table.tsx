@@ -30,7 +30,7 @@ import { ITimetableGenerationState, updateDataStored } from '@/context/slice_tim
 import { useDispatch, useSelector } from 'react-redux';
 import { doc, setDoc } from 'firebase/firestore';
 import { firestore } from '@/utils/firebaseConfig';
-import { IConfigurationStoreObject, ITeachingAssignmentObject } from '../../../_libs/constants';
+import { IConfigurationStoreObject, ITeachingAssignmentObject } from '@/utils/constants';
 
 interface HeadCell {
 	disablePadding: boolean;

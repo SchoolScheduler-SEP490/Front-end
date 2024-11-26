@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
-import { IConfigurationStoreObject } from '../../../../_libs/constants';
+import { IConfigurationStoreObject } from '@/utils/constants';
 import useNotify from '@/hooks/useNotify';
 
 export default function Home() {

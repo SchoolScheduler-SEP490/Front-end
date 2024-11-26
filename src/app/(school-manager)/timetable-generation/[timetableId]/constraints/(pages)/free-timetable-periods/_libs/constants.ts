@@ -1,4 +1,4 @@
-import { IFixedPeriodObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { IFixedPeriodObject } from '@/utils/constants';
 
 export interface IExtendedFixedPeriod extends IFixedPeriodObject {
 	subjectName: string;

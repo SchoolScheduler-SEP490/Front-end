@@ -1,5 +1,5 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { INoAssignPeriodObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { INoAssignPeriodObject } from '@/utils/constants';
 
 export interface ITeacherResponse {
 	id: number;

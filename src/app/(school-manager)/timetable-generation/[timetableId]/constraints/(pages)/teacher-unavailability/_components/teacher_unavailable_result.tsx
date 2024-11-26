@@ -85,7 +85,10 @@ const TeacherUnavailableResult = (props: ITeacherUnavailableResultProps) => {
 								<TableCell align='center'>
 									<IconButton
 										color='error'
-										onClick={() => handleDelete(teacher['teacher-id'])}
+										onClick={(e) => {
+											e.stopPropagation();
+											handleDelete(teacher['teacher-id']);
+										}}
 									>
 										<DeleteIcon />
 									</IconButton>

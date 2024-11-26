@@ -200,3 +200,129 @@ export const TIMETABLE_SLOTS = [
 
 export const WEEK_DAYS = ['T.2', 'T.3', 'T.4', 'T.5', 'T.6', 'T.7'];
 export const WEEK_DAYS_FULL = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+
+// =============================================TIMETABLE CONSTANTS===================================================
+// Phân công giáo viên
+export interface ITeachingAssignmentObject {
+	id: number;
+	'teacher-id': number;
+}
+
+// Tiết cố định
+export interface IFixedPeriodObject {
+	'subject-id': number;
+	'class-id': number;
+	'start-at': number;
+}
+
+// Tiết không xếp
+export interface INoAssignPeriodObject {
+	'start-at': number;
+	'class-id': number | null;
+	'teacher-id': number;
+	'subject-id': number | null;
+}
+
+// Tiết rảnh
+export interface IFreePeriodObject {
+	'start-at': number;
+	'class-id': number;
+}
+
+export interface IClassCombinationObject {
+	'subject-id': number;
+	'class-ids': number[];
+	'room-id'?: number;
+	session: EClassSession;
+	'teacher-id': number | null;
+}
+
+export enum EClassSession {
+	Morning = 'Morning',
+	Afternoon = 'Afternoon',
+}
+
+// Interface của cấu hình đi cùng với thời khóa biểu bên dưới
+export interface IConfigurationStoreObject {
+	id?: string;
+	'timetable-id': string;
+	'fixed-periods-para': IFixedPeriodObject[];
+	'no-assign-periods-para': INoAssignPeriodObject[];
+	'free-timetable-periods-para': IFreePeriodObject[];
+	'teacher-assignments': ITeachingAssignmentObject[];
+	'class-combinations': IClassCombinationObject[];
+	'applied-curriculum-id': number;
+	'required-break-periods': number;
+	'minimum-days-off': number;
+	'days-in-week': number;
+}
+
+// Interface của record thời khóa biểu
+export interface ITimetableStoreObject {
+	id?: string;
+	'timetable-name': string;
+	'timetable-abbreviation': string;
+	'school-id': number;
+	'year-id': number;
+	'year-name': string;
+	'term-name': string;
+	'term-id': number;
+	'config-id': string;
+	// Id của thời khóa biểu đã tạo.
+	'generated-schedule-id': string | null;
+	'applied-week': number | null;
+	'ended-week': number | null;
+	status: ETimetableStatus;
+}
+
+export enum ETimetableStatus {
+	Published = 'Công bố',
+	Pending = 'Chờ duyệt',
+	Inactived = 'Vô hiệu',
+}
+
+// Record kết quả generate thời khóa biểu
+export interface IScheduleResponse {
+	id: number;
+	'school-year-id': number;
+	'start-week': number;
+	'end-week': number;
+	'school-id': number;
+	'term-id': number;
+	'term-name': string | null;
+	name: string;
+	'fitness-point': number;
+	'class-schedules': IClassSchedule[];
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface IClassSchedule {
+	'school-schedule-id': number;
+	'student-class-id': number;
+	'student-class-name': string;
+	'class-periods': IClassPeriod[];
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface IClassPeriod {
+	'class-schedule-id': number | null;
+	'room-id': number | null;
+	'room-code': string | null;
+	'teacher-id': number;
+	'subject-id': number;
+	'date-of-week': number;
+	'subject-abbreviation': string;
+	'teacher-abbreviation': string;
+	'teacher-assignment-id': number;
+	'start-at': number;
+	priority: string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}

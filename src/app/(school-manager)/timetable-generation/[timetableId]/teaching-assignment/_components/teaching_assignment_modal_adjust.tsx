@@ -10,7 +10,7 @@ import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import React, { useEffect, useState } from 'react';
-import { IConfigurationStoreObject, ITeachingAssignmentObject } from '../../../_libs/constants';
+import { IConfigurationStoreObject, ITeachingAssignmentObject } from '@/utils/constants';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	IAssignmentResponse,
@@ -106,9 +106,8 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		setSelectedGrade,
 	} = props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
-		(state: any) => state.timetableGeneration
-	);
+	const { dataStored, dataFirestoreName, timetableStored }: ITimetableGenerationState =
+		useSelector((state: any) => state.timetableGeneration);
 	const dispatch = useSMDispatch();
 
 	const [editingObjects, setEditingObjects] = useState<ITeachingAssignmentObject[]>([]);
@@ -128,13 +127,21 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleSaveUpdates = async () => {
 		// Save data to Firebase
-		if (dataStored && dataFirestoreName && dataStored.id) {
+		if (dataStored && dataFirestoreName && dataStored.id && automationResult.length > 0) {
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(
 				docRef,
 				{
 					...dataStored,
-					'teacher-assignments': editingObjects,
+					'teacher-assignments': automationResult
+						.find((item) => item['term-id'] === timetableStored['term-id'])
+						?.assignments.map(
+							(assignment: IAssignmentResponse) =>
+								({
+									id: assignment.id,
+									'teacher-id': assignment['teacher-id'],
+								} as ITeachingAssignmentObject)
+						),
 				} as IConfigurationStoreObject,
 				{ merge: true }
 			);
@@ -306,7 +313,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 													) => option.value}
 													noOptionsText='Không có giáo viên phù hợp'
 													disableClearable
-													defaultValue={renderTeacherOption(assignment)}
+													value={renderTeacherOption(assignment)}
 													onOpen={() => {
 														handleSelectSubject(
 															assignment['subject-id']

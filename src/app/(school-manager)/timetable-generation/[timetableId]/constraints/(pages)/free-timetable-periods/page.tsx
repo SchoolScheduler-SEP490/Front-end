@@ -1,7 +1,7 @@
 'use client';
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { IFreePeriodObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { IFreePeriodObject } from '@/utils/constants';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import {
@@ -72,7 +72,7 @@ export default function FreeTimetablePeriods() {
 
 	const [selectedGrade, setSelectedGrade] = useState<string>(CLASSGROUP_TRANSLATOR_REVERSED[10]);
 	const [selectedSession, setSelectedSession] = useState<number>(0);
-	const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+	const [selectedCells, setSelectedCells] = useState<string[]>([]);
 
 	const [gradeOptions, setGradeOptions] = useState<IDropdownOption<string>[]>([]);
 	const [sessionOptions, setSessionOptions] = useState<IDropdownOption<number>[]>([]);
@@ -90,11 +90,11 @@ export default function FreeTimetablePeriods() {
 
 	useEffect(() => {
 		if (dataStored && dataStored['free-timetable-periods-para']) {
-			const tmpResults: Set<string> = new Set<string>();
+			const tmpResults: string[] = [];
 			dataStored['free-timetable-periods-para'].forEach((para) => {
-				tmpResults.add(`${para['start-at']}-${para['class-id']}`);
+				tmpResults.push(`${para['start-at']}-${para['class-id']}`);
 			});
-			if (tmpResults.size > 0) {
+			if (tmpResults.length > 0) {
 				setSelectedCells(tmpResults);
 			}
 		}
@@ -158,19 +158,15 @@ export default function FreeTimetablePeriods() {
 	};
 
 	const toggleCellSelection = (cellId: string) => {
-		setSelectedCells((prev) => {
-			const newSelected = new Set(prev);
-			if (newSelected.has(cellId)) {
-				newSelected.delete(cellId);
-			} else {
-				newSelected.add(cellId);
-			}
-			return newSelected;
-		});
+		if (selectedCells.includes(cellId)) {
+			setSelectedCells(selectedCells.filter((cell) => cell !== cellId));
+		} else {
+			setSelectedCells((prev) => [...prev, cellId]);
+		}
 	};
 
 	const handleClearData = () => {
-		setSelectedCells(new Set());
+		setSelectedCells([]);
 		setSelectedGrade(CLASSGROUP_TRANSLATOR_REVERSED[10]);
 		setSelectedSession(0);
 	};
@@ -275,7 +271,7 @@ export default function FreeTimetablePeriods() {
 						variant='contained'
 						onClick={handleUpdateResults}
 						color='inherit'
-						disabled={selectedCells.size === 0}
+						disabled={selectedCells.length === 0}
 						sx={{
 							bgcolor: '#175b8e',
 							color: 'white',
@@ -351,7 +347,7 @@ export default function FreeTimetablePeriods() {
 													slotIndex
 												}-${clazz.value}`;
 												const isSelected =
-													selectedCells.has(cellId) || false;
+													selectedCells.includes(cellId) || false;
 												return (
 													<TableCell
 														key={cellId}

@@ -21,7 +21,7 @@ import {
 import { doc, setDoc } from 'firebase/firestore';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IConfigurationStoreObject, IFixedPeriodObject } from '../../../_libs/constants';
+import { IConfigurationStoreObject, IFixedPeriodObject } from '@/utils/constants';
 import { ITeachersLessonsObject } from '../_libs/constants';
 import useFilterArray from '@/hooks/useFilterArray';
 

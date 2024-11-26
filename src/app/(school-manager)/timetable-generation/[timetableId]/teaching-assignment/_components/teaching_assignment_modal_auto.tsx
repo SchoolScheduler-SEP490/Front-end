@@ -15,7 +15,7 @@ import {
 	Typography,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { IConfigurationStoreObject } from '../../../_libs/constants';
+import { IConfigurationStoreObject } from '@/utils/constants';
 import useCheckAutoAssignAvailability from '../_hooks/useCheckAvailability';
 import { getAutoAssignmentApi } from '../_libs/apis';
 import {

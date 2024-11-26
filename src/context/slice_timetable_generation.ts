@@ -1,13 +1,11 @@
-import {
-	IConfigurationStoreObject,
-	ITimetableStoreObject,
-} from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { IConfigurationStoreObject, ITimetableStoreObject } from '@/utils/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ITimetableGenerationState {
 	timetableId: string;
 	dataFirestoreName: string;
 	timetableFirestoreName: string;
+	generatedScheduleFirestorename: string;
 	isModifying: boolean;
 	dataStored: IConfigurationStoreObject;
 	timetableStored: ITimetableStoreObject;
@@ -22,6 +20,7 @@ const initialState: ITimetableGenerationState = {
 	timetableId: '',
 	dataFirestoreName: 'configurations',
 	timetableFirestoreName: 'timetables',
+	generatedScheduleFirestorename: 'schedule-responses',
 	isModifying: false,
 	dataStored: {} as IConfigurationStoreObject,
 	timetableStored: {} as ITimetableStoreObject,

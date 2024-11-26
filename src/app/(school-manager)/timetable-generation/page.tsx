@@ -4,7 +4,13 @@ import { useAppContext } from '@/context/app_provider';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useNotify from '@/hooks/useNotify';
-import { ISchoolYearResponse, ITermResponse } from '@/utils/constants';
+import {
+	ETimetableStatus,
+	IConfigurationStoreObject,
+	ISchoolYearResponse,
+	ITermResponse,
+	ITimetableStoreObject,
+} from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import {
 	Button,
@@ -22,12 +28,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
-import {
-	ETimetableStatus,
-	IConfigurationStoreObject,
-	ITimetableStoreObject,
-	TIMETABLE_GENERATION_TABS,
-} from './_libs/constants';
+import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -69,6 +70,8 @@ export default function Home() {
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
 	});
+
+	// const {data:classCombination}
 
 	// Process data
 	useEffect(() => {
@@ -127,6 +130,7 @@ export default function Home() {
 			'timetable-abbreviation': timetableAbbreviation,
 			'school-id': Number(schoolId),
 			'year-id': selectedSchoolYearId,
+			'generated-schedule-id': null,
 			'year-name':
 				schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
 			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
