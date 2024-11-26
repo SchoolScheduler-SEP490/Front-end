@@ -21,8 +21,9 @@ export default function SMClass() {
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const [currentSchoolYear, setCurrentSchoolYear] = React.useState<string>('');
-	const [isFilterable, setIsFilterable] = React.useState<boolean>(false);
+	const [isFilterable, setIsFilterable] = React.useState<boolean>(true);
 	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
+	const [selectedYearId, setSelectedYearId] = React.useState(selectedSchoolYearId);
 
 	const { data, error, isValidating, mutate } = useClassData({
 		sessionToken,
@@ -62,7 +63,7 @@ export default function SMClass() {
 	React.useEffect(() => {
 		mutate();
 		setIsErrorShown(false);
-		if (data?.status === 200 && currentSchoolYear) {
+		if (data?.status === 200 ) {
 			setTotalRows(data.result['total-item-count']);
 			const classData: IClassTableData[] = data.result.items.map((item: IClass) => ({
 				id: item.id,
@@ -75,7 +76,7 @@ export default function SMClass() {
 			}));
 			setClassTableData(classData);
 		}
-	}, [data, currentSchoolYear]);
+	}, [data, selectedSchoolYearId]);
 
 	React.useEffect(() => {
 		setPage((prev) => Math.min(prev, getMaxPage() - 1));
@@ -132,7 +133,7 @@ export default function SMClass() {
 			<div
 				className={`w-full h-auto flex flex-row ${
 					isFilterable ? 'justify-start items-start' : 'justify-center items-center'
-				} pt-5 px-[1.5vw] gap-[1vw]`}
+				} pt-5  gap-[1vw]`}
 			>
 				<ClassTable
 					classTableData={classTableData}
@@ -148,8 +149,9 @@ export default function SMClass() {
 				<ClassFilterable
 					open={isFilterable}
 					setOpen={setIsFilterable}
-					selectedYearId={selectedSchoolYearId}
-					setSelectedYearId={(value: number) => selectedSchoolYearId}
+					selectedYearId={selectedYearId}
+					setSelectedYearId={setSelectedYearId}
+					mutate={mutate}
 				/>
 			</div>
 		</div>

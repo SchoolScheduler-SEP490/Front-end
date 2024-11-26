@@ -185,12 +185,12 @@ export interface QueryCondition {
 	value: any;
 }
 
-export const APPROPRIATE_LEVEL: { key: string; value: number }[] = [
-	{ key: 'Không đạt', value: 1 },
-	{ key: 'Cơ bản', value: 2 },
-	{ key: 'Đạt', value: 3 },
-	{ key: 'Nâng cao', value: 4 },
-	{ key: 'Thành thạo', value: 5 },
+export const APPROPRIATE_LEVEL: { key: number; value: string }[] = [
+	{ key: 1, value: ' Unqualified' },
+	{ key: 2, value: 'Basic' },
+	{ key: 3, value: 'Proficient' },
+	{ key: 4, value: 'Advanced' },
+	{ key: 5, value: 'Mastery' },
 ];
 
 export const TIMETABLE_SLOTS = [

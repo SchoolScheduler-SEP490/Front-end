@@ -51,12 +51,7 @@ const headCells: readonly HeadCell[] = [
     id: "curriculum" as keyof IClassGroupTableData,
     label: "Khung chương trình",
     centered: false,
-  },
-  {
-    id: "createDate" as keyof IClassGroupTableData,
-    label: "Ngày tạo",
-    centered: true,
-  },
+  }
 ];
 
 function EnhancedTableHead() {
@@ -144,9 +139,6 @@ const ClassGroupTableSkeleton = () => {
                         padding="normal"
                         align="left"
                       >
-                        <Skeleton animation="wave" variant="text" />
-                      </TableCell>
-                      <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
                       <TableCell align="left">

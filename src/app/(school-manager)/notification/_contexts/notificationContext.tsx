@@ -32,8 +32,12 @@ export const NotificationProvider = ({
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const fetchUnreadCount = async () => {
-    const count = await getUnreadCount(sessionToken, accountId);
-    setUnreadCount(count);
+    try {     
+      const count = await getUnreadCount(sessionToken, accountId);
+      setUnreadCount(count);
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
   };
 
   useEffect(() => {

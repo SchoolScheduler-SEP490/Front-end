@@ -37,6 +37,9 @@ export interface IAssignClass {
 export interface IStudentClass {
   id: number;
   name: string;
+  "student-class-group-name": string;
+  "curriculum-id": number;
+  "curriculum-name": string;
 }
 
 export interface ICurriculum {

@@ -1,3 +1,4 @@
+import { APPROPRIATE_LEVEL, CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 import * as yup from "yup";
 
 export const teacherSchema = yup.object().shape({
@@ -29,9 +30,6 @@ export const teacherSchema = yup.object().shape({
     .min(10, "Số điện thoại phải có đúng 10 số.")
     .max(10, "Số điện thoại phải có đúng 10 số."),
 
-  ["main-subject"]: yup.object().shape({
-    ["subject-abreviation"]: yup.string().required("Vui lòng chọn môn học.")
-  }),
 });
 
 export const updateTeacherSchema = yup.object().shape({
@@ -70,4 +68,23 @@ export const updateTeacherSchema = yup.object().shape({
         "is-main": yup.boolean()
       })
     )
+});
+
+export const addTeachableSubject = yup.object().shape({
+  subjects: yup.array().of(
+    yup.object().shape({
+      "subject-abreviation": yup.string().required("Vui lòng chọn môn học"),
+      "list-approriate-level-by-grades": yup.array().of(
+        yup.object().shape({
+          "appropriate-level": yup.string()
+            .oneOf(APPROPRIATE_LEVEL.map(level => level.value))
+            .required("Vui lòng chọn độ phù hợp"),
+          grade: yup.string()
+            .oneOf(Object.keys(CLASSGROUP_TRANSLATOR))
+            .required("Vui lòng chọn khối")
+        })
+      ).min(1, "Vui lòng chọn ít nhất một khối"),
+      "is-main": yup.boolean().required("Vui lòng chọn loại môn học")
+    })
+  )
 });

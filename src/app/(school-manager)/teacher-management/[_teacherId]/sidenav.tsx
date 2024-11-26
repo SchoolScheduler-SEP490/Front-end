@@ -9,17 +9,17 @@ interface TeacherSidenavProps {
 
 export default function TeacherSidenav({ activeTab, handleTabChange }: TeacherSidenavProps) {
   return (
-    <div className="w-[240px] border-r bg-white">
+    <div className="w-full border-b bg-white fixed top-16 z-10">
       <Tabs
-        orientation="vertical"
+        orientation="horizontal"
+        variant="fullWidth"
         value={activeTab}
         onChange={handleTabChange}
         sx={{
-          borderRight: 1,
-          borderColor: 'divider',
+          width: '84%',
           '& .MuiTab-root': {
-            alignItems: 'flex-start',
-            textAlign: 'left',
+            alignItems: 'center',
+            textAlign: 'center',
             color: 'var(--basic-gray)',
             fontSize: '14px',
             fontWeight: 400,

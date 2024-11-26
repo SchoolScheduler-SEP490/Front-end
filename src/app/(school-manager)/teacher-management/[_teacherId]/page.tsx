@@ -18,10 +18,10 @@ import dayjs from "dayjs";
 import UpdateTeacherModal from "../_components/update_teacher";
 import { Card, CardContent, Typography, Divider } from "@mui/material";
 import TeacherSidenav from "./sidenav";
-import TeacherAssignment from "./teacher_assignment";
+import TeachableSubjectTable from "./teachable_subject";
+import useSWR from "swr";
 
 export default function TeacherDetails() {
-  const [teacherData, setTeacherData] = useState<ITeacherDetail>();
   const { sessionToken, schoolId } = useAppContext();
   const api = process.env.NEXT_PUBLIC_API_URL;
   const searchParams = useSearchParams();
@@ -29,28 +29,28 @@ export default function TeacherDetails() {
   const router = useRouter();
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const fetchTeacherDetails = React.useCallback(async () => {
-    setIsLoading(true);
-    const response = await fetch(
-      `${api}/api/schools/${schoolId}/teachers/${teacherId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      }
-    );
-    const data = await response.json();
-    if (data.status === 200) {
-      setTeacherData(data.result);
+  
+  const { data: teacherData, isLoading, mutate } = useSWR(
+    teacherId ? ['teacher-detail', schoolId, teacherId] : null,
+    async () => {
+      const response = await fetch(
+        `${api}/api/schools/${schoolId}/teachers/${teacherId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      return data.result;
+    },
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateOnMount: true,
     }
-  }, [api, schoolId, teacherId, sessionToken]);
-
-  useEffect(() => {
-    if (sessionToken && teacherId) {
-      fetchTeacherDetails();
-    }
-  }, [teacherId, sessionToken, fetchTeacherDetails]);
+  );  
 
   const handleBack = () => {
     router.push("/teacher-management");
@@ -71,27 +71,23 @@ export default function TeacherDetails() {
         </div>
       </SMHeader>
 
-      {isLoading && teacherData && (
-        <div className="flex h-full">
+      {!isLoading && teacherData && (
+        <div className="flex flex-col h-full py-20">
           <TeacherSidenav
             activeTab={activeTab}
             handleTabChange={handleTabChange}
           />
-          <div className="flex-1 overflow-auto w-screen">
+          <div className="flex-1 overflow-auto">
             {activeTab === 0 && (
-              <div className="w-full p-7">
+              <div className="w-full p-7 flex justify-center">
                 <UpdateTeacherModal
                   open={openUpdateModal}
                   onClose={setOpenUpdateModal}
                   teacherId={Number(teacherId)}
-                  mutate={fetchTeacherDetails}
+                  mutate={mutate}
                 />
                 {teacherData && (
-                  <Grid
-                    container
-                    spacing={2}
-                    className="!flex self-center mx-auto my-auto"
-                  >
+                  <Grid container spacing={2} className="!flex justify-center">
                     <Grid item xs={12} md={5}>
                       <Card className="!w-full !shadow-md !border !border-gray-200 !rounded-lg">
                         <CardContent>
@@ -260,11 +256,13 @@ export default function TeacherDetails() {
               </div>
             )}
             {activeTab === 1 && (
-              <div className="p-7">
-                <h2 className="text-title-medium font-semibold mb-4">
-                  Phân công giảng dạy
-                </h2>
-                <TeacherAssignment teacherId={teacherId} />
+              <div className="p-7 flex flex-col items-center ">
+                <TeachableSubjectTable
+                  teacherId={teacherId}
+                  schoolId={schoolId}
+                  sessionToken={sessionToken}
+                  mutate={mutate}
+                />
               </div>
             )}
           </div>
@@ -272,4 +270,5 @@ export default function TeacherDetails() {
       )}
     </div>
   );
+
 }
