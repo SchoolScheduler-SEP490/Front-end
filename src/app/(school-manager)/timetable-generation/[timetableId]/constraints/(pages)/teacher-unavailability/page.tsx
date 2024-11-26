@@ -1,10 +1,7 @@
 'use client';
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import {
-	IConfigurationStoreObject,
-	INoAssignPeriodObject,
-} from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { IConfigurationStoreObject, INoAssignPeriodObject } from '@/utils/constants';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
@@ -13,6 +10,7 @@ import { firestore } from '@/utils/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import TeacherUnavailableResult from './_components/teacher_unavailable_result';
 import TeacherUnavailableSelector from './_components/teacher_unavailable_selector';
 import useFetchTeacher from './_hooks/useFetchTeacher';
 import {
@@ -20,7 +18,6 @@ import {
 	ITeacherResponse,
 	ITeacherUnavailability,
 } from './_libs/constants';
-import TeacherUnavailableResult from './_components/teacher_unavailable_result';
 
 export default function TeacherUnavailability() {
 	const { schoolId, sessionToken } = useAppContext();
@@ -71,21 +68,22 @@ export default function TeacherUnavailability() {
 		});
 		if (dataStored && dataFirestoreName && dataStored.id) {
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
+			const newResults: INoAssignPeriodObject[] = useFilterArray(
+				[...dataStored['no-assign-periods-para'], ...tmpResults],
+				['teacher-id', 'start-at']
+			);
 			await setDoc(
 				docRef,
 				{
 					...dataStored,
-					'no-assign-periods-para': useFilterArray(
-						[...results, ...tmpResults],
-						['teacher-id', 'start-at']
-					),
+					'no-assign-periods-para': newResults,
 				} as IConfigurationStoreObject,
 				{ merge: true }
 			);
 			dispatch(
 				updateDataStored({
 					target: 'no-assign-periods-para',
-					value: useFilterArray([...results, ...tmpResults], ['teacher-id', 'start-at']),
+					value: newResults,
 				})
 			);
 			useNotify({
@@ -116,14 +114,16 @@ export default function TeacherUnavailability() {
 					value: newResults,
 				})
 			);
+			hadnleClearData();
+			useNotify({
+				message: 'Xóa thành công',
+				type: 'success',
+			});
 		}
-		useNotify({
-			message: 'Xóa thành công',
-			type: 'success',
-		});
 	};
 
 	const handleSelectResult = (teacherId: number) => {
+		hadnleClearData();
 		const tmpSelectedCells: { [key: string]: { selected: boolean } } = {};
 		dataStored['no-assign-periods-para']
 			.filter((teacher: INoAssignPeriodObject) => teacher['teacher-id'] === teacherId)

@@ -8,10 +8,7 @@ import { useEffect, useState } from 'react';
 import { IAssignmentResponse, IClassResponse, IExtendedFixedPeriod } from './_libs/constants';
 import useFetchTeachingAssignment from './_hooks/useFetchTeachingAssignment';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import {
-	IFixedPeriodObject,
-	ITeachingAssignmentObject,
-} from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { IFixedPeriodObject, ITeachingAssignmentObject } from '@/utils/constants';
 
 export default function FixedPeriodsPage() {
 	const { schoolId, sessionToken } = useAppContext();

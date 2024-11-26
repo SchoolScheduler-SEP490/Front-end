@@ -4,12 +4,16 @@ import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
-import { CLASSGROUP_STRING_TYPE, CLASSGROUP_TRANSLATOR_REVERSED } from '@/utils/constants';
+import {
+	CLASSGROUP_STRING_TYPE,
+	CLASSGROUP_TRANSLATOR_REVERSED,
+	EClassSession,
+	IClassCombinationObject,
+} from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { EClassSession, IClassCombinationObject } from '../../_libs/constants';
 import ClassCombinationResult from './_components/class_combination_result';
 import ClassCombinationSelector from './_components/class_combination_selector';
 import useFetchClassCombinations from './_hook/useFetchClassCombinations';

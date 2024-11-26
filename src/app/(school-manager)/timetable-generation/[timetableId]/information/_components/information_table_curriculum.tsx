@@ -145,7 +145,7 @@ const CurriculumInformationTable = () => {
 		<div className='w-full h-[90vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
 			<Paper sx={{ mb: 2 }}>
 				<TableContainer component={Paper}>
-					<Table aria-label='curriculum table'>
+					<Table aria-label='curriculum table' size='small'>
 						<TableHead>
 							<TableRow>
 								<TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
@@ -217,7 +217,9 @@ const CurriculumInformationTable = () => {
 									<TableCell>
 										{getShortenedSubjects(row.selectiveSubjects)}
 									</TableCell>
-									<TableCell>Khối {CLASSGROUP_TRANSLATOR[row.grade]}</TableCell>
+									<TableCell width={80}>
+										Khối {CLASSGROUP_TRANSLATOR[row.grade]}
+									</TableCell>
 									<TableCell>{row.appliedClassGroups.join(' - ')}</TableCell>
 									<TableCell width={80}>
 										<a

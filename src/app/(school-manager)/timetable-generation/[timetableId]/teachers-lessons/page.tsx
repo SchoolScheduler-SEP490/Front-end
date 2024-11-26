@@ -3,7 +3,6 @@ import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { IFixedPeriodObject, ITeachingAssignmentObject } from '../../_libs/constants';
 import TeachersLessonsSideNav from './_components/teachers_lessons_sidenav';
 import TeachersLessonsTable from './_components/teachers_lessons_table';
 import useFetchClassData from './_hooks/useFetchClass';
@@ -19,6 +18,7 @@ import {
 } from './_libs/constants';
 import useFetchTeacher from './_hooks/useFetchTeacher';
 import useNotify from '@/hooks/useNotify';
+import { IFixedPeriodObject, ITeachingAssignmentObject } from '@/utils/constants';
 
 export default function TeachersLessons() {
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();

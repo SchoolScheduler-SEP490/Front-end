@@ -1,5 +1,5 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { IClassCombinationObject } from '../../../_libs/constants';
+import { IClassCombinationObject } from '@/utils/constants';
 
 export interface IClassResponse {
 	id: number;

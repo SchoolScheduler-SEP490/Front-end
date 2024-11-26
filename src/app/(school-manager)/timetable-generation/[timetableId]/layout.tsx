@@ -14,12 +14,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TimetableTabs from '../_components/timetable-tabs';
-import {
-	IConfigurationStoreObject,
-	ITimetableStoreObject,
-	TIMETABLE_GENERATION_TABS,
-} from '../_libs/constants';
+import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
+import { IConfigurationStoreObject, ITimetableStoreObject } from '@/utils/constants';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
