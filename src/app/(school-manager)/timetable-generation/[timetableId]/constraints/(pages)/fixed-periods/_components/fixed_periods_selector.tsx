@@ -22,7 +22,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import { IFilterableDropdownOption } from '../_libs/constants';
+import { IFilterableDropdownOption } from '../../teacher-unavailability/_libs/constants';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
