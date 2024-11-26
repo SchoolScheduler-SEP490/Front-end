@@ -89,7 +89,6 @@ export default function SMTeacher() {
       setTeacherTableData(teacherData);
     }
   }, [data, selectedDepartment, departments]);
-  
 
   React.useEffect(() => {
     setPage((prev) => Math.min(prev, getMaxPage() - 1));
@@ -145,31 +144,37 @@ export default function SMTeacher() {
           </h3>
         </div>
       </SMHeader>
-        <div
-				className={`w-full h-auto flex flex-row ${
-					isFilterable ? 'justify-start items-start' : 'justify-center items-center'
-				} pt-5 px-[1.5vw] gap-[1vw]`}
-        >
-          <TeacherTable
-            teacherTableData={teacherTableData}
-            page={page}
-            setPage={setPage}
-            rowsPerPage={rowsPerPage}
-            setRowsPerPage={setRowsPerPage}
-            totalRows={totalRows}
-            mutate={mutate}
-            isFilterable={isFilterable}
-            setIsFilterable={setIsFilterable}
-          />
-          <TeacherFilterable
-            open={isFilterable}
-            setOpen={setIsFilterable}
-            selectedDepartment={selectedDepartment}
-            setSelectedDepartment={setSelectedDepartment}
-            departments={departments}
-            mutate={mutate}
-          />
+      <div className="w-full h-fit flex flex-col justify-center items-center px-[1vw] pt-[5vh]">
+        <div className="w-full h-fit flex flex-row justify-center items-start gap-6">
+          <div
+            className={`${
+              isFilterable ? "w-[79%]" : "w-full"
+            }`}
+          >
+            <TeacherTable
+              teacherTableData={teacherTableData}
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              totalRows={totalRows}
+              mutate={mutate}
+              isFilterable={isFilterable}
+              setIsFilterable={setIsFilterable}
+            />
+          </div>
+          {isFilterable && (
+            <TeacherFilterable
+              open={isFilterable}
+              setOpen={setIsFilterable}
+              selectedDepartment={selectedDepartment}
+              setSelectedDepartment={setSelectedDepartment}
+              departments={departments}
+              mutate={mutate}
+            />
+          )}
         </div>
       </div>
+    </div>
   );
 }

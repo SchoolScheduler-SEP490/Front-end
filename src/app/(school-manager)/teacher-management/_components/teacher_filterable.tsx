@@ -29,7 +29,7 @@ const TeacherFilterable = (props: TeacherFilterableProps) => {
   };
 
   return (
-    <div className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] ${
+    <div className={`h-full w-[23%] flex flex-col justify-start items-center ${
       open ? "visible animate-fade-left animate-once animate-duration-500 animate-ease-out" : "hidden"
     }`}>
       <Paper className="w-full p-3 flex flex-col justify-start items-center gap-3">
