@@ -41,7 +41,7 @@ const style = {
 	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
-	width: '40vw',
+	width: '50vw',
 	height: 'fit-content',
 	bgcolor: 'background.paper',
 };
@@ -132,6 +132,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 	const formik = useFormik({
 		initialValues: {
 			'curriculum-name': '',
+			'curriculum-code': '',
 			grade: 0,
 			'elective-subject-ids': [],
 			'specialized-subject-ids': [],
@@ -210,6 +211,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 			});
 			formik.setValues({
 				'curriculum-name': oldData['curriculum-name'],
+				'curriculum-code': oldData['curriculum-code'],
 				grade: CLASSGROUP_TRANSLATOR[oldData.grade],
 				'elective-subject-ids': Array.from(electiveSubjectIds),
 				'specialized-subject-ids': Array.from(specialisedSubjectIds),
@@ -285,6 +287,42 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 								helperText={
 									formik.touched['curriculum-name'] &&
 									formik.errors['curriculum-name']
+								}
+								slotProps={{
+									input: {
+										endAdornment: (
+											<Image
+												className='opacity-30 mx-2 select-none'
+												src='/images/icons/text-formatting.png'
+												alt='email'
+												width={20}
+												height={20}
+											/>
+										),
+									},
+								}}
+							/>
+						</div>
+						<div className='w-full h-fit flex flex-row justify-between items-center'>
+							<h3 className=' h-full flex justify-start pt-4'>
+								Mã Khung chương trình
+							</h3>
+							<TextField
+								className='w-[70%]'
+								variant='standard'
+								label='Nhập mã Khung chương trình'
+								id='curriculum-code'
+								name='curriculum-code'
+								value={formik.values['curriculum-code']}
+								onChange={formik.handleChange('curriculum-code')}
+								onBlur={formik.handleBlur}
+								error={
+									formik.touched['curriculum-code'] &&
+									Boolean(formik.errors['curriculum-code'])
+								}
+								helperText={
+									formik.touched['curriculum-code'] &&
+									formik.errors['curriculum-code']
 								}
 								slotProps={{
 									input: {
