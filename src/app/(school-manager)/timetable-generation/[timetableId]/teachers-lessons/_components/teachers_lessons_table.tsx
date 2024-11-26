@@ -3,6 +3,7 @@ import TableChartSharpIcon from '@mui/icons-material/TableChartSharp';
 import {
 	IconButton,
 	Paper,
+	styled,
 	Table,
 	TableBody,
 	TableCell,
@@ -12,10 +13,37 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 	Toolbar,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
 } from '@mui/material';
 import { MouseEvent, useState } from 'react';
 import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';
 import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
+import { ITeachersLessonsObject } from '../_libs/constants';
+import useGetSlotDetails from '../_hooks/useGetSlotDetails';
+import FixedPeriodAssignmentModal from './teachers_lessons_modal_edit';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 13,
+	},
+}));
+
+const getExistingSlot = (
+	data: ITeachersLessonsObject[],
+	slotId: number
+): ITeachersLessonsObject | undefined => {
+	const existingSlot: ITeachersLessonsObject | undefined = data.find((item) =>
+		item.slots.includes(slotId)
+	);
+	return existingSlot;
+};
 
 interface EnhancedTableProps {
 	numberOfSlots: number;
@@ -73,6 +101,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 					<TableCell
 						key={index}
 						sx={{
+							textAlign: 'center',
 							fontWeight: 'bold',
 							borderRight: '1px solid #f0f0f0',
 							borderLeft: '1px solid #f0f0f0',
@@ -87,121 +116,33 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 	);
 }
 
-const rows = [
-	{
-		monHoc: 'Toán',
-		giaoVien: 'Hoàng',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T6.S3',
-		tiet5: 'T6.S4',
-	},
-	{
-		monHoc: 'Văn',
-		giaoVien: 'Lan',
-		tiet1: 'T3.S1',
-		tiet2: 'T3.S2',
-		tiet3: 'T4.S1',
-		tiet4: 'T5.S3',
-		tiet5: 'T5.S4',
-	},
-	{
-		monHoc: 'Anh',
-		giaoVien: 'Minh',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T4.S3',
-		tiet5: 'T4.S4',
-	},
-	{
-		monHoc: 'Lý',
-		giaoVien: 'Hùng',
-		tiet1: 'T3.S1',
-		tiet2: 'T3.S2',
-		tiet3: 'T4.S1',
-		tiet4: 'T6.S3',
-		tiet5: 'T6.S4',
-	},
-	{
-		monHoc: 'Hóa',
-		giaoVien: 'Hà',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T5.S3',
-		tiet5: 'T5.S4',
-	},
-	{
-		monHoc: 'Sinh',
-		giaoVien: 'Mai',
-		tiet1: 'T3.S1',
-		tiet2: 'T3.S2',
-		tiet3: 'T4.S1',
-		tiet4: 'T6.S3',
-		tiet5: 'T6.S4',
-	},
-	{
-		monHoc: 'Sử',
-		giaoVien: 'Tùng',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T4.S3',
-		tiet5: 'T4.S4',
-	},
-	{
-		monHoc: 'Địa',
-		giaoVien: 'Hương',
-		tiet1: 'T3.S1',
-		tiet2: 'T3.S2',
-		tiet3: 'T4.S1',
-		tiet4: 'T5.S3',
-		tiet5: 'T5.S4',
-	},
-	{
-		monHoc: 'GDCD',
-		giaoVien: 'Phúc',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T6.S3',
-		tiet5: 'T6.S4',
-	},
-	{
-		monHoc: 'Tin',
-		giaoVien: 'Dũng',
-		tiet1: 'T3.S1',
-		tiet2: 'T3.S2',
-		tiet3: 'T4.S1',
-		tiet4: 'T5.S3',
-		tiet5: 'T5.S4',
-	},
-	{
-		monHoc: 'Thể dục',
-		giaoVien: 'Hải',
-		tiet1: 'T2.S1',
-		tiet2: 'T2.S2',
-		tiet3: 'T3.S1',
-		tiet4: 'T4.S3',
-		tiet5: 'T4.S4',
-	},
-];
-
 interface ITeachersLessonsTableProps {
 	// Add something here
+	data: ITeachersLessonsObject[];
+	maxSlot: number;
+	homeroomTeacher: string;
 }
 
 const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
-	const [alignment, setAlignment] = useState('list');
-	const [maxSlots, setMaxSlots] = useState<number>(5);
+	const { data, maxSlot, homeroomTeacher } = props;
+
+	const [alignment, setAlignment] = useState<string>('list');
+	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
+	const [selectedObject, setSelectedObject] = useState<ITeachersLessonsObject>(
+		{} as ITeachersLessonsObject
+	);
 
 	const handleChange = (event: MouseEvent<HTMLElement>, newAlignment: string) => {
 		if (!(alignment === newAlignment)) {
 			setAlignment(newAlignment);
 		}
 	};
+
+	const handleOpenAssignModal = (object: ITeachersLessonsObject) => {
+		setSelectedObject(object);
+		setIsAssignModalOpen(true);
+	};
+
 	return (
 		<div className='w-full h-fit flex justify-start items-center '>
 			{alignment === 'list' && (
@@ -228,24 +169,49 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 						</div>
 						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 							<h3 className='text-body-medium opacity-80'>GVCN: </h3>
-							<h2 className='text-body-medium-strong font-normal'>PhuongLHK</h2>
+							<h2 className='text-body-medium-strong font-normal'>
+								{homeroomTeacher}
+							</h2>
 						</div>
 					</Toolbar>
 					<TableContainer>
 						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
-							<EnhancedTableHead numberOfSlots={maxSlots} />
+							<EnhancedTableHead numberOfSlots={maxSlot} />
 							<TableBody>
-								{rows.map((row, index) => (
+								{data.map((row, index) => (
 									<TableRow key={index}>
-										<TableCell>{row.monHoc}</TableCell>
-										<TableCell>{row.giaoVien}</TableCell>
-										<TableCell>{row.tiet1}</TableCell>
-										<TableCell>{row.tiet2}</TableCell>
-										<TableCell>{row.tiet3}</TableCell>
-										<TableCell>{row.tiet4}</TableCell>
-										<TableCell>{row.tiet5}</TableCell>
+										<TableCell>{row.subjectName}</TableCell>
+										<TableCell>{row.teacherName}</TableCell>
+										{Array.from({ length: maxSlot }, (_, index) => (
+											<TableCell key={index} sx={{ textAlign: 'center' }}>
+												<LightTooltip
+													title={
+														row.slots[index]
+															? useGetSlotDetails(
+																	row.slots[index],
+																	false
+															  )
+															: 'Tiết chưa xếp sẵn'
+													}
+													arrow
+												>
+													{index < row.totalSlotPerWeek ? (
+														<h3>
+															{row.slots[index]
+																? useGetSlotDetails(
+																		row.slots[index],
+																		true
+																  )
+																: '- - -'}
+														</h3>
+													) : (
+														<h3></h3>
+													)}
+												</LightTooltip>
+											</TableCell>
+										))}
 										<TableCell width={50}>
-											<IconButton>
+											<IconButton onClick={() => handleOpenAssignModal(row)}>
 												<DriveFileRenameOutlineSharpIcon />
 											</IconButton>
 										</TableCell>
@@ -280,7 +246,9 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 						</div>
 						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 							<h3 className='text-body-medium opacity-80'>GVCN:</h3>
-							<h2 className='text-body-medium-strong font-normal'>PhuongLHK</h2>
+							<h2 className='text-body-medium-strong font-normal'>
+								{homeroomTeacher}
+							</h2>
 						</div>
 					</Toolbar>
 					<TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto' }}>
@@ -312,11 +280,11 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{TIMETABLE_SLOTS.map((session, i) => (
+								{TIMETABLE_SLOTS.map((session, sessionIndex) => (
 									<>
-										{session.slots.map((slot, index) => (
+										{session.slots.map((slot, slotIndex) => (
 											<TableRow key={`${session.period}-${slot}`}>
-												{index === 0 && (
+												{slotIndex === 0 && (
 													<TableCell
 														rowSpan={session.slots.length}
 														align='center'
@@ -329,44 +297,51 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 													</TableCell>
 												)}
 												<TableCell align='center'>{slot}</TableCell>
-												{WEEK_DAYS.map((day) => {
-													const cellId = `${day}-${session.period}-${slot}`;
-													// const isSelected =
-													// 	selectedCells[cellId]?.selected || false;
-													return (
-														<TableCell
-															key={cellId}
-															align='center'
-															sx={{
-																// backgroundColor: isSelected
-																// 	? '#E0E0E0'
-																// 	: 'transparent',
-																cursor: 'pointer',
-																userSelect: 'none',
-																border: '1px solid #ddd',
-															}}
-															// onMouseDown={() =>
-															// 	handleMouseDown(cellId)
-															// }
-															// onMouseEnter={() =>
-															// 	handleMouseEnter(cellId)
-															// }
-														>
-															{/* <Collapse in={isSelected} timeout={200}>
-																<Typography fontSize={13}>
-																	<ClearIcon
-																		fontSize='small'
-																		sx={{ opacity: 0.6 }}
-																	/>
-																</Typography>
-															</Collapse> */}
-														</TableCell>
-													);
-												})}
+												{WEEK_DAYS.map(
+													(day: string, weekdayIndex: number) => {
+														const cellId =
+															weekdayIndex * 10 +
+															sessionIndex * 5 +
+															slotIndex +
+															1;
+														const existingSlot = getExistingSlot(
+															data,
+															cellId
+														);
+														return (
+															<TableCell
+																key={cellId}
+																align='center'
+																sx={{
+																	cursor: 'pointer',
+																	userSelect: 'none',
+																	border: '1px solid #ddd',
+																	':hover': {
+																		backgroundColor: '#f0f0f0',
+																	},
+																	width: 80,
+																	maxWidth: 80,
+																	height: 50,
+																	maxHeight: 50,
+																}}
+																onClick={() =>
+																	handleOpenAssignModal(
+																		existingSlot ??
+																			({} as ITeachersLessonsObject)
+																	)
+																}
+															>
+																{existingSlot
+																	? `${existingSlot.subjectName} - ${existingSlot.teacherName}`
+																	: '- - -'}
+															</TableCell>
+														);
+													}
+												)}
 											</TableRow>
 										))}
-										{i === 0 && (
-											<TableRow key={i}>
+										{sessionIndex === 0 && (
+											<TableRow key={sessionIndex}>
 												<TableCell
 													colSpan={WEEK_DAYS.length - 1}
 												></TableCell>
@@ -379,6 +354,12 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 					</TableContainer>
 				</Paper>
 			)}
+			<FixedPeriodAssignmentModal
+				open={isAssignModalOpen}
+				setOpen={setIsAssignModalOpen}
+				selectedObject={selectedObject}
+				data={data}
+			/>
 		</div>
 	);
 };

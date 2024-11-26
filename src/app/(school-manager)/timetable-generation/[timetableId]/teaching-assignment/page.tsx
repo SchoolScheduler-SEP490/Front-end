@@ -248,7 +248,7 @@ export default function SMTeachingAssignment() {
 			).reverse();
 			setTableData(tableData);
 		}
-	}, [teachingAssignmentData, teacherData, selectedSchoolYearId, selectedClassId]);
+	}, [teachingAssignmentData, teacherData, selectedSchoolYearId, selectedClassId, dataStored]);
 
 	// Render skeleton if data while fetching data
 	if (isClassValidating || isTeachingAssignmentValidating || isTeacherValidating) {

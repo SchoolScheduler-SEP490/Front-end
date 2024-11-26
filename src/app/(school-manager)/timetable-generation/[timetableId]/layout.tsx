@@ -149,7 +149,9 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 						arrow
 					>
 						<h3 className='text-title-small text-white font-medium tracking-wider'>
-							{timetableStored['timetable-abbreviation'] ?? ''}
+							{timetableStored['timetable-abbreviation'] !== null
+								? timetableStored['timetable-abbreviation']
+								: ''}
 						</h3>
 					</LightTooltip>
 					<h6 className='text-body-small text-white opacity-80'>

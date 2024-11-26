@@ -145,11 +145,9 @@ export default function Home() {
 			'free-timetable-periods-para': [],
 			'class-combinations': [],
 			'applied-curriculum-id': 0,
-			'max-period-per-session': 0,
-			'min-period-per-session': 0,
-			'days-in-week': 0,
+			'days-in-week': 6,
 			'minimum-days-off': 0,
-			'required-break-periods': 0,
+			'required-break-periods': 1,
 		};
 		const timetableRef = await addDoc(collection(firestore, 'timetables'), newTimetableData);
 		const configRef = await addDoc(

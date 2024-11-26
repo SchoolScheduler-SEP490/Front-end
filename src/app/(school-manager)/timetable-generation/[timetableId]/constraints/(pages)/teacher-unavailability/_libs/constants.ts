@@ -1,5 +1,5 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { ITeachingAssignmentObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
+import { INoAssignPeriodObject } from '@/app/(school-manager)/timetable-generation/_libs/constants';
 
 export interface ITeacherResponse {
 	id: number;
@@ -33,7 +33,7 @@ export interface ITeachableSubject {
 	'is-main': boolean;
 }
 
-export interface IExtendedTeachingAssignment extends ITeachingAssignmentObject {
+export interface ITeacherUnavailability extends INoAssignPeriodObject {
 	teacherObject: ITeacherResponse;
 }
 

@@ -1,26 +1,12 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
-import useFilterArray from '@/hooks/useFilterArray';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import {
-	Box,
-	Checkbox,
-	Collapse,
-	IconButton,
-	List,
-	ListItem,
-	ListItemText,
-	Modal,
-	styled,
-	Typography,
-} from '@mui/material';
+import { Box, IconButton, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { TransitionGroup } from 'react-transition-group';
+import useApplyCurriculum from '../_hooks/useApplyCurriculum';
 import useFetchCurriculumClass from '../_hooks/useFetchClass';
 import { IApplyCurriculumRequest, ISGClassResponse, IVulnerableClass } from '../_libs/constants';
 import ApllyConfirmationModal from './curiculumn_modal_confirm';
-import useApplyCurriculum from '../_hooks/useApplyCurriculum';
 
 const style = {
 	position: 'absolute',

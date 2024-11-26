@@ -63,8 +63,25 @@ export interface ITeachersLessonsObject {
 	teacherId: number;
 	teacherName: string;
 	classId: number;
-	className: string;
+	className?: string;
 	subjectId: number;
 	subjectName: string;
 	slots: number[];
+	totalSlotPerWeek: number;
+}
+
+export interface IAssignmentResponse {
+	'period-count': number;
+	'student-class-id': number;
+	'assignment-type': string;
+	'subject-id': number;
+	'subject-name': string;
+	'teacher-id': number;
+	'teacher-first-name': string;
+	'teacher-last-name': string;
+	'teacher-abbreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
 }

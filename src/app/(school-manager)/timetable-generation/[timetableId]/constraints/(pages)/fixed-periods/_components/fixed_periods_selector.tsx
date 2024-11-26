@@ -57,7 +57,7 @@ interface ITeacherUnavailableSelectorProps {
 	handleUpdateResults: () => void;
 }
 
-const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => {
+const FixedPeriodsSelector = (props: ITeacherUnavailableSelectorProps) => {
 	const {
 		teacherOptions,
 		selectedTeacherIds,
@@ -126,7 +126,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 	}, [teacherOptions, selectedTeacherIds]);
 
 	return (
-		<div className='w-[60%] h-[90vh] border-r-1 border-basic-gray-active px-[2vw] pt-[5vh] flex flex-col justify-start items-start gap-5'>
+		<div className='w-[50%] h-[90vh] border-r-1 border-basic-gray-active px-[2vw] pt-[5vh] flex flex-col justify-start items-start gap-5'>
 			<div
 				id='teacher-selector'
 				className='w-full h-[5vh] flex flex-row justify-between items-baseline'
@@ -315,4 +315,4 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 	);
 };
 
-export default TeacherUnavailableSelector;
+export default FixedPeriodsSelector;

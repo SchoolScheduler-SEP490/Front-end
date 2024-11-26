@@ -215,10 +215,14 @@ const ClassCombination = (props: ClassCombinationProps) => {
 				} as IClassCombinationObject,
 			];
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
-			await setDoc(docRef, {
-				...dataStored,
-				'class-combinations': newResults,
-			});
+			await setDoc(
+				docRef,
+				{
+					...dataStored,
+					'class-combinations': newResults,
+				},
+				{ merge: true }
+			);
 			dispatch(updateDataStored({ target: 'class-combinations', value: newResults }));
 			useNotify({ message: 'Lưu thay đổi thành công', type: 'success' });
 
@@ -241,10 +245,14 @@ const ClassCombination = (props: ClassCombinationProps) => {
 				return item;
 			});
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
-			await setDoc(docRef, {
-				...dataStored,
-				'class-combinations': newResults,
-			});
+			await setDoc(
+				docRef,
+				{
+					...dataStored,
+					'class-combinations': newResults,
+				},
+				{ merge: true }
+			);
 			dispatch(updateDataStored({ target: 'class-combinations', value: newResults }));
 		}
 	};
@@ -257,10 +265,14 @@ const ClassCombination = (props: ClassCombinationProps) => {
 					item['class-ids'] !== selectedResultRow?.['class-ids']
 			);
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
-			await setDoc(docRef, {
-				...dataStored,
-				'class-combinations': newResults,
-			});
+			await setDoc(
+				docRef,
+				{
+					...dataStored,
+					'class-combinations': newResults,
+				},
+				{ merge: true }
+			);
 			dispatch(updateDataStored({ target: 'class-combinations', value: newResults }));
 		}
 	};

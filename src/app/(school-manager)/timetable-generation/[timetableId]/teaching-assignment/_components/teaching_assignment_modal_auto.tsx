@@ -144,7 +144,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			};
 			setAutoParams(tmpAutoParams);
 		}
-	}, [assignedTeachers, dataStored]);
+	}, [assignedTeachers, dataStored, maxPeriodPerWeek, minPeriodPerWeek]);
 
 	useEffect(() => {
 		if (open) {
