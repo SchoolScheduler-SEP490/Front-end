@@ -84,6 +84,7 @@ export default function SMTeacher() {
         email: item.email,
         phoneNumber: item.phone || "N/A",
         status: item.status,
+        teachableSubjects: item["teachable-subjects"].map(subject =>  subject["subject-name"]). join(" - ")
       }));
 
       setTeacherTableData(teacherData);
