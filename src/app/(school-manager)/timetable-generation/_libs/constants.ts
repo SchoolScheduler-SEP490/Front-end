@@ -2,9 +2,9 @@ import { IDropdownOption } from '../../_utils/contants';
 
 export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
 	{ label: 'Thông tin chung', value: 'information' },
-	{ label: 'Tạo ràng buộc', value: 'constraints' },
+	{ label: 'Cấu hình ràng buộc', value: 'constraints' },
 	{ label: 'Phân công giáo viên', value: 'teaching-assignment' },
-	{ label: 'Giáo viên - Tiết học', value: 'teachers-lessons' },
+	{ label: 'Xếp tiết cố định', value: 'teachers-lessons' },
 	{ label: 'Tạo thời khóa biểu', value: 'timetable-generation' },
 ];
 
@@ -24,9 +24,9 @@ export interface IFixedPeriodObject {
 // Tiết không xếp
 export interface INoAssignPeriodObject {
 	'start-at': number;
-	'class-id': number;
+	'class-id': number | null;
 	'teacher-id': number;
-	'subject-id': number;
+	'subject-id': number | null;
 }
 
 // Tiết rảnh
@@ -56,12 +56,9 @@ export interface IConfigurationStoreObject {
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];
 	'class-combinations': IClassCombinationObject[];
-	'max-period-per-session': number;
-	'min-period-per-session': number;
 	'applied-curriculum-id': number;
 	'required-break-periods': number;
 	'minimum-days-off': number;
-	// 'term-id': number;
 	'days-in-week': number;
 }
 

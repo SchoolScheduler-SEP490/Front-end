@@ -26,6 +26,11 @@ import {
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
 import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
+import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
+import { useDispatch, useSelector } from 'react-redux';
+import { doc, setDoc } from 'firebase/firestore';
+import { firestore } from '@/utils/firebaseConfig';
+import { IConfigurationStoreObject, ITeachingAssignmentObject } from '../../../_libs/constants';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -104,6 +109,10 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		selectedGrade,
 	} = props;
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
+	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
+	const dispatch = useDispatch();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
@@ -148,15 +157,24 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	};
 
 	const handleConfirmUpdate = async () => {
-		await useAssignTeacher({
-			sessionToken: sessionToken,
-			formData: editingObjects,
-			schoolId: Number(schoolId),
-			schoolYearId: selectedSchoolYearId,
-		});
-		mutate();
-		setIsEditing(false);
-		setEditingObjects([]);
+		if (dataStored && dataStored.id && dataFirestoreName) {
+			const newResult: ITeachingAssignmentObject[] = [
+				...dataStored['teacher-assignments'],
+				...editingObjects,
+			];
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
+			await setDoc(
+				docRef,
+				{
+					...dataStored,
+					'teacher-assignments': newResult,
+				} as IConfigurationStoreObject,
+				{ merge: true }
+			);
+			dispatch(updateDataStored({ target: 'teacher-assignments', value: newResult }));
+			setIsEditing(false);
+			setEditingObjects([]);
+		}
 	};
 
 	const handleAssignTeacher = (assignmentId: number, selectedTeacherId: number) => {

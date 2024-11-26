@@ -48,6 +48,8 @@ interface IApplyModalProps {
 	setModifyingResultModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	assignedTeachers: ITeacherAssignmentRequest[];
 	dataStored: IConfigurationStoreObject;
+	minPeriodPerWeek: number;
+	maxPeriodPerWeek: number;
 }
 
 const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
@@ -58,11 +60,15 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 		setModifyingResultModalOpen,
 		assignedTeachers,
 		dataStored,
+		maxPeriodPerWeek,
+		minPeriodPerWeek,
 	} = props;
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 	const [errorObject, setErrorObject] = useState<ITAAvailabilityResponse | undefined>(undefined);
 
 	const [autoParams, setAutoParams] = useState<IAutoTeacherAssingmentRequest>({
+		'max-periods-per-week': 0,
+		'min-periods-per-week': 0,
 		'fixed-assignment': null,
 		'class-combinations': null,
 	});
@@ -122,6 +128,8 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 	useEffect(() => {
 		if (dataStored) {
 			const tmpAutoParams: IAutoTeacherAssingmentRequest = {
+				'max-periods-per-week': maxPeriodPerWeek,
+				'min-periods-per-week': minPeriodPerWeek,
 				'fixed-assignment':
 					assignedTeachers.length > 0
 						? assignedTeachers.map((teacher) => ({
@@ -136,7 +144,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			};
 			setAutoParams(tmpAutoParams);
 		}
-	}, [assignedTeachers, dataStored]);
+	}, [assignedTeachers, dataStored, maxPeriodPerWeek, minPeriodPerWeek]);
 
 	useEffect(() => {
 		if (open) {
@@ -262,77 +270,89 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 				) : (
 					<div className='w-full h-fit max-h-[50vh] p-3 overflow-y-scroll no-scrollbar'>
 						{isAutomationAvaialable && (
-							<h2 className='text-body-large-strong font-normal w-full text-left py-5'>
-								Phân công tự động cho toàn bộ giáo viên?
-							</h2>
+							<div className='w-full h-full flex flex-col justify-center items-start'>
+								<h2 className='text-body-large-strong font-normal w-full text-left py-5'>
+									Phân công tự động cho toàn bộ giáo viên?
+								</h2>
+								<p className='text-body-small italic opacity-60 text-basic-positive'>
+									(*) Đã đủ điều kiện thể tiến hành phân công tự động
+								</p>
+							</div>
 						)}
-						{errorObject &&
-							Object.entries(errorObject).map(([entity, errors], index) => (
-								<div key={entity + index}>
-									{errors.length > 0 && (
-										<div>
-											<div className='w-full flex flex-row justify-between items-baseline'>
-												<h3 className='text-body-large-strong font-medium'>
-													{entity}
-												</h3>
-												<a
-													href={ENTITY_TARGET[entity]}
-													target='_blank'
-													rel='noopener noreferrer'
-													className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
-												>
-													Sửa lỗi {entity}
-													<ArrowOutwardIcon
-														color='inherit'
-														sx={{ fontSize: 18, opacity: 0.8 }}
-													/>
-												</a>
+						{errorObject && (
+							<div className='w-full h-full flex-col justify-center items-start'>
+								<p className='text-body-small italic opacity-60 text-basic-gray py-1'>
+									(*) Vui lòng sửa những lỗi sau trước khi thực hiện phân công tự
+									động
+								</p>
+								{Object.entries(errorObject).map(([entity, errors], index) => (
+									<div key={entity + index}>
+										{errors.length > 0 && (
+											<div>
+												<div className='w-full flex flex-row justify-between items-baseline'>
+													<h3 className='text-body-large-strong font-medium'>
+														{entity}
+													</h3>
+													<a
+														href={ENTITY_TARGET[entity]}
+														target='_blank'
+														rel='noopener noreferrer'
+														className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
+													>
+														Sửa lỗi {entity}
+														<ArrowOutwardIcon
+															color='inherit'
+															sx={{ fontSize: 18, opacity: 0.8 }}
+														/>
+													</a>
+												</div>
+												<ul className='list-disc pl-5 pb-3'>
+													{errors.map((error: string, index: number) => (
+														<>
+															{recoveredObjects &&
+															recoveredObjects[
+																entity as keyof ITAAvailabilityResponse
+															]?.includes(error) ? (
+																// Success case
+																<li
+																	key={error + index}
+																	className='text-body-small font-regular py-1 text-basic-positive'
+																>
+																	<div className='w-[90%] flex flex-row justify-between items-stretch'>
+																		<h1 className='w-[80%]'>
+																			{error}
+																		</h1>
+																		<CheckIcon
+																			color='success'
+																			fontSize='small'
+																		/>
+																	</div>
+																</li>
+															) : (
+																// Error case
+																<li
+																	key={index}
+																	className='text-body-small font-regular py-1 text-basic-negative'
+																>
+																	<div className='w-[90%] flex flex-row justify-between items-stretch'>
+																		<h1>{error}</h1>
+																		<CloseIcon
+																			color='error'
+																			fontSize='small'
+																		/>
+																	</div>
+																</li>
+															)}
+														</>
+													))}
+												</ul>
+												<Divider variant='middle' />
 											</div>
-											<ul className='list-disc pl-5 pb-3'>
-												{errors.map((error: string, index: number) => (
-													<>
-														{recoveredObjects &&
-														recoveredObjects[
-															entity as keyof ITAAvailabilityResponse
-														]?.includes(error) ? (
-															// Success case
-															<li
-																key={error + index}
-																className='text-body-small font-regular py-1 text-basic-positive'
-															>
-																<div className='w-[90%] flex flex-row justify-between items-stretch'>
-																	<h1 className='w-[80%]'>
-																		{error}
-																	</h1>
-																	<CheckIcon
-																		color='success'
-																		fontSize='small'
-																	/>
-																</div>
-															</li>
-														) : (
-															// Error case
-															<li
-																key={index}
-																className='text-body-small font-regular py-1 text-basic-negative'
-															>
-																<div className='w-[90%] flex flex-row justify-between items-stretch'>
-																	<h1>{error}</h1>
-																	<CloseIcon
-																		color='error'
-																		fontSize='small'
-																	/>
-																</div>
-															</li>
-														)}
-													</>
-												))}
-											</ul>
-											<Divider variant='middle' />
-										</div>
-									)}
-								</div>
-							))}
+										)}
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 				)}
 				<div

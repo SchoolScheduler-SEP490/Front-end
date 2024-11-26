@@ -4,6 +4,6 @@ import { usePathname, useRouter } from 'next/navigation';
 const SMConstraintPage = () => {
 	const router = useRouter();
 	const pathName = usePathname();
-	router.replace(pathName + '/teacher-unavailability');
+	router.replace(pathName + '/general-configurations');
 };
 export default SMConstraintPage;

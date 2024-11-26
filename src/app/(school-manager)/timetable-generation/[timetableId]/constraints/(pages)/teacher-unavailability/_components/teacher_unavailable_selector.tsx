@@ -1,4 +1,6 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
+import ClearIcon from '@mui/icons-material/Clear';
 import {
 	Button,
 	Checkbox,
@@ -20,9 +22,7 @@ import {
 	useTheme,
 } from '@mui/material';
 import { Dispatch, SetStateAction, useMemo, useState } from 'react';
-import ClearIcon from '@mui/icons-material/Clear';
 import { IFilterableDropdownOption } from '../_libs/constants';
-import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -47,41 +47,53 @@ function getStyles(
 	};
 }
 
-interface CellState {
-	selected: boolean;
-}
-
 interface ITeacherUnavailableSelectorProps {
 	teacherOptions: IFilterableDropdownOption<number>[];
 	departmentOptions: IDropdownOption<number>[];
 	selectedTeacherIds: number[];
 	setSelectedTeacherIds: Dispatch<SetStateAction<number[]>>;
+	selectedCells: { [key: string]: { selected: boolean } };
+	setSelectedCells: Dispatch<SetStateAction<{ [key: number]: { selected: boolean } }>>;
+	handleUpdateResults: () => void;
 }
 
 const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => {
-	const { teacherOptions, selectedTeacherIds, setSelectedTeacherIds, departmentOptions } = props;
+	const {
+		teacherOptions,
+		selectedTeacherIds,
+		setSelectedTeacherIds,
+		departmentOptions,
+		selectedCells,
+		setSelectedCells,
+		handleUpdateResults,
+	} = props;
 	const theme = useTheme();
 
 	const [isSelecting, setIsSelecting] = useState(false);
-	const [selectedCells, setSelectedCells] = useState<{ [key: string]: CellState }>({});
-	const [selectedaDeparmentId, setSelectedDepartmentId] = useState<number>(0);
+	const [selectedaDeparmentId, setSelectedDepartmentId] = useState<number>(-1);
 
-	const handleMouseDown = (cellId: string) => {
-		setIsSelecting(true);
-		setSelectedCells((prev) => ({
-			...prev,
-			[cellId]: { selected: !prev[cellId]?.selected },
-		}));
+	const handleMouseDown = (cellId: number) => {
+		if (selectedTeacherIds.length > 0) {
+			setIsSelecting(true);
+			setSelectedCells((prev) => ({
+				...prev,
+				[cellId]: { selected: !prev[cellId]?.selected },
+			}));
+		}
 	};
 
 	const filteredData = useMemo(() => {
+		setSelectedTeacherIds([]);
+		if (selectedaDeparmentId === -1 || selectedaDeparmentId === 0) {
+			return teacherOptions;
+		}
 		return selectedaDeparmentId !== 0
 			? teacherOptions.filter((item) => item.filterableId === selectedaDeparmentId)
 			: teacherOptions;
-	}, [selectedaDeparmentId]);
+	}, [selectedaDeparmentId, teacherOptions]);
 
-	const handleMouseEnter = (cellId: string) => {
-		if (isSelecting) {
+	const handleMouseEnter = (cellId: number) => {
+		if (isSelecting && selectedTeacherIds.length > 0) {
 			setSelectedCells((prev) => {
 				const newSelectedCells = { ...prev };
 
@@ -121,7 +133,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 			>
 				<FormControl sx={{ width: '20%' }}>
 					<InputLabel id='teacher-selector-label' variant='standard'>
-						Chọn TBM
+						Lọc theo TBM
 					</InputLabel>
 					<Select
 						labelId='teacher-selector-label'
@@ -131,10 +143,23 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 						onChange={(e) => setSelectedDepartmentId(Number(e.target.value))}
 						MenuProps={MenuProps}
 						sx={{ width: '100%' }}
+						renderValue={(selected) => {
+							if (selected === 0) {
+								return '  - - -'; // Hiển thị khi chọn giá trị "0"
+							}
+							const selectedOption = departmentOptions.find(
+								(option) => option.value === selected
+							);
+							return selectedOption ? selectedOption.label : 'Tất cả'; // Hiển thị label tương ứng
+						}}
 					>
-						{departmentOptions.length === 0 && (
+						{departmentOptions.length === 0 ? (
 							<MenuItem disabled value={0}>
 								Không tìm thấy TBM
+							</MenuItem>
+						) : (
+							<MenuItem value={-1} disabled={departmentOptions.length === 0}>
+								<ListItemText primary={'Chọn tất cả'} />
 							</MenuItem>
 						)}
 						{departmentOptions.map((option: IDropdownOption<number>, index: number) => (
@@ -143,7 +168,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 								value={option.value}
 								style={getStyles(option, teacherOptions, theme)}
 							>
-								<Checkbox checked={selectedTeacherIds.includes(option.value)} />
+								<Checkbox checked={selectedaDeparmentId === option.value} />
 								<ListItemText primary={option.label} />
 							</MenuItem>
 						))}
@@ -161,7 +186,7 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 						multiple
 						onChange={(e) => handleSelectTeacher(e.target.value as number[])}
 						MenuProps={MenuProps}
-						sx={{ width: '100%' }}
+						sx={{ width: '100%', maxWidth: '20vw' }}
 						renderValue={() => selectedTeachersLabels}
 					>
 						{filteredData.length === 0 && (
@@ -183,9 +208,9 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 				</FormControl>
 				<Button
 					variant='contained'
-					// onClick={handleQuickAssign}
+					onClick={handleUpdateResults}
 					color='inherit'
-					// disabled={selectedCurriculumId === 0}
+					disabled={Object.entries(selectedCells).length === 0}
 					sx={{
 						bgcolor: '#175b8e',
 						color: 'white',
@@ -197,11 +222,12 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 					Lưu thay đổi
 				</Button>
 			</div>
-			<div className='w-full h-fit select-none'>
-				<TableContainer
-					component={Paper}
-					sx={{ maxWidth: 900, margin: 'auto', marginTop: 5 }}
-				>
+			<div className='w-full h-fit select-none mt-6'>
+				<p className='text-body-small italic opacity-60 my-1 w-full text-ellipsis text-nowrap overflow-hidden'>
+					(*) Kéo và chọn các tiết nghỉ/bận của giáo viên để tránh xếp lịch vào các tiết
+					đó
+				</p>
+				<TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto' }}>
 					<Table onMouseUp={handleMouseUp} size='small' onMouseLeave={handleMouseUp}>
 						<TableHead>
 							<TableRow>
@@ -219,11 +245,11 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{TIMETABLE_SLOTS.map((session, i) => (
+							{TIMETABLE_SLOTS.map((session, sessionIndex) => (
 								<>
-									{session.slots.map((slot, index) => (
-										<TableRow key={`${session.period}-${slot}`}>
-											{index === 0 && (
+									{session.slots.map((sessionSlot, slotIndex: number) => (
+										<TableRow key={`${session.period}-${slotIndex}`}>
+											{slotIndex === 0 && (
 												<TableCell
 													rowSpan={session.slots.length}
 													align='center'
@@ -235,9 +261,13 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 													{session.period}
 												</TableCell>
 											)}
-											<TableCell align='center'>{slot}</TableCell>
-											{WEEK_DAYS.map((day) => {
-												const cellId = `${day}-${session.period}-${slot}`;
+											<TableCell align='center'>{sessionSlot}</TableCell>
+											{WEEK_DAYS.map((weekday, weekdayIndex: number) => {
+												const cellId =
+													weekdayIndex * 10 +
+													sessionIndex * 5 +
+													slotIndex +
+													1;
 												const isSelected =
 													selectedCells[cellId]?.selected || false;
 												return (
@@ -270,8 +300,8 @@ const TeacherUnavailableSelector = (props: ITeacherUnavailableSelectorProps) => 
 											})}
 										</TableRow>
 									))}
-									{i === 0 && (
-										<TableRow key={i}>
+									{sessionIndex === 0 && (
+										<TableRow key={sessionIndex}>
 											<TableCell colSpan={WEEK_DAYS.length - 1}></TableCell>
 										</TableRow>
 									)}

@@ -166,6 +166,7 @@ export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
 	'Nội dung giáo dục của địa phương': 'GDĐP',
 	'Tiếng dân tộc thiểu số': 'Tiếng DTTS',
 	'Ngoại ngữ 2': 'NN2',
+	'Sinh Hoạt Dưới Cờ': 'SHDC',
 };
 
 export const TEACHER_GENDER: { key: string; value: number }[] = [
@@ -198,3 +199,4 @@ export const TIMETABLE_SLOTS = [
 ];
 
 export const WEEK_DAYS = ['T.2', 'T.3', 'T.4', 'T.5', 'T.6', 'T.7'];
+export const WEEK_DAYS_FULL = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];

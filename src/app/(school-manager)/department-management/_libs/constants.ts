@@ -69,6 +69,9 @@ export interface ITeacherResponse {
 	abbreviation: string;
 	email: string;
 	gender: string;
+	'is-home-room-teacher': boolean;
+	'student-class-id': number;
+	'home-room-teacher-of-class': string;
 	'department-id': number;
 	'department-name': string;
 	'date-of-birth': string;
@@ -77,7 +80,19 @@ export interface ITeacherResponse {
 	'is-deleted': boolean;
 	phone: string;
 	'period-count': number;
-	'teachable-subjects': any[];
+	'teachable-subjects': ITeachableSubject[];
+}
+
+export interface ITeachableSubject {
+	id: number;
+	'subject-id': number;
+	'subject-name': string;
+	abbreviation: string;
+	'list-appropriate-level-by-grades': {
+		'appropriate-level': string;
+		grade: string;
+	}[];
+	'is-main': boolean;
 }
 
 export const MEETING_DAY_OPTIONS: IDropdownOption<number>[] = [

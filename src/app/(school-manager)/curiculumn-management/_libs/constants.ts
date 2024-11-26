@@ -26,6 +26,7 @@ export interface IFetchCurriculumBodyProps {
 //Create Curriculum Data
 export interface ICreateCurriculumRequest {
 	'curriculum-name': string;
+	'curriculum-code': string;
 	grade: number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
@@ -34,6 +35,7 @@ export interface ICreateCurriculumRequest {
 // Update Curriculum Data
 export interface IUpdateCurriculumRequest {
 	'curriculum-name': string;
+	'curriculum-code': string;
 	grade: number;
 	'elective-subject-ids': number[];
 	'specialized-subject-ids': number[];
@@ -65,6 +67,7 @@ export interface ISchoolYearResponse {
 export interface ICurriculumDetailResponse {
 	id: number;
 	'curriculum-name': string;
+	'curriculum-code': string;
 	grade: string;
 	'subject-selective-views': ISubjectInGroup[];
 	'subject-specializedt-views': ISubjectInGroup[];

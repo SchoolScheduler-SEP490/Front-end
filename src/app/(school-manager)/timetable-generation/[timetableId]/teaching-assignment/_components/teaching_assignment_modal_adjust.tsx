@@ -130,10 +130,14 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		// Save data to Firebase
 		if (dataStored && dataFirestoreName && dataStored.id) {
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
-			await setDoc(docRef, {
-				...dataStored,
-				'teacher-assignments': editingObjects,
-			} as IConfigurationStoreObject);
+			await setDoc(
+				docRef,
+				{
+					...dataStored,
+					'teacher-assignments': editingObjects,
+				} as IConfigurationStoreObject,
+				{ merge: true }
+			);
 			dispatch(updateDataStored({ target: 'teacher-assignments', value: editingObjects }));
 			useNotify({ message: 'Phân công giáo viên thành công', type: 'success' });
 			updateTeachingAssignment();
@@ -148,7 +152,13 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 			automationResult.map((item: IAutoTeacherAssignmentResponse) => {
 				tmpTeachingAssignmentObjs = [
 					...tmpTeachingAssignmentObjs,
-					...item['assignment-minimal-data'],
+					...item.assignments.map(
+						(ass) =>
+							({
+								id: ass.id,
+								'teacher-id': ass['teacher-id'],
+							} as ITeachingAssignmentObject)
+					),
 				];
 			});
 			if (tmpTeachingAssignmentObjs.length > 0) {

@@ -7,7 +7,6 @@ import { CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
-import CurriculumDetails from './_components/curiculumn_details';
 import CurriculumTable from './_components/curiculumn_table';
 import CurriculumTableSkeleton from './_components/skeleton_table';
 import useFetchCurriculumData from './_hooks/useFetchCurriculum';
@@ -24,8 +23,6 @@ export default function SMSubject() {
 		[]
 	);
 	const [selectedCurriculumId, setSelectedCurriculumId] = React.useState<number>(0);
-	const [isDetailOpen, setIsDetailOpen] = React.useState<boolean>(false);
-	const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState<boolean>(false);
 	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
 	const { data, error, isValidating, mutate } = useFetchCurriculumData({
@@ -151,18 +148,8 @@ export default function SMSubject() {
 						mutate={mutate}
 						selectedCurriculumId={selectedCurriculumId}
 						setSelectedCurriculumId={setSelectedCurriculumId}
-						isOpenViewDetails={isDetailOpen}
-						setOpenViewDetails={setIsDetailOpen}
-						isUpdateModalOpen={isUpdateModalOpen}
-						setUpdateModalOpen={setIsUpdateModalOpen}
 					/>
 				</div>
-				<CurriculumDetails
-					open={isDetailOpen}
-					setOpen={setIsDetailOpen}
-					subjectGroupId={selectedCurriculumId}
-					setIsUpdateModalOpen={setIsUpdateModalOpen}
-				/>
 			</div>
 		</div>
 	);
