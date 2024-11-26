@@ -24,12 +24,7 @@ import { useAppContext } from "@/context/app_provider";
 import { IAddTeacherData, IDepartment, ISubject } from "../_libs/constants";
 import useAddTeacher from "../_hooks/useAddTeacher";
 import { getDepartmentName, getSubjectName } from "../_libs/apiTeacher";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
-  APPROPRIATE_LEVEL,
-  CLASSGROUP_STRING_TYPE,
-  CLASSGROUP_TRANSLATOR,
   TEACHER_GENDER,
   TEACHER_GENDER_TRANSLATOR,
   TEACHER_ROLE,
@@ -62,8 +57,6 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
-  const [expandedGrade, setExpandedGrade] = React.useState<string | null>(null);
-  const [gradeFields, setGradeFields] = React.useState([{ id: 0 }]);
 
   React.useEffect(() => {
     const loadDepartments = async () => {
@@ -117,23 +110,11 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
       "teacher-role": "",
       status: "",
       phone: "",
-      "main-subject": {
-        "subject-abreviation": "",
-        "list-approriate-level-by-grades": [],
-        "is-main": true,
-      },
     },
     validationSchema: teacherSchema,
     onSubmit: async (formData) => {
       handleFormSubmit({
         ...formData,
-        "main-subject": {
-          "subject-abreviation":
-            formData["main-subject"]["subject-abreviation"],
-          "list-approriate-level-by-grades":
-            formData["main-subject"]["list-approriate-level-by-grades"],
-          "is-main": true,
-        },
       });
     },
   });
@@ -393,57 +374,6 @@ const AddTeacherModal = (props: AddTeacherFormProps) => {
                 </Grid>
               </Grid>
             </Grid>
-
-            {/* <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid
-                  item
-                  xs={3}
-                  sx={{ display: "flex", alignItems: "center" }}
-                >
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Chuyên môn
-                  </Typography>
-                </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={
-                      formik.touched["main-subject"]?.["subject-abreviation"] &&
-                      Boolean(
-                        formik.errors["main-subject"]?.["subject-abreviation"]
-                      )
-                    }
-                  >
-                    <Select
-                      variant="standard"
-                      name="main-subject.subject-abreviation"
-                      value={
-                        formik.values["main-subject"]["subject-abreviation"]
-                      }
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      MenuProps={MenuProps}
-                    >
-                      <MenuItem value="">--Chọn môn học--</MenuItem>
-                      {subjects.map((subject) => (
-                        <MenuItem key={subject.id} value={subject.abbreviation}>
-                          {`${subject["subject-name"]} - ${subject.abbreviation}`}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["main-subject"]?.["subject-abreviation"] &&
-                      formik.errors["main-subject"]?.[
-                        "subject-abreviation"
-                      ] && (
-                        <FormHelperText sx={{ margin: 0 }}>
-                          {formik.errors["main-subject"]["subject-abreviation"]}
-                        </FormHelperText>
-                      )}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid> */}
 
             <Grid item xs={12}>
               <Grid container spacing={2}>

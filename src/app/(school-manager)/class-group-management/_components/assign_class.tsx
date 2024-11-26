@@ -9,15 +9,19 @@ import {
   MenuItem,
   IconButton,
   FormHelperText,
+  ListItem,
+  List,
+  Checkbox,
+  ListItemText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
 import { useFormik } from "formik";
 import { useAppContext } from "@/context/app_provider";
-import { IStudentClass } from "../_libs/constants";
+import { IClass, IClassGroup, ICurriculum, IStudentClass } from "../_libs/constants";
 import useAssignClass from "../_hooks/useAssignClass";
 import { assignStudentClass } from "../_libs/class_group_schema";
-import { getStudentClass } from "../_libs/apiClassGroup";
+import { getClassGroupById, getCurriculum, getStudentClass } from "../_libs/apiClassGroup";
 import { KeyedMutator } from "swr";
 
 interface AssignClassProps {
@@ -29,29 +33,32 @@ interface AssignClassProps {
 
 const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassProps) => {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+  const [classes, setClasses] = useState<IStudentClass[]>([]);
+  const [curriculums, setCurriculums] = useState<ICurriculum[]>([]);
   const { handleAssignClass } = useAssignClass();
-  const [availableClasses, setAvailableClasses] = useState<IStudentClass[]>([]);
-
-  const fetchStudentClasses = async () => {
-    try {
-      const response = await getStudentClass(
-        sessionToken,
-        schoolId,
-        selectedSchoolYearId
-      );
-      if (response.status === 200) {
-        setAvailableClasses(response.result.items);
-      }
-    } catch (error) {
-      console.error("Failed to fetch classes:", error);
-    }
-  };
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [classesResponse, curriculumsResponse] = await Promise.all([
+          getStudentClass(sessionToken, schoolId, selectedSchoolYearId),
+          getCurriculum(sessionToken, schoolId, selectedSchoolYearId)
+        ]);
+
+        if (classesResponse.status === 200 && curriculumsResponse.status === 200) {
+          setClasses(classesResponse.result.items);
+          setCurriculums(curriculumsResponse.result.items);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
     if (open) {
-      fetchStudentClasses();
+      fetchData();
     }
-  }, [open, schoolId, selectedSchoolYearId]);
+  }, [open, schoolId, selectedSchoolYearId, sessionToken]);
+
 
   const formik = useFormik({
     initialValues: {
@@ -73,60 +80,75 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <div className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3">
         <Typography variant="h6" className="text-title-medium-strong font-normal opacity-60">
           Phân công lớp học
         </Typography>
-        <IconButton onClick={handleClose}>
+        <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </div>
 
       <form onSubmit={formik.handleSubmit}>
-        <DialogContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <Grid item xs={3} sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Lớp học
-                  </Typography>
+        <DialogContent
+          sx={{
+            maxHeight: "70vh",
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              display: "none",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "-ms-overflow-style": "none",
+          }}
+        >
+          <List>
+            {classes.map((classItem) => (
+              <ListItem
+                key={classItem.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                  }
+                }}
+              >
+                <Checkbox
+                  checked={formik.values["class-ids"].includes(classItem.id)}
+                  onChange={() => {
+                    const currentValues = [...formik.values["class-ids"]];
+                    const index = currentValues.indexOf(classItem.id);
+                    if (index === -1) {
+                      currentValues.push(classItem.id);
+                    } else {
+                      currentValues.splice(index, 1);
+                    }
+                    formik.setFieldValue("class-ids", currentValues);
+                  }}
+                />
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={3}>
+                    <Typography>{classItem.name}</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography>{classItem["student-class-group-name"]}</Typography>
+                  </Grid>
+                  <Grid item xs={5}>
+                    <Typography>{classItem["curriculum-name"]}</Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={9}>
-                  <FormControl
-                    fullWidth
-                    error={formik.touched["class-ids"] && Boolean(formik.errors["class-ids"])}
-                  >
-                    <Select
-                      multiple
-                      value={formik.values["class-ids"]}
-                      onChange={(e) => formik.setFieldValue("class-ids", e.target.value)}
-                      onBlur={formik.handleBlur("class-ids")}
-                      variant="standard"
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 150,
-                            overflow: "auto",
-                          },
-                        },
-                      }}
-                    >
-                      {availableClasses.map((classItem) => (
-                        <MenuItem key={classItem.id} value={classItem.id}>
-                          {classItem.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formik.touched["class-ids"] && formik.errors["class-ids"] && (
-                      <FormHelperText>{formik.errors["class-ids"]}</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+              </ListItem>
+            ))}
+          </List>
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
@@ -137,7 +159,7 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
           />
           <ContainedButton
             title="Huỷ"
-            onClick={handleClose}
+            onClick={onClose}
             styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
         </div>
@@ -145,5 +167,6 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
     </Dialog>
   );
 };
+
 
 export default AssignClassModal;

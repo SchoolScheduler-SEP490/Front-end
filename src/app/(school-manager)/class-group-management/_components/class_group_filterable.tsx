@@ -24,8 +24,13 @@ const ClassGroupFilterable = (props: IClassGroupFilterableProps) => {
   const { open, setOpen, selectedGrade, setSelectedGrade, mutate } = props;
 
   const handleGradeSelect = (event: SelectChangeEvent<number | string>) => {
-    const grade = event.target.value === '' ? null : Number(event.target.value);
-    setSelectedGrade(grade);
+    const value = event.target.value;
+    if (value === 'all') {
+      setSelectedGrade(null);
+      // mutate(); 
+    } else {
+      setSelectedGrade(Number(value));
+    }
   };
   
   const handleClose = () => {
@@ -62,10 +67,10 @@ const ClassGroupFilterable = (props: IClassGroupFilterableProps) => {
           <Select
             labelId="demo-simple-select-filled-label"
             id="demo-simple-select-filled"
-            value={selectedGrade ?? ''}
+            value={selectedGrade === null ? 'all' : selectedGrade}
             onChange={handleGradeSelect}
           >
-            <MenuItem value="">Tất cả khối</MenuItem>
+            <MenuItem value="all">Tất cả khối</MenuItem>
             {CLASSGROUP_STRING_TYPE.map((grade) => (
               <MenuItem key={grade.key} value={grade.value}>
                 {grade.key}

@@ -167,11 +167,9 @@ interface ITeacherTableProps {
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
   totalRows?: number;
   mutate: KeyedMutator<any>;
+  isFilterable: boolean;
+  setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-const dropdownOptions: ICommonOption[] = [
-  { img: "/images/icons/delete.png", title: "Xóa giáo viên" },
-];
 
 const TeacherTable = (props: ITeacherTableProps) => {
   const {
@@ -182,6 +180,8 @@ const TeacherTable = (props: ITeacherTableProps) => {
     setRowsPerPage,
     totalRows,
     mutate,
+    isFilterable,
+    setIsFilterable,
   } = props;
 
   const [order, setOrder] = React.useState<Order>("asc");
@@ -196,6 +196,8 @@ const TeacherTable = (props: ITeacherTableProps) => {
   >();
   const open = Boolean(anchorEl);
   const router = useRouter();
+  const [displayCount, setDisplayCount] = React.useState(5);
+  const [startIndex, setStartIndex] = React.useState(0);
 
   const handleRowClick = (teacherId: number) => {
     router.push(`/teacher-management/detail?id=${teacherId}`);
@@ -259,74 +261,109 @@ const TeacherTable = (props: ITeacherTableProps) => {
 
   const handleOpenAddForm = () => setOpenAddForm(true);
 
+  const handleFilterable = () => {
+    setIsFilterable(!isFilterable);
+  };
+
+  const handleDeleteClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    row: ITeacherTableData
+  ) => {
+    event.stopPropagation();
+    setSelectedRow(row);
+    setOpenDeleteModal(true);
+  };
+
+  const handleScrollLeft = () => {
+    if (startIndex > 0) {
+      setStartIndex((prev) => prev - 1);
+    }
+  };
+
+  const handleScrollRight = () => {
+    if (startIndex + displayCount < teacherTableData.length) {
+      setStartIndex((prev) => prev + 1);
+    }
+  };
+
+  const visibleTeachers = teacherTableData.slice(
+    startIndex,
+    startIndex + displayCount
+  );
+
   return (
-    <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2 }}>
-        <Toolbar
-          sx={[
-            {
-              pl: { sm: 2 },
-              pr: { xs: 1, sm: 1 },
-              width: "100%",
-            },
-          ]}
-        >
-          <h2 className="text-title-medium-strong font-semibold w-full text-left">
-            Danh sách giáo viên
-          </h2>
-          <Tooltip title="Thêm giáo viên">
-            <IconButton onClick={handleOpenAddForm}>
-              <AddIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Lọc danh sách">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size="medium"
+    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
+      <Box sx={{ width: "100%" }}>
+        <Paper sx={{ width: "100%", mb: 2 }}>
+          <Toolbar
+            sx={[
+              {
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                width: "100%",
+              },
+            ]}
           >
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={teacherTableData.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const labelId = `enhanced-table-checkbox-${index}`;
-                return (
-                  <TableRow
-                    hover
-                    onClick={() => handleRowClick(row.id)}
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.id}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      align="left"
+            <h2 className="text-title-medium-strong font-semibold w-full text-left">
+              Danh sách giáo viên
+            </h2>
+            <Tooltip title="Thêm giáo viên">
+              <IconButton onClick={handleOpenAddForm}>
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Lọc danh sách">
+              <IconButton onClick={handleFilterable}>
+                <FilterListIcon />
+              </IconButton>
+            </Tooltip>
+          </Toolbar>
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size="medium"
+            >
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={teacherTableData.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  return (
+                    <TableRow
+                      hover
+                      onClick={() => handleRowClick(row.id)}
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.id}
+                      sx={{ cursor: "pointer" }}
                     >
-                      {index + 1 + page * rowsPerPage}
-                    </TableCell>
-                    <TableCell align="left">{row.teacherName}</TableCell>
-                    <TableCell align="left">{row.nameAbbreviation}</TableCell>
-                    <TableCell align="left">{row.subjectDepartment}</TableCell>
-                    <TableCell align="left">{row.teachableSubjects}</TableCell>
-                    <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.phoneNumber}</TableCell>
-                    <TableCell align="left">
-                      <div className="w-full h-full flex justify-center items-center">
-                        <div
-                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
+                      >
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
+                      <TableCell align="left">{row.teacherName}</TableCell>
+                      <TableCell align="left">{row.nameAbbreviation}</TableCell>
+                      <TableCell align="left">
+                        {row.subjectDepartment}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.teachableSubjects}
+                      </TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
+                      <TableCell align="left">{row.phoneNumber}</TableCell>
+                      <TableCell align="left">
+                        <div className="w-full h-full flex justify-center items-center">
+                          <div
+                            className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
                           ${
                             row.status === 1
                               ? "bg-basic-positive-hover text-basic-positive"
@@ -334,110 +371,75 @@ const TeacherTable = (props: ITeacherTableProps) => {
                               ? "bg-basic-negative-hover text-basic-negative"
                               : "bg-basic-gray-hover text-basic-gray"
                           }`}
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          {TEACHER_STATUS_TRANSLATOR[row.status]}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell width={80} onClick={(e) => e.stopPropagation()}>
-                      <IconButton
-                        color="success"
-                        sx={{ zIndex: 10 }}
-                        id="basic-button"
-                        aria-controls={open ? `basic-menu${index}` : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) => handleClick(event, row)}
-                      >
-                        <Image
-                          src="/images/icons/menu.png"
-                          alt="notification-icon"
-                          unoptimized={true}
-                          width={20}
-                          height={20}
-                        />
-                      </IconButton>
-
-                      <Menu
-                        id={`basic-menu${index}`}
-                        anchorEl={anchorEl}
-                        elevation={1}
-                        open={Boolean(anchorEl) && selectedRow === row}
-                        onClose={handleMenuClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
-                      >
-                        {dropdownOptions.map((option, index) => (
-                          <MenuItem
-                            key={option.title}
-                            onClick={(e) => handleMenuItemClick(index, e)}
-                            className={`flex flex-row items-center ${
-                              index === dropdownOptions.length - 1 &&
-                              "hover:bg-basic-negative-hover hover:text-basic-negative"
-                            }`}
+                            style={{ whiteSpace: "nowrap" }}
                           >
-                            <Image
-                              className="mr-4"
-                              src={option.img}
-                              alt={option.title}
-                              width={15}
-                              height={15}
-                            />
-                            <h2 className="text-body-medium">{option.title}</h2>
-                          </MenuItem>
-                        ))}
-                      </Menu>
-                    </TableCell>
+                            {TEACHER_STATUS_TRANSLATOR[row.status]}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell width={80}>
+                        <IconButton
+                          color="error"
+                          sx={{ zIndex: 10 }}
+                          onClick={(event) => handleDeleteClick(event, row)}
+                        >
+                          <Image
+                            src="/images/icons/delete.png"
+                            alt="Xóa tổ bộ môn"
+                            width={15}
+                            height={15}
+                          />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: 50 * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={8} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 50 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={8} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          labelRowsPerPage='Số hàng'
-          labelDisplayedRows={({from, to, count}) => 
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            labelRowsPerPage="Số hàng"
+            labelDisplayedRows={({ from, to, count }) =>
               `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
-          }
-          count={totalRows ?? teacherTableData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+            }
+            count={totalRows ?? teacherTableData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <DeleteConfirmationModal
+          open={openDeleteModal}
+          onClose={setOpenDeleteModal}
+          teacherName={selectedRow?.teacherName ?? "Không xác định"}
+          teacherId={selectedRow?.id ?? 0}
+          mutate={mutate}
         />
-      </Paper>
-      <DeleteConfirmationModal
-        open={openDeleteModal}
-        onClose={setOpenDeleteModal}
-        teacherName={selectedRow?.teacherName ?? "Không xác định"}
-        teacherId={selectedRow?.id ?? 0}
-        mutate={mutate}
-      />
-      <AddTeacherModal
-        open={openAddForm}
-        onClose={setOpenAddForm}
-        mutate={mutate}
-      />
-      <UpdateTeacherModal
-        open={openUpdateModal}
-        onClose={setOpenUpdateModal}
-        teacherId={selectedRow?.id ?? 0}
-        mutate={mutate}
-      />
-    </Box>
+        <AddTeacherModal
+          open={openAddForm}
+          onClose={setOpenAddForm}
+          mutate={mutate}
+        />
+        <UpdateTeacherModal
+          open={openUpdateModal}
+          onClose={setOpenUpdateModal}
+          teacherId={selectedRow?.id ?? 0}
+          mutate={mutate}
+        />
+      </Box>
+    </div>
   );
 };
 export default TeacherTable;

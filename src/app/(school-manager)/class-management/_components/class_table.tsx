@@ -70,7 +70,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "room" as keyof IClassTableData,
-    label: "Phòng học",
+    label: "Phòng học mặc định",
     centered: false,
   },
   {
@@ -274,7 +274,7 @@ const ClassTable = (props: IClassTableProps) => {
             ]}
           >
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
-              Lớp học
+              Lớp đơn
             </h2>
             <Tooltip title="Thêm lớp học">
               <IconButton onClick={handleOpenAddForm}>
@@ -337,7 +337,7 @@ const ClassTable = (props: IClassTableProps) => {
                             )?.key
                           : "-"}
                       </TableCell>
-                      <TableCell align="left">{row.room}</TableCell>
+                      <TableCell align="center">{row.room}</TableCell>
                       <TableCell align="left">
                         {row.homeroomTeacherName}
                       </TableCell>

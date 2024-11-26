@@ -84,12 +84,7 @@ const headCells: readonly HeadCell[] = [
     id: "curriculum" as keyof IClassGroupTableData,
     label: "Khung chương trình",
     centered: false,
-  },
-  {
-    id: "createDate" as keyof IClassGroupTableData,
-    label: "Ngày tạo",
-    centered: true,
-  },
+  }
 ];
 
 interface EnhancedTableProps {
@@ -165,6 +160,10 @@ interface IClassGroupTableProps {
   isFilterable: boolean;
   setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
   selectedGrade: number | null; 
+  selectedClassGroupId: number;
+  setSelectedClassGroupId: React.Dispatch<React.SetStateAction<number>>;
+  isDetailsShown: boolean;
+	setIsDetailsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -186,6 +185,10 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     isFilterable,
 		setIsFilterable,
     selectedGrade, 
+    selectedClassGroupId,
+    setSelectedClassGroupId,
+    isDetailsShown,
+    setIsDetailsShown
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
@@ -216,8 +219,15 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
 
   const handleFilterable = () => {
     setIsFilterable(!isFilterable);
-    mutate();
+    setIsDetailsShown(false);
+    // mutate();
   };
+
+  const handleSelectClassGroup = (row: IClassGroupTableData) => {
+    setSelectedClassGroupId(row.id);
+    setIsDetailsShown(true);
+    setIsFilterable(false);
+  }
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -351,7 +361,14 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                         hover
                         role="checkbox"
                         tabIndex={-1}
-                        sx={{ cursor: "pointer" }}
+                        sx={[
+                          { cursor: 'pointer' },
+                          selectedClassGroupId === row.id &&
+                            isDetailsShown && {
+                              backgroundColor: '#f5f5f5',
+                            },
+                        ]}
+                        onClick={() => handleSelectClassGroup(row)}
                       >
                         <TableCell
                           component="th"
@@ -384,9 +401,6 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                         </TableCell>
                         <TableCell align="left">{`Khối ${row.grade}`}</TableCell>
                         <TableCell align="left">{row.curriculum}</TableCell>
-                        <TableCell align="center">
-                          {dayjs(row.createDate).format("DD-MM-YYYY")}
-                        </TableCell>
                         <TableCell
                           width={80}
                           onClick={(e) => e.stopPropagation()}

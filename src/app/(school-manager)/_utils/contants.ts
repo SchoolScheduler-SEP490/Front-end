@@ -57,7 +57,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		]
 	},
 	{
-		category: 'Quản lý giáo viên',
+		category: 'Giảng dạy',
 		items: [
 			{
 				name: 'Giáo viên',
@@ -73,7 +73,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		]
 	},
 	{
-		category: 'Đối tượng',
+		category: 'Tổng quan',
 		items: [
 			{
 				name: 'Khung chương trình',
@@ -98,7 +98,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		],
 	},
 	{
-		category: 'Hoạt động',
+		category: 'Cấu hình',
 		items: [
 			{
 				name: 'Nhập TKB',
@@ -109,6 +109,16 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				name: 'Cấu hình chung',
 				url: '/general-configurations',
 				icon: '/images/icons/constraint.png',
+			},
+		],
+	},
+	{
+		category: 'Báo cáo',
+		items: [
+			{
+				name: 'Đơn xin nghỉ',
+				url: '/import-timetable',
+				icon: '/images/icons/Import.png',
 			},
 		],
 	},
@@ -124,8 +134,5 @@ export const TEACHER_SIDENAV = [
 	},
 	{
 		name: 'Chuyên môn giảng dạy '
-	},
-	{
-		name: 'Bảng phân công giảng dạy',
 	}
 ];

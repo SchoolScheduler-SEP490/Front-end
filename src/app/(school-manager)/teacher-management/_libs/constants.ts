@@ -59,7 +59,6 @@ export interface IAddTeacherData {
   "teacher-role": string;
   status: string;
   phone: string;
-  "main-subject": IMainSubject;
 }
 
 export interface IMainSubject {
@@ -84,12 +83,12 @@ export interface ISubject {
   abbreviation: string;
 }
 
+// use to get teachable subjects
 export interface ITeachableSubject {
   "subject-id": number;
   "subject-name": string;
   abbreviation: string;
-  "appropriate-level": number;
-  grade: string[];
+  "list-approriate-level-by-grades": IAppropriateLevel[];
   "is-main": boolean;
 }
 
@@ -124,4 +123,32 @@ export interface IAssignmentDetail {
   "start-week": number;
   "end-week": number;
   "total-period": number;
+}
+
+// use for update teachable subject (api patch)
+export interface ITeachableSubjectRequest {
+  "subject-abreviation": string;
+  "list-approriate-level-by-grades": Array<{
+    grade: string;
+    "appropriate-level": string;
+  }>;
+  "is-main": boolean;
+}
+
+export interface ITeachableSubjectResponse {
+  id: number;
+  "first-name": string;
+  "last-name": string;
+  abbreviation: string;
+  email: string;
+  gender: string;
+  "department-id": number;
+  "department-name": string;
+  "date-of-birth": string;
+  "teacher-role": number;
+  status: number;
+  "is-deleted": boolean;
+  phone: string;
+  "period-count": number;
+  "teachable-subjects": ITeachableSubject[];
 }
