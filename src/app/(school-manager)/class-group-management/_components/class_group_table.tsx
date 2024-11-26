@@ -480,6 +480,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
             onClose={() => setOpenCurriculumModal(false)}
             classGroupId={selectedRow?.id || 0}
             mutate={mutate}
+            grade={CLASSGROUP_TRANSLATOR_REVERSED[selectedRow?.grade || 0]}
           />
           <UpdateClassGroupModal
             open={openUpdateModal}
