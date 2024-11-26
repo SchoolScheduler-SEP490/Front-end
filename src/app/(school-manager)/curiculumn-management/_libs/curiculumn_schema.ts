@@ -6,6 +6,12 @@ export const curriculumSchema = yup.object().shape({
 		.required('Tên Khung chương trình là bắt buộc')
 		.max(50, 'Tên Khung chương trình tối đa 50 ký tự'),
 
+	'curriculum-code': yup
+		.string()
+		.required('Mã Khung chương trình là bắt buộc')
+		.matches(/^[A-Z0-9\-]+$/, 'Mã Khung chương trình chỉ chứa chữ in hoa, số và dấu gạch ngang')
+		.max(20, 'Mã Khung chương trình tối đa 20 ký tự'),
+
 	grade: yup
 		.number()
 		.oneOf([10, 11, 12], 'Khối lớp không hợp lệ')
