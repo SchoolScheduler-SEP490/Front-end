@@ -22,7 +22,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
 import { KeyedMutator } from "swr";
 import { IClassGroupTableData } from "../_libs/constants";
-import { ICommonOption } from "@/utils/constants";
+import { CLASSGROUP_TRANSLATOR_REVERSED, ICommonOption } from "@/utils/constants";
 import AddClassGroupModal from "./add_class_group";
 import DeleteClassGroupModal from "./delete_class_group";
 import AssignClassModal from "./assign_class";
@@ -473,6 +473,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
             onClose={() => setOpenAssignModal(false)}
             classGroupId={selectedRow?.id || 0}
             mutate={mutate}
+            grade={CLASSGROUP_TRANSLATOR_REVERSED[selectedRow?.grade || 0]}
           />
           <AssignCurriculumModal
             open={openCurriculumModal}

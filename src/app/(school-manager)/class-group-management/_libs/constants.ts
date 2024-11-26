@@ -40,6 +40,7 @@ export interface IStudentClass {
   "student-class-group-name": string;
   "curriculum-id": number;
   "curriculum-name": string;
+  grade: string;
 }
 
 export interface ICurriculum {
