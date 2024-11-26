@@ -133,7 +133,7 @@ export default function SMClass() {
 			<div
 				className={`w-full h-auto flex flex-row ${
 					isFilterable ? 'justify-start items-start' : 'justify-center items-center'
-				} pl-4 pt-5 gap-[1vw]`}
+				} pl-[1.5vw] pt-5 gap-[1vw]`}
 			>
 				<ClassTable
 					classTableData={classTableData}

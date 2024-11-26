@@ -46,6 +46,7 @@ export interface IStudentClass {
 export interface ICurriculum {
   id: number;
   "curriculum-name": string;
+  grade: string;
 }
 
 export interface IClassGroupDetail {

@@ -165,7 +165,7 @@ export default function SMClassGroup() {
             : isDetailsShown
             ? "justify-end"
             : "justify-center"
-        } pl-[1.5vw] gap-[1vw]`}
+        } pl-[1.5vw] pt-5 gap-[1vw]`}
       >
         <ClassGroupTable
           classGroupTableData={classGroupTableData}

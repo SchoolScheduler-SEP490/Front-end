@@ -9,6 +9,7 @@ import {
   MenuItem,
   IconButton,
   FormHelperText,
+  InputLabel,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ContainedButton from "@/commons/button-contained";
@@ -24,6 +25,7 @@ interface AssignCurriculumProps {
   onClose: () => void;
   classGroupId: number;
   mutate: KeyedMutator<any>;
+  grade: string;
 }
 
 const AssignCurriculumModal = ({
@@ -31,6 +33,7 @@ const AssignCurriculumModal = ({
   onClose,
   classGroupId,
   mutate,
+  grade
 }: AssignCurriculumProps) => {
   const { handleAssignCurriculum } = useAssignCurriculum();
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
@@ -47,7 +50,10 @@ const AssignCurriculumModal = ({
 
         const response = await getCurriculum(sessionToken, schoolId, selectedSchoolYearId);
         if (response.status === 200) {
-          setCurriculums(response.result.items);
+          const filteredCurriculums = response.result.items.filter(
+            (curriculum: ICurriculum) => curriculum.grade === grade
+          );
+          setCurriculums(filteredCurriculums);
         }
       } catch (error) {
         console.error('Failed to fetch curriculums:', error);
@@ -91,6 +97,7 @@ const AssignCurriculumModal = ({
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <FormControl fullWidth>
+                <InputLabel>Chọn khung chương trình</InputLabel>
                 <Select
                   value={formik.values.curriculumId}
                   onChange={(e) => formik.setFieldValue("curriculumId", e.target.value)}
