@@ -24,7 +24,7 @@ export interface ITeacher {
   status: number;
   "is-deleted": boolean;
   phone: string;
-  "teachable-subjects": ISubject;
+  "teachable-subjects": ITeachableSubject[];
 }
 
 // Update teacher response data
