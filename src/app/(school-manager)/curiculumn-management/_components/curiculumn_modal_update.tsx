@@ -251,7 +251,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Thêm Khung chương trình môn
+						Cập nhật Khung chương trình
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -450,17 +450,17 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 					</div>
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
-							title='Cập nhật Khung chương trình'
-							disableRipple
-							type='submit'
-							disabled={!formik.isValid}
-							styles='bg-primary-300 text-white !py-1 px-4'
-						/>
-						<ContainedButton
 							title='Huỷ'
 							onClick={handleClose}
 							disableRipple
 							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+						/>
+						<ContainedButton
+							title='Cập nhật'
+							disableRipple
+							type='submit'
+							disabled={!formik.isValid}
+							styles='bg-primary-300 text-white !py-1 px-4'
 						/>
 					</div>
 				</form>

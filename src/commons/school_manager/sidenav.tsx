@@ -53,7 +53,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 const SMSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
-	const [expanded, setExpanded] = useState<string[]>(['panel0']);
+	const [expanded, setExpanded] = useState<string[]>(['panel0', 'panel1', 'panel2']);
 	const { logout } = useAppContext();
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 
@@ -69,7 +69,7 @@ const SMSidenav = () => {
 	useEffect(() => {
 		SM_SIDENAV.map((item, index) => {
 			item.items.map((subItem) => {
-				if (subItem.url === currentPath) {
+				if (currentPath.startsWith(subItem.url)) {
 					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
 				}
 			});

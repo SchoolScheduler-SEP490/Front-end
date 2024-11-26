@@ -80,3 +80,21 @@ export const getFetchSubjectApi = ({
 	}).toString();
 	return `${localApi ?? api}/api/subjects?${queryString}`;
 };
+
+export const getFetchTeachingAssignmentApi = ({
+	schoolId,
+	schoolYearId,
+	termId,
+	studentClassId,
+}: {
+	schoolId: number;
+	schoolYearId: number;
+	termId: number;
+	studentClassId: number;
+}) => {
+	const queryString = new URLSearchParams({
+		studentClassId: studentClassId.toString(),
+		termId: termId.toString(),
+	}).toString();
+	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments?${queryString}`;
+};

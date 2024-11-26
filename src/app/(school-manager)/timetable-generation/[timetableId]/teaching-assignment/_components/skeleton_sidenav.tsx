@@ -67,6 +67,7 @@ const TeachingAssignmentSideNavSkeleton = () => {
 					expanded={expanded.includes(`panel`)}
 					onChange={toggleDropdown(`panel`)}
 					className='w-full p-0 m-0'
+					key={item}
 				>
 					<AccordionSummary
 						aria-controls={`paneld-content`}

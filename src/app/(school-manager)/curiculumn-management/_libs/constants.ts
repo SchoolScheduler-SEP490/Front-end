@@ -65,6 +65,7 @@ export interface ISchoolYearResponse {
 export interface ICurriculumDetailResponse {
 	id: number;
 	'curriculum-name': string;
+	'curriculum-code': string;
 	grade: string;
 	'subject-selective-views': ISubjectInGroup[];
 	'subject-specializedt-views': ISubjectInGroup[];

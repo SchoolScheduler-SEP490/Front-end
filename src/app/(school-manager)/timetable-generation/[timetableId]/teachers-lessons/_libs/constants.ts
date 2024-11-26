@@ -34,6 +34,9 @@ export interface ITeacherResponse {
 	abbreviation: string;
 	email: string;
 	gender: string;
+	'is-home-room-teacher': boolean;
+	'student-class-id': number;
+	'home-room-teacher-of-class': string;
 	'department-id': number;
 	'department-name': string;
 	'date-of-birth': string;
@@ -41,21 +44,44 @@ export interface ITeacherResponse {
 	status: number;
 	'is-deleted': boolean;
 	phone: string;
+	'period-count': number;
 	'teachable-subjects': ITeachableSubject[];
 }
-
 export interface ITeachableSubject {
+	id: number;
 	'subject-id': number;
 	'subject-name': string;
 	abbreviation: string;
+	'list-appropriate-level-by-grades': {
+		'appropriate-level': string;
+		grade: string;
+	}[];
+	'is-main': boolean;
 }
 
 export interface ITeachersLessonsObject {
 	teacherId: number;
 	teacherName: string;
 	classId: number;
-	className: string;
+	className?: string;
 	subjectId: number;
 	subjectName: string;
 	slots: number[];
+	totalSlotPerWeek: number;
+}
+
+export interface IAssignmentResponse {
+	'period-count': number;
+	'student-class-id': number;
+	'assignment-type': string;
+	'subject-id': number;
+	'subject-name': string;
+	'teacher-id': number;
+	'teacher-first-name': string;
+	'teacher-last-name': string;
+	'teacher-abbreviation': string;
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
 }

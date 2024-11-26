@@ -17,13 +17,13 @@ const SubjectDetails = (props: ISubjectDetailsProps) => {
 	const { open, setOpen, subjectId } = props;
 	const { sessionToken, schoolId } = useAppContext();
 	const [subjectDetails, setSubjectDetails] = useState<ISubjectResponse | null>(null);
-	const [availableTeachers, setAvailableTeachers] = useState<string[] | null>(null);
+	const [availableTeachers, setAvailableTeachers] = useState<string[]>([]);
 
 	const { data, mutate } = useFetchSubjectDetails({
 		sessionToken,
 		subjectId,
 	});
-	const { data: teacherData } = useFetchTeachableTeacher({
+	const { data: teacherData, isLoading: isTeacherLoading } = useFetchTeachableTeacher({
 		sessionToken,
 		schoolId: Number(schoolId),
 		subjectId,
