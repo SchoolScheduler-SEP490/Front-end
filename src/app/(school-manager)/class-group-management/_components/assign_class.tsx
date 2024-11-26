@@ -29,9 +29,10 @@ interface AssignClassProps {
   onClose: () => void;
   classGroupId: number;
   mutate: KeyedMutator<any>;
+  grade: string;
 }
 
-const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassProps) => {
+const AssignClassModal = ({ open, onClose, classGroupId, mutate, grade }: AssignClassProps) => {
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
   const [classes, setClasses] = useState<IStudentClass[]>([]);
   const [curriculums, setCurriculums] = useState<ICurriculum[]>([]);
@@ -46,7 +47,10 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
         ]);
 
         if (classesResponse.status === 200 && curriculumsResponse.status === 200) {
-          setClasses(classesResponse.result.items);
+          const filteredClasses = classesResponse.result.items.filter(
+            (classItem: IStudentClass) => classItem.grade === grade
+        );
+          setClasses(filteredClasses);
           setCurriculums(curriculumsResponse.result.items);
         }
       } catch (error) {
@@ -57,7 +61,7 @@ const AssignClassModal = ({ open, onClose, classGroupId, mutate }: AssignClassPr
     if (open) {
       fetchData();
     }
-  }, [open, schoolId, selectedSchoolYearId, sessionToken]);
+  }, [open, schoolId, selectedSchoolYearId, sessionToken, grade]);
 
 
   const formik = useFormik({
