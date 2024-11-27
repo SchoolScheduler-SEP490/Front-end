@@ -121,14 +121,14 @@ export default function Home() {
 					setIsTimetableGenerated(true);
 					useNotify({
 						type: 'success',
-						message: data?.message,
+						message: data?.Message,
 					});
 				}
 			} else {
 				setIsTimetableGenerating(false);
 				useNotify({
 					type: 'error',
-					message: data?.message,
+					message: data?.Message,
 				});
 			}
 		}
