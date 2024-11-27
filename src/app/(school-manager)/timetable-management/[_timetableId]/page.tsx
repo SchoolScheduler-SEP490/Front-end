@@ -82,19 +82,22 @@ export default function TimetableDetail() {
 
   useEffect(() => {
     const fetchScheduleData = async () => {
-      const scheduleRef = doc(
-        firestore,
-        "schedule-responses",
-        "OA4tFt6lktBrS8XUVtUH"
-      );
-      const scheduleSnap = await getDoc(scheduleRef);
-
-      if (scheduleSnap.exists()) {
-        const data = scheduleSnap.data() as IScheduleResponse;
-        setScheduleData(data);
+      setIsLoading(true);
+      try {
+        const scheduleRef = doc(firestore, 'schedule-responses', 'OA4tFt6lktBrS8XUVtUH');
+        const scheduleSnap = await getDoc(scheduleRef);
+        
+        if (scheduleSnap.exists()) {
+          const data = scheduleSnap.data() as IScheduleResponse;
+          setScheduleData(data);
+        }
+      } catch (error) {
+        console.error('Error fetching schedule:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
-
+  
     fetchScheduleData();
   }, []);
 
@@ -121,6 +124,7 @@ export default function TimetableDetail() {
           </h3>
         </div>
       </SMHeader>
+      {(!isLoading && scheduleData) && (
       <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[3vh]">
         <div className="w-full mb-4 flex justify-center">
           <FormControl sx={{ minWidth: 170 }}>
@@ -235,6 +239,7 @@ export default function TimetableDetail() {
           </Table>
         </TableContainer>
       </div>
+      )}
     </div>
   );
 }
