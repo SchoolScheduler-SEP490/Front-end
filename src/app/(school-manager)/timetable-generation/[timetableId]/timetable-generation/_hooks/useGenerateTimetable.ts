@@ -40,7 +40,7 @@ const useGenerateTimetable = async (props: IGenerateTimetableProps) => {
 		return response;
 	} catch (err: any) {
 		useNotify({
-			message: err?.message ?? 'Có lỗi xảy ra',
+			message: err?.Message ?? 'Có lỗi xảy ra',
 			type: 'error',
 		});
 	}
