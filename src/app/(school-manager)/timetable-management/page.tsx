@@ -14,6 +14,7 @@ import { firestore } from '@/utils/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import { useEffect, useState } from "react";
 import LoadingComponent from "@/commons/loading";
+
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
@@ -24,62 +25,6 @@ const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
     fontSize: 13,
   },
 }));
-
-//   {
-//     id: 1,
-//     timetableCode: "T01",
-//     timetableName: "Thời khóa biểu 1",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 100,
-//     status: "Công bố",
-//   },
-//   {
-//     id: 2,
-//     timetableCode: "T02",
-//     timetableName: "Thời khóa biểu 2",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 60,
-//     status: "Chờ duyệt",
-//   },
-//   {
-//     id: 3,
-//     timetableCode: "T03",
-//     timetableName: "Thời khóa biểu 3",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 80,
-//     status: "Chờ duyệt",
-//   },
-//   {
-//     id: 4,
-//     timetableCode: "T04",
-//     timetableName: "Thời khóa biểu 3",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 50,
-//     status: "Vô hiệu",
-//   },
-//   {
-//     id: 5,
-//     timetableCode: "T05",
-//     timetableName: "Thời khóa biểu 3",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 95,
-//     status: "Vô hiệu",
-//   },
-//   {
-//     id: 6,
-//     timetableCode: "T06",
-//     timetableName: "Thời khóa biểu 3",
-//     appliedDate: "2022-09-01",
-//     endDate: "2022-09-30",
-//     fitness: 69,
-//     status: "Vô hiệu",
-//   },
-// ];
 
 export default function TimetableManagement() {
   const router = useRouter();
@@ -95,10 +40,10 @@ export default function TimetableManagement() {
         try {
             const timetablesRef = collection(firestore, 'timetables');
             const snapshot = await getDocs(timetablesRef);
-            const timetables = snapshot.docs.map((doc, index) => {
+            const timetables = snapshot.docs.map((doc) => {
                 const data = doc.data();
                 return {
-                    id: index + 1,
+                    id: doc.id,
                     timetableCode: data['timetable-abbreviation'],
                     timetableName: data['timetable-name'],
                     appliedWeek: data['applied-week'],
@@ -107,8 +52,7 @@ export default function TimetableManagement() {
                     termName: data['term-name'],
                     yearName: data['year-name']
                 };
-            }) as ITimetableTableData[];
-            
+            });       
             setTimetableData(timetables);
         } catch (error) {
             console.error('Error fetching timetables:', error);

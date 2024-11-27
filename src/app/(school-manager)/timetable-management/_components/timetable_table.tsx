@@ -21,6 +21,9 @@ import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
 import { ITimetableTableData } from "../_libs/constants";
 import { useRouter } from "next/navigation";
+import { ETimetableStatus } from "@/utils/constants";
+import { FormControl, MenuItem, Select } from "@mui/material";
+import TuneIcon from '@mui/icons-material/Tune';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -115,16 +118,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
+        <TableCell>
         </TableCell>
         {headCells.map((headCell) => (
           <TableCell
@@ -217,6 +211,8 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
+  const [selectedStatus, setSelectedStatus] = React.useState<ETimetableStatus>(ETimetableStatus.Pending);
+
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
@@ -233,30 +229,12 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelected = data.map((n) => n.id);
-      setSelected(newSelected);
+      // setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleOneClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -277,14 +255,20 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
     [order, orderBy, page, rowsPerPage, data]
   );
 
-  const handleRowClick = (event: React.MouseEvent<unknown>, id: number) => {
-    // Prevent navigation when clicking checkbox
-    if ((event.target as HTMLElement).closest('.MuiCheckbox-root')) {
-        handleOneClick(event, id);
-        return;
-    }
-    router.push(`/timetable-management/${id}`);
-};
+  const handleRowClick = (row: ITimetableTableData) => {
+    router.push(`/timetable-management/${row.id}`);
+  };
+
+  const handleCheckboxClick = (event: React.MouseEvent<unknown>, row: ITimetableTableData) => {
+    event.stopPropagation(); // Prevent row click event
+    router.push(`/timetable-generation/${row.id}/information`);
+  };
+
+  const handleStatusChange = (newStatus: ETimetableStatus) => {
+    setSelectedStatus(newStatus);
+    // Add API call to update status in backend
+  };
+
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
@@ -305,28 +289,32 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = selected.includes(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleRowClick(event, row.id)}
+                    onClick={() => handleRowClick(row)}
                     role="checkbox"
-                    aria-checked={isItemSelected}
+                   
                     tabIndex={-1}
                     key={row.id}
-                    selected={isItemSelected}
+                    
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell padding="checkbox">
-                      <Checkbox
+                    <TableCell>
+                      {/* <Checkbox
+                       onClick={(event) => handleCheckboxClick(event, row)}
                         color="primary"
-                        checked={isItemSelected}
                         inputProps={{
                           "aria-labelledby": labelId,
                         }}
-                      />
+                      /> */}
+                      <IconButton
+                       onClick={(event) => handleCheckboxClick(event, row)}
+                      >
+                        <TuneIcon />
+                      </IconButton>
                     </TableCell>
                     <TableCell
                       component="th"
@@ -340,23 +328,35 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                     <TableCell align="left">{row.timetableName}</TableCell>
                     <TableCell align="center">{row.termName}</TableCell>
                     <TableCell align="center">{row.yearName}</TableCell>
-                    <TableCell align="center">
-                      <div className="w-full h-full flex justify-center items-center">
-                        <div
-                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
-                            ${
-                                row.status === "Công bố"
-                                ? "bg-basic-positive-hover text-basic-positive"
-                                : row.status ===
-                                    "Vô hiệu"
-                                ? "bg-basic-negative-hover text-basic-negative"
-                                : "bg-basic-gray-hover text-basic-gray"
-                            }`}
-                        >
-                          {row.status}
-                        </div>
-                      </div>
-                    </TableCell>
+<TableCell align="center">
+  <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
+    
+    <Select
+    value={row.status}
+    onChange={(e) => handleStatusChange(e.target.value as ETimetableStatus)}
+    sx={{
+      '&.MuiSelect-select': {
+        borderRadius: '4px',
+      }
+    }}
+  >
+    {Object.values(ETimetableStatus).map((status) => (
+      <MenuItem 
+        key={status} 
+        value={status}
+        sx={{
+          backgroundColor: 
+            status === ETimetableStatus.Published ? 'basic-positive-hover' :
+            status === ETimetableStatus.Pending ? 'basic-gray-hover' :
+            'basic-negative-hover'
+        }}
+      >
+        {status}
+      </MenuItem>
+    ))}
+  </Select>
+  </FormControl>
+</TableCell>
                   </TableRow>
                 );
               })}

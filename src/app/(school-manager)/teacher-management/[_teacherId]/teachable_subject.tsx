@@ -19,7 +19,7 @@ import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AddTeachableSubjectModal from "./add_teachable_subject";
-import { KeyedMutator } from "swr";
+import useSWR, { KeyedMutator } from "swr";
 
 interface TeachableSubjectTableProps {
   teacherId: string | null;
@@ -40,20 +40,21 @@ export default function TeachableSubjectTable({
   const [departmentName, setDepartmentName] = useState<string>("");
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (teacherId) {
-        const response = await getTeacherSubject(
-          schoolId,
-          Number(teacherId),
-          sessionToken
-        );
-        if (response.status === 200) {
-          setTeachableSubjects(response.result["teachable-subjects"]);
-          setDepartmentName(response.result["department-name"]);
-        }
+  const fetchData = async () => {
+    if (teacherId) {
+      const response = await getTeacherSubject(
+        schoolId,
+        Number(teacherId),
+        sessionToken
+      );
+      if (response.status === 200) {
+        setTeachableSubjects(response.result["teachable-subjects"]);
+        setDepartmentName(response.result["department-name"]);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, [teacherId, schoolId, sessionToken]);
 
@@ -159,7 +160,7 @@ export default function TeachableSubjectTable({
           open={openAddForm}
           onClose={setOpenAddForm}
           teacherId={teacherId}
-          mutate={mutate}
+          mutate={fetchData}
         />
       </Paper>
     </Box>
