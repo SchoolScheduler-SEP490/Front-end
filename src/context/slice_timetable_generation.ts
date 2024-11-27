@@ -1,4 +1,8 @@
-import { IConfigurationStoreObject, ITimetableStoreObject } from '@/utils/constants';
+import {
+	IConfigurationStoreObject,
+	IScheduleResponse,
+	ITimetableStoreObject,
+} from '@/utils/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface ITimetableGenerationState {
@@ -9,10 +13,16 @@ export interface ITimetableGenerationState {
 	isModifying: boolean;
 	dataStored: IConfigurationStoreObject;
 	timetableStored: ITimetableStoreObject;
+	generatedScheduleStored: IScheduleResponse;
 }
 
 interface IUpdateDataStored {
 	target: keyof IConfigurationStoreObject;
+	value: any;
+}
+
+interface IUpdateTimetableStored {
+	target: keyof ITimetableStoreObject;
 	value: any;
 }
 
@@ -24,6 +34,7 @@ const initialState: ITimetableGenerationState = {
 	isModifying: false,
 	dataStored: {} as IConfigurationStoreObject,
 	timetableStored: {} as ITimetableStoreObject,
+	generatedScheduleStored: {} as IScheduleResponse,
 };
 
 export const timetableGenerationSlice = createSlice({
@@ -36,10 +47,17 @@ export const timetableGenerationSlice = createSlice({
 		setTimetableStored: (state, action: PayloadAction<ITimetableStoreObject>) => {
 			state.timetableStored = action.payload;
 		},
+		setGeneratedScheduleStored: (state, action: PayloadAction<IScheduleResponse>) => {
+			state.generatedScheduleStored = action.payload;
+		},
 		setModifyingStatus: (state, action: PayloadAction<boolean>) => {
 			state.isModifying = action.payload;
 		},
 		updateDataStored: (state, action: PayloadAction<IUpdateDataStored>) => {
+			(state.dataStored as any)[action.payload.target] = action.payload.value;
+			state.isModifying = true;
+		},
+		updateTimetableStored: (state, action: PayloadAction<IUpdateTimetableStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
 			state.isModifying = true;
 		},
@@ -50,10 +68,15 @@ export const timetableGenerationSlice = createSlice({
 });
 
 export const {
+	// Data initialization
 	setDataStored,
 	setTimetableStored,
 	setModifyingStatus,
+	setGeneratedScheduleStored,
+
+	// Action with payload
 	updateDataStored,
+	updateTimetableStored,
 	setTimetableId,
 } = timetableGenerationSlice.actions;
 export default timetableGenerationSlice.reducer;

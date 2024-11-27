@@ -1,11 +1,11 @@
 'use client';
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { IConfigurationStoreObject, INoAssignPeriodObject } from '@/utils/constants';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
+import { IConfigurationStoreObject, INoAssignPeriodObject } from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';

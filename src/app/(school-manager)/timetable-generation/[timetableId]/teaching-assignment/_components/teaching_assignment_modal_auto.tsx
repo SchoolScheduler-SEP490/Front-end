@@ -133,7 +133,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 				'fixed-assignment':
 					assignedTeachers.length > 0
 						? assignedTeachers.map((teacher) => ({
-								'assignment-id': teacher.id,
+								'assignment-id': teacher['assignment-id'],
 								'teacher-id': teacher['teacher-id'],
 						  }))
 						: null,

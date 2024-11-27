@@ -138,7 +138,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 						?.assignments.map(
 							(assignment: IAssignmentResponse) =>
 								({
-									id: assignment.id,
+									'assignment-id': assignment.id,
 									'teacher-id': assignment['teacher-id'],
 								} as ITeachingAssignmentObject)
 						),
@@ -162,7 +162,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 					...item.assignments.map(
 						(ass) =>
 							({
-								id: ass.id,
+								'assignment-id': ass.id,
 								'teacher-id': ass['teacher-id'],
 							} as ITeachingAssignmentObject)
 					),
@@ -218,7 +218,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleUpdateTeacher = (assignmentId: number, teacherId: number) => {
 		const updatedObjects = editingObjects.map((obj: ITeachingAssignmentObject) => {
-			if (obj.id === assignmentId) {
+			if (obj['assignment-id'] === assignmentId) {
 				return {
 					...obj,
 					'teacher-id': teacherId,

@@ -204,7 +204,7 @@ export const WEEK_DAYS_FULL = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Th�
 // =============================================TIMETABLE CONSTANTS===================================================
 // Phân công giáo viên
 export interface ITeachingAssignmentObject {
-	id: number;
+	'assignment-id': number;
 	'teacher-id': number;
 }
 
@@ -284,6 +284,7 @@ export enum ETimetableStatus {
 // Record kết quả generate thời khóa biểu
 export interface IScheduleResponse {
 	id: number;
+	'timetable-id': string;
 	'school-year-id': number;
 	'start-week': number;
 	'end-week': number;

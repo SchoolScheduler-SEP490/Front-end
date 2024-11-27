@@ -25,3 +25,18 @@ export const TIMETABLE_GENERATION_TABS: IDropdownOption<string>[] = [
 	{ label: 'Xếp tiết cố định', value: 'teachers-lessons' },
 	{ label: 'Tạo thời khóa biểu', value: 'timetable-generation' },
 ];
+
+export interface IClassCombinationResponse {
+	'subject-id': number;
+	'room-id': number;
+	'school-id': number;
+	'term-id': number;
+	'room-subject-code': string;
+	'room-subject-name': string | null;
+	model: string;
+	'student-class': any[];
+	id: number;
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}

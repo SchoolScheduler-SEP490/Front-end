@@ -3,6 +3,7 @@ import SMHeader from '@/commons/school_manager/header';
 import {
 	ITimetableGenerationState,
 	setDataStored,
+	setGeneratedScheduleStored,
 	setTimetableId,
 	setTimetableStored,
 } from '@/context/slice_timetable_generation';
@@ -16,7 +17,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import TimetableTabs from '../_components/timetable-tabs';
 import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
-import { IConfigurationStoreObject, ITimetableStoreObject } from '@/utils/constants';
+import {
+	IConfigurationStoreObject,
+	IScheduleResponse,
+	ITimetableStoreObject,
+} from '@/utils/constants';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -64,6 +69,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 		dataFirestoreName,
 		timetableFirestoreName,
 		timetableStored,
+		generatedScheduleFirestorename,
 	}: ITimetableGenerationState = useSelector((state: any) => state.timetableGeneration);
 
 	useMemo(() => {
@@ -72,6 +78,16 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 			const docSnap = await getDoc(docRef);
 			const timetableStore: ITimetableStoreObject = docSnap.data() as ITimetableStoreObject;
 			if (timetableStore) {
+				if (timetableStore['generated-schedule-id']) {
+					const docRef = doc(
+						firestore,
+						generatedScheduleFirestorename,
+						timetableStore['generated-schedule-id']
+					);
+					const docSnap = await getDoc(docRef);
+					const generatedSchedule = docSnap.data() as IScheduleResponse;
+					dispatch(setGeneratedScheduleStored(generatedSchedule));
+				}
 				dispatch(setTimetableStored(timetableStore));
 			}
 		};

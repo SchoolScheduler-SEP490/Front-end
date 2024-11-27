@@ -180,17 +180,17 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	const handleAssignTeacher = (assignmentId: number, selectedTeacherId: number) => {
 		setIsEditing(true);
 		var editingObject: ITeacherAssignmentRequest | undefined = editingObjects.find(
-			(item) => item.id === assignmentId
+			(item) => item['assignment-id'] === assignmentId
 		);
 		if (!editingObject) {
 			editingObject = {
-				id: assignmentId,
+				'assignment-id': assignmentId,
 				'teacher-id': selectedTeacherId ?? 0,
 			};
 		} else {
 			editingObject['teacher-id'] = selectedTeacherId;
 		}
-		setEditingObjects(useFilterArray([...editingObjects, editingObject], ['id']));
+		setEditingObjects(useFilterArray([...editingObjects, editingObject], ['assignment-id']));
 	};
 
 	const handleSelectSubject = (subjectId: number) => {
@@ -288,8 +288,9 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 								{subjectData.map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
 									const editedObject: ITeacherAssignmentRequest | undefined =
-										editingObjects.find((item) => item.id === row.id) ??
-										undefined;
+										editingObjects.find(
+											(item) => item['assignment-id'] === row.id
+										) ?? undefined;
 
 									return (
 										<TableRow

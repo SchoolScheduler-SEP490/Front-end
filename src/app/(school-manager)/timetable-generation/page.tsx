@@ -6,6 +6,7 @@ import useFetchTerm from '@/hooks/useFetchTerm';
 import useNotify from '@/hooks/useNotify';
 import {
 	ETimetableStatus,
+	IClassCombinationObject,
 	IConfigurationStoreObject,
 	ISchoolYearResponse,
 	ITermResponse,
@@ -28,7 +29,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
-import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
+import { IClassCombinationResponse, TIMETABLE_GENERATION_TABS } from './_libs/constants';
+import useFetchClassCombinations from './_hooks/useFetchClassCombination';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -48,7 +50,7 @@ interface ISortableDropdown<T> extends IDropdownOption<T> {
 
 export default function Home() {
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
-	const { selectedSchoolYearId, schoolId } = useAppContext();
+	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
 	const router = useRouter();
 	const pathName = usePathname();
 
@@ -59,6 +61,9 @@ export default function Home() {
 
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
+	const [createdClassCombination, setCreatedClassCombination] = useState<
+		IClassCombinationObject[]
+	>([]);
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear();
 	const {
@@ -71,7 +76,35 @@ export default function Home() {
 		schoolYearId: selectedSchoolYearId,
 	});
 
-	// const {data:classCombination}
+	const { data: classCombinationData, mutate: updateClassCombination } =
+		useFetchClassCombinations({
+			schoolId: Number(schoolId),
+			sessionToken,
+			pageIndex: 1,
+			pageSize: 1000,
+			termId: selectedTermId,
+		});
+
+	// Xử lý dữ liệu class combination đã được tạo sẵn vào trong timetable Firebase
+	useEffect(() => {
+		setCreatedClassCombination([]);
+		updateClassCombination();
+		if (classCombinationData?.status === 200) {
+			const tmpCreatedClassCombination: IClassCombinationObject[] =
+				classCombinationData.result.items.map(
+					(item: IClassCombinationResponse) =>
+						({
+							'class-ids': item['student-class'].map((clazz) => clazz.id),
+							'subject-id': item['subject-id'],
+							'teacher-id': null,
+							'room-id': item['room-id'],
+						} as IClassCombinationObject)
+				);
+			if (tmpCreatedClassCombination.length > 0) {
+				setCreatedClassCombination(tmpCreatedClassCombination);
+			}
+		}
+	}, [classCombinationData]);
 
 	// Process data
 	useEffect(() => {
@@ -147,7 +180,7 @@ export default function Home() {
 			'fixed-periods-para': [],
 			'no-assign-periods-para': [],
 			'free-timetable-periods-para': [],
-			'class-combinations': [],
+			'class-combinations': createdClassCombination,
 			'applied-curriculum-id': 0,
 			'days-in-week': 6,
 			'minimum-days-off': 0,
