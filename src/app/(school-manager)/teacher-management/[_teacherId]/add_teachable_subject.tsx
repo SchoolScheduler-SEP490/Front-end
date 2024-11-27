@@ -78,49 +78,59 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
 
   const handleFormSubmit = async (values: FormValues) => {
     if (teacherId) {
-      await addNewTeachableSubject(
+      const result = await useAddTeachableSubject({
         schoolId,
-        Number(teacherId),
-        values.subjects,
+        teacherId: Number(teacherId),
+        teachableData: values.subjects[0],
         sessionToken
-      );
-      mutate();
-      handleClose();
+      });
+      if (result) {
+        await mutate();
+        handleClose();
+      }
     }
   };
-
+  
   const formik = useFormik<FormValues>({
     initialValues: {
-      subjects: [
-        {
-          "subject-abreviation": "",
-          "list-approriate-level-by-grades": [],
-          "is-main": false,
-        },
-      ],
-    },
-    validationSchema: addTeachableSubject,
-    onSubmit: handleFormSubmit,
-  });
-
-  const addNewSubject = () => {
-    formik.setFieldValue("subjects", [
-      ...formik.values.subjects,
-      {
+      subjects: [{
         "subject-abreviation": "",
         "list-approriate-level-by-grades": [],
         "is-main": false,
-      },
-    ]);
-    const newIndex = formik.values.subjects.length;
-    setExpandedAccordion(newIndex);
+      }]
+    },
+    validationSchema: addTeachableSubject,
+    onSubmit: async (formData) => {
+      handleFormSubmit(formData)
+    },
+  });
+
+  const addNewSubject = () => {
+    const newSubject = {
+      "subject-abreviation": "",
+      "list-approriate-level-by-grades": [],
+      "is-main": false,
+    };
+    formik.setValues({
+      subjects: [
+        ...formik.values.subjects,
+        {
+          "subject-abreviation": newSubject["subject-abreviation"],
+          "list-approriate-level-by-grades": newSubject["list-approriate-level-by-grades"],
+          "is-main": newSubject["is-main"],
+        }
+      ]
+    });
+    setExpandedAccordion(formik.values.subjects.length);
   };
 
   const removeSubject = (index: number) => {
-    const newSubjects = [...formik.values.subjects];
+    const newSubjects = [formik.values];
     newSubjects.splice(index, 1);
-    formik.setFieldValue("subjects", newSubjects);
+    formik.setValues(newSubjects[0]);
+    setExpandedAccordion(Math.max(0, index - 1));
   };
+  
   console.log(formik.values);
   console.log(formik.errors);
   return (
@@ -171,7 +181,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                   {index > 0 && (
                     <IconButton
                       onClick={(e) => {
-                        e.stopPropagation();
+                        // e.stopPropagation();
                         removeSubject(index);
                       }}
                       color="error"
@@ -187,51 +197,8 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                 {/* Subject Selection */}
                 <Grid item xs={12}>
                   <Grid item xs={12}>
-                  <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={3}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          fontWeight: "bold",
-                          display: "flex",
-                          alignItems: "center",
-                          height: "100%",
-                          minHeight: "80px"
-                        }}
-                      >
-                        Môn học
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={8}>
-                      <FormControl fullWidth>
-                      <InputLabel>Tên môn học</InputLabel>
-                        <Select
-                          variant="standard"
-                          name={`subjects.${index}.subject-abreviation`}
-                          value={subject["subject-abreviation"]}
-                          onChange={formik.handleChange}
-                          MenuProps={MenuProps}
-                        >
-                          <MenuItem value="">--Chọn môn học--</MenuItem>
-                          {subjects.map((s) => (
-                            <MenuItem
-                              key={s.abbreviation}
-                              value={s.abbreviation}
-                            >
-                              {s["subject-name"]}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-                  </Grid>
-
-                  {/* Grade Levels */}
-                  <Grid item xs={12}>
                     <Grid container spacing={2} sx={{ mb: 2 }}>
                       <Grid item xs={3}>
-                        <div className="flex flex-row justify-start items-center gap-1">
                         <Typography
                           variant="body1"
                           sx={{
@@ -239,22 +206,65 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                             display: "flex",
                             alignItems: "center",
                             height: "100%",
-                            minHeight: "80px"
+                            minHeight: "80px",
                           }}
                         >
-                          Khối
+                          Môn học
                         </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() =>
-                            setGradeFields([
-                              ...gradeFields,
-                              { id: gradeFields.length },
-                            ])
-                          }
-                        >
-                          <AddIcon fontSize="small" />
-                        </IconButton>
+                      </Grid>
+                      <Grid item xs={8}>
+                        <FormControl fullWidth>
+                          <InputLabel>Tên môn học</InputLabel>
+                          <Select
+                            variant="standard"
+                            name={`subjects.${index}.subject-abreviation`}
+                            value={subject["subject-abreviation"]}
+                            onChange={formik.handleChange}
+                            MenuProps={MenuProps}
+                          >
+                            <MenuItem value="">--Chọn môn học--</MenuItem>
+                            {subjects.map((s) => (
+                              <MenuItem
+                                key={s.abbreviation}
+                                value={s.abbreviation}
+                              >
+                                {s["subject-name"]}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+
+                  {/* Grade Levels */}
+                  <Grid item xs={12}>
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={3}>
+                        <div className="flex flex-row justify-start items-center gap-1">
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: "bold",
+                              display: "flex",
+                              alignItems: "center",
+                              height: "100%",
+                              minHeight: "80px",
+                            }}
+                          >
+                            Khối
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              setGradeFields([
+                                ...gradeFields,
+                                { id: gradeFields.length },
+                              ])
+                            }
+                          >
+                            <AddIcon fontSize="small" />
+                          </IconButton>
                         </div>
                       </Grid>
 
@@ -267,7 +277,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                             <Grid container spacing={2}>
                               <Grid item xs={6}>
                                 <FormControl fullWidth>
-                                <InputLabel>Khối</InputLabel>
+                                  <InputLabel>Khối</InputLabel>
                                   <Select
                                     variant="standard"
                                     value={
@@ -311,7 +321,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                               </Grid>
                               <Grid item xs={5}>
                                 <FormControl fullWidth>
-                                <InputLabel>Độ phù hợp</InputLabel>
+                                  <InputLabel>Độ phù hợp</InputLabel>
                                   <Select
                                     variant="standard"
                                     value={
@@ -349,31 +359,43 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                   </Select>
                                 </FormControl>
                               </Grid>
-                            {gradeIndex > 0 && (
-                              <Grid item xs={1} sx={{ display: 'flex', justifyContent: 'center' }}>
-
-                              <IconButton
-                                onClick={() => {
-                                  const newFields = gradeFields.filter(
-                                    (_, i) => i !== gradeIndex
-                                  );
-                                  setGradeFields(newFields);
-                                  const currentGrades = [
-                                    ...formik.values.subjects[index][
-                                      "list-approriate-level-by-grades"
-                                    ],
-                                  ];
-                                  currentGrades.splice(gradeIndex, 1);
-                                  formik.setFieldValue(
-                                    `subjects.${index}.list-approriate-level-by-grades`,
-                                    currentGrades
-                                  );
-                                }}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                              </Grid>
-                            )}
+                              {gradeIndex > 0 && (
+                                <Grid
+                                  item
+                                  xs={1}
+                                  sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  <IconButton
+                                    onClick={() => {
+                                      const newFields = gradeFields.filter(
+                                        (_, i) => i !== gradeIndex
+                                      );
+                                      setGradeFields(newFields);
+                                      const currentGrades = [
+                                        ...formik.values.subjects[index][
+                                          "list-approriate-level-by-grades"
+                                        ],
+                                      ];
+                                      currentGrades.splice(gradeIndex, 1);
+                                      formik.setFieldValue(
+                                        `subjects.${index}.list-approriate-level-by-grades`,
+                                        currentGrades
+                                      );
+                                    }}
+                                  >
+                                    <DeleteIcon
+                                      sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        height: "100%",
+                                      }}
+                                    />
+                                  </IconButton>
+                                </Grid>
+                              )}
                             </Grid>
                           </div>
                         ))}

@@ -1,5 +1,5 @@
 export interface ITimetableTableData {
-    id: number;
+    id: string;
     timetableCode: string;
     timetableName: string;
     appliedWeek: string | null;
@@ -65,6 +65,4 @@ export const SAMPLE_CLASSES = [
 
 export const TIME_SLOTS = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
-    startTime: `${Math.floor(i/2) + 7}:${i%2 === 0 ? '00' : '45'}`,
-    endTime: `${Math.floor((i+1)/2) + 7}:${(i+1)%2 === 0 ? '00' : '45'}`
 }));
