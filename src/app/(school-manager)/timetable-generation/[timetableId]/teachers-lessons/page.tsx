@@ -104,7 +104,7 @@ export default function TeachersLessons() {
 				availableSubjects.forEach((assignment: IAssignmentResponse) => {
 					const assignedTeacher: ITeachingAssignmentObject | undefined = dataStored[
 						'teacher-assignments'
-					].find((item) => item.id === assignment.id);
+					].find((item) => item['assignment-id'] === assignment.id);
 
 					const availableTeacher: ITeacherResponse | undefined =
 						teacherData.result.items.find(

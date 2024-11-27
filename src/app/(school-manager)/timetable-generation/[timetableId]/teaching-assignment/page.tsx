@@ -172,9 +172,9 @@ export default function SMTeachingAssignment() {
 				'teacher-assignt-view'
 			].map((item: ITeachingAssignmentResponse) => {
 				const existingAssignment =
-					editingObjects.find((assignment) => assignment.id === item.id) ??
+					editingObjects.find((assignment) => assignment['assignment-id'] === item.id) ??
 					dataStored['teacher-assignments'].find(
-						(assignment) => assignment.id === item.id
+						(assignment) => assignment['assignment-id'] === item.id
 					);
 				if (existingAssignment !== undefined) {
 					const existingTeacher: ITeacherResponse = teacherData.result.items.find(
@@ -209,9 +209,9 @@ export default function SMTeachingAssignment() {
 				'teacher-not-assignt-view'
 			].map((item: ITeachingAssignmentResponse) => {
 				const existingAssignment =
-					editingObjects.find((assignment) => assignment.id === item.id) ??
+					editingObjects.find((assignment) => assignment['assignment-id'] === item.id) ??
 					dataStored['teacher-assignments'].find(
-						(assignment) => assignment.id === item.id
+						(assignment) => assignment['assignment-id'] === item.id
 					);
 				if (existingAssignment !== undefined) {
 					const existingTeacher: ITeacherResponse = teacherData.result.items.find(

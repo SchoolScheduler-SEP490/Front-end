@@ -49,7 +49,7 @@ export default function Home() {
 				.required('Vui lòng nhập khoảng nghỉ giữa 2 buổi')
 				.min(1, 'Phải có ít nhất 1 khoảng nghỉ')
 				.max(3, 'Khoảng nghỉ không được kéo dài quá 3 tiết'),
-			'minimum-days-off': yup.number().required('Vui lòng nhập số ngày nghỉ ít nhất'),
+			'minimum-days-off': yup.number(),
 		}),
 	});
 
@@ -92,7 +92,7 @@ export default function Home() {
 
 	return (
 		<div className='w-full h-screen flex flex-col justify-start items-center pt-[15vh]'>
-			<div className='w-[25vw] h-[40vh] flex flex-col justify-start items-center gap-3'>
+			<div className='w-[30vw] h-[40vh] flex flex-col justify-start items-center gap-3'>
 				<h1 className='w-full text-center text-title-medium-strong mb-2'>Cấu hình chung</h1>
 				<TextField
 					fullWidth
@@ -155,10 +155,10 @@ export default function Home() {
 				<TextField
 					fullWidth
 					variant='standard'
-					id='abbreviation'
-					name='abbreviation'
+					id='minimum-days-off'
+					name='minimum-days-off'
 					type='number'
-					label='Số ngày nghỉ tối thiểu'
+					label='Số ngày nghỉ tối thiểu của giáo viên'
 					value={formik.values['minimum-days-off']}
 					onChange={formik.handleChange('minimum-days-off')}
 					onBlur={formik.handleBlur}
@@ -168,6 +168,8 @@ export default function Home() {
 					}
 					helperText={
 						formik.touched['minimum-days-off'] && formik.errors['minimum-days-off']
+							? formik.errors['minimum-days-off']
+							: 'Nhập giá trị phù hợp (1-2 buổi) nhằm đảm bảo việc xếp TKB khả thi'
 					}
 					slotProps={{
 						input: {

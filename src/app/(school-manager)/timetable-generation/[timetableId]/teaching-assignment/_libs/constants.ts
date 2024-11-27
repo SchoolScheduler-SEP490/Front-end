@@ -43,7 +43,7 @@ export interface ITermResponse {
 }
 
 export interface ITeacherAssignmentRequest {
-	id: number;
+	'assignment-id': number;
 	'teacher-id': number;
 }
 
