@@ -40,6 +40,7 @@ import {
   TIMETABLE_SLOTS,
   WEEK_DAYS_FULL,
 } from "@/utils/constants";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function TimetableDetail() {
   const params = useParams();
@@ -52,6 +53,9 @@ export default function TimetableDetail() {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
+  const isMenuOpen = useSelector(
+    (state: any) => state.schoolManager.isMenuOpen
+  );
 
   const handleBack = () => {
     router.push("/timetable-management");
@@ -82,16 +86,23 @@ export default function TimetableDetail() {
 
   useEffect(() => {
     const fetchScheduleData = async () => {
-      const scheduleRef = doc(
-        firestore,
-        "schedule-responses",
-        "OA4tFt6lktBrS8XUVtUH"
-      );
-      const scheduleSnap = await getDoc(scheduleRef);
+      setIsLoading(true);
+      try {
+        const scheduleRef = doc(
+          firestore,
+          "schedule-responses",
+          "OA4tFt6lktBrS8XUVtUH"
+        );
+        const scheduleSnap = await getDoc(scheduleRef);
 
-      if (scheduleSnap.exists()) {
-        const data = scheduleSnap.data() as IScheduleResponse;
-        setScheduleData(data);
+        if (scheduleSnap.exists()) {
+          const data = scheduleSnap.data() as IScheduleResponse;
+          setScheduleData(data);
+        }
+      } catch (error) {
+        console.error("Error fetching schedule:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -110,7 +121,11 @@ export default function TimetableDetail() {
   }, [scheduleData]);
 
   return (
-    <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
+    <div
+      className={`w-[${
+        !isMenuOpen ? "84" : "100"
+      }%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+    >
       <SMHeader>
         <div className="flex items-center gap-4">
           <IconButton onClick={handleBack} sx={{ color: "white" }}>
@@ -121,120 +136,122 @@ export default function TimetableDetail() {
           </h3>
         </div>
       </SMHeader>
-      <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[3vh]">
-        <div className="w-full mb-4 flex justify-center">
-          <FormControl sx={{ minWidth: 170 }}>
-            <InputLabel>Khối</InputLabel>
-            <Select
-              value={selectedGrade}
-              label="Khối"
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              <MenuItem value="all">Tất cả</MenuItem>
-              {grades.map((grade) => (
-                <MenuItem key={grade} value={grade}>
-                  Khối {grade}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 750 }} aria-label="timetable">
-            <TableHead>
-              <TableRow>
-                <TableCell className="font-semibold">Thứ</TableCell>
-                <TableCell className="font-semibold">Tiết/Lớp</TableCell>
-                <TableCell colSpan={visibleClasses.length + 2}>
-                  <div className="flex items-center justify-center gap-2 ">
-                    {classNames.map((className) => (
-                      <div
-                        key={className}
-                        className="font-semibold w-full text-center"
-                      >
-                        {className}
-                      </div>
-                    ))}
-                  </div>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {WEEK_DAYS_FULL.map((day, dayIndex) =>
-                TIMETABLE_SLOTS.map((session, sessionIndex) =>
-                  session.slots.map((slot, slotIndex) => (
-                    <TableRow key={`${day}-${session.period}-${slotIndex}`}>
-                      {slotIndex === 0 && sessionIndex === 0 && (
-                        <TableCell
-                          rowSpan={TIMETABLE_SLOTS.reduce(
-                            (acc, s) => acc + s.slots.length,
-                            0
-                          )}
-                          className="font-semibold"
-                          sx={{
-                            borderRight: "1px solid #e5e7eb",
-                            textAlign: "center",
-                          }}
+      {!isLoading && scheduleData && (
+        <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[3vh]">
+          <div className="w-full mb-4 flex justify-center">
+            <FormControl sx={{ minWidth: 170 }}>
+              <InputLabel>Khối</InputLabel>
+              <Select
+                value={selectedGrade}
+                label="Khối"
+                onChange={(e) => setSelectedGrade(e.target.value)}
+              >
+                <MenuItem value="all">Tất cả</MenuItem>
+                {grades.map((grade) => (
+                  <MenuItem key={grade} value={grade}>
+                    Khối {grade}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 750 }} aria-label="timetable">
+              <TableHead>
+                <TableRow>
+                  <TableCell className="font-semibold">Thứ</TableCell>
+                  <TableCell className="font-semibold">Tiết/Lớp</TableCell>
+                  <TableCell colSpan={visibleClasses.length + 2}>
+                    <div className="flex items-center justify-center gap-2 ">
+                      {classNames.map((className) => (
+                        <div
+                          key={className}
+                          className="font-semibold w-full text-center"
                         >
-                          {day}
-                        </TableCell>
-                      )}
-                      <TableCell component="th" scope="row">
-                        {slot}
-                      </TableCell>
-                      <TableCell
-                        colSpan={
-                          (scheduleData?.["class-schedules"]?.length ?? 0) + 2
-                        }
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-[40px]" />
-                          {scheduleData?.["class-schedules"].map(
-                            (classSchedule) => {
-                              const currentSlotIndex =
-                                dayIndex * 10 +
-                                sessionIndex * 5 +
-                                slotIndex +
-                                1;
-                              const period = classSchedule[
-                                "class-periods"
-                              ].find(
-                                (p) =>
-                                  p["start-at"] === currentSlotIndex &&
-                                  !p["is-deleted"]
-                              );
+                          {className}
+                        </div>
+                      ))}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                              return (
-                                <div
-                                  key={`${classSchedule["student-class-id"]}-${currentSlotIndex}`}
-                                  className="w-full"
-                                >
-                                  <div className="min-h-[60px] p-2 border border-dashed border-gray-200 rounded flex flex-col justify-between">
-                                    <div className="text-sm font-medium text-center">
-                                      {period?.["subject-abbreviation"]}
-                                    </div>
-                                    <div className="flex justify-center text-xs text-gray-500">
-                                      <span>
-                                        {period?.["teacher-abbreviation"]}
-                                      </span>
+              <TableBody>
+                {WEEK_DAYS_FULL.map((day, dayIndex) =>
+                  TIMETABLE_SLOTS.map((session, sessionIndex) =>
+                    session.slots.map((slot, slotIndex) => (
+                      <TableRow key={`${day}-${session.period}-${slotIndex}`}>
+                        {slotIndex === 0 && sessionIndex === 0 && (
+                          <TableCell
+                            rowSpan={TIMETABLE_SLOTS.reduce(
+                              (acc, s) => acc + s.slots.length,
+                              0
+                            )}
+                            className="font-semibold"
+                            sx={{
+                              borderRight: "1px solid #e5e7eb",
+                              textAlign: "center",
+                            }}
+                          >
+                            {day}
+                          </TableCell>
+                        )}
+                        <TableCell component="th" scope="row">
+                          {slot}
+                        </TableCell>
+                        <TableCell
+                          colSpan={
+                            (scheduleData?.["class-schedules"]?.length ?? 0) + 2
+                          }
+                        >
+                          <div className="flex items-center justify-center gap-2">
+                            <div className="w-[40px]" />
+                            {scheduleData?.["class-schedules"].map(
+                              (classSchedule) => {
+                                const currentSlotIndex =
+                                  dayIndex * 10 +
+                                  sessionIndex * 5 +
+                                  slotIndex +
+                                  1;
+                                const period = classSchedule[
+                                  "class-periods"
+                                ].find(
+                                  (p) =>
+                                    p["start-at"] === currentSlotIndex &&
+                                    !p["is-deleted"]
+                                );
+
+                                return (
+                                  <div
+                                    key={`${classSchedule["student-class-id"]}-${currentSlotIndex}`}
+                                    className="w-full"
+                                  >
+                                    <div className="min-h-[60px] p-2 border border-dashed border-gray-200 rounded flex flex-col justify-between">
+                                      <div className="text-sm font-medium text-center">
+                                        {period?.["subject-abbreviation"]}
+                                      </div>
+                                      <div className="flex justify-center text-xs text-gray-500">
+                                        <span>
+                                          {period?.["teacher-abbreviation"]}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              );
-                            }
-                          )}
-                          <div className="w-[40px]" />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+                                );
+                              }
+                            )}
+                            <div className="w-[40px]" />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+      )}
     </div>
   );
 }
