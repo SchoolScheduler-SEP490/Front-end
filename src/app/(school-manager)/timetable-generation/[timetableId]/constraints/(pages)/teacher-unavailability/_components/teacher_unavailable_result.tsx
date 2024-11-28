@@ -1,5 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
+	Button,
+	Collapse,
 	IconButton,
 	Paper,
 	Skeleton,
@@ -11,6 +13,8 @@ import {
 	TableRow,
 } from '@mui/material';
 import { ITeacherUnavailability } from '../_libs/constants';
+import { usePathname, useRouter } from 'next/navigation';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 interface ITeacherUnavailableResultProps {
 	data: ITeacherUnavailability[];
@@ -21,10 +25,48 @@ interface ITeacherUnavailableResultProps {
 
 const TeacherUnavailableResult = (props: ITeacherUnavailableResultProps) => {
 	const { data, isLoading, handleDelete, handleSelectResult } = props;
+	const router = useRouter();
+	const pathName = usePathname();
+
+	const handleNext = () => {
+		const tmpPathArr: string[] = pathName.split('/');
+		tmpPathArr.splice(4);
+		tmpPathArr.push('free-timetable-periods');
+		router.push(tmpPathArr.join('/'));
+	};
 
 	return (
 		<div className='w-[40%] h-[90vh] px-[2vw] pt-[6vh] flex flex-col justify-start items-start gap-5'>
-			<h1 className='text-title-small-strong h-[5vh] t'>Danh sách áp dụng</h1>
+			<div className='w-full h-fit flex flex-row justify-between items-baseline'>
+				<h1 className='text-title-small-strong h-[5vh] align-text-bottom'>kết quả</h1>
+				<Collapse
+					in={data.length > 0}
+					orientation='horizontal'
+					sx={{
+						width: data.length > 0 ? '60%' : '0%',
+						height: 'fit-content',
+						p: 0,
+						m: 0,
+					}}
+				>
+					<Button
+						variant='outlined'
+						onClick={handleNext}
+						color='success'
+						sx={{
+							borderRadius: 0,
+							width: '100%',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							textWrap: 'nowrap',
+							borderBottom: '2px solid #008000',
+						}}
+						endIcon={<ArrowForwardIcon />}
+					>
+						xếp tiết nghỉ
+					</Button>
+				</Collapse>
+			</div>
 			<TableContainer component={Paper}>
 				<Table sx={{ minWidth: '100%' }} aria-label='teacher table' size='small'>
 					<TableHead>
