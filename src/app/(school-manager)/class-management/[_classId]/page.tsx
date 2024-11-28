@@ -248,7 +248,7 @@ export default function ClassDetails() {
 
 												return teacherAssignments.map(
 													(assignment, index) => {
-														const teacherName = `${assignment['teacher-first-name']} ${assignment['teacher-last-name']}`;
+														const teacherName = `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
 														let teacherCell = null;
 														const rowId = `${subject['subject-id']}-${index}`;
 
@@ -257,7 +257,7 @@ export default function ClassDetails() {
 															currentTeacherRowSpan =
 																teacherAssignments.filter(
 																	(a) =>
-																		`${a['teacher-first-name']} ${a['teacher-last-name']}` ===
+																		`${a['teacher-last-name']} ${a['teacher-first-name']}` ===
 																		teacherName
 																).length;
 															teacherCell = (

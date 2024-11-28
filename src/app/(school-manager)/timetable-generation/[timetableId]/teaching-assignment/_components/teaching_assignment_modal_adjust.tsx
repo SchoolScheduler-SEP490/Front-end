@@ -2,15 +2,22 @@
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
+import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
+import useNotify from '@/hooks/useNotify';
+import { useSMDispatch } from '@/hooks/useStore';
+import { ITeachingAssignmentObject } from '@/utils/constants';
+import { firestore } from '@/utils/firebaseConfig';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, IconButton, Modal, styled, TextField, Typography } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
+import { doc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { IConfigurationStoreObject, ITeachingAssignmentObject } from '@/utils/constants';
+import { useSelector } from 'react-redux';
+import { KeyedMutator } from 'swr';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	IAssignmentResponse,
@@ -19,13 +26,6 @@ import {
 	ITeachingAssignmentSidenavData,
 } from '../_libs/constants';
 import TeachingAssignmentSideNav from './teaching_assignment_sidenav';
-import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
-import { useSelector } from 'react-redux';
-import { doc, setDoc } from 'firebase/firestore';
-import { firestore } from '@/utils/firebaseConfig';
-import { useSMDispatch } from '@/hooks/useStore';
-import useNotify from '@/hooks/useNotify';
-import { KeyedMutator } from 'swr';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -72,15 +72,20 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ITermSeperatedAssignment {
-	termId: number;
-	termName: string;
-	assignments: IAssignmentResponse[];
+interface IExtendedTeachingAssignment extends ITeachingAssignmentObject {
+	'teacher-name': string;
 }
 
 const renderTeacherOption = (assignment: IAssignmentResponse): IDropdownOption<number> => {
 	return {
-		label: `${assignment['teacher-first-name']} ${assignment['teacher-last-name']} (${assignment['teacher-abbreviation']})`,
+		label: `${assignment['teacher-last-name']} ${assignment['teacher-first-name']} (${assignment['teacher-abbreviation']})`,
+		value: assignment['teacher-id'],
+	} as IDropdownOption<number>;
+};
+
+const renderSelectedOption = (assignment: IExtendedTeachingAssignment): IDropdownOption<number> => {
+	return {
+		label: assignment['teacher-name'],
 		value: assignment['teacher-id'],
 	} as IDropdownOption<number>;
 };
@@ -105,17 +110,17 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		selectedGrade,
 		setSelectedGrade,
 	} = props;
-	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+	const { schoolId, sessionToken } = useAppContext();
 	const { dataStored, dataFirestoreName, timetableStored }: ITimetableGenerationState =
 		useSelector((state: any) => state.timetableGeneration);
 	const dispatch = useSMDispatch();
 
-	const [editingObjects, setEditingObjects] = useState<ITeachingAssignmentObject[]>([]);
-	const [selectedClassId, setSelectedClassId] = useState<number>(0);
-	const [selectedAssignments, setSelectedAssignments] = useState<ITermSeperatedAssignment[]>([]);
-	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
-	const [expanded, setExpanded] = useState<string[]>(['panel0', 'panel1']);
+	const [editingObjects] = useState<IExtendedTeachingAssignment[]>([]);
+	const [selectedAssignments, setSelectedAssignments] = useState<IAssignmentResponse[]>([]);
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
+
+	const [selectedClassId, setSelectedClassId] = useState<number>(0);
+	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(0);
 
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
@@ -127,52 +132,46 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleSaveUpdates = async () => {
 		// Save data to Firebase
+		const originAutoResult: ITeachingAssignmentObject[] = [];
+		automationResult.map((item) => {
+			if (item['term-id'] === timetableStored['term-id']) {
+				item.assignments.map((assignment) => {
+					originAutoResult.push({
+						'assignment-id': assignment.id,
+						'teacher-id': assignment['teacher-id'],
+					} as ITeachingAssignmentObject);
+				});
+			}
+		});
 		if (dataStored && dataFirestoreName && dataStored.id && automationResult.length > 0) {
+			const finalResult: ITeachingAssignmentObject[] = useFilterArray(
+				[
+					...originAutoResult,
+					...editingObjects.map(
+						(obj) =>
+							({
+								'assignment-id': obj['assignment-id'],
+								'teacher-id': obj['teacher-id'],
+							} as ITeachingAssignmentObject)
+					),
+				],
+				['assignment-id']
+			);
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(
 				docRef,
 				{
 					...dataStored,
-					'teacher-assignments': automationResult
-						.find((item) => item['term-id'] === timetableStored['term-id'])
-						?.assignments.map(
-							(assignment: IAssignmentResponse) =>
-								({
-									'assignment-id': assignment.id,
-									'teacher-id': assignment['teacher-id'],
-								} as ITeachingAssignmentObject)
-						),
-				} as IConfigurationStoreObject,
+					'teacher-assignments': finalResult,
+				},
 				{ merge: true }
 			);
-			dispatch(updateDataStored({ target: 'teacher-assignments', value: editingObjects }));
+			dispatch(updateDataStored({ target: 'teacher-assignments', value: finalResult }));
 			useNotify({ message: 'Phân công giáo viên thành công', type: 'success' });
 			updateTeachingAssignment();
 			handleClose();
 		}
 	};
-
-	// Data chuẩn để lưu vào Firebase
-	useEffect(() => {
-		if (open && automationResult.length > 0) {
-			var tmpTeachingAssignmentObjs: ITeachingAssignmentObject[] = [];
-			automationResult.map((item: IAutoTeacherAssignmentResponse) => {
-				tmpTeachingAssignmentObjs = [
-					...tmpTeachingAssignmentObjs,
-					...item.assignments.map(
-						(ass) =>
-							({
-								'assignment-id': ass.id,
-								'teacher-id': ass['teacher-id'],
-							} as ITeachingAssignmentObject)
-					),
-				];
-			});
-			if (tmpTeachingAssignmentObjs.length > 0) {
-				setEditingObjects(tmpTeachingAssignmentObjs);
-			}
-		}
-	}, [automationResult, open]);
 
 	// Lấy dữ liệu mặc định khi mở modal
 	useEffect(() => {
@@ -180,27 +179,24 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 			setSelectedClassId(sidenavData[0].items[0].value);
 			setSelectedCurriculumName(sidenavData[0].items[0].extra);
 		}
-	}, [open]);
+	}, [automationResult]);
 
 	// Lấy dữ liệu phân công giáo viên theo lớp đã chọn
 	useEffect(() => {
 		if (open && automationResult.length > 0) {
-			const tmpCurrentAssignments: ITermSeperatedAssignment[] = automationResult.map(
-				(item: IAutoTeacherAssignmentResponse) =>
-					({
-						termId: item['term-id'],
-						termName: item['term-name'],
-						assignments: item.assignments.filter(
-							(ass: IAssignmentResponse) =>
-								ass['student-class-id'] === selectedClassId
-						),
-					} as ITermSeperatedAssignment)
-			);
-			if (tmpCurrentAssignments.length > 0) {
-				setSelectedAssignments(tmpCurrentAssignments);
+			const currentTermAssignments: IAssignmentResponse[] | undefined = automationResult.find(
+				(item) => item['term-id'] === timetableStored['term-id']
+			)?.assignments;
+			if (currentTermAssignments && currentTermAssignments.length > 0) {
+				const currentClassAssignment: IAssignmentResponse[] = currentTermAssignments.filter(
+					(item) => item['student-class-id'] === selectedClassId
+				);
+				if (currentClassAssignment.length > 0) {
+					setSelectedAssignments(currentClassAssignment);
+				}
 			}
 		}
-	}, [selectedClassId, open]);
+	}, [selectedClassId]);
 
 	useEffect(() => {
 		if (teachableData?.status === 200) {
@@ -216,31 +212,26 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		}
 	}, [teachableData, selectedSubjectId]);
 
-	const handleUpdateTeacher = (assignmentId: number, teacherId: number) => {
-		const updatedObjects = editingObjects.map((obj: ITeachingAssignmentObject) => {
-			if (obj['assignment-id'] === assignmentId) {
-				return {
-					...obj,
-					'teacher-id': teacherId,
-				};
-			}
-			return obj;
-		});
-		setEditingObjects(updatedObjects);
+	const handleUpdateTeacher = (assignmentId: number, teacherId: number, teacherName: string) => {
+		const editIndex = editingObjects.findIndex((obj) => obj['assignment-id'] === assignmentId);
+		if (editIndex !== -1) {
+			editingObjects[editIndex] = {
+				'assignment-id': assignmentId,
+				'teacher-id': teacherId,
+				'teacher-name': teacherName,
+			} as IExtendedTeachingAssignment;
+		} else {
+			editingObjects.push({
+				'assignment-id': assignmentId,
+				'teacher-id': teacherId,
+				'teacher-name': teacherName,
+			} as IExtendedTeachingAssignment);
+		}
 	};
 
 	const handleClose = () => {
 		setOpen(false);
 	};
-
-	const toggleDropdown =
-		(panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-			if (newExpanded) {
-				setExpanded((prev: string[]) => [...prev, panel]);
-			} else {
-				setExpanded((prev: string[]) => prev.filter((item) => item !== panel));
-			}
-		};
 
 	const handleSelectSubject = (subjectId: number) => {
 		setSelectedSubjectId(subjectId);
@@ -282,69 +273,61 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 						setSelectedGrade={setSelectedGrade}
 					/>
 					<div className='w-full h-[60vh] pb-[1px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
-						{selectedAssignments.map(
-							(item: ITermSeperatedAssignment, index: number) => (
-								<Accordion
-									expanded={expanded.includes(`panel${index}`)}
-									onChange={toggleDropdown(`panel${index}`)}
-									className='w-full p-0 m-0'
-									key={index}
-								>
-									<AccordionSummary
-										aria-controls={`panel${index}d-content`}
-										id={`panel${index}d-header`}
-										className='!text-black !bg-basic-gray-hover'
-									>
-										<Typography fontSize={15}>{item.termName}</Typography>
-									</AccordionSummary>
-									<AccordionDetails className='w-full p-0 px-2'>
-										{item.assignments.map((assignment: IAssignmentResponse) => (
-											<div className='w-full h-fit py-2 border-b-1 border-basic-gray-active flex flex-row justify-between items-center'>
-												<h1 className='text-body-medium font-normal'>
-													{assignment['subject-name']}
-												</h1>
-												<Autocomplete
-													options={teachableDropdown}
-													getOptionLabel={(
-														option: IDropdownOption<number>
-													) => option.label}
-													getOptionKey={(
-														option: IDropdownOption<number>
-													) => option.value}
-													noOptionsText='Không có giáo viên phù hợp'
-													disableClearable
-													value={renderTeacherOption(assignment)}
-													onOpen={() => {
-														handleSelectSubject(
-															assignment['subject-id']
-														);
-													}}
-													onBlur={() => {
-														setTeachableDropdown([]);
-													}}
-													onChange={(
-														event: any,
-														newValue: IDropdownOption<number> | null
-													) => {
-														if (newValue !== null) {
-															handleUpdateTeacher(
-																assignment.id,
-																newValue.value
-															);
-														}
-													}}
-													blurOnSelect
-													renderInput={(params) => (
-														<TextField {...params} variant='standard' />
-													)}
-													sx={{ width: '50%' }}
-												/>
-											</div>
-										))}
-									</AccordionDetails>
-								</Accordion>
-							)
-						)}
+						{selectedAssignments.map((assignment: IAssignmentResponse) => {
+							const editedObject = editingObjects.find(
+								(obj) => obj['assignment-id'] === assignment.id
+							);
+							return (
+								<div className='w-full h-fit py-2 px-[1vw] border-b-1 border-basic-gray-active flex flex-row justify-between items-center'>
+									<h1 className='text-body-medium font-normal'>
+										{assignment['subject-name']}
+										<span className='text-body-small pl-1 opacity-80'>
+											({assignment['period-count']} tiết)
+										</span>
+									</h1>
+
+									<Autocomplete
+										options={teachableDropdown}
+										getOptionLabel={(option: IDropdownOption<number>) =>
+											option.label
+										}
+										getOptionKey={(option: IDropdownOption<number>) =>
+											option.value
+										}
+										noOptionsText='Không có giáo viên phù hợp'
+										disableClearable
+										value={
+											editedObject
+												? renderSelectedOption(editedObject)
+												: renderTeacherOption(assignment)
+										}
+										onOpen={() => {
+											handleSelectSubject(assignment['subject-id']);
+										}}
+										onBlur={() => {
+											setTeachableDropdown([]);
+										}}
+										onChange={(
+											event: any,
+											newValue: IDropdownOption<number> | null
+										) => {
+											if (newValue !== null) {
+												handleUpdateTeacher(
+													assignment.id,
+													newValue.value,
+													newValue.label
+												);
+											}
+										}}
+										blurOnSelect
+										renderInput={(params) => (
+											<TextField {...params} variant='standard' />
+										)}
+										sx={{ width: '50%' }}
+									/>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 				<div
@@ -361,7 +344,6 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 						title='áp dụng phân công'
 						disableRipple
 						type='button'
-						disabled={editingObjects.length === 0}
 						styles='bg-primary-300 text-white !py-1 px-4'
 						onClick={handleSaveUpdates}
 					/>

@@ -10,8 +10,10 @@ import {
 } from '@/utils/constants';
 import {
 	Box,
+	Button,
 	CircularProgress,
 	circularProgressClasses,
+	Collapse,
 	Table,
 	TableBody,
 	TableCell,
@@ -19,7 +21,7 @@ import {
 	TableHead,
 	TableRow,
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useFetchClassData from '../_hooks/useFetchClass';
 import useFetchSubject from '../_hooks/useFetchSubject';
@@ -36,12 +38,12 @@ import {
 import Image from 'next/image';
 
 interface IPreviewScheduleProps {
-	// Add props herer
+	isTimetableGenerating: boolean;
+	handleGenerateTimetable: () => void;
 }
 
 const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
-	// Add logic here
-	const {} = props;
+	const { handleGenerateTimetable, isTimetableGenerating } = props;
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
 	const { dataStored, timetableStored, generatedScheduleStored }: ITimetableGenerationState =
 		useSelector((state: any) => state.timetableGeneration);
@@ -218,33 +220,69 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 
 	return (
 		<div className='w-full h-full flex flex-col justify-start items-center'>
-			{timetableStored['generated-schedule-id'] ? (
-				<div className='w-full flex flex-row justify-center items-center gap-5 py-2'>
-					<h1 className='text-title-small-strong opacity-60'>
-						{generatedScheduleStored.name}
-					</h1>
-					<div className='w-fit h-full flex flex-row justify-start items-center gap-2'>
-						<Image
-							src={'/images/icons/dumbbell.png'}
-							alt='dumbbell'
-							width={15}
-							height={15}
-						/>
-						<h1
-							className={`text-body-large-strong font-semibold ${
-								generatedScheduleStored['fitness-point'] > 80
-									? 'text-basic-positive'
-									: 'text-basic-gray'
-							}`}
-						>
-							{generatedScheduleStored['fitness-point']}%
+			<Collapse
+				in={!isTimetableGenerating}
+				orientation='vertical'
+				timeout={300}
+				sx={{
+					height: '8%',
+					position: 'relative',
+					width: '100%',
+					display: 'flex',
+					flexDirection: 'column',
+					justifyContent: 'center',
+				}}
+			>
+				{timetableStored['generated-schedule-id'] ? (
+					<div className='w-full h-full flex flex-row justify-center items-center gap-5 py-2 translate-x-[0.5%]'>
+						<h1 className='text-title-small-strong opacity-60 h-full align-middle'>
+							{generatedScheduleStored.name}
 						</h1>
+						<div className='w-fit h-full flex flex-row justify-start items-center gap-2'>
+							<Image
+								src={'/images/icons/dumbbell.png'}
+								alt='dumbbell'
+								width={15}
+								height={15}
+							/>
+							<h1
+								className={`text-body-large-strong font-semibold ${
+									generatedScheduleStored['fitness-point'] > 80
+										? 'text-basic-positive'
+										: 'text-basic-gray'
+								}`}
+							>
+								{generatedScheduleStored['fitness-point']}%
+							</h1>
+						</div>
 					</div>
-				</div>
-			) : (
-				<h1 className='py-2 text-title-small-strong opacity-60'>Các tiết xếp sẵn</h1>
-			)}
+				) : (
+					<h1 className='py-2 text-title-small-strong opacity-60 w-full text-center'>
+						Các tiết xếp sẵn
+					</h1>
+				)}
+				<Button
+					variant='contained'
+					onClick={handleGenerateTimetable}
+					color='inherit'
+					disabled={isDataLoading}
+					sx={{
+						bgcolor: '#175b8e',
+						color: 'white',
+						borderRadius: 0,
+						boxShadow: 'none',
+						position: 'absolute',
+						top: '50%',
+						right: '2%',
+						transform: 'translateY(-50%)',
+						zIndex: 10,
+					}}
+				>
+					Tạo thời khóa biểu
+				</Button>
+			</Collapse>
 			{isDataLoading ? (
+				// Loading component
 				<div className='w-full h-[60%] max-h-[50vh] p-3 flex justify-center items-center overflow-y-scroll no-scrollbar'>
 					<Box sx={{ position: 'relative' }}>
 						<CircularProgress
@@ -282,16 +320,46 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 					</Box>
 				</div>
 			) : (
-				<div className='w-full h-[90vh] pb-[20vh] overflow-scroll no-scrollbar'>
-					<TableContainer sx={{ pb: 5 }}>
-						<Table size='small'>
-							<TableHead>
+				<div className='w-full h-[92%] flex flex-col justify-start items-center pb-[5vh]'>
+					<TableContainer sx={{ mb: 10, maxHeight: '100%' }} className='!no-scrollbar'>
+						<Table size='small' stickyHeader sx={{ position: 'relative' }}>
+							<TableHead
+								sx={{
+									position: 'sticky',
+									top: 0,
+									left: 0,
+									zIndex: 100,
+									backgroundColor: '#ffffff', // Đặt màu nền cho cả hàng
+								}}
+							>
 								<TableRow>
-									<TableCell sx={{ border: '1px solid #ddd' }}>Thứ</TableCell>
-									<TableCell sx={{ border: '1px solid #ddd' }}>Tiết</TableCell>
+									<TableCell
+										sx={{
+											border: '1px solid #ddd',
+											fontWeight: 'bold',
+											textAlign: 'center',
+										}}
+									>
+										Thứ
+									</TableCell>
+									<TableCell
+										sx={{
+											border: '1px solid #ddd',
+											fontWeight: 'bold',
+											textAlign: 'center',
+										}}
+									>
+										Tiết
+									</TableCell>
 									{filteredData &&
 										filteredData?.map((clazz: ITimetableDisplayData) => (
-											<TableCell sx={{ border: '1px solid #ddd' }}>
+											<TableCell
+												sx={{
+													border: '1px solid #ddd',
+													fontWeight: 'bold',
+													textAlign: 'center',
+												}}
+											>
 												{clazz.className}
 											</TableCell>
 										))}
@@ -307,9 +375,15 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 														<TableCell
 															sx={{
 																border: '1px solid #ddd',
-																width: 30,
+																minWidth: 10,
+																width: 10,
+																maxWidth: 10,
+																textAlign: 'center',
+																fontWeight: 'bold',
+																overflow: 'hidden',
 															}}
 															rowSpan={10}
+															width={10}
 														>
 															{weekday}
 														</TableCell>
@@ -317,14 +391,14 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 													<TableCell
 														sx={{
 															border: '1px solid #ddd',
-															width: 30,
+															maxWidth: 10,
 															textAlign: 'center',
 															fontWeight: 'bold',
 														}}
 														className={`${
 															slotIndex < 5
-																? 'text-primary-400'
-																: 'text-tertiary-normal'
+																? '!text-primary-400'
+																: '!text-tertiary-normal'
 														}`}
 													>
 														{slot}
@@ -342,15 +416,25 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 																		<TableCell
 																			sx={{
 																				border: '1px solid #ddd',
-																				width: 50,
+																				maxWidth: 50,
+																				maxHeight: 100,
 																				backgroundColor:
 																					'#f0f0f0',
+																				overflow: 'hidden',
 																			}}
 																		>
-																			{
-																				period.subjectAbbreviation
-																			}{' '}
-																			- {period.teacherName}
+																			<div className='flex flex-col justify-center items-center opacity-80'>
+																				<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
+																					{
+																						period.subjectAbbreviation
+																					}
+																				</strong>
+																				<p className='text-ellipsis text-nowrap overflow-hidden'>
+																					{
+																						period.teacherName
+																					}
+																				</p>{' '}
+																			</div>
 																		</TableCell>
 																	);
 																}
@@ -367,6 +451,17 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 												</TableRow>
 											)
 										)}
+										<TableRow
+											key={weekdayIndex + Math.floor(Math.random() * 1000)}
+										>
+											<TableCell
+												sx={{
+													width: '100%',
+													height: 1,
+												}}
+												colSpan={filteredData?.length + 2}
+											></TableCell>
+										</TableRow>
 									</>
 								))}
 							</TableBody>

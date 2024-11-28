@@ -56,7 +56,7 @@ export default function Home() {
 				schoolId: Number(schoolId),
 				schoolYearId: selectedSchoolYearId,
 			});
-			if (data?.status === 200) {
+			if (data?.Status === 200) {
 				where('timetable-id', '==', timetableId);
 				const result: IScheduleResponse = { ...data.result, 'timetable-id': timetableId };
 				if (result) {
@@ -126,9 +126,10 @@ export default function Home() {
 				}
 			} else {
 				setIsTimetableGenerating(false);
+				setIsTimetableGenerated(false);
 				useNotify({
 					type: 'error',
-					message: data?.Message,
+					message: data.Message,
 				});
 			}
 		}
@@ -140,42 +141,12 @@ export default function Home() {
 
 	return (
 		<div className='w-full h-screen flex flex-col justify-start items-start'>
-			<div className='w-full h-fit py-2 flex flex-row justify-center items-center'>
-				{isTimetableGenerated ? (
-					<Button
-						variant='contained'
-						onClick={handleGoBack}
-						color='success'
-						disabled={isTimetableGenerating}
-						sx={{
-							color: 'white',
-							borderRadius: 0,
-							boxShadow: 'none',
-						}}
-					>
-						Về trang quản lý
-					</Button>
-				) : (
-					<Button
-						variant='contained'
-						onClick={handleGenerateTimetable}
-						color='inherit'
-						disabled={isTimetableGenerating}
-						sx={{
-							bgcolor: '#175b8e',
-							color: 'white',
-							borderRadius: 0,
-							boxShadow: 'none',
-						}}
-					>
-						Tạo thời khóa biểu
-					</Button>
-				)}
-			</div>
-			<Divider variant='middle' sx={{ width: '100%' }} />
 			{isTimetableGenerating && <TimetableLoading isComplete={!isTimetableGenerating} />}
 			<div className='w-full h-full flex flex-col justify-center items-center'>
-				<PreviewScheduleTable />
+				<PreviewScheduleTable
+					isTimetableGenerating={isTimetableGenerating}
+					handleGenerateTimetable={handleGenerateTimetable}
+				/>
 			</div>
 		</div>
 	);

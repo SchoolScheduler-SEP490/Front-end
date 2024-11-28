@@ -3,6 +3,9 @@ import { Tab, Tabs } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSelector } from 'react-redux';
+import { IConfigurationStoreObject } from '@/utils/constants';
 
 function a11yProps(index: number) {
 	return {
@@ -15,6 +18,9 @@ const TimetableTabs = () => {
 	const pathName = usePathname();
 	const [value, setValue] = useState(0);
 	const router = useRouter();
+	const { dataStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
 
 	useEffect(() => {
 		if (pathName.length > 0) {
@@ -44,9 +50,19 @@ const TimetableTabs = () => {
 				scrollButtons
 				allowScrollButtonsMobile
 			>
-				{TIMETABLE_GENERATION_TABS.map((tab, index) => (
-					<Tab key={index} label={`${index}. ${tab.label}`} {...a11yProps(index)} />
-				))}
+				<Tab label='0. Thông tin chung' {...a11yProps(0)} />
+				<Tab label='1. Cấu hình ràng buộc' {...a11yProps(1)} />
+				<Tab label='2. Phân công giáo viên' {...a11yProps(1)} />
+				<Tab
+					label='3. Xếp tiết cố định'
+					disabled={dataStored['teacher-assignments']?.length === 0}
+					{...a11yProps(3)}
+				/>
+				<Tab
+					label='4. Tạo thời khóa biểu'
+					// disabled={dataStored['teacher-assignments'].length === 0}
+					{...a11yProps(3)}
+				/>
 			</Tabs>
 		</div>
 	);

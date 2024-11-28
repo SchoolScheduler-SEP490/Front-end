@@ -49,6 +49,7 @@ export default function TeacherUnavailability() {
 	};
 
 	const handleUpdateResults = async () => {
+		// Lấy những slot đã được chọn dưới client
 		const tmpSelectedSlotIds: Set<number> = new Set<number>([]);
 		Object.entries(selectedCells).forEach(([key, value]) => {
 			if (value.selected) {
@@ -57,6 +58,7 @@ export default function TeacherUnavailability() {
 				tmpSelectedSlotIds.delete(Number(key));
 			}
 		});
+		//Mapping slot đã chọn với những giáo viên đã chọn lưu thành các object để chuẩn hóa và đẩy lên server
 		const tmpResults: INoAssignPeriodObject[] = [];
 		selectedTeacherIds.forEach((teacherId) => {
 			tmpSelectedSlotIds.forEach((slotId) => {
@@ -69,7 +71,12 @@ export default function TeacherUnavailability() {
 		if (dataStored && dataFirestoreName && dataStored.id) {
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			const newResults: INoAssignPeriodObject[] = useFilterArray(
-				[...dataStored['no-assign-periods-para'], ...tmpResults],
+				[
+					...dataStored['no-assign-periods-para'].filter(
+						(item) => !selectedTeacherIds.includes(item['teacher-id'])
+					),
+					...tmpResults,
+				],
 				['teacher-id', 'start-at']
 			);
 			await setDoc(
@@ -144,7 +151,7 @@ export default function TeacherUnavailability() {
 			var tmpDepartmentOptions: IDropdownOption<number>[] = [];
 			teacherData.result.items.map((teacher: ITeacherResponse) => {
 				tmpTeacherOptions.push({
-					label: `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`,
+					label: `${teacher['last-name']} ${teacher['first-name']} (${teacher.abbreviation})`,
 					value: teacher.id,
 					filterableId: teacher['department-id'],
 				} as IFilterableDropdownOption<number>);

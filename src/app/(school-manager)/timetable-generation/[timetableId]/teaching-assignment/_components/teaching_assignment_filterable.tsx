@@ -131,6 +131,7 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 					type='number'
 					name='max'
 					label='Số tiết tối đa/tuần'
+					onFocus={(event) => event.target.select()}
 					value={maxPeriodPerWeek}
 					onChange={handleChange}
 					error={errors.field1 || errors.duplicate}
@@ -147,6 +148,7 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 					type='number'
 					name='min'
 					label='Số tiết tối thiểu/tuần'
+					onFocus={(event) => event.target.select()}
 					value={minPeriodPerWeek}
 					onChange={handleChange}
 					error={errors.field2 || errors.duplicate}

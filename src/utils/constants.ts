@@ -283,8 +283,6 @@ export enum ETimetableStatus {
 
 // Record kết quả generate thời khóa biểu
 export interface IScheduleResponse {
-	id: number;
-	'timetable-id': string;
 	'school-year-id': number;
 	'start-week': number;
 	'end-week': number;
@@ -294,6 +292,7 @@ export interface IScheduleResponse {
 	name: string;
 	'fitness-point': number;
 	'class-schedules': IClassSchedule[];
+	id: number;
 	'create-date': string;
 	'update-date': string | null;
 	'is-deleted': boolean;

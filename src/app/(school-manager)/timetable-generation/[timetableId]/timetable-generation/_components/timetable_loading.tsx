@@ -7,7 +7,7 @@ interface LoadingComponentProps {
 
 const TimetableLoading: React.FC<LoadingComponentProps> = ({ isComplete }) => {
 	const [progress, setProgress] = useState<number>(0);
-	const [message, setMessage] = useState<string>('Đang xếp Thời khóa biểu...');
+	const [message, setMessage] = useState<string>('Đang phân tích dữ liệu...');
 
 	const [buffer, setBuffer] = React.useState(10);
 
@@ -20,7 +20,7 @@ const TimetableLoading: React.FC<LoadingComponentProps> = ({ isComplete }) => {
 			} else {
 				setProgress(progress + 1);
 				if (buffer < 100 && progress % 5 === 0) {
-					const newBuffer = buffer + 1 + Math.random() * 10;
+					const newBuffer = buffer + 10 + Math.random() * 10;
 					setBuffer(newBuffer > 100 ? 100 : newBuffer);
 				}
 			}
@@ -37,7 +37,7 @@ const TimetableLoading: React.FC<LoadingComponentProps> = ({ isComplete }) => {
 				}
 
 				if (prevProgress >= 80 && prevProgress < 90) {
-					setMessage('Đang thực thi thuật toán...');
+					setMessage('Đang xếp thời khóa biểu...');
 					return prevProgress + 0.5; // Tăng chậm hơn giữa 80-90%
 				}
 
@@ -58,11 +58,18 @@ const TimetableLoading: React.FC<LoadingComponentProps> = ({ isComplete }) => {
 	}, [isComplete]);
 
 	return (
-		<Box sx={{ width: '100%', textAlign: 'center', mt: 2 }}>
-			<Typography variant='h6' gutterBottom sx={{ opacity: '60%' }}>
+		<Box sx={{ width: '100%', textAlign: 'center' }}>
+			<LinearProgress
+				color='inherit'
+				sx={{ bgcolor: '#fff0eb', color: '#ff6b35', height: 5 }}
+			/>
+			<Typography
+				variant='h6'
+				gutterBottom
+				sx={{ opacity: '60%', mt: 1, textAlign: 'center' }}
+			>
 				{message}
 			</Typography>
-			<LinearProgress variant='buffer' value={progress} valueBuffer={buffer} />
 		</Box>
 	);
 };

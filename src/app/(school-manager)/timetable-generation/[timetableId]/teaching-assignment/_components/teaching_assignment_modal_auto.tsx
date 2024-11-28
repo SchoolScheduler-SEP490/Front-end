@@ -107,6 +107,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			setAutomationResult(data.result as IAutoTeacherAssignmentResponse[]);
 			setModifyingResultModalOpen(true);
 			handleClose();
+			setIsValidating(false);
 			useNotify({
 				message:
 					response.status === 200
@@ -117,12 +118,12 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 		}
 		if (data?.status === 400) {
 			setErrorObject({ ...data.result } as ITAAvailabilityResponse);
+			setIsValidating(false);
 			useNotify({
 				message: 'Phân công tự động thất bại',
 				type: 'error',
 			});
 		}
-		setIsValidating(false);
 	};
 
 	useEffect(() => {
@@ -363,13 +364,14 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						title='Huỷ'
 						onClick={handleClose}
 						disableRipple
+						disabled={isValidating}
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton
 						title='phân công tự động'
 						disableRipple
 						type='button'
-						disabled={!isAutomationAvaialable}
+						disabled={!isAutomationAvaialable || isValidating}
 						styles='bg-primary-300 text-white !py-1 px-4'
 						onClick={handleAutoAssignment}
 					/>

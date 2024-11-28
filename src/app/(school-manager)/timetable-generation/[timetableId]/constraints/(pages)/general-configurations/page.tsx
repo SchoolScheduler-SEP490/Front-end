@@ -49,7 +49,7 @@ export default function Home() {
 				.required('Vui lòng nhập khoảng nghỉ giữa 2 buổi')
 				.min(1, 'Phải có ít nhất 1 khoảng nghỉ')
 				.max(3, 'Khoảng nghỉ không được kéo dài quá 3 tiết'),
-			'minimum-days-off': yup.number(),
+			'minimum-days-off': yup.number().min(0, 'Số ngày nghỉ không được âm'),
 		}),
 	});
 
@@ -101,6 +101,7 @@ export default function Home() {
 					name='days-in-week'
 					type='number'
 					label='Số ngày học trong tuần'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['days-in-week']}
 					onChange={formik.handleChange('days-in-week')}
 					onBlur={formik.handleBlur}
@@ -127,6 +128,7 @@ export default function Home() {
 					name='required-break-periods'
 					type='number'
 					label='Khoảng nghỉ giữa 2 buổi'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['required-break-periods']}
 					onChange={formik.handleChange('required-break-periods')}
 					onBlur={formik.handleBlur}
@@ -159,6 +161,7 @@ export default function Home() {
 					name='minimum-days-off'
 					type='number'
 					label='Số ngày nghỉ tối thiểu của giáo viên'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['minimum-days-off']}
 					onChange={formik.handleChange('minimum-days-off')}
 					onBlur={formik.handleBlur}
