@@ -38,7 +38,7 @@ const ClassGroupFilterable = (props: IClassGroupFilterableProps) => {
   };
   return (
     <div
-      className={`h-full w-[23%] flex flex-col justify-start items-center pt-[2vh] ${
+      className={`h-full w-[23%] flex flex-col justify-start items-center pt-[5vh] ${
         open
           ? "visible animate-fade-left animate-once animate-duration-500 animate-ease-out"
           : "hidden"

@@ -45,7 +45,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				icon: '/images/icons/classroom.png',
 			},
 			{
-				name: 'Lớp gộp',
+				name: 'Lớp ghép',
 				url: '/combine-class-management',
 				icon: '/images/icons/training.png',
 			},

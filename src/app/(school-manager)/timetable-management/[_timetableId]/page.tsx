@@ -47,6 +47,7 @@ export default function TimetableDetail() {
   const timetableId = params._timetableId;
   const router = useRouter();
   const [selectedGrade, setSelectedGrade] = useState("all");
+  const [selectedTeacher, setSelectedTeacher] = useState("all");
   const [displayCount, setDisplayCount] = useState(5);
   const [startIndex, setStartIndex] = useState(0);
   const [scheduleData, setScheduleData] = useState<IScheduleResponse | null>(
@@ -71,6 +72,17 @@ export default function TimetableDetail() {
     startIndex,
     startIndex + displayCount
   );
+
+  const teacherNames = useMemo(() => {
+    if (!scheduleData) return [];
+    const teachers = new Set();
+    scheduleData["class-schedules"].forEach((schedule) => {
+      schedule["class-periods"].forEach((period) => {
+        teachers.add(period["teacher-abbreviation"]);
+      });
+    });
+    return Array.from(teachers) as string[];
+  }, [scheduleData]);
 
   const handleScrollLeft = () => {
     if (startIndex > 0) {
@@ -140,16 +152,24 @@ export default function TimetableDetail() {
         <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[3vh]">
           <div className="w-full mb-4 flex justify-center">
             <FormControl sx={{ minWidth: 170 }}>
-              <InputLabel>Khối</InputLabel>
+              <InputLabel>Giáo viên</InputLabel>
               <Select
-                value={selectedGrade}
-                label="Khối"
-                onChange={(e) => setSelectedGrade(e.target.value)}
+                value={selectedTeacher}
+                label="Giáo viên"
+                onChange={(e) => setSelectedTeacher(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                      width: 250,
+                    },
+                  },
+                }}
               >
                 <MenuItem value="all">Tất cả</MenuItem>
-                {grades.map((grade) => (
-                  <MenuItem key={grade} value={grade}>
-                    Khối {grade}
+                {teacherNames.map((teacher) => (
+                  <MenuItem key={teacher} value={teacher}>
+                    {teacher}
                   </MenuItem>
                 ))}
               </Select>
@@ -218,7 +238,10 @@ export default function TimetableDetail() {
                                 ].find(
                                   (p) =>
                                     p["start-at"] === currentSlotIndex &&
-                                    !p["is-deleted"]
+                                    !p["is-deleted"] &&
+                                    (selectedTeacher === "all" ||
+                                      p["teacher-abbreviation"] ===
+                                        selectedTeacher)
                                 );
 
                                 return (
