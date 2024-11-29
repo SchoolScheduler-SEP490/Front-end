@@ -109,7 +109,7 @@ export const getSubjectName = async (
   const totalCount = initialData.result["total-item-count"];
 
   const response = await fetch(
-    `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount || 20}`,
+    `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
     {
       method: "GET",
       headers: {

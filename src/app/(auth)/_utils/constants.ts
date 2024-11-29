@@ -24,13 +24,9 @@ export interface IJWTTokenPayload {
 }
 
 export interface IRegisterForm {
-	email: string;
-	phone: string;
-	password: string;
-	confirm: string;
-}
-
-export interface IRegisterResponse {
-	status: number;
-	message: string;
+	"school-id": number,
+	email: string,
+	phone: string,
+	password: string,
+	"confirm-account-password": string
 }

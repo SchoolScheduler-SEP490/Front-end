@@ -179,6 +179,21 @@ export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	2: 'Nữ',
 };
 
+export const ROOM_SUBJECT_MODEL: { key: string, value: number }[] = [
+	{ key: 'Full', value: 1},
+	{ key: 'NotFull', value: 2}
+]
+
+export const MAIN_SESSION: { key: string, value: number }[] = [
+	{ key: 'Morning', value: 1 },
+	{ key: 'Afternoon', value: 2 },
+]
+
+export const MAIN_SESSION_TRANSLATOR: { [key: number]: string } = {
+	1: 'Buổi sáng',
+	2: 'Buổi chiều',
+};
+
 export interface QueryCondition {
 	field: string;
 	operator: WhereFilterOp;

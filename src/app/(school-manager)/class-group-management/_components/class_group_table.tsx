@@ -287,7 +287,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
   const handleOpenAddForm = () => setOpenAddForm(true);
 
   return (
-    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
+    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[5vh]">
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <Toolbar
