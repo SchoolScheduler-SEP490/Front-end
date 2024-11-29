@@ -23,6 +23,7 @@ import { KeyedMutator } from "swr";
 import { useAppContext } from "@/context/app_provider";
 import {
   IClassCombination,
+  IExistingCombineClass,
   IRoom,
   ISubject,
   ITerm,
@@ -30,6 +31,7 @@ import {
 import useAddCombineClass from "../_hooks/useAddCombineClass";
 import {
   getClassCombination,
+  getExistingCombineClass,
   getRoomName,
   getSubjectName,
   getTermName,
@@ -62,12 +64,11 @@ const MenuProps = {
 const AddCombineClassModal = (props: AddCombineClassFormProps) => {
   const { open, onClose, mutate } = props;
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-  const [availableClasses, setAvailableClasses] = useState<IClassCombination[]>(
-    []
-  );
+  const [availableClasses, setAvailableClasses] = useState<IClassCombination[]>([]);
   const [subjects, setSubjects] = useState<ISubject[]>([]);
   const [termName, setTermName] = useState<ITerm[]>([]);
   const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [existingCombineClass, setExistingCombineClass] = useState<IExistingCombineClass[]>([]);
 
   const formik = useFormik({
     initialValues: {
@@ -82,7 +83,7 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
       session: "",
       grade: "",
     },
-    validationSchema: addCombineClassSchema,
+    validationSchema: addCombineClassSchema(existingCombineClass),
     onSubmit: async (values) => {
       const requestData = {
         "subject-id": values["subject-id"],
@@ -181,6 +182,20 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
     };
     fetchRooms();
   }, [formik.values["student-class-id"]]);
+
+  useEffect(() => {
+    const loadExistingCombineClass = async () => {
+      try {
+        const response = await getExistingCombineClass(schoolId, sessionToken);
+        if (response.status === 200) {
+          setExistingCombineClass(response.result.items);
+        }
+      } catch (error) {
+        console.error("Failed to load existing combine class:", error);
+      }
+    }
+    loadExistingCombineClass();
+  }, [schoolId, sessionToken]);
 
   const handleClose = () => {
     formik.handleReset(formik.initialValues);

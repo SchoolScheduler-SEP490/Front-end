@@ -1,5 +1,5 @@
 import { request } from "http";
-import { IAddCombineClassRequest } from "./constants";
+import { IAddCombineClassRequest, IExistingCombineClassResponse } from "./constants";
 
 const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
@@ -36,7 +36,11 @@ export const getSubjectName = async (
   return data;
 };
 
-export const getRoomName = async (sessionToken: string, schoolId: string, capacity: number) => {
+export const getRoomName = async (
+  sessionToken: string,
+  schoolId: string,
+  capacity: number
+) => {
   const initialResponse = await fetch(
     `${api}/api/schools/${schoolId}/rooms?capacity=${capacity}&pageIndex=1&pageSize=20`,
     {
@@ -121,20 +125,50 @@ export const getClassCombination = async (
   return data;
 };
 
-
 export const addCombineClass = async (
   sessionToken: string,
   requestData: IAddCombineClassRequest
 ) => {
-  const response = await fetch (`${api}/api/room-subjects`, {
+  const response = await fetch(`${api}/api/room-subjects`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${sessionToken}`,
     },
     body: JSON.stringify(requestData),
-  })
+  });
   const data = await response.json();
   return data;
-}
+};
 
+export const getExistingCombineClass = async (
+  schoolId: string,
+  sessionToken: string
+): Promise<IExistingCombineClassResponse> => {
+  const initialResponse = await fetch(
+    `${api}/api/room-subjects?schoolId=${schoolId}&pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch(
+    `${api}/api/room-subjects?schoolId=${schoolId}&pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
+  const data = await response.json();
+  return data;
+};
