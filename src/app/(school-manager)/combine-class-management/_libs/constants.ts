@@ -55,3 +55,18 @@ export interface IAddCombineClassRequest {
   "model": typeof ROOM_SUBJECT_MODEL[number]['key'];
   "student-class-id": number[];
 }
+
+export interface IExistingCombineClass {
+  id: number;
+  "room-subject-name": string;
+  "room-subject-code": string;
+}
+
+export interface IExistingCombineClassResponse {
+  status: number;
+  message: string;
+  result: {
+    items: IExistingCombineClass[];
+    "total-item-count": number;
+  };
+}
