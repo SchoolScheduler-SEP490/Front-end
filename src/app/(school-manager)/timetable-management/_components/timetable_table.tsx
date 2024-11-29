@@ -23,7 +23,7 @@ import { ITimetableTableData } from "../_libs/constants";
 import { useRouter } from "next/navigation";
 import { ETimetableStatus } from "@/utils/constants";
 import { FormControl, MenuItem, Select } from "@mui/material";
-import TuneIcon from '@mui/icons-material/Tune';
+import TuneIcon from "@mui/icons-material/Tune";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -58,34 +58,34 @@ interface HeadCell {
 
 const headCells: readonly HeadCell[] = [
   {
-      id: 'timetableCode',
-      centered: true,
-      disablePadding: false,
-      label: 'Mã TKB',
+    id: "timetableCode",
+    centered: true,
+    disablePadding: false,
+    label: "Mã TKB",
   },
   {
-      id: 'timetableName',
-      centered: false,
-      disablePadding: false,
-      label: 'Tên TKB',
+    id: "timetableName",
+    centered: false,
+    disablePadding: false,
+    label: "Tên TKB",
   },
   {
-      id: 'termName',
-      centered: true,
-      disablePadding: false,
-      label: 'Học kỳ',
+    id: "termName",
+    centered: true,
+    disablePadding: false,
+    label: "Học kỳ",
   },
   {
-      id: 'yearName',
-      centered: true,
-      disablePadding: false,
-      label: 'Năm học',
+    id: "yearName",
+    centered: true,
+    disablePadding: false,
+    label: "Năm học",
   },
   {
-      id: 'status',
-      centered: true,
-      disablePadding: false,
-      label: 'Trạng thái',
+    id: "status",
+    centered: true,
+    disablePadding: false,
+    label: "Trạng thái",
   },
 ];
 
@@ -118,8 +118,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell>
-        </TableCell>
+        <TableCell></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -211,8 +210,9 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
-  const [selectedStatus, setSelectedStatus] = React.useState<ETimetableStatus>(ETimetableStatus.Pending);
-
+  const [selectedStatus, setSelectedStatus] = React.useState<ETimetableStatus>(
+    ETimetableStatus.Pending
+  );
 
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
@@ -234,7 +234,6 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
     }
     setSelected([]);
   };
-
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -259,7 +258,10 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
     router.push(`/timetable-management/${row.id}`);
   };
 
-  const handleCheckboxClick = (event: React.MouseEvent<unknown>, row: ITimetableTableData) => {
+  const handleCheckboxClick = (
+    event: React.MouseEvent<unknown>,
+    row: ITimetableTableData
+  ) => {
     event.stopPropagation(); // Prevent row click event
     router.push(`/timetable-generation/${row.id}/information`);
   };
@@ -296,10 +298,8 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                     hover
                     onClick={() => handleRowClick(row)}
                     role="checkbox"
-                   
                     tabIndex={-1}
                     key={row.id}
-                    
                     sx={{ cursor: "pointer" }}
                   >
                     <TableCell>
@@ -311,7 +311,7 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                         }}
                       /> */}
                       <IconButton
-                       onClick={(event) => handleCheckboxClick(event, row)}
+                        onClick={(event) => handleCheckboxClick(event, row)}
                       >
                         <TuneIcon />
                       </IconButton>
@@ -328,35 +328,43 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                     <TableCell align="left">{row.timetableName}</TableCell>
                     <TableCell align="center">{row.termName}</TableCell>
                     <TableCell align="center">{row.yearName}</TableCell>
-<TableCell align="center">
-  <FormControl variant="standard" sx={{ m: 1, minWidth: 100 }}>
-    
-    <Select
-    value={row.status}
-    onChange={(e) => handleStatusChange(e.target.value as ETimetableStatus)}
-    sx={{
-      '&.MuiSelect-select': {
-        borderRadius: '4px',
-      }
-    }}
-  >
-    {Object.values(ETimetableStatus).map((status) => (
-      <MenuItem 
-        key={status} 
-        value={status}
-        sx={{
-          backgroundColor: 
-            status === ETimetableStatus.Published ? 'basic-positive-hover' :
-            status === ETimetableStatus.Pending ? 'basic-gray-hover' :
-            'basic-negative-hover'
-        }}
-      >
-        {status}
-      </MenuItem>
-    ))}
-  </Select>
-  </FormControl>
-</TableCell>
+                    <TableCell align="center">
+                      <FormControl
+                        variant="standard"
+                        sx={{ m: 1, minWidth: 100 }}
+                      >
+                        <Select
+                          value={row.status}
+                          onChange={(e) =>
+                            handleStatusChange(
+                              e.target.value as ETimetableStatus
+                            )
+                          }
+                          sx={{
+                            "&.MuiSelect-select": {
+                              borderRadius: "4px",
+                            },
+                          }}
+                        >
+                          {Object.values(ETimetableStatus).map((status) => (
+                            <MenuItem
+                              key={status}
+                              value={status}
+                              sx={{
+                                backgroundColor:
+                                  status === ETimetableStatus.Published
+                                    ? "basic-positive-hover"
+                                    : status === ETimetableStatus.Pending
+                                    ? "basic-gray-hover"
+                                    : "basic-negative-hover",
+                              }}
+                            >
+                              {status}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
                   </TableRow>
                 );
               })}
