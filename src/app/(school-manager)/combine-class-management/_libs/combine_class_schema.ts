@@ -1,6 +1,7 @@
 import * as yup from "yup";
+import { IExistingCombineClass } from "./constants";
 
-export const addCombineClassSchema = yup.object().shape({
+export const addCombineClassSchema = (existCombineClass : IExistingCombineClass[]) => yup.object().shape({
     
   "subject-id": yup.number().required("Vui lòng chọn môn học"),
 
@@ -10,11 +11,25 @@ export const addCombineClassSchema = yup.object().shape({
 
   "room-subject-code": yup
     .string()
-    .required("Mã phòng học không được để trống"),
+    .required("Mã phòng học không được để trống")
+    .test("room-code", "Mã phòng học đã tồn tại", function (value) {
+      if (!value) return true;
+      return !existCombineClass.some(
+        (exist) =>
+          exist["room-subject-code"].toLowerCase() === value.toLowerCase()
+      );
+    }),
 
-  "room-subject-name": yup
+    "room-subject-name": yup
     .string()
-    .required("Tên phòng học không được để trống"),
+    .required("Tên phòng học không được để trống")
+    .test("room-name", "Tên phòng học đã tồn tại", function (value) {
+      if (!value || !existCombineClass) return true;
+      return !existCombineClass.some(
+        (exist) =>
+          exist["room-subject-name"]?.toLowerCase() === value?.toLowerCase()
+      );
+    }),
 
   model: yup
     .string()
