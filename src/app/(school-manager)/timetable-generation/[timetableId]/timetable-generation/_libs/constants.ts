@@ -10,7 +10,7 @@ export interface IGenerateTimetableRequest {
 	'start-week': number;
 	'end-week': number;
 	'timetable-name': string;
-	'fixed-periods-para': IFixedPeriodObject[];
+	'fixed-periods-para': { 'class-id': number; 'start-at': number; 'subject-id': number }[];
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];

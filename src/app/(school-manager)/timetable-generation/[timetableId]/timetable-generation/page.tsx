@@ -40,7 +40,11 @@ export default function Home() {
 				'start-week': timetableStored['applied-week'] ?? 0,
 				'end-week': timetableStored['ended-week'] ?? 0,
 				'timetable-name': timetableStored['timetable-name'],
-				'fixed-periods-para': dataStored['fixed-periods-para'],
+				'fixed-periods-para': dataStored['fixed-periods-para'].map((item) => ({
+					'class-id': item['class-id'],
+					'start-at': item['start-at'],
+					'subject-id': item['subject-id'],
+				})),
 				'no-assign-periods-para': dataStored['no-assign-periods-para'],
 				'free-timetable-periods-para': dataStored['free-timetable-periods-para'],
 				'teacher-assignments': dataStored['teacher-assignments'],

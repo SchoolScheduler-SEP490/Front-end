@@ -1,5 +1,4 @@
 import { INavigation } from '@/utils/constants';
-import { boolean } from 'yup';
 
 export interface ISMSidenav {
 	category: string;
@@ -54,7 +53,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				url: '/class-group-management',
 				icon: '/images/icons/multiple-users-silhouette.png',
 			},
-		]
+		],
 	},
 	{
 		category: 'Giảng dạy',
@@ -69,8 +68,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				url: '/subject-management',
 				icon: '/images/icons/books.png',
 			},
-
-		]
+		],
 	},
 	{
 		category: 'Tổng quan',
@@ -133,6 +131,6 @@ export const TEACHER_SIDENAV = [
 		name: 'Thông tin chung',
 	},
 	{
-		name: 'Chuyên môn giảng dạy '
-	}
+		name: 'Chuyên môn giảng dạy ',
+	},
 ];

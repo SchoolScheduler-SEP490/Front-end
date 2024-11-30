@@ -199,7 +199,9 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 		// Lấy ra các slot mà giáo viên đã dạy
 		if (open && dataStored && dataStored['fixed-periods-para']) {
 			const occupiedSlots: IFixedPeriodObject[] = dataStored['fixed-periods-para'].filter(
-				(item) => item['teacher-id'] === selectedObject.teacherId
+				(item) =>
+					item['teacher-id'] === selectedObject.teacherId &&
+					item['class-id'] !== selectedObject.classId
 			);
 			if (occupiedSlots.length > 0) {
 				if (occupiedSlots.some((item) => item['start-at'] === cellId)) {
