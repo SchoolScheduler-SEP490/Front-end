@@ -5,6 +5,7 @@ import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useNotify from '@/hooks/useNotify';
 import {
+	EClassSession,
 	ETimetableStatus,
 	IClassCombinationObject,
 	IConfigurationStoreObject,
@@ -61,9 +62,9 @@ export default function Home() {
 
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
-	const [createdClassCombination, setCreatedClassCombination] = useState<
-		IClassCombinationObject[]
-	>([]);
+	const [createdClassCombination, setCreatedClassCombination] = useState<IClassCombinationObject[]>(
+		[]
+	);
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear();
 	const {
@@ -76,14 +77,13 @@ export default function Home() {
 		schoolYearId: selectedSchoolYearId,
 	});
 
-	const { data: classCombinationData, mutate: updateClassCombination } =
-		useFetchClassCombinations({
-			schoolId: Number(schoolId),
-			sessionToken,
-			pageIndex: 1,
-			pageSize: 1000,
-			termId: selectedTermId,
-		});
+	const { data: classCombinationData, mutate: updateClassCombination } = useFetchClassCombinations({
+		schoolId: Number(schoolId),
+		sessionToken,
+		pageIndex: 1,
+		pageSize: 1000,
+		termId: selectedTermId,
+	});
 
 	// Xử lý dữ liệu class combination đã được tạo sẵn vào trong timetable Firebase
 	useEffect(() => {
@@ -98,6 +98,7 @@ export default function Home() {
 							'subject-id': item['subject-id'],
 							'teacher-id': null,
 							'room-id': item['room-id'],
+							session: EClassSession.Morning,
 						} as IClassCombinationObject)
 				);
 			if (tmpCreatedClassCombination.length > 0) {
@@ -117,9 +118,7 @@ export default function Home() {
 				})
 			);
 			setTermIdOptions(
-				studyOptions.sort((a, b) =>
-					(a.criteria as string).localeCompare(b.criteria as string)
-				)
+				studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
 			);
 			setSelectedTermId(studyOptions[0].value);
 		}
@@ -132,17 +131,13 @@ export default function Home() {
 				(term: ITermResponse) => term['school-year-id'] === selectedYearId
 			);
 			if (termInYear.length > 0) {
-				const studyOptions: ISortableDropdown<number>[] = termInYear.map(
-					(item: ITermResponse) => ({
-						value: item.id,
-						label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-						criteria: item.name,
-					})
-				);
+				const studyOptions: ISortableDropdown<number>[] = termInYear.map((item: ITermResponse) => ({
+					value: item.id,
+					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
+					criteria: item.name,
+				}));
 				setTermIdOptions(
-					studyOptions.sort((a, b) =>
-						(a.criteria as string).localeCompare(b.criteria as string)
-					)
+					studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
 				);
 				if (!studyOptions.some((item) => item.value === selectedTermId)) {
 					setSelectedTermId(studyOptions[0].value);
@@ -164,8 +159,7 @@ export default function Home() {
 			'school-id': Number(schoolId),
 			'year-id': selectedSchoolYearId,
 			'generated-schedule-id': null,
-			'year-name':
-				schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
+			'year-name': schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
 			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
 			'term-id': selectedTermId,
 			'config-id': '',
@@ -187,10 +181,7 @@ export default function Home() {
 			'required-break-periods': 1,
 		};
 		const timetableRef = await addDoc(collection(firestore, 'timetables'), newTimetableData);
-		const configRef = await addDoc(
-			collection(firestore, 'configurations'),
-			newConfigurationData
-		);
+		const configRef = await addDoc(collection(firestore, 'configurations'), newConfigurationData);
 		if (timetableRef.id && configRef.id) {
 			await updateDoc(timetableRef, { 'config-id': configRef.id });
 			await updateDoc(configRef, { 'timetable-id': timetableRef.id });
@@ -239,9 +230,7 @@ export default function Home() {
 			</SMHeader>
 			<div className='w-full h-full flex flex-col justify-start pt-[20vh] items-center'>
 				<div className='w-[30vw] h-[40vh] flex flex-col justify-start items-center gap-3'>
-					<h1 className='text-title-large-strong text-primary-500'>
-						Thông tin Thời khóa biểu
-					</h1>
+					<h1 className='text-title-large-strong text-primary-500'>Thông tin Thời khóa biểu</h1>
 					<TextField
 						fullWidth
 						variant='standard'
@@ -298,10 +287,7 @@ export default function Home() {
 							onChange={(event) => setSelectedYearId(Number(event.target.value))}
 							MenuProps={MenuProps}
 							renderValue={(selected) => {
-								return (
-									schoolYearIdOptions.find((item) => item.value === selected)
-										?.label ?? ''
-								);
+								return schoolYearIdOptions.find((item) => item.value === selected)?.label ?? '';
 							}}
 							sx={{ width: '100%', fontSize: '1.000rem' }}
 						>
@@ -313,11 +299,7 @@ export default function Home() {
 							{schoolYearIdOptions.map((item, index) => (
 								<MenuItem key={item.label + index} value={item.value}>
 									<Checkbox
-										checked={
-											selectedYearId === 0
-												? false
-												: selectedYearId === item.value
-										}
+										checked={selectedYearId === 0 ? false : selectedYearId === item.value}
 									/>
 									<ListItemText primary={item.label} />
 								</MenuItem>
@@ -336,10 +318,7 @@ export default function Home() {
 							onChange={(event) => setSelectedTermId(Number(event.target.value))}
 							MenuProps={MenuProps}
 							renderValue={(selected) => {
-								return (
-									termIdOptions.find((item) => item.value === selected)?.label ??
-									''
-								);
+								return termIdOptions.find((item) => item.value === selected)?.label ?? '';
 							}}
 							sx={{ width: '100%', fontSize: '1.000rem' }}
 						>
@@ -351,11 +330,7 @@ export default function Home() {
 							{termIdOptions.map((item, index) => (
 								<MenuItem key={item.label + index} value={item.value}>
 									<Checkbox
-										checked={
-											selectedTermId === 0
-												? false
-												: selectedTermId === item.value
-										}
+										checked={selectedTermId === 0 ? false : selectedTermId === item.value}
 									/>
 									<ListItemText primary={item.label} />
 								</MenuItem>

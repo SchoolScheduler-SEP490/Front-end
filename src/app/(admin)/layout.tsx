@@ -1,7 +1,7 @@
 'use client';
+import AdminSidenav from '@/commons/admin/sidenav';
 import { useAppContext } from '@/context/app_provider';
 import { notFound } from 'next/navigation';
-import { useMemo } from 'react';
 
 export default function AdminLayout({
 	children,
@@ -10,11 +10,14 @@ export default function AdminLayout({
 }>) {
 	const { userRole } = useAppContext();
 
-	useMemo(() => {
-		if (userRole?.toLowerCase() !== 'admin') {
-			notFound();
-		}
-	}, [userRole]);
+	if ((userRole?.toLowerCase() ?? '') !== 'admin') {
+		notFound();
+	}
 
-	return <section>{children}</section>;
+	return (
+		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start overflow-y-hidden'>
+			<AdminSidenav />
+			{children}
+		</section>
+	);
 }

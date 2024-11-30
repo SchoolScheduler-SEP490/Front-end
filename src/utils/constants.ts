@@ -249,7 +249,7 @@ export interface IClassCombinationObject {
 	'subject-id': number;
 	'class-ids': number[];
 	'room-id'?: number;
-	session: EClassSession;
+	session: EClassSession | null;
 	'teacher-id': number | null;
 }
 
