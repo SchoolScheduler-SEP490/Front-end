@@ -31,12 +31,16 @@ const useFetchTeachingAssignment = (props: IFetchTeachingAssignmentProps) => {
 		return data;
 	}
 
-	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
-		revalidateOnFocus: false,
-		revalidateOnReconnect: true,
-		revalidateIfStale: false,
-		shouldRetryOnError: false,
-	});
+	const { data, error, isLoading, isValidating, mutate } = useSWR(
+		studentClassId ? endpoint : null,
+		fetcher,
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: true,
+			revalidateIfStale: false,
+			shouldRetryOnError: false,
+		}
+	);
 
 	return { data, error, isLoading, isValidating, mutate };
 };

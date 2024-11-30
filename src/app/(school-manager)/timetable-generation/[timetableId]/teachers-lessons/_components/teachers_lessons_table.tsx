@@ -17,12 +17,16 @@ import {
 	tooltipClasses,
 	TooltipProps,
 } from '@mui/material';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';
 import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
 import { ITeachersLessonsObject } from '../_libs/constants';
 import useGetSlotDetails from '../_hooks/useGetSlotDetails';
 import FixedPeriodAssignmentModal from './teachers_lessons_modal_edit';
+import useFetchCurriculumDetails from '../_hooks/useFetchCurriculumDetails';
+import { useAppContext } from '@/context/app_provider';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSelector } from 'react-redux';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -31,7 +35,7 @@ const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 		backgroundColor: theme.palette.common.white,
 		color: 'rgba(0, 0, 0, 0.87)',
 		boxShadow: theme.shadows[1],
-		fontSize: 13,
+		fontSize: 15,
 	},
 }));
 
@@ -121,10 +125,11 @@ interface ITeachersLessonsTableProps {
 	data: ITeachersLessonsObject[];
 	maxSlot: number;
 	homeroomTeacher: string;
+	mainSession: number;
 }
 
 const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
-	const { data, maxSlot, homeroomTeacher } = props;
+	const { data, maxSlot, homeroomTeacher, mainSession } = props;
 
 	const [alignment, setAlignment] = useState<string>('list');
 	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
@@ -194,6 +199,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 															: 'Tiết chưa xếp sẵn'
 													}
 													arrow
+													placement='right'
 												>
 													{index < row.totalSlotPerWeek ? (
 														<h3>
@@ -253,7 +259,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 					</Toolbar>
 					<TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto' }}>
 						{/* <Table onMouseUp={handleMouseUp} size='small' onMouseLeave={handleMouseUp}> */}
-						<Table>
+						<Table size='small'>
 							<TableHead>
 								<TableRow>
 									<TableCell
@@ -313,27 +319,47 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 																key={cellId}
 																align='center'
 																sx={{
-																	cursor: 'pointer',
+																	// cursor: 'pointer',
 																	userSelect: 'none',
 																	border: '1px solid #ddd',
 																	':hover': {
 																		backgroundColor: '#f0f0f0',
 																	},
-																	width: 80,
-																	maxWidth: 80,
-																	height: 50,
-																	maxHeight: 50,
+																	minWidth: 60,
+																	maxWidth: 60,
+																	minHeight: 40,
+																	height: 40,
+																	maxHeight: 40,
 																}}
-																onClick={() =>
-																	handleOpenAssignModal(
-																		existingSlot ??
-																			({} as ITeachersLessonsObject)
-																	)
-																}
+																// onClick={() =>
+																// 	handleOpenAssignModal(
+																// 		existingSlot ??
+																// 			({} as ITeachersLessonsObject)
+																// 	)
+																// }
 															>
-																{existingSlot
-																	? `${existingSlot.subjectName} - ${existingSlot.teacherName}`
-																	: '- - -'}
+																{existingSlot ? (
+																	<LightTooltip
+																		title={
+																			existingSlot.subjectName
+																		}
+																	>
+																		<div className='w-full h-full flex flex-col justify-center items-center'>
+																			<p className='w-full overflow-hidden text-ellipsis whitespace-nowrap font-semibold'>
+																				{
+																					existingSlot.subjectName
+																				}
+																			</p>
+																			<p>
+																				{
+																					existingSlot.teacherName
+																				}
+																			</p>
+																		</div>
+																	</LightTooltip>
+																) : (
+																	'- - -'
+																)}
 															</TableCell>
 														);
 													}
@@ -344,6 +370,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 											<TableRow key={sessionIndex}>
 												<TableCell
 													colSpan={WEEK_DAYS.length - 1}
+													sx={{ maxHeight: 10, height: 10 }}
 												></TableCell>
 											</TableRow>
 										)}
@@ -359,6 +386,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 				setOpen={setIsAssignModalOpen}
 				selectedObject={selectedObject}
 				data={data}
+				mainSession={mainSession}
 			/>
 		</div>
 	);

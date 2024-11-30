@@ -82,7 +82,7 @@ export default function FixedPeriodsPage() {
 						)
 					) {
 						tmpTeacherOptions.push({
-							label: `${assignment['teacher-first-name']} ${assignment['teacher-last-name']} (${assignment['teacher-abbreviation']})`,
+							label: `${assignment['teacher-last-name']} ${assignment['teacher-first-name']} (${assignment['teacher-abbreviation']})`,
 							value: assignment['teacher-id'],
 						} as IDropdownOption<number>);
 					}
@@ -116,7 +116,7 @@ export default function FixedPeriodsPage() {
 							...obj,
 							subjectName: existingAssignment['subject-name'],
 							className: existingClass.label,
-							teacherName: `${existingAssignment['teacher-first-name']} ${existingAssignment['teacher-last-name']} (${existingAssignment['teacher-abbreviation']})`,
+							teacherName: `${existingAssignment['teacher-last-name']} ${existingAssignment['teacher-first-name']} (${existingAssignment['teacher-abbreviation']})`,
 							teacherId: existingAssignment['teacher-id'],
 						} as IExtendedFixedPeriod);
 					}

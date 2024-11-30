@@ -179,15 +179,15 @@ export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	2: 'Nữ',
 };
 
-export const ROOM_SUBJECT_MODEL: { key: string, value: number }[] = [
-	{ key: 'Full', value: 1},
-	{ key: 'NotFull', value: 2}
-]
+export const ROOM_SUBJECT_MODEL: { key: string; value: number }[] = [
+	{ key: 'Full', value: 1 },
+	{ key: 'NotFull', value: 2 },
+];
 
-export const MAIN_SESSION: { key: string, value: number }[] = [
+export const MAIN_SESSION: { key: string; value: number }[] = [
 	{ key: 'Morning', value: 1 },
 	{ key: 'Afternoon', value: 2 },
-]
+];
 
 export const MAIN_SESSION_TRANSLATOR: { [key: number]: string } = {
 	1: 'Buổi sáng',
@@ -228,6 +228,7 @@ export interface IFixedPeriodObject {
 	'subject-id': number;
 	'class-id': number;
 	'start-at': number;
+	'teacher-id': number;
 }
 
 // Tiết không xếp
@@ -298,8 +299,6 @@ export enum ETimetableStatus {
 
 // Record kết quả generate thời khóa biểu
 export interface IScheduleResponse {
-	id: number;
-	'timetable-id': string;
 	'school-year-id': number;
 	'start-week': number;
 	'end-week': number;
@@ -309,6 +308,7 @@ export interface IScheduleResponse {
 	name: string;
 	'fitness-point': number;
 	'class-schedules': IClassSchedule[];
+	id: number;
 	'create-date': string;
 	'update-date': string | null;
 	'is-deleted': boolean;

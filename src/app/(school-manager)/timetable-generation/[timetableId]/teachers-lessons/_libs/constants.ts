@@ -1,3 +1,5 @@
+import { IFixedPeriodObject } from '@/utils/constants';
+
 export interface ITeachersLessonsSidenavData {
 	title: string;
 	items: { key: string; value: number; extra: string }[];
@@ -66,8 +68,14 @@ export interface ITeachersLessonsObject {
 	className?: string;
 	subjectId: number;
 	subjectName: string;
+	subjectAbbreviation: string;
 	slots: number[];
 	totalSlotPerWeek: number;
+	totalMainSlotsPerWeek: number;
+	totalSubSlotsPerWeek: number;
+	isDoubleSlot: boolean;
+	minimumMainCouple: number;
+	minimumSubCouple: number;
 }
 
 export interface IAssignmentResponse {
@@ -84,4 +92,37 @@ export interface IAssignmentResponse {
 	'create-date': string;
 	'update-date': string | null;
 	'is-deleted': boolean;
+}
+
+export interface ICurriculumDetailResponse {
+	id: number;
+	'curriculum-name': string;
+	'curriculum-code': string;
+	grade: string;
+	'subject-selective-views': ISubjectInGroup[];
+	'subject-specializedt-views': ISubjectInGroup[];
+	'subject-required-views': ISubjectInGroup[];
+	'student-class-group-view-names': string[];
+}
+
+export interface ISubjectInGroup {
+	id: number;
+	'subject-id': number;
+	'subject-name': string;
+	abbreviation: string;
+	'subject-in-group-type': number;
+	'is-required': boolean;
+	description: string;
+	'main-slot-per-week': number;
+	'sub-slot-per-week': number;
+	'total-slot-per-week': number;
+	'is-specialized': boolean;
+	'is-double-period': boolean;
+	'slot-per-term': number;
+	'term-id': number;
+	'total-slot-in-year': number;
+	'slot-specialized': number;
+	'subject-group-type': string;
+	'main-minimum-couple': number;
+	'sub-minimum-couple': number;
 }

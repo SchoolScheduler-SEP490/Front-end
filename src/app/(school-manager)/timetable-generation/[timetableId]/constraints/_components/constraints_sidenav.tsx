@@ -59,50 +59,24 @@ const ConstraintsSidenav = (props: IConstraintsSidenavProps) => {
 				</div>
 			)}
 			{data.map((item: IConstraintsSidenavData, index) => (
-				<Accordion
-					expanded={expanded.includes(`panel${index}`)}
-					onChange={toggleDropdown(`panel${index}`)}
-					className='w-full h-fit !p-0 !m-0'
-					key={item.category + index}
-					sx={{
-						boxShadow: 'none', // Remove the box-shadow
-						'&:before': {
-							content: '""',
-							display: 'block',
-							backgroundColor: '#e0e0e0', // Keep the divider line with a light gray color
-						},
-					}}
-				>
-					<AccordionSummary
-						aria-controls={`panel${index}d-content`}
-						id={`panel${index}d-header`}
-						className='!text-black !bg-basic-gray-hover !m-0 !py-0 !h-[10px]'
-					>
-						<Typography className='!text-body-large-strong py-1'>
-							{item.category}
-						</Typography>
-					</AccordionSummary>
-					<AccordionDetails className='!w-full h-fit !p-0'>
-						{item.items.map((subItem: IDropdownOption<string>, id: number) => (
-							<div
-								key={subItem.label + id}
-								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
+				<>
+					{item.items.map((subItem: IDropdownOption<string>, id: number) => (
+						<div
+							key={subItem.label + id}
+							className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 select-none gap-5 hover:cursor-pointer 
 									${currentPath === subItem.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
-								onClick={() => handleSelectConstraint(subItem.value)}
+							onClick={() => handleSelectConstraint(subItem.value)}
+						>
+							<p
+								className={`text-body-medium font-normal w-full ${
+									currentPath === subItem.value ? ' !font-semibold' : ''
+								}`}
 							>
-								<p
-									className={`${
-										inter.className
-									} antialiased text-body-medium font-normal opacity-90 ${
-										currentPath === subItem.value ? ' !font-medium' : ''
-									}`}
-								>
-									{subItem.label}
-								</p>
-							</div>
-						))}
-					</AccordionDetails>
-				</Accordion>
+								{subItem.label}
+							</p>
+						</div>
+					))}
+				</>
 			))}
 		</div>
 	);

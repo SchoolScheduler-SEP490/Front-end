@@ -1,22 +1,28 @@
 'use client';
 
 import { ITimetableGenerationState, setDataStored } from '@/context/slice_timetable_generation';
+import useNotify from '@/hooks/useNotify';
+import { IConfigurationStoreObject } from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
-import { Button, TextField } from '@mui/material';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Button, Collapse, TextField } from '@mui/material';
 import { doc, setDoc } from 'firebase/firestore';
 import { useFormik } from 'formik';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
-import { IConfigurationStoreObject } from '@/utils/constants';
-import useNotify from '@/hooks/useNotify';
 
 export default function Home() {
 	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 	const dispatch = useDispatch();
+	const router = useRouter();
+	const pathName = usePathname();
+
+	const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (dataStored) {
@@ -49,7 +55,7 @@ export default function Home() {
 				.required('Vui lòng nhập khoảng nghỉ giữa 2 buổi')
 				.min(1, 'Phải có ít nhất 1 khoảng nghỉ')
 				.max(3, 'Khoảng nghỉ không được kéo dài quá 3 tiết'),
-			'minimum-days-off': yup.number(),
+			'minimum-days-off': yup.number().min(0, 'Số ngày nghỉ không được âm'),
 		}),
 	});
 
@@ -87,7 +93,15 @@ export default function Home() {
 				type: 'success',
 			});
 			handleClearData();
+			setIsCompleted(true);
 		}
+	};
+
+	const handleNext = () => {
+		const tmpPathArr: string[] = pathName.split('/');
+		tmpPathArr.splice(4);
+		tmpPathArr.push('teacher-unavailability');
+		router.push(tmpPathArr.join('/'));
 	};
 
 	return (
@@ -101,6 +115,7 @@ export default function Home() {
 					name='days-in-week'
 					type='number'
 					label='Số ngày học trong tuần'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['days-in-week']}
 					onChange={formik.handleChange('days-in-week')}
 					onBlur={formik.handleBlur}
@@ -127,6 +142,7 @@ export default function Home() {
 					name='required-break-periods'
 					type='number'
 					label='Khoảng nghỉ giữa 2 buổi'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['required-break-periods']}
 					onChange={formik.handleChange('required-break-periods')}
 					onBlur={formik.handleBlur}
@@ -159,6 +175,7 @@ export default function Home() {
 					name='minimum-days-off'
 					type='number'
 					label='Số ngày nghỉ tối thiểu của giáo viên'
+					onFocus={(event) => event.target.select()}
 					value={formik.values['minimum-days-off']}
 					onChange={formik.handleChange('minimum-days-off')}
 					onBlur={formik.handleBlur}
@@ -185,21 +202,49 @@ export default function Home() {
 						},
 					}}
 				/>
-				<Button
-					variant='contained'
-					fullWidth
-					disabled={!formik.isValid}
-					onClick={handleUpdateGeneralConfigurations}
-					color='inherit'
-					sx={{
-						bgcolor: '#175b8e',
-						color: 'white',
-						borderRadius: 0,
-						marginTop: '2vh',
-					}}
-				>
-					Lưu thay đổi
-				</Button>
+				<div className={`w-full h-fit flex flex-row justify-between items-center `}>
+					<Button
+						variant='contained'
+						disabled={!formik.isValid}
+						onClick={handleUpdateGeneralConfigurations}
+						color='inherit'
+						sx={{
+							bgcolor: '#175b8e',
+							color: 'white',
+							borderRadius: 0,
+							width: isCompleted ? '50%' : '100%',
+						}}
+					>
+						Lưu thay đổi
+					</Button>
+					<Collapse
+						in={isCompleted}
+						orientation='horizontal'
+						sx={{
+							width: isCompleted ? '60%' : '0%',
+							height: 'fit-content',
+							p: 0,
+							m: 0,
+						}}
+					>
+						<Button
+							variant='contained'
+							disabled={!formik.isValid}
+							onClick={handleNext}
+							color='success'
+							sx={{
+								borderRadius: 0,
+								width: '100%',
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								textWrap: 'nowrap',
+							}}
+							endIcon={<ArrowForwardIcon />}
+						>
+							Bước tiếp theo
+						</Button>
+					</Collapse>
+				</div>
 			</div>
 		</div>
 	);

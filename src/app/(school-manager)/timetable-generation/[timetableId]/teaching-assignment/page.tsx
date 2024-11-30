@@ -223,7 +223,7 @@ export default function SMTeachingAssignment() {
 						subjectName: item['subject-name'],
 						teacherName: existingAssignment
 							? {
-									label: `${existingTeacher['first-name']} ${existingTeacher['last-name']} (${existingTeacher.abbreviation})`,
+									label: `${existingTeacher['last-name']} ${existingTeacher['first-name']} (${existingTeacher.abbreviation})`,
 									value: existingAssignment['teacher-id'],
 							  }
 							: {
