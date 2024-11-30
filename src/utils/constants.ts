@@ -179,15 +179,15 @@ export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	2: 'Nữ',
 };
 
-export const ROOM_SUBJECT_MODEL: { key: string, value: number }[] = [
-	{ key: 'Full', value: 1},
-	{ key: 'NotFull', value: 2}
-]
+export const ROOM_SUBJECT_MODEL: { key: string; value: number }[] = [
+	{ key: 'Full', value: 1 },
+	{ key: 'NotFull', value: 2 },
+];
 
-export const MAIN_SESSION: { key: string, value: number }[] = [
+export const MAIN_SESSION: { key: string; value: number }[] = [
 	{ key: 'Morning', value: 1 },
 	{ key: 'Afternoon', value: 2 },
-]
+];
 
 export const MAIN_SESSION_TRANSLATOR: { [key: number]: string } = {
 	1: 'Buổi sáng',
@@ -228,6 +228,7 @@ export interface IFixedPeriodObject {
 	'subject-id': number;
 	'class-id': number;
 	'start-at': number;
+	'teacher-id': number;
 }
 
 // Tiết không xếp
