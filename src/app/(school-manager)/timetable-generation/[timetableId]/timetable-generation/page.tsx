@@ -67,18 +67,10 @@ export default function Home() {
 					const querySnapshot = await getDocs(q);
 					if (!querySnapshot.empty) {
 						querySnapshot.forEach(async (existingDoc) => {
-							const docRef = doc(
-								firestore,
-								generatedScheduleFirestorename,
-								existingDoc.id
-							);
+							const docRef = doc(firestore, generatedScheduleFirestorename, existingDoc.id);
 							await setDoc(docRef, result, { merge: true });
 
-							const docRef2 = doc(
-								firestore,
-								timetableFirestoreName,
-								timetableId ?? ''
-							);
+							const docRef2 = doc(firestore, timetableFirestoreName, timetableId ?? '');
 							await setDoc(
 								docRef2,
 								{ ...timetableStored, 'generated-schedule-id': existingDoc.id },
@@ -98,11 +90,7 @@ export default function Home() {
 							result
 						);
 						if (resRef.id) {
-							const docRef = doc(
-								firestore,
-								timetableFirestoreName,
-								timetableStored.id ?? ''
-							);
+							const docRef = doc(firestore, timetableFirestoreName, timetableStored.id ?? '');
 							await setDoc(
 								docRef,
 								{ ...dataStored, 'generated-schedule-id': resRef.id },
@@ -129,7 +117,7 @@ export default function Home() {
 				setIsTimetableGenerated(false);
 				useNotify({
 					type: 'error',
-					message: data.Message,
+					message: data?.Message,
 				});
 			}
 		}

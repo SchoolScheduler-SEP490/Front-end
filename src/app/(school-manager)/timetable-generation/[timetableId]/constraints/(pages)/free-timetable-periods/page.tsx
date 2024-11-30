@@ -1,19 +1,18 @@
 'use client';
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { IFreePeriodObject } from '@/utils/constants';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
+import useNotify from '@/hooks/useNotify';
 import {
 	CLASSGROUP_STRING_TYPE,
 	CLASSGROUP_TRANSLATOR,
 	CLASSGROUP_TRANSLATOR_REVERSED,
+	IFreePeriodObject,
 	WEEK_DAYS_FULL,
 } from '@/utils/constants';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import useFetchClasses from './_hooks/useFetchClass';
-import { IClassResponse } from './_libs/constants';
+import { firestore } from '@/utils/firebaseConfig';
+import ClearIcon from '@mui/icons-material/Clear';
 import {
 	Button,
 	Checkbox,
@@ -35,10 +34,15 @@ import {
 	Typography,
 	useTheme,
 } from '@mui/material';
-import ClearIcon from '@mui/icons-material/Clear';
-import { firestore } from '@/utils/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
-import useNotify from '@/hooks/useNotify';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import useFetchClasses from './_hooks/useFetchClass';
+import { IClassResponse } from './_libs/constants';
+
+interface IAvailableEmptySlots {
+	[key: string]: number;
+}
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -71,12 +75,16 @@ export default function FreeTimetablePeriods() {
 	const theme = useTheme();
 
 	const [selectedGrade, setSelectedGrade] = useState<string>(CLASSGROUP_TRANSLATOR_REVERSED[10]);
-	const [selectedSession, setSelectedSession] = useState<number>(0);
 	const [selectedCells, setSelectedCells] = useState<string[]>([]);
+	const [initSelectedCells, setInitSelectedCells] = useState<string[]>([]);
+	//Object để tính số tiết tối đa mà một lớp có thể nghỉ (Day x 5 tiết - số tiết / tuần của lớp)
+	const [availableEmptySlots, setAvailableEmptySlots] = useState<IAvailableEmptySlots>({});
+	const [isEdited, setIsEdited] = useState<boolean>(false);
 
 	const [gradeOptions, setGradeOptions] = useState<IDropdownOption<string>[]>([]);
 	const [sessionOptions, setSessionOptions] = useState<IDropdownOption<number>[]>([]);
 	const [classesInGrade, setClassesInGrade] = useState<IDropdownOption<number>[]>([]);
+
 	const [isMouseDown, setIsMouseDown] = useState(false);
 
 	const { data: classData, mutate: updateClass } = useFetchClasses({
@@ -87,18 +95,6 @@ export default function FreeTimetablePeriods() {
 		pageSize: 1000,
 		schoolYearId: timetableStored['year-id'] ?? 0,
 	});
-
-	useEffect(() => {
-		if (dataStored && dataStored['free-timetable-periods-para']) {
-			const tmpResults: string[] = [];
-			dataStored['free-timetable-periods-para'].forEach((para) => {
-				tmpResults.push(`${para['start-at']}-${para['class-id']}`);
-			});
-			if (tmpResults.length > 0) {
-				setSelectedCells(tmpResults);
-			}
-		}
-	}, [dataStored]);
 
 	useEffect(() => {
 		const gradeOptions: IDropdownOption<string>[] = CLASSGROUP_STRING_TYPE.map(
@@ -120,13 +116,17 @@ export default function FreeTimetablePeriods() {
 	useEffect(() => {
 		setClassesInGrade([]);
 		updateClass();
+		let tmpAvailableEmptySlots: IAvailableEmptySlots = {};
 		if (classData?.status === 200) {
 			const tmpClasses: IDropdownOption<number>[] = classData.result.items.map(
-				(clazz: IClassResponse) =>
-					({
+				(clazz: IClassResponse) => {
+					tmpAvailableEmptySlots[clazz.id] =
+						dataStored['days-in-week'] * 10 - clazz['period-count'];
+					return {
 						label: clazz.name,
 						value: clazz.id,
-					} as IDropdownOption<number>)
+					} as IDropdownOption<number>;
+				}
 			);
 
 			// Sort classes by length and then alphabetically
@@ -140,16 +140,29 @@ export default function FreeTimetablePeriods() {
 				setClassesInGrade(tmpClasses);
 			}
 		}
-	}, [classData]);
+		if (dataStored && dataStored['free-timetable-periods-para']) {
+			const tmpResults: string[] = [];
+			dataStored['free-timetable-periods-para'].forEach((para) => {
+				// Với mỗi lần xuất hiện của para, giảm số lượng tiết trống của lớp đó đi 1
+				tmpAvailableEmptySlots[para['class-id']] =
+					tmpAvailableEmptySlots[para['class-id']] - 1;
+				tmpResults.push(`${para['start-at']}-${para['class-id']}`);
+			});
+			if (tmpResults.length > 0) {
+				setInitSelectedCells(tmpResults);
+			}
+		}
+		setAvailableEmptySlots(tmpAvailableEmptySlots);
+	}, [classData, dataStored]);
 
 	const handleMouseDown = (cellId: string) => {
 		setIsMouseDown(true);
-		toggleCellSelection(cellId);
+		handleSelectCell(cellId);
 	};
 
 	const handleMouseEnter = (cellId: string) => {
 		if (isMouseDown) {
-			toggleCellSelection(cellId);
+			handleSelectCell(cellId);
 		}
 	};
 
@@ -157,61 +170,81 @@ export default function FreeTimetablePeriods() {
 		setIsMouseDown(false);
 	};
 
-	const toggleCellSelection = (cellId: string) => {
+	const handleSelectCell = (cellId: string) => {
+		const [slotId, classId] = cellId.split('-');
+
+		//Check xem còn available slot không
 		if (selectedCells.includes(cellId)) {
-			setSelectedCells(selectedCells.filter((cell) => cell !== cellId));
+			setSelectedCells((prev) => prev.filter((cell) => cell !== cellId));
+			// Nếu xóa ô đã chọn thì trả lại 1 slot trống cho lớp
+			setAvailableEmptySlots((prev) => ({
+				...prev,
+				[Number(classId)]: prev[Number(classId)] + 1,
+			}));
+			setIsEdited(true);
+		} else if (initSelectedCells.includes(cellId)) {
+			setInitSelectedCells((prev) => prev.filter((cell) => cell !== cellId));
+			// Nếu xóa ô đã chọn thì trả lại 1 slot trống cho lớp
+			setAvailableEmptySlots((prev) => ({
+				...prev,
+				[Number(classId)]: prev[Number(classId)] + 1,
+			}));
+			setIsEdited(true);
 		} else {
-			setSelectedCells((prev) => [...prev, cellId]);
+			if (availableEmptySlots[Number(classId)] > 0) {
+				setSelectedCells((prev) => [...prev, cellId]);
+				// Nếu chọn thêm ô mới thì giảm 1 slot trống của lớp
+				setAvailableEmptySlots((prev) => ({
+					...prev,
+					[Number(classId)]: prev[Number(classId)] - 1,
+				}));
+				setIsEdited(true);
+			}
 		}
 	};
 
 	const handleClearData = () => {
 		setSelectedCells([]);
-		setSelectedGrade(CLASSGROUP_TRANSLATOR_REVERSED[10]);
-		setSelectedSession(0);
+		setIsEdited(false);
 	};
 
 	const handleUpdateResults = async () => {
 		const tmpResults: IFreePeriodObject[] = [];
-		selectedCells.forEach((cell) => {
+		[...selectedCells, ...initSelectedCells].forEach((cell) => {
 			const [slotId, classId] = cell.split('-');
 			tmpResults.push({
 				'class-id': Number(classId),
 				'start-at': Number(slotId),
 			} as IFreePeriodObject);
 		});
-		if (tmpResults.length > 0) {
-			if (dataStored && dataStored.id && dataFirestoreName) {
-				const docRef = doc(firestore, dataFirestoreName, dataStored.id);
-				await setDoc(
-					docRef,
-					{ ...dataStored, 'free-timetable-periods-para': tmpResults },
-					{ merge: true }
-				);
-				dispatch(
-					updateDataStored({ target: 'free-timetable-periods-para', value: tmpResults })
-				);
-				useNotify({
-					message: 'Cập nhật cấu hình thành công',
-					type: 'success',
-				});
-				handleClearData();
-			}
+		if (dataStored && dataStored.id && dataFirestoreName) {
+			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
+			await setDoc(
+				docRef,
+				{ ...dataStored, 'free-timetable-periods-para': tmpResults },
+				{ merge: true }
+			);
+			dispatch(
+				updateDataStored({ target: 'free-timetable-periods-para', value: tmpResults })
+			);
+			useNotify({
+				message: 'Cập nhật cấu hình thành công',
+				type: 'success',
+			});
+			handleClearData();
 		}
 	};
 
 	return (
 		<div
-			className='w-full h-full max-h-[90vh] flex flex-row justify-center items-start pt-[5vh] overflow-y-scroll no-scrollbar'
+			className='w-full h-full max-h-[90vh] flex flex-row justify-center items-start pt-[2vh] overflow-y-hidden'
 			onMouseUp={handleMouseUp}
 		>
 			<Paper sx={{ width: '95%', mb: 5 }}>
 				<Toolbar sx={{ height: 30 }}>
 					<div className='w-full flex flex-row justify-start items-baseline gap-5'>
+						<Typography>Chọn khối</Typography>
 						<FormControl sx={{ width: '10%' }}>
-							<InputLabel id='teacher-selector-label' variant='standard'>
-								Chọn khối
-							</InputLabel>
 							<Select
 								labelId='periods-selector-label'
 								id='periods-selector-select'
@@ -238,40 +271,12 @@ export default function FreeTimetablePeriods() {
 								)}
 							</Select>
 						</FormControl>
-						<FormControl sx={{ width: '10%' }}>
-							<InputLabel id='teacher-selector-label' variant='standard'>
-								Chọn buổi
-							</InputLabel>
-							<Select
-								labelId='sessions-selector-label'
-								id='sessions-selector-select'
-								variant='standard'
-								value={selectedSession}
-								onChange={(e) => setSelectedSession(Number(e.target.value))}
-								MenuProps={MenuProps}
-								sx={{ width: '100%' }}
-								renderValue={(selected) => (selected === 0 ? 'Sáng' : 'Chiều')}
-							>
-								{sessionOptions.map(
-									(option: IDropdownOption<number>, index: number) => (
-										<MenuItem
-											key={option.label + index}
-											value={option.value}
-											style={getStyles<number>(option, sessionOptions, theme)}
-										>
-											<Checkbox checked={selectedSession === option.value} />
-											<ListItemText primary={option.label} />
-										</MenuItem>
-									)
-								)}
-							</Select>
-						</FormControl>
 					</div>
 					<Button
 						variant='contained'
 						onClick={handleUpdateResults}
 						color='inherit'
-						disabled={selectedCells.length === 0}
+						disabled={!isEdited}
 						sx={{
 							bgcolor: '#175b8e',
 							color: 'white',
@@ -283,8 +288,8 @@ export default function FreeTimetablePeriods() {
 						Lưu thay đổi
 					</Button>
 				</Toolbar>
-				<TableContainer>
-					<Table size='small'>
+				<TableContainer className='!no-scrollbar !max-h-[70vh]'>
+					<Table size='small' stickyHeader>
 						<TableHead>
 							<TableRow>
 								<TableCell sx={{ fontWeight: 'bold', border: '1px solid #ddd' }}>
@@ -297,12 +302,20 @@ export default function FreeTimetablePeriods() {
 									<TableCell
 										key={index}
 										sx={{
-											fontWeight: 'bold',
 											textAlign: 'center',
 											border: '1px solid #ddd',
+											p: 0,
+											m: 0,
 										}}
 									>
-										{clazz.label}
+										<div className='w-full h-fit flex flex-col justify-start items-center pt-[5%] gap-0'>
+											<h1 className='font-bold w-full text-center'>
+												{clazz.label}
+											</h1>
+											<p className='w-full text-center line-clamp-2'>
+												({availableEmptySlots[clazz.value]})
+											</p>
+										</div>
 									</TableCell>
 								))}
 							</TableRow>
@@ -310,11 +323,11 @@ export default function FreeTimetablePeriods() {
 						<TableBody>
 							{WEEK_DAYS_FULL.map((day: string, weekdayIndex: number) => (
 								<>
-									{[1, 2, 3, 4, 5].map((slotIndex) => (
+									{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((slotIndex) => (
 										<TableRow key={`${weekdayIndex}-${slotIndex}`}>
 											{slotIndex === 1 && (
 												<TableCell
-													rowSpan={5}
+													rowSpan={10}
 													width={30}
 													sx={{
 														textAlign: 'center',
@@ -332,22 +345,22 @@ export default function FreeTimetablePeriods() {
 													border: '1px solid #ddd',
 												}}
 												className={
-													selectedSession === 0
+													slotIndex <= 5
 														? '!text-primary-400'
 														: '!text-tertiary-normal'
 												}
 												width={30}
 											>
-												{slotIndex + selectedSession * 5}
+												{slotIndex}
 											</TableCell>
 											{classesInGrade.map((clazz) => {
-												const cellId = `${
-													weekdayIndex * 10 +
-													selectedSession * 5 +
-													slotIndex
-												}-${clazz.value}`;
+												const cellId = `${weekdayIndex * 10 + slotIndex}-${
+													clazz.value
+												}`;
 												const isSelected =
 													selectedCells.includes(cellId) || false;
+												const isInitSelected =
+													initSelectedCells.includes(cellId);
 												return (
 													<TableCell
 														key={cellId}
@@ -363,10 +376,15 @@ export default function FreeTimetablePeriods() {
 															textAlign: 'center',
 															backgroundColor: isSelected
 																? '#e7e7e7'
+																: isInitSelected
+																? '#F5F5F5'
 																: 'transparent',
 														}}
 													>
-														<Collapse in={isSelected} timeout={200}>
+														<Collapse
+															in={isSelected || isInitSelected}
+															timeout={200}
+														>
 															<Typography fontSize={13}>
 																<ClearIcon
 																	fontSize='small'

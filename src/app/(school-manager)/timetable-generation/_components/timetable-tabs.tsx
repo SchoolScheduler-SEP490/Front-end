@@ -94,7 +94,7 @@ const TimetableTabs = () => {
 				/>
 				<Tab
 					label='4. Tạo thời khóa biểu'
-					// disabled={dataStored['teacher-assignments'].length === 0}
+					disabled={dataStored['teacher-assignments']?.length === 0}
 					{...a11yProps(3)}
 				/>
 			</Tabs>

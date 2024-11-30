@@ -98,3 +98,19 @@ export const getFetchTeachingAssignmentApi = ({
 	}).toString();
 	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments?${queryString}`;
 };
+
+export const getFetchCurriculumDetailApi = ({
+	localApi,
+	curriculumId,
+	schoolId,
+	schoolYearId,
+}: {
+	localApi?: string;
+	curriculumId: number;
+	schoolId: number;
+	schoolYearId: number;
+}) => {
+	return `${
+		localApi ?? api
+	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${curriculumId}`;
+};
