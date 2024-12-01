@@ -62,9 +62,6 @@ export default function Home() {
 
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
-	const [createdClassCombination, setCreatedClassCombination] = useState<IClassCombinationObject[]>(
-		[]
-	);
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear();
 	const {
@@ -76,36 +73,6 @@ export default function Home() {
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
 	});
-
-	const { data: classCombinationData, mutate: updateClassCombination } = useFetchClassCombinations({
-		schoolId: Number(schoolId),
-		sessionToken,
-		pageIndex: 1,
-		pageSize: 1000,
-		termId: selectedTermId,
-	});
-
-	// Xử lý dữ liệu class combination đã được tạo sẵn vào trong timetable Firebase
-	useEffect(() => {
-		setCreatedClassCombination([]);
-		updateClassCombination();
-		if (classCombinationData?.status === 200) {
-			const tmpCreatedClassCombination: IClassCombinationObject[] =
-				classCombinationData.result.items.map(
-					(item: IClassCombinationResponse) =>
-						({
-							'class-ids': item['student-class'].map((clazz) => clazz.id),
-							'subject-id': item['subject-id'],
-							'teacher-id': null,
-							'room-id': item['room-id'],
-							session: EClassSession.Morning,
-						} as IClassCombinationObject)
-				);
-			if (tmpCreatedClassCombination.length > 0) {
-				setCreatedClassCombination(tmpCreatedClassCombination);
-			}
-		}
-	}, [classCombinationData]);
 
 	// Process data
 	useEffect(() => {
@@ -174,11 +141,11 @@ export default function Home() {
 			'fixed-periods-para': [],
 			'no-assign-periods-para': [],
 			'free-timetable-periods-para': [],
-			'class-combinations': createdClassCombination,
 			'applied-curriculum-id': 0,
 			'days-in-week': 6,
 			'minimum-days-off': 0,
 			'required-break-periods': 1,
+			'max-execution-time-in-seconds': 600, // 10 minutes
 		};
 		const timetableRef = await addDoc(collection(firestore, 'timetables'), newTimetableData);
 		const configRef = await addDoc(collection(firestore, 'configurations'), newConfigurationData);

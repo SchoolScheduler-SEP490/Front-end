@@ -114,7 +114,7 @@ const CurriculumInformationTable = () => {
 			detailedCurriculums.forEach((cur: ICurriculumDetailResponse) => {
 				let classGroups: string[] = [];
 				classGroupData.result.items.map((classGroup: IClassGroupResponse) => {
-					if (classGroup['curriculum-id'] === cur.id) {
+					if (classGroup['curriculum-id'] === cur.id && classGroup.classes.length > 0) {
 						classGroups.push(classGroup['group-name']);
 					}
 				});
@@ -125,9 +125,9 @@ const CurriculumInformationTable = () => {
 					specializedSubjects: useFilterArray(cur['subject-specializedt-views'], [
 						'subject-id',
 					]).map((sub) => sub['subject-name']),
-					selectiveSubjects: useFilterArray(cur['subject-selective-views'], [
-						'subject-id',
-					]).map((sub) => sub['subject-name']),
+					selectiveSubjects: useFilterArray(cur['subject-selective-views'], ['subject-id']).map(
+						(sub) => sub['subject-name']
+					),
 					grade: cur.grade,
 					appliedClassGroups: classGroups,
 				};
@@ -135,7 +135,10 @@ const CurriculumInformationTable = () => {
 			});
 			if (tmpCurriculumInformationArr.length > 0) {
 				setCurriculumInformation(
-					useFilterArray(tmpCurriculumInformationArr, ['curriculumId'])
+					useFilterArray(
+						tmpCurriculumInformationArr.filter((item) => item.appliedClassGroups.length !== 0),
+						['curriculumId']
+					)
 				);
 			}
 		}
@@ -169,37 +172,19 @@ const CurriculumInformationTable = () => {
 												<Skeleton variant='text' animation='wave' />
 											</TableCell>
 											<TableCell>
-												<Skeleton
-													variant='text'
-													animation='wave'
-													width={150}
-												/>
+												<Skeleton variant='text' animation='wave' width={150} />
 											</TableCell>
 											<TableCell>
-												<Skeleton
-													variant='text'
-													animation='wave'
-													width={150}
-												/>
+												<Skeleton variant='text' animation='wave' width={150} />
 											</TableCell>
 											<TableCell>
-												<Skeleton
-													variant='text'
-													animation='wave'
-													width={150}
-												/>
+												<Skeleton variant='text' animation='wave' width={150} />
 											</TableCell>
 											<TableCell>
-												<Skeleton
-													variant='text'
-													animation='wave'
-													width={150}
-												/>
+												<Skeleton variant='text' animation='wave' width={150} />
 											</TableCell>
 											<TableCell width={80}>
-												<p className='text-primary-400 underline'>
-													Chi tiết
-												</p>
+												<p className='text-primary-400 underline'>Chi tiết</p>
 											</TableCell>
 										</TableRow>
 									))}
@@ -211,15 +196,9 @@ const CurriculumInformationTable = () => {
 										{index + 1}
 									</TableCell>
 									<TableCell>{row.curriculumName}</TableCell>
-									<TableCell>
-										{getShortenedSubjects(row.specializedSubjects)}
-									</TableCell>
-									<TableCell>
-										{getShortenedSubjects(row.selectiveSubjects)}
-									</TableCell>
-									<TableCell width={80}>
-										Khối {CLASSGROUP_TRANSLATOR[row.grade]}
-									</TableCell>
+									<TableCell>{getShortenedSubjects(row.specializedSubjects)}</TableCell>
+									<TableCell>{getShortenedSubjects(row.selectiveSubjects)}</TableCell>
+									<TableCell width={80}>Khối {CLASSGROUP_TRANSLATOR[row.grade]}</TableCell>
 									<TableCell>{row.appliedClassGroups.join(' - ')}</TableCell>
 									<TableCell width={80}>
 										<a

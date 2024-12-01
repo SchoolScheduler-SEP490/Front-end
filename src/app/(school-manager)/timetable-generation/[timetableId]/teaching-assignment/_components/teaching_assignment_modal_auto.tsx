@@ -110,9 +110,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			setIsValidating(false);
 			useNotify({
 				message:
-					response.status === 200
-						? 'Phân công tự động thành công'
-						: 'Phân công tự động thất bại',
+					response.status === 200 ? 'Phân công tự động thành công' : 'Phân công tự động thất bại',
 				type: response.status === 200 ? 'success' : 'error',
 			});
 		}
@@ -138,10 +136,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 								'teacher-id': teacher['teacher-id'],
 						  }))
 						: null,
-				'class-combinations':
-					dataStored['class-combinations'].length > 0
-						? dataStored['class-combinations']
-						: null,
+				'class-combinations': null,
 			};
 			setAutoParams(tmpAutoParams);
 		}
@@ -154,42 +149,37 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 				if (!errorObject) {
 					setErrorObject(newErrorObject);
 				} else {
-					Object.entries(newErrorObject).forEach(
-						([entity, errors]: [string, string[]]) => {
-							if (errorObject[entity as keyof ITAAvailabilityResponse]) {
-								const newErrors: string[] = errors.filter(
-									(error) =>
-										!errorObject[
-											entity as keyof ITAAvailabilityResponse
-										].includes(error)
-								);
-								// In case of creating new errors
-								if (newErrors.length > 0) {
-									setErrorObject((prev) => {
-										if (!prev) return prev;
-										return {
-											...prev,
-											[entity as keyof ITAAvailabilityResponse]: [
-												...prev[entity as keyof ITAAvailabilityResponse],
-												...newErrors,
-											],
-										};
-									});
-								}
-								// For case of having removed some errors
-								const removedErrors = findRemovedElements(
-									errorObject[entity as keyof ITAAvailabilityResponse],
-									errors
-								);
-								if (removedErrors.length > 0) {
-									setRecoveredObjects((prev: ITAAvailabilityResponse) => ({
+					Object.entries(newErrorObject).forEach(([entity, errors]: [string, string[]]) => {
+						if (errorObject[entity as keyof ITAAvailabilityResponse]) {
+							const newErrors: string[] = errors.filter(
+								(error) => !errorObject[entity as keyof ITAAvailabilityResponse].includes(error)
+							);
+							// In case of creating new errors
+							if (newErrors.length > 0) {
+								setErrorObject((prev) => {
+									if (!prev) return prev;
+									return {
 										...prev,
-										[entity as keyof ITAAvailabilityResponse]: removedErrors,
-									}));
-								}
+										[entity as keyof ITAAvailabilityResponse]: [
+											...prev[entity as keyof ITAAvailabilityResponse],
+											...newErrors,
+										],
+									};
+								});
+							}
+							// For case of having removed some errors
+							const removedErrors = findRemovedElements(
+								errorObject[entity as keyof ITAAvailabilityResponse],
+								errors
+							);
+							if (removedErrors.length > 0) {
+								setRecoveredObjects((prev: ITAAvailabilityResponse) => ({
+									...prev,
+									[entity as keyof ITAAvailabilityResponse]: removedErrors,
+								}));
 							}
 						}
-					);
+					});
 				}
 			} else if (data?.status === 200) {
 				setIsAutomationAvailable(true);
@@ -283,17 +273,14 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						{errorObject && (
 							<div className='w-full h-full flex-col justify-center items-start'>
 								<p className='text-body-small italic opacity-60 text-basic-gray py-1'>
-									(*) Vui lòng sửa những lỗi sau trước khi thực hiện phân công tự
-									động
+									(*) Vui lòng sửa những lỗi sau trước khi thực hiện phân công tự động
 								</p>
 								{Object.entries(errorObject).map(([entity, errors], index) => (
 									<div key={entity + index}>
 										{errors.length > 0 && (
 											<div>
 												<div className='w-full flex flex-row justify-between items-baseline'>
-													<h3 className='text-body-large-strong font-medium'>
-														{entity}
-													</h3>
+													<h3 className='text-body-large-strong font-medium'>{entity}</h3>
 													<a
 														href={ENTITY_TARGET[entity]}
 														target='_blank'
@@ -301,32 +288,24 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 														className='flex flex-row justify-end items-center text-body-medium font-normal opacity-80 text-primary-500'
 													>
 														Sửa lỗi {entity}
-														<ArrowOutwardIcon
-															color='inherit'
-															sx={{ fontSize: 18, opacity: 0.8 }}
-														/>
+														<ArrowOutwardIcon color='inherit' sx={{ fontSize: 18, opacity: 0.8 }} />
 													</a>
 												</div>
 												<ul className='list-disc pl-5 pb-3'>
 													{errors.map((error: string, index: number) => (
 														<>
 															{recoveredObjects &&
-															recoveredObjects[
-																entity as keyof ITAAvailabilityResponse
-															]?.includes(error) ? (
+															recoveredObjects[entity as keyof ITAAvailabilityResponse]?.includes(
+																error
+															) ? (
 																// Success case
 																<li
 																	key={error + index}
 																	className='text-body-small font-regular py-1 text-basic-positive'
 																>
 																	<div className='w-[90%] flex flex-row justify-between items-stretch'>
-																		<h1 className='w-[80%]'>
-																			{error}
-																		</h1>
-																		<CheckIcon
-																			color='success'
-																			fontSize='small'
-																		/>
+																		<h1 className='w-[80%]'>{error}</h1>
+																		<CheckIcon color='success' fontSize='small' />
 																	</div>
 																</li>
 															) : (
@@ -337,10 +316,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 																>
 																	<div className='w-[90%] flex flex-row justify-between items-stretch'>
 																		<h1>{error}</h1>
-																		<CloseIcon
-																			color='error'
-																			fontSize='small'
-																		/>
+																		<CloseIcon color='error' fontSize='small' />
 																	</div>
 																</li>
 															)}

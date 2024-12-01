@@ -266,11 +266,11 @@ export interface IConfigurationStoreObject {
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];
-	'class-combinations': IClassCombinationObject[];
 	'applied-curriculum-id': number;
 	'required-break-periods': number;
 	'minimum-days-off': number;
 	'days-in-week': number;
+	'max-execution-time-in-seconds': number;
 }
 
 // Interface của record thời khóa biểu

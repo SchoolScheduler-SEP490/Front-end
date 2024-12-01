@@ -8,20 +8,28 @@ import {
 	ITeachingAssignmentObject,
 	WEEK_DAYS,
 } from '@/utils/constants';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 import {
 	Box,
 	Button,
 	CircularProgress,
 	circularProgressClasses,
 	Collapse,
+	IconButton,
+	styled,
 	Table,
 	TableBody,
 	TableCell,
 	TableContainer,
 	TableHead,
 	TableRow,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
 } from '@mui/material';
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useFetchClassData from '../_hooks/useFetchClass';
 import useFetchSubject from '../_hooks/useFetchSubject';
@@ -35,7 +43,19 @@ import {
 	ITeacherResponse,
 	ITimetableDisplayData,
 } from '../_libs/constants';
-import Image from 'next/image';
+import ConfigurationAdjustModal from './timetable_modal_adjust';
+import TimetableEditModal from './timetable_modal_edit';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 14,
+	},
+}));
 
 interface IPreviewScheduleProps {
 	isTimetableGenerating: boolean;
@@ -48,25 +68,21 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 	const { dataStored, timetableStored, generatedScheduleStored }: ITimetableGenerationState =
 		useSelector((state: any) => state.timetableGeneration);
 
-	const [displayData, setDisplayData] = useState<ITimetableDisplayData[]>([]);
 	const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
+	const [isConfigurationOpen, openConfiguration] = useState<boolean>(false);
+	const [isTimetableGenerated, setIsTimetableGenerated] = useState<boolean>(false);
+	const [isTimetableEditModalOpen, openTimetableEditModal] = useState<boolean>(false);
 
-	const {
-		data: teacherData,
-		mutate: updateTeacher,
-		isValidating: isTeacherValidating,
-	} = useFetchTeacher({
+	const [displayData, setDisplayData] = useState<ITimetableDisplayData[]>([]);
+
+	const { data: teacherData, mutate: updateTeacher } = useFetchTeacher({
 		sessionToken,
 		schoolId,
 		pageSize: 1000,
 		pageIndex: 1,
 	});
 
-	const {
-		data: classData,
-		isValidating: isClassValidating,
-		mutate: updateClass,
-	} = useFetchClassData({
+	const { data: classData, mutate: updateClass } = useFetchClassData({
 		sessionToken,
 		schoolId,
 		pageSize: 1000,
@@ -74,11 +90,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 		schoolYearId: selectedSchoolYearId,
 	});
 
-	const {
-		data: subjectData,
-		mutate: updateSubject,
-		isValidating: isSubjectValidating,
-	} = useFetchSubject({
+	const { data: subjectData, mutate: updateSubject } = useFetchSubject({
 		sessionToken,
 		schoolYearId: selectedSchoolYearId,
 		pageSize: 100,
@@ -98,7 +110,9 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 			timetableStored
 		) {
 			setIsDataLoading(true);
-			if (timetableStored['generated-schedule-id']) {
+			if (generatedScheduleStored && generatedScheduleStored.id) {
+				openConfiguration(false);
+				setIsTimetableGenerated(true);
 				const tmpDisplayData: ITimetableDisplayData[] = generatedScheduleStored[
 					'class-schedules'
 				].map(
@@ -123,6 +137,8 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 					setIsDataLoading(false);
 				}
 			} else {
+				openConfiguration(true);
+				setIsTimetableGenerated(false);
 				classData.result.items.map(async (clazz: IClassResponse) => {
 					const assignmentEndpoint = getFetchTeachingAssignmentApi({
 						schoolId: Number(schoolId),
@@ -145,43 +161,35 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 						];
 						const tmpPeriods: IPeriodDisplayData[] = [];
 						availableAssignments.forEach((assignment: IAssignmentResponse) => {
-							const assignedTeacher: ITeachingAssignmentObject | undefined =
-								dataStored['teacher-assignments'].find(
-									(item) => item['assignment-id'] === assignment.id
-								);
+							const assignedTeacher: ITeachingAssignmentObject | undefined = dataStored[
+								'teacher-assignments'
+							].find((item) => item['assignment-id'] === assignment.id);
 
-							const availableTeacher: ITeacherResponse | undefined =
-								teacherData.result.items.find(
-									(teacher: ITeacherResponse) =>
-										teacher.id === assignedTeacher?.['teacher-id']
-								);
+							const availableTeacher: ITeacherResponse | undefined = teacherData.result.items.find(
+								(teacher: ITeacherResponse) => teacher.id === assignedTeacher?.['teacher-id']
+							);
 
 							if (availableTeacher) {
 								// Assign giá trị vào trong class
-								dataStored['fixed-periods-para'].forEach(
-									(slot: IFixedPeriodObject) => {
-										if (
-											slot['class-id'] === assignment['student-class-id'] &&
-											slot['subject-id'] === assignment['subject-id']
-										) {
-											const existingSubject: ISubjectResponse =
-												subjectData.result.items.find(
-													(subject: ISubjectResponse) =>
-														subject.id === assignment['subject-id']
-												);
-											if (existingSubject) {
-												tmpPeriods.push({
-													slot: slot['start-at'],
-													subjectId: assignment['subject-id'],
-													subjectAbbreviation:
-														existingSubject.abbreviation,
-													teacherId: availableTeacher.id,
-													teacherName: availableTeacher.abbreviation,
-												} as IPeriodDisplayData);
-											}
+								dataStored['fixed-periods-para'].forEach((slot: IFixedPeriodObject) => {
+									if (
+										slot['class-id'] === assignment['student-class-id'] &&
+										slot['subject-id'] === assignment['subject-id']
+									) {
+										const existingSubject: ISubjectResponse = subjectData.result.items.find(
+											(subject: ISubjectResponse) => subject.id === assignment['subject-id']
+										);
+										if (existingSubject) {
+											tmpPeriods.push({
+												slot: slot['start-at'],
+												subjectId: assignment['subject-id'],
+												subjectAbbreviation: existingSubject.abbreviation,
+												teacherId: availableTeacher.id,
+												teacherName: availableTeacher.abbreviation,
+											} as IPeriodDisplayData);
 										}
 									}
-								);
+								});
 							}
 						});
 						setDisplayData((prev) => [
@@ -198,6 +206,14 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 			}
 		}
 	}, [classData, teacherData, dataStored, timetableStored, subjectData, generatedScheduleStored]);
+
+	const handleConfigurationButton = () => {
+		openConfiguration(true);
+	};
+
+	const handleEditTimetable = () => {
+		openTimetableEditModal(true);
+	};
 
 	const filteredData = useMemo(() => {
 		const tmpDisplayData = useFilterArray(displayData, ['classId']).sort((a, b) =>
@@ -219,13 +235,14 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 	}, [displayData]);
 
 	return (
-		<div className='w-full h-full flex flex-col justify-start items-center'>
+		<div className='w-full h-[100vh] flex flex-col justify-between py-2 items-center'>
 			<Collapse
 				in={!isTimetableGenerating}
 				orientation='vertical'
 				timeout={300}
+				unmountOnExit
 				sx={{
-					height: '8%',
+					height: '10vh',
 					position: 'relative',
 					width: '100%',
 					display: 'flex',
@@ -239,12 +256,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 							{generatedScheduleStored.name}
 						</h1>
 						<div className='w-fit h-full flex flex-row justify-start items-center gap-2'>
-							<Image
-								src={'/images/icons/dumbbell.png'}
-								alt='dumbbell'
-								width={15}
-								height={15}
-							/>
+							<Image src={'/images/icons/dumbbell.png'} alt='dumbbell' width={15} height={15} />
 							<h1
 								className={`text-body-large-strong font-semibold ${
 									generatedScheduleStored['fitness-point'] > 80
@@ -261,29 +273,54 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 						Các tiết xếp sẵn
 					</h1>
 				)}
-				<Button
-					variant='contained'
-					onClick={handleGenerateTimetable}
-					color='inherit'
-					disabled={isDataLoading}
-					sx={{
-						bgcolor: '#175b8e',
-						color: 'white',
-						borderRadius: 0,
-						boxShadow: 'none',
-						position: 'absolute',
-						top: '50%',
-						right: '2%',
-						transform: 'translateY(-50%)',
-						zIndex: 10,
-					}}
-				>
-					Tạo thời khóa biểu
-				</Button>
+				{!isTimetableGenerated ? (
+					<div className='w-fit h-full flex flex-row justify-between items-center gap-5 absolute top-[0%] right-[2%] z-10'>
+						<Button
+							variant='contained'
+							onClick={handleGenerateTimetable}
+							color='inherit'
+							disabled={isDataLoading}
+							sx={{
+								bgcolor: '#175b8e',
+								color: 'white',
+								borderRadius: 0,
+								boxShadow: 'none',
+							}}
+						>
+							Tạo thời khóa biểu
+						</Button>
+
+						<LightTooltip title='Cấu hình TKB' arrow>
+							<IconButton color='primary' onClick={handleConfigurationButton}>
+								<Image src={'/images/icons/setting.png'} alt='Cấu hình' width={20} height={20} />
+							</IconButton>
+						</LightTooltip>
+					</div>
+				) : (
+					<div className='w-fit h-full flex flex-row justify-between items-center gap-2 absolute top-[0%] right-[2%] z-10'>
+						<LightTooltip title='Chỉnh sửa TKB' arrow>
+							<IconButton color='primary' onClick={handleEditTimetable}>
+								<DriveFileRenameOutlineIcon />
+							</IconButton>
+						</LightTooltip>
+
+						<LightTooltip title='Xếp lại TKB' arrow>
+							<IconButton color='success' onClick={handleGenerateTimetable}>
+								<PostAddIcon />
+							</IconButton>
+						</LightTooltip>
+
+						<LightTooltip title='Cấu hình TKB' arrow>
+							<IconButton color='primary' onClick={handleConfigurationButton}>
+								<Image src={'/images/icons/setting.png'} alt='Cấu hình' width={20} height={20} />
+							</IconButton>
+						</LightTooltip>
+					</div>
+				)}
 			</Collapse>
 			{isDataLoading ? (
 				// Loading component
-				<div className='w-full h-[60%] max-h-[50vh] p-3 flex justify-center items-center overflow-y-scroll no-scrollbar'>
+				<div className='w-full h-[80%] p-3 flex justify-center items-start overflow-y-scroll no-scrollbar'>
 					<Box sx={{ position: 'relative' }}>
 						<CircularProgress
 							variant='determinate'
@@ -320,7 +357,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 					</Box>
 				</div>
 			) : (
-				<div className='w-full h-[92%] flex flex-col justify-start items-center pb-[5vh]'>
+				<div className='w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]'>
 					<TableContainer sx={{ mb: 10, maxHeight: '100%' }} className='!no-scrollbar'>
 						<Table size='small' stickyHeader sx={{ position: 'relative' }}>
 							<TableHead
@@ -329,7 +366,6 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 									top: 0,
 									left: 0,
 									zIndex: 100,
-									backgroundColor: '#ffffff', // Đặt màu nền cho cả hàng
 								}}
 							>
 								<TableRow>
@@ -338,6 +374,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 											border: '1px solid #ddd',
 											fontWeight: 'bold',
 											textAlign: 'center',
+											backgroundColor: '#f5ffff',
 										}}
 									>
 										Thứ
@@ -347,6 +384,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 											border: '1px solid #ddd',
 											fontWeight: 'bold',
 											textAlign: 'center',
+											backgroundColor: '#f5ffff',
 										}}
 									>
 										Tiết
@@ -358,6 +396,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 													border: '1px solid #ddd',
 													fontWeight: 'bold',
 													textAlign: 'center',
+													backgroundColor: '#f5ffff',
 												}}
 											>
 												{clazz.className}
@@ -368,92 +407,77 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 							<TableBody>
 								{WEEK_DAYS.map((weekday: string, weekdayIndex: number) => (
 									<>
-										{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-											(slot: number, slotIndex: number) => (
-												<TableRow>
-													{slotIndex === 0 && (
-														<TableCell
-															sx={{
-																border: '1px solid #ddd',
-																minWidth: 10,
-																width: 10,
-																maxWidth: 10,
-																textAlign: 'center',
-																fontWeight: 'bold',
-																overflow: 'hidden',
-															}}
-															rowSpan={10}
-															width={10}
-														>
-															{weekday}
-														</TableCell>
-													)}
+										{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((slot: number, slotIndex: number) => (
+											<TableRow>
+												{slotIndex === 0 && (
 													<TableCell
 														sx={{
 															border: '1px solid #ddd',
+															minWidth: 10,
+															width: 10,
 															maxWidth: 10,
 															textAlign: 'center',
 															fontWeight: 'bold',
+															overflow: 'hidden',
 														}}
-														className={`${
-															slotIndex < 5
-																? '!text-primary-400'
-																: '!text-tertiary-normal'
-														}`}
+														rowSpan={10}
+														width={10}
 													>
-														{slot}
+														{weekday}
 													</TableCell>
-													{filteredData &&
-														filteredData.map(
-															(clazz: ITimetableDisplayData) => {
-																const period = clazz.periods.find(
-																	(item) =>
-																		item.slot ===
-																		slot + weekdayIndex * 10
-																);
-																if (period) {
-																	return (
-																		<TableCell
-																			sx={{
-																				border: '1px solid #ddd',
-																				maxWidth: 50,
-																				maxHeight: 100,
-																				backgroundColor:
-																					'#f0f0f0',
-																				overflow: 'hidden',
-																			}}
-																		>
-																			<div className='flex flex-col justify-center items-center opacity-80'>
-																				<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
-																					{
-																						period.subjectAbbreviation
-																					}
-																				</strong>
-																				<p className='text-ellipsis text-nowrap overflow-hidden'>
-																					{
-																						period.teacherName
-																					}
-																				</p>{' '}
-																			</div>
-																		</TableCell>
-																	);
-																}
-																return (
-																	<TableCell
-																		sx={{
-																			border: '1px solid #ddd',
-																			width: 50,
-																		}}
-																	></TableCell>
-																);
-															}
-														)}
-												</TableRow>
-											)
-										)}
-										<TableRow
-											key={weekdayIndex + Math.floor(Math.random() * 1000)}
-										>
+												)}
+												<TableCell
+													sx={{
+														border: '1px solid #ddd',
+														maxWidth: 10,
+														textAlign: 'center',
+														fontWeight: 'bold',
+													}}
+													className={`${
+														slotIndex < 5 ? '!text-primary-400' : '!text-tertiary-normal'
+													}`}
+												>
+													{slot}
+												</TableCell>
+												{filteredData &&
+													filteredData.map((clazz: ITimetableDisplayData) => {
+														const period = clazz.periods.find(
+															(item) => item.slot === slot + weekdayIndex * 10
+														);
+														if (period) {
+															return (
+																<TableCell
+																	sx={{
+																		border: '1px solid #ddd',
+																		maxWidth: 50,
+																		maxHeight: 100,
+																		backgroundColor: '#f0f0f0',
+																		overflow: 'hidden',
+																	}}
+																>
+																	<div className='flex flex-col justify-center items-center opacity-80'>
+																		<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
+																			{period.subjectAbbreviation}
+																		</strong>
+																		<p className='text-ellipsis text-nowrap overflow-hidden'>
+																			{period.teacherName}
+																		</p>{' '}
+																	</div>
+																</TableCell>
+															);
+														}
+														return (
+															<TableCell
+																sx={{
+																	border: '1px solid #ddd',
+																	width: 50,
+																}}
+															></TableCell>
+														);
+													})}
+											</TableRow>
+										))}
+										<TableRow key={weekdayIndex + Math.floor(Math.random() * 1000)}>
 											<TableCell
 												sx={{
 													width: '100%',
@@ -469,6 +493,8 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 					</TableContainer>
 				</div>
 			)}
+			<ConfigurationAdjustModal open={isConfigurationOpen} setOpen={openConfiguration} />
+			<TimetableEditModal open={isTimetableEditModalOpen} setOpen={openTimetableEditModal} />
 		</div>
 	);
 };

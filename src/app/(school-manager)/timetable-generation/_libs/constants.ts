@@ -34,7 +34,11 @@ export interface IClassCombinationResponse {
 	'room-subject-code': string;
 	'room-subject-name': string | null;
 	model: string;
-	'student-class': any[];
+	session: string | null;
+	'student-class': {
+		id: number;
+		'student-class-name': string;
+	}[];
 	id: number;
 	'create-date': string;
 	'update-date': string | null;

@@ -132,9 +132,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 	useEffect(() => {
 		if (pathName.length > 0) {
 			const currentTab: string[] = pathName.split('/');
-			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) =>
-				currentTab.includes(tab.value)
-			);
+			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) => currentTab.includes(tab.value));
 			setValue(tabIndex);
 		}
 	}, [pathName]);
@@ -147,7 +145,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 		>
 			<SMHeader>
 				<div className='flex flex-row justify-start items-baseline gap-2'>
-					<IconButton color='info' onClick={() => router.back()}>
+					<IconButton color='info' onClick={() => router.replace('/timetable-management')}>
 						<Image
 							src='/images/icons/arrow.png'
 							alt='Trở lại'
@@ -156,11 +154,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 							unoptimized={true}
 						/>
 					</IconButton>
-					<LightTooltip
-						title={timetableStored['timetable-name']}
-						placement='bottom'
-						arrow
-					>
+					<LightTooltip title={timetableStored['timetable-name']} placement='bottom' arrow>
 						<h3 className='text-title-small text-white font-medium tracking-wider'>
 							{timetableStored['timetable-abbreviation'] !== null
 								? timetableStored['timetable-abbreviation']
