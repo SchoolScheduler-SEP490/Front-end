@@ -58,11 +58,19 @@ const getExistingSlot = (
 const isValidSlot = (
 	mainSession: number,
 	slotIndex: number,
-	isSubSessionAllow?: boolean
+	isSubSessionAllow?: boolean,
+	onlySubSession?: boolean // thêm tham số này
 ): boolean => {
+	// Nếu chỉ có tiết trái buổi thì disable tiết chính khóa
+	if (onlySubSession) {
+		return !(1 + mainSession * 5 <= slotIndex && slotIndex <= 5 + mainSession * 5);
+	}
+
+	// Kiểm tra tiết chính khóa hoặc bật cờ cho phép tiết trái buổi
 	if ((1 + mainSession * 5 <= slotIndex && slotIndex <= 5 + mainSession * 5) || isSubSessionAllow) {
 		return true;
 	}
+
 	return false;
 };
 
@@ -128,7 +136,7 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 					});
 				}
 			} else if (!isValidSlot(mainSession, ((cellId - 1) % 10) + 1)) {
-				// Lấy ra số tiết đã xếp vào buổi chính khóa
+				// Lấy ra số tiết đã xếp vào tiết trái buổi
 
 				const tmpSelectedSlotInSession = selectedCells.filter(
 					(id) => 1 + mainSession * 5 <= id && id <= 5 + mainSession * 5
@@ -405,9 +413,17 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 														sx={{
 															fontWeight: 'bold',
 															border: '1px solid #ddd',
+															width: 100,
+															p: 0,
+															m: 0,
 														}}
 													>
-														{session.period}
+														<div className='w-full  flex flex-col justify-center items-center'>
+															<h1 className='w-full text-center'>{session.period}</h1>
+															<p className='text-body-small font-light w-full text-center'>
+																({mainSession === sessionIndex ? 'Chính khóa' : 'Trái buổi'})
+															</p>
+														</div>
 													</TableCell>
 												)}
 												<TableCell align='center'>{slot}</TableCell>
@@ -426,7 +442,9 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 																		isValidSlot(
 																			mainSession,
 																			sessionIndex * 5 + slotIndex + 1,
-																			selectedObject.totalSubSlotsPerWeek !== 0
+																			selectedObject.totalSubSlotsPerWeek !== 0,
+																			selectedObject.totalMainSlotsPerWeek === 0 &&
+																				selectedObject.totalSubSlotsPerWeek > 0
 																		) &&
 																		!isOccupiedSlot(cellId) &&
 																		!isFreePeriod(cellId) &&
@@ -442,7 +460,9 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 																		isValidSlot(
 																			mainSession,
 																			sessionIndex * 5 + slotIndex + 1,
-																			selectedObject.totalSubSlotsPerWeek !== 0
+																			selectedObject.totalSubSlotsPerWeek !== 0,
+																			selectedObject.totalMainSlotsPerWeek === 0 &&
+																				selectedObject.totalSubSlotsPerWeek > 0
 																		) &&
 																		!isOccupiedSlot(cellId) &&
 																		!isFreePeriod(cellId) &&
@@ -462,7 +482,9 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 																	isValidSlot(
 																		mainSession,
 																		sessionIndex * 5 + slotIndex + 1,
-																		selectedObject.totalSubSlotsPerWeek !== 0
+																		selectedObject.totalSubSlotsPerWeek !== 0,
+																		selectedObject.totalMainSlotsPerWeek === 0 &&
+																			selectedObject.totalSubSlotsPerWeek > 0
 																	)
 																) {
 																	if (
@@ -482,17 +504,17 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 														>
 															{isOccupiedSlot(cellId) && (
 																<LightTooltip title='Giáo viên đảm nhiệm có lịch dạy tiết này ở lớp khác'>
-																	<div className='w-full h-full'></div>
+																	<div className='w-full h-[0]'></div>
 																</LightTooltip>
 															)}
 															{isFreePeriod(cellId) && (
 																<LightTooltip title='Tiết trống cố định'>
-																	<div className='w-full h-full'></div>
+																	<div className='w-full h-[0]'></div>
 																</LightTooltip>
 															)}
 															{isTeacherUnavailability(cellId) && (
 																<LightTooltip title='Lịch nghỉ của giáo viên đảm nhiệm bộ môn'>
-																	<div className='w-full h-full'></div>
+																	<div className='w-full h-[0]'></div>
 																</LightTooltip>
 															)}
 															{existingSlot && !(selectedObject?.slots === existingSlot?.slots) && (

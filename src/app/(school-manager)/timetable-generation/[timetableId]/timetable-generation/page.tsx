@@ -8,7 +8,6 @@ import {
 import useNotify from '@/hooks/useNotify';
 import { IScheduleResponse } from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
-import { Button, Divider } from '@mui/material';
 import { addDoc, collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +15,6 @@ import TimetableLoading from './_components/timetable_loading';
 import PreviewScheduleTable from './_components/timetable_table_preview';
 import useGenerateTimetable from './_hooks/useGenerateTimetable';
 import { IGenerateTimetableRequest } from './_libs/constants';
-import { useRouter } from 'next/navigation';
 
 export default function Home() {
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
@@ -28,10 +26,8 @@ export default function Home() {
 		timetableId,
 	}: ITimetableGenerationState = useSelector((state: any) => state.timetableGeneration);
 	const dispatch = useDispatch();
-	const router = useRouter();
 
 	const [isTimetableGenerating, setIsTimetableGenerating] = useState<boolean>(false);
-	const [isTimetableGenerated, setIsTimetableGenerated] = useState<boolean>(false);
 
 	const handleGenerateTimetable = async () => {
 		if (dataStored && timetableStored) {
@@ -48,11 +44,11 @@ export default function Home() {
 				'no-assign-periods-para': dataStored['no-assign-periods-para'],
 				'free-timetable-periods-para': dataStored['free-timetable-periods-para'],
 				'teacher-assignments': dataStored['teacher-assignments'],
-				'class-combinations': dataStored['class-combinations'],
 				'required-break-periods': dataStored['required-break-periods'],
 				'minimum-days-off': dataStored['minimum-days-off'],
 				'term-id': timetableStored['term-id'] ?? 0,
 				'days-in-week': dataStored['days-in-week'],
+				'max-execution-time-in-seconds': dataStored['max-execution-time-in-seconds'],
 			};
 			const data = await useGenerateTimetable({
 				formData: requestBody,
@@ -60,16 +56,16 @@ export default function Home() {
 				schoolId: Number(schoolId),
 				schoolYearId: selectedSchoolYearId,
 			});
-			if (data?.Status === 200) {
-				where('timetable-id', '==', timetableId);
+			if (data?.status === 200) {
 				const result: IScheduleResponse = { ...data.result, 'timetable-id': timetableId };
 				if (result) {
-					const q = query(
+					const timetableQuery = query(
 						collection(firestore, generatedScheduleFirestorename),
 						where('timetable-id', '==', timetableId)
 					);
-					const querySnapshot = await getDocs(q);
+					const querySnapshot = await getDocs(timetableQuery);
 					if (!querySnapshot.empty) {
+						// Update record đã tồn tại
 						querySnapshot.forEach(async (existingDoc) => {
 							const docRef = doc(firestore, generatedScheduleFirestorename, existingDoc.id);
 							await setDoc(docRef, result, { merge: true });
@@ -79,46 +75,68 @@ export default function Home() {
 								docRef2,
 								{ ...timetableStored, 'generated-schedule-id': existingDoc.id },
 								{ merge: true }
-							);
-
-							dispatch(
-								updateTimetableStored({
-									target: 'generated-schedule-id',
-									value: existingDoc.id,
-								})
-							);
+							).then(() => {
+								dispatch(
+									setGeneratedScheduleStored({ ...result }),
+									updateTimetableStored({
+										target: 'generated-schedule-id',
+										value: existingDoc.id,
+									})
+								);
+								setIsTimetableGenerating(false);
+								useNotify({
+									type: 'success',
+									message: data?.message,
+								});
+							});
 						});
 					} else {
-						const resRef = await addDoc(
-							collection(firestore, generatedScheduleFirestorename),
-							result
-						);
-						if (resRef.id) {
-							const docRef = doc(firestore, timetableFirestoreName, timetableStored.id ?? '');
-							await setDoc(
-								docRef,
-								{ ...dataStored, 'generated-schedule-id': resRef.id },
-								{ merge: true }
+						try {
+							// Tạo record mới nếu chưa có
+							const resRef = await addDoc(
+								collection(firestore, generatedScheduleFirestorename),
+								result
 							);
-							dispatch(
-								updateTimetableStored({
-									target: 'generated-schedule-id',
-									value: resRef.id,
-								})
-							);
+
+							if (resRef.id) {
+								const timetableDocRef = doc(
+									firestore,
+									timetableFirestoreName,
+									timetableId ?? 'Unknown'
+								);
+								await setDoc(
+									timetableDocRef,
+									{ ...dataStored, 'generated-schedule-id': resRef.id },
+									{ merge: true }
+								).then(() => {
+									// Dispatch từng hành động một cách riêng biệt
+									dispatch(
+										setGeneratedScheduleStored(result),
+										updateTimetableStored({
+											target: 'generated-schedule-id',
+											value: resRef.id,
+										})
+									);
+									useNotify({
+										type: 'success',
+										message: data?.message,
+									});
+								});
+							}
+						} catch (error: any) {
+							console.error('Error while adding or updating document:', error);
+							useNotify({
+								type: 'error',
+								message: 'Đã có lỗi xảy ra trong quá trình lưu dữ liệu.',
+							});
+						} finally {
+							// Đảm bảo trạng thái được đặt lại sau khi kết thúc xử lý
+							setIsTimetableGenerating(false);
 						}
 					}
-					dispatch(setGeneratedScheduleStored(result));
-					setIsTimetableGenerating(false);
-					setIsTimetableGenerated(true);
-					useNotify({
-						type: 'success',
-						message: data?.Message,
-					});
 				}
 			} else {
 				setIsTimetableGenerating(false);
-				setIsTimetableGenerated(false);
 				useNotify({
 					type: 'error',
 					message: data?.Message,
@@ -127,14 +145,10 @@ export default function Home() {
 		}
 	};
 
-	const handleGoBack = () => {
-		router.push('/timetable-management');
-	};
-
 	return (
 		<div className='w-full h-screen flex flex-col justify-start items-start'>
 			{isTimetableGenerating && <TimetableLoading isComplete={!isTimetableGenerating} />}
-			<div className='w-full h-full flex flex-col justify-center items-center'>
+			<div className='w-full h-[100vh] flex flex-col justify-center items-center'>
 				<PreviewScheduleTable
 					isTimetableGenerating={isTimetableGenerating}
 					handleGenerateTimetable={handleGenerateTimetable}

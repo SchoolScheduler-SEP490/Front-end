@@ -58,19 +58,23 @@ const TimetableLoading: React.FC<LoadingComponentProps> = ({ isComplete }) => {
 	}, [isComplete]);
 
 	return (
-		<Box sx={{ width: '100%', textAlign: 'center' }}>
-			<LinearProgress
-				color='inherit'
-				sx={{ bgcolor: '#fff0eb', color: '#ff6b35', height: 5 }}
-			/>
+		<div className='w-full h-[8vh] min-h-[8vh] text-center '>
+			<LinearProgress color='inherit' sx={{ bgcolor: '#fff0eb', color: '#ff6b35', height: 5 }} />
 			<Typography
 				variant='h6'
 				gutterBottom
-				sx={{ opacity: '60%', mt: 1, textAlign: 'center' }}
+				sx={{
+					opacity: '60%',
+					mt: 1,
+					textAlign: 'center',
+					transform: 'translateX(10px)',
+					height: '90%',
+					verticalAlign: 'middle',
+				}}
 			>
 				{message}
 			</Typography>
-		</Box>
+		</div>
 	);
 };
 

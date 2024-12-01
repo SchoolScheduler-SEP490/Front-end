@@ -111,8 +111,9 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		setSelectedGrade,
 	} = props;
 	const { schoolId, sessionToken } = useAppContext();
-	const { dataStored, dataFirestoreName, timetableStored }: ITimetableGenerationState =
-		useSelector((state: any) => state.timetableGeneration);
+	const { dataStored, dataFirestoreName, timetableStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
 	const dispatch = useSMDispatch();
 
 	const [editingObjects] = useState<IExtendedTeachingAssignment[]>([]);
@@ -196,7 +197,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 				}
 			}
 		}
-	}, [selectedClassId]);
+	}, [selectedClassId, automationResult]);
 
 	useEffect(() => {
 		if (teachableData?.status === 200) {
@@ -288,12 +289,8 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 									<Autocomplete
 										options={teachableDropdown}
-										getOptionLabel={(option: IDropdownOption<number>) =>
-											option.label
-										}
-										getOptionKey={(option: IDropdownOption<number>) =>
-											option.value
-										}
+										getOptionLabel={(option: IDropdownOption<number>) => option.label}
+										getOptionKey={(option: IDropdownOption<number>) => option.value}
 										noOptionsText='Không có giáo viên phù hợp'
 										disableClearable
 										value={
@@ -307,22 +304,13 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 										onBlur={() => {
 											setTeachableDropdown([]);
 										}}
-										onChange={(
-											event: any,
-											newValue: IDropdownOption<number> | null
-										) => {
+										onChange={(event: any, newValue: IDropdownOption<number> | null) => {
 											if (newValue !== null) {
-												handleUpdateTeacher(
-													assignment.id,
-													newValue.value,
-													newValue.label
-												);
+												handleUpdateTeacher(assignment.id, newValue.value, newValue.label);
 											}
 										}}
 										blurOnSelect
-										renderInput={(params) => (
-											<TextField {...params} variant='standard' />
-										)}
+										renderInput={(params) => <TextField {...params} variant='standard' />}
 										sx={{ width: '50%' }}
 									/>
 								</div>

@@ -138,7 +138,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 	);
 
 	const handleChange = (event: MouseEvent<HTMLElement>, newAlignment: string) => {
-		if (!(alignment === newAlignment)) {
+		if (newAlignment !== null) {
 			setAlignment(newAlignment);
 		}
 	};
@@ -174,9 +174,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 						</div>
 						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 							<h3 className='text-body-medium opacity-80'>GVCN: </h3>
-							<h2 className='text-body-medium-strong font-normal'>
-								{homeroomTeacher}
-							</h2>
+							<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
 						</div>
 					</Toolbar>
 					<TableContainer>
@@ -192,10 +190,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 												<LightTooltip
 													title={
 														row.slots[index]
-															? useGetSlotDetails(
-																	row.slots[index],
-																	false
-															  )
+															? useGetSlotDetails(row.slots[index], false)
 															: 'Tiết chưa xếp sẵn'
 													}
 													arrow
@@ -204,10 +199,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 													{index < row.totalSlotPerWeek ? (
 														<h3>
 															{row.slots[index]
-																? useGetSlotDetails(
-																		row.slots[index],
-																		true
-																  )
+																? useGetSlotDetails(row.slots[index], true)
 																: '- - -'}
 														</h3>
 													) : (
@@ -252,9 +244,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 						</div>
 						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 							<h3 className='text-body-medium opacity-80'>GVCN:</h3>
-							<h2 className='text-body-medium-strong font-normal'>
-								{homeroomTeacher}
-							</h2>
+							<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
 						</div>
 					</Toolbar>
 					<TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto' }}>
@@ -262,24 +252,14 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 						<Table size='small'>
 							<TableHead>
 								<TableRow>
-									<TableCell
-										align='center'
-										sx={{ fontWeight: 'bold', width: 80 }}
-									>
+									<TableCell align='center' sx={{ fontWeight: 'bold', width: 80 }}>
 										Buổi
 									</TableCell>
-									<TableCell
-										align='center'
-										sx={{ fontWeight: 'bold', width: 80 }}
-									>
+									<TableCell align='center' sx={{ fontWeight: 'bold', width: 80 }}>
 										Tiết
 									</TableCell>
 									{WEEK_DAYS.map((day) => (
-										<TableCell
-											key={day}
-											align='center'
-											sx={{ fontWeight: 'bold' }}
-										>
+										<TableCell key={day} align='center' sx={{ fontWeight: 'bold' }}>
 											{day}
 										</TableCell>
 									))}
@@ -303,67 +283,48 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 													</TableCell>
 												)}
 												<TableCell align='center'>{slot}</TableCell>
-												{WEEK_DAYS.map(
-													(day: string, weekdayIndex: number) => {
-														const cellId =
-															weekdayIndex * 10 +
-															sessionIndex * 5 +
-															slotIndex +
-															1;
-														const existingSlot = getExistingSlot(
-															data,
-															cellId
-														);
-														return (
-															<TableCell
-																key={cellId}
-																align='center'
-																sx={{
-																	// cursor: 'pointer',
-																	userSelect: 'none',
-																	border: '1px solid #ddd',
-																	':hover': {
-																		backgroundColor: '#f0f0f0',
-																	},
-																	minWidth: 60,
-																	maxWidth: 60,
-																	minHeight: 40,
-																	height: 40,
-																	maxHeight: 40,
-																}}
-																// onClick={() =>
-																// 	handleOpenAssignModal(
-																// 		existingSlot ??
-																// 			({} as ITeachersLessonsObject)
-																// 	)
-																// }
-															>
-																{existingSlot ? (
-																	<LightTooltip
-																		title={
-																			existingSlot.subjectName
-																		}
-																	>
-																		<div className='w-full h-full flex flex-col justify-center items-center'>
-																			<p className='w-full overflow-hidden text-ellipsis whitespace-nowrap font-semibold'>
-																				{
-																					existingSlot.subjectName
-																				}
-																			</p>
-																			<p>
-																				{
-																					existingSlot.teacherName
-																				}
-																			</p>
-																		</div>
-																	</LightTooltip>
-																) : (
-																	'- - -'
-																)}
-															</TableCell>
-														);
-													}
-												)}
+												{WEEK_DAYS.map((day: string, weekdayIndex: number) => {
+													const cellId = weekdayIndex * 10 + sessionIndex * 5 + slotIndex + 1;
+													const existingSlot = getExistingSlot(data, cellId);
+													return (
+														<TableCell
+															key={cellId}
+															align='center'
+															sx={{
+																// cursor: 'pointer',
+																userSelect: 'none',
+																border: '1px solid #ddd',
+																':hover': {
+																	backgroundColor: '#f0f0f0',
+																},
+																minWidth: 60,
+																maxWidth: 60,
+																minHeight: 40,
+																height: 40,
+																maxHeight: 40,
+															}}
+															// onClick={() =>
+															// 	handleOpenAssignModal(
+															// 		existingSlot ??
+															// 			({} as ITeachersLessonsObject)
+															// 	)
+															// }
+														>
+															{existingSlot ? (
+																<LightTooltip title={existingSlot.subjectName}>
+																	<div className='w-full h-full flex flex-col justify-center items-center'>
+																		<p className='w-full overflow-hidden text-ellipsis whitespace-nowrap font-semibold'>
+																			{existingSlot.subjectName}
+																		</p>
+																		<p>{existingSlot.teacherName}</p>
+																	</div>
+																</LightTooltip>
+															) : (
+																'- - -'
+															)}
+														</TableCell>
+													);
+												})}
 											</TableRow>
 										))}
 										{sessionIndex === 0 && (

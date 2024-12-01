@@ -14,11 +14,11 @@ export interface IGenerateTimetableRequest {
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];
-	'class-combinations': IClassCombinationObject[];
 	'required-break-periods': number;
 	'minimum-days-off': number;
 	'term-id': number;
 	'days-in-week': number;
+	'max-execution-time-in-seconds': number;
 }
 
 export interface ITeacherResponse {

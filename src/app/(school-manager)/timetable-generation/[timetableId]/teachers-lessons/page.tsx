@@ -24,8 +24,9 @@ import useFetchCurriculumDetails from './_hooks/useFetchCurriculumDetails';
 
 export default function TeachersLessons() {
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
-	const { dataFirestoreName, timetableStored, dataStored }: ITimetableGenerationState =
-		useSelector((state: any) => state.timetableGeneration);
+	const { dataFirestoreName, timetableStored, dataStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
 
 	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
@@ -115,11 +116,9 @@ export default function TeachersLessons() {
 						'teacher-assignments'
 					].find((item) => item['assignment-id'] === assignment.id);
 
-					const availableTeacher: ITeacherResponse | undefined =
-						teacherData.result.items.find(
-							(teacher: ITeacherResponse) =>
-								teacher.id === assignedTeacher?.['teacher-id']
-						);
+					const availableTeacher: ITeacherResponse | undefined = teacherData.result.items.find(
+						(teacher: ITeacherResponse) => teacher.id === assignedTeacher?.['teacher-id']
+					);
 					if (availableTeacher) {
 						const subjectInCurriculum: ISubjectInGroup | undefined =
 							availableCurriculumSubjects.find(
@@ -133,9 +132,10 @@ export default function TeachersLessons() {
 							slots: [],
 							subjectId: assignment['subject-id'],
 							subjectName: assignment['subject-name'],
-							subjectAbbreviation:
-								subjectInCurriculum?.abbreviation ?? assignment['subject-name'],
-							totalSlotPerWeek: assignment['period-count'],
+							subjectAbbreviation: subjectInCurriculum?.abbreviation ?? assignment['subject-name'],
+							totalSlotPerWeek:
+								(subjectInCurriculum?.['main-slot-per-week'] ?? 0) +
+								(subjectInCurriculum?.['sub-slot-per-week'] ?? 0),
 							totalMainSlotsPerWeek: subjectInCurriculum?.['main-slot-per-week'] ?? 0,
 							totalSubSlotsPerWeek: subjectInCurriculum?.['sub-slot-per-week'] ?? 0,
 							isDoubleSlot: subjectInCurriculum?.['is-double-period'] ?? false,
@@ -149,9 +149,7 @@ export default function TeachersLessons() {
 				if (dataStored['fixed-periods-para'].length > 0) {
 					dataStored['fixed-periods-para'].forEach((obj: IFixedPeriodObject) => {
 						const existingIndex = tmpEditingObjects.findIndex(
-							(item) =>
-								item.subjectId === obj['subject-id'] &&
-								item.classId === obj['class-id']
+							(item) => item.subjectId === obj['subject-id'] && item.classId === obj['class-id']
 						);
 						if (existingIndex !== -1) {
 							if (maxSlot < tmpEditingObjects[existingIndex].totalSlotPerWeek) {

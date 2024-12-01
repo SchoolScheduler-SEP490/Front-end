@@ -1,6 +1,6 @@
 'use client';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
-import { Button, Tab, Tabs, Typography } from '@mui/material';
+import { Button, Divider, Tab, Tabs, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -26,9 +26,7 @@ const TimetableTabs = () => {
 	useEffect(() => {
 		if (pathName.length > 0) {
 			const currentTab: string[] = pathName.split('/');
-			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) =>
-				currentTab.includes(tab.value)
-			);
+			const tabIndex = TIMETABLE_GENERATION_TABS.findIndex((tab) => currentTab.includes(tab.value));
 			setValue(tabIndex);
 		}
 	}, [pathName]);
@@ -58,7 +56,7 @@ const TimetableTabs = () => {
 	};
 
 	return (
-		<div className='w-full h-fit border-b-1 border-basic-gray flex flex-row justify-between items-center px-2'>
+		<div className='w-full h-fit border-b-1 border-basic-gray flex flex-row justify-between items-center px-2 gap-1'>
 			<Button
 				variant='contained'
 				color='inherit'
@@ -76,6 +74,7 @@ const TimetableTabs = () => {
 			>
 				<Typography>trở về</Typography>
 			</Button>
+			<Divider orientation='vertical' flexItem />
 			<Tabs
 				value={value}
 				onChange={handleChange}
@@ -98,12 +97,16 @@ const TimetableTabs = () => {
 					{...a11yProps(3)}
 				/>
 			</Tabs>
+			<Divider orientation='vertical' flexItem />
 			<Button
 				variant='contained'
 				color='inherit'
 				endIcon={<ArrowForwardIosIcon fontSize='small' />}
 				onClick={handleNext}
-				disabled={value === TIMETABLE_GENERATION_TABS.length - 1}
+				disabled={
+					value === TIMETABLE_GENERATION_TABS.length - 1 ||
+					(value === 2 && dataStored['teacher-assignments']?.length === 0)
+				}
 				sx={{
 					bgcolor: '#e6edf3',
 					color: '#004e89',

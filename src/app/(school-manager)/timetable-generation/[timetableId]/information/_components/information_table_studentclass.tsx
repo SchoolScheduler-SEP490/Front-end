@@ -11,7 +11,7 @@ import {
 	TableHead,
 	TableRow,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useFetchClasses from '../_hooks/useFetchClasses';
 import { IClassResponse } from '../_libs/constant';
 
@@ -42,6 +42,24 @@ const StudentClassInformationTable = () => {
 			}
 		}
 	}, [classData]);
+
+	const sortedData = useMemo(() => {
+		const tmpDisplayData = [...classTableData];
+
+		// Bước 1: Sort theo độ dài chuỗi
+		tmpDisplayData.sort((a, b) => a.name.length - b.name.length);
+
+		// Bước 2: Sort theo thứ tự alphabet nếu độ dài bằng nhau
+		tmpDisplayData.sort((a, b) => {
+			if (a.name.length === b.name.length) {
+				return a.name.localeCompare(b.name, undefined, {
+					numeric: true,
+				});
+			}
+			return 0; // Không thay đổi nếu độ dài khác nhau (đã được xử lý ở bước 1)
+		});
+		return tmpDisplayData;
+	}, [classTableData]);
 
 	return (
 		<div className='w-full h-[90vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
@@ -93,15 +111,13 @@ const StudentClassInformationTable = () => {
 												<Skeleton variant='text' animation='wave' />
 											</TableCell>
 											<TableCell width={80}>
-												<p className='text-primary-400 underline'>
-													Chi tiết
-												</p>
+												<p className='text-primary-400 underline'>Chi tiết</p>
 											</TableCell>
 										</TableRow>
 									))}
 								</>
 							)}
-							{classTableData.map((row, index) => (
+							{sortedData.map((row, index) => (
 								<TableRow key={index}>
 									<TableCell>{index + 1}</TableCell>
 									<TableCell>{row.name}</TableCell>
