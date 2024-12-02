@@ -93,6 +93,11 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				url: '/room-management',
 				icon: '/images/icons/desk.png',
 			},
+			{
+				name: 'Tòa nhà',
+				url: '/building-management',
+				icon: '/images/icons/building.png',
+			},
 		],
 	},
 	{
