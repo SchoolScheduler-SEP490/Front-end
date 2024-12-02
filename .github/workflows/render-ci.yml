@@ -1,9 +1,14 @@
 # .github/workflows/render-ci.yml
 
 on:
-    pull_request:
-    push:
-      branches: [main]
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types:
+      - merged
   
   jobs:
     ci:
