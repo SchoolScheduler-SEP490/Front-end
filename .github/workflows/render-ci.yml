@@ -1,4 +1,4 @@
-# .github/workflows/ci.yml
+# .github/workflows/render-ci.yml
 
 on:
     pull_request:
