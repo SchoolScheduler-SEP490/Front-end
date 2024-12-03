@@ -95,6 +95,7 @@ export interface IClassResponse {
 export interface ITimetableDisplayData {
 	classId: number;
 	className: string;
+	mainSessionId: number;
 	periods: IPeriodDisplayData[];
 }
 
@@ -103,7 +104,13 @@ export interface IPeriodDisplayData {
 	teacherName: string;
 	subjectId: number;
 	subjectAbbreviation: string;
+	classId: number;
+	className: string;
 	slot: number;
+}
+
+export interface ISwitchPeriod extends IPeriodDisplayData {
+	isDoubleSlot: boolean;
 }
 
 export interface ISubjectResponse {
