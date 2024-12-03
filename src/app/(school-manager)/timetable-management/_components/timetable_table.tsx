@@ -118,7 +118,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -258,13 +257,6 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
     router.push(`/timetable-management/${row.id}`);
   };
 
-  const handleCheckboxClick = (
-    event: React.MouseEvent<unknown>,
-    row: ITimetableTableData
-  ) => {
-    event.stopPropagation(); // Prevent row click event
-    router.push(`/timetable-generation/${row.id}/information`);
-  };
 
   const handleStatusChange = (newStatus: ETimetableStatus) => {
     setSelectedStatus(newStatus);
@@ -302,20 +294,6 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                     key={row.id}
                     sx={{ cursor: "pointer" }}
                   >
-                    <TableCell>
-                      {/* <Checkbox
-                       onClick={(event) => handleCheckboxClick(event, row)}
-                        color="primary"
-                        inputProps={{
-                          "aria-labelledby": labelId,
-                        }}
-                      /> */}
-                      <IconButton
-                        onClick={(event) => handleCheckboxClick(event, row)}
-                      >
-                        <TuneIcon />
-                      </IconButton>
-                    </TableCell>
                     <TableCell
                       component="th"
                       id={labelId}

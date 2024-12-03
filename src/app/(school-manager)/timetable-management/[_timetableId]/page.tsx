@@ -9,6 +9,7 @@ import {
   ITimetableTableData,
 } from "../_libs/constants";
 import {
+  Button,
   FormControl,
   IconButton,
   InputLabel,
@@ -21,6 +22,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -41,6 +44,9 @@ import {
   WEEK_DAYS_FULL,
 } from "@/utils/constants";
 import { useDispatch, useSelector } from "react-redux";
+import Image from "next/image";
+import AddIcon from "@mui/icons-material/Add";
+import TuneIcon from "@mui/icons-material/Tune";
 
 export default function TimetableDetail() {
   const params = useParams();
@@ -100,16 +106,26 @@ export default function TimetableDetail() {
     const fetchScheduleData = async () => {
       setIsLoading(true);
       try {
-        const scheduleRef = doc(
+        // First get the timetable document to get generated-schedule-id
+        const timetableRef = doc(
           firestore,
-          "schedule-responses",
-          "OA4tFt6lktBrS8XUVtUH"
+          "timetables",
+          timetableId as string
         );
-        const scheduleSnap = await getDoc(scheduleRef);
+        const timetableSnap = await getDoc(timetableRef);
 
-        if (scheduleSnap.exists()) {
-          const data = scheduleSnap.data() as IScheduleResponse;
-          setScheduleData(data);
+        if (timetableSnap.exists()) {
+          const timetableData = timetableSnap.data();
+          const scheduleId = timetableData["generated-schedule-id"];
+
+          // Then get the schedule data using generated-schedule-id
+          const scheduleRef = doc(firestore, "schedule-responses", scheduleId);
+          const scheduleSnap = await getDoc(scheduleRef);
+
+          if (scheduleSnap.exists()) {
+            const data = scheduleSnap.data() as IScheduleResponse;
+            setScheduleData(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching schedule:", error);
@@ -118,8 +134,10 @@ export default function TimetableDetail() {
       }
     };
 
-    fetchScheduleData();
-  }, []);
+    if (timetableId) {
+      fetchScheduleData();
+    }
+  }, [timetableId]);
 
   const classNames = useMemo(() => {
     if (!scheduleData) return [];
@@ -148,9 +166,52 @@ export default function TimetableDetail() {
           </h3>
         </div>
       </SMHeader>
+
+      {!isLoading && !scheduleData && (
+        <div className="flex flex-col justify-center items-center w-full h-full gap-8 bg-gradient-to-b from-gray-50 to-white p-12 rounded-xl shadow-xl">
+          {/* Image Section with Animation */}
+          <div className="flex justify-center transform transition-all duration-500 hover:scale-110">
+            <Image
+              src="/images/icons/empty-folder.png"
+              alt="No schedule available"
+              width={350}
+              height={300}
+              unoptimized={true}
+              className="opacity-90 drop-shadow-lg"
+            />
+          </div>
+
+          <div className="text-center space-y-2">
+            <Typography
+              variant="h5"
+              className="text-gray-700 font-semibold tracking-wide"
+            >
+              Thời khóa biểu chưa được tạo!
+            </Typography>
+            <Typography variant="body1" className="text-gray-500">
+              Bấm nút bên dưới để bắt đầu tạo thời khóa biểu mới
+            </Typography>
+          </div>
+
+          <Button
+            variant="contained"
+            size="large"
+            className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-s 
+                 transform transition-all duration-300 hover:scale-105 hover:shadow-lg
+                 flex items-center gap-2"
+            onClick={() =>
+              router.push(`/timetable-generation/${timetableId}/information`)
+            }
+          >
+            <AddIcon />
+            Tạo thời khóa biểu
+          </Button>
+        </div>
+      )}
+
       {!isLoading && scheduleData && (
         <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[3vh]">
-          <div className="w-full mb-4 flex justify-center">
+          <div className="w-full mb-4 flex justify-between items-center">
             <FormControl sx={{ minWidth: 170 }}>
               <InputLabel>Giáo viên</InputLabel>
               <Select
@@ -174,7 +235,19 @@ export default function TimetableDetail() {
                 ))}
               </Select>
             </FormControl>
+            <Tooltip title="Cấu hình">
+              <IconButton
+                onClick={() =>
+                  router.push(
+                    `/timetable-generation/${timetableId}/information`
+                  )
+                }
+              >
+                <TuneIcon />
+              </IconButton>
+            </Tooltip>
           </div>
+
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 750 }} aria-label="timetable">
               <TableHead>
