@@ -280,7 +280,7 @@ export default function TimetableDetail() {
                               (acc, s) => acc + s.slots.length,
                               0
                             )}
-                            className="font-semibold"
+                            className="!font-semibold"
                             sx={{
                               borderRight: "1px solid #e5e7eb",
                               textAlign: "center",
