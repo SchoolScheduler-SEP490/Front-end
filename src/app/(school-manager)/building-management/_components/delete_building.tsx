@@ -55,7 +55,7 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
           id="modal-header"
           className="w-full h-fit flex flex-row justify-between items-center p-2 pl-5"
         >
-                      <Typography
+          <Typography
             variant="h6"
             component="h2"
             className="text-title-large-strong font-semibold"
@@ -65,8 +65,6 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
           <IconButton onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-
-
         </div>
         <div className="p-4 pl-5">
           <Typography className="text-title-small-strong">
