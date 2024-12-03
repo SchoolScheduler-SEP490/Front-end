@@ -115,23 +115,28 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 				setIsTimetableGenerated(true);
 				const tmpDisplayData: ITimetableDisplayData[] = generatedScheduleStored[
 					'class-schedules'
-				].map(
-					(clazz: IClassSchedule) =>
-						({
-							classId: clazz['student-class-id'],
-							className: clazz['student-class-name'],
-							periods: clazz['class-periods'].map(
-								(period: IClassPeriod) =>
-									({
-										slot: period['start-at'],
-										subjectId: period['subject-id'],
-										subjectAbbreviation: period['subject-abbreviation'],
-										teacherId: period['teacher-id'],
-										teacherName: period['teacher-abbreviation'],
-									} as IPeriodDisplayData)
-							),
-						} as ITimetableDisplayData)
-				);
+				].map((clazz: IClassSchedule) => {
+					const existingClass: IClassResponse | undefined = classData.result.items.find(
+						(item: IClassResponse) => item.id === clazz['student-class-id']
+					);
+					return {
+						classId: clazz['student-class-id'],
+						className: clazz['student-class-name'],
+						mainSessionId: existingClass ? existingClass['main-session'] - 1 : 0,
+						periods: clazz['class-periods'].map(
+							(period: IClassPeriod) =>
+								({
+									slot: period['start-at'],
+									subjectId: period['subject-id'],
+									subjectAbbreviation: period['subject-abbreviation'],
+									teacherId: period['teacher-id'],
+									classId: clazz['student-class-id'],
+									className: clazz['student-class-name'],
+									teacherName: period['teacher-abbreviation'],
+								} as IPeriodDisplayData)
+						),
+					} as ITimetableDisplayData;
+				});
 				if (tmpDisplayData.length > 0) {
 					setDisplayData(tmpDisplayData);
 					setIsDataLoading(false);
@@ -494,7 +499,11 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 				</div>
 			)}
 			<ConfigurationAdjustModal open={isConfigurationOpen} setOpen={openConfiguration} />
-			<TimetableEditModal open={isTimetableEditModalOpen} setOpen={openTimetableEditModal} />
+			<TimetableEditModal
+				open={isTimetableEditModalOpen}
+				setOpen={openTimetableEditModal}
+				data={displayData}
+			/>
 		</div>
 	);
 };
