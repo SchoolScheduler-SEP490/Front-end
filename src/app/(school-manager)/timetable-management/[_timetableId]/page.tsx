@@ -196,7 +196,7 @@ export default function TimetableDetail() {
           <Button
             variant="contained"
             size="large"
-            className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-s 
+            className="!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s 
                  transform transition-all duration-300 hover:scale-105 hover:shadow-lg
                  flex items-center gap-2"
             onClick={() =>
@@ -252,8 +252,8 @@ export default function TimetableDetail() {
             <Table sx={{ minWidth: 750 }} aria-label="timetable">
               <TableHead>
                 <TableRow>
-                  <TableCell className="font-semibold">Thứ</TableCell>
-                  <TableCell className="font-semibold">Tiết/Lớp</TableCell>
+                  <TableCell className="!font-semibold">Thứ</TableCell>
+                  <TableCell className="!font-semibold">Tiết/Lớp</TableCell>
                   <TableCell colSpan={visibleClasses.length + 2}>
                     <div className="flex items-center justify-center gap-2 ">
                       {classNames.map((className) => (
