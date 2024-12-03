@@ -132,6 +132,7 @@ export default function Home() {
 			'config-id': '',
 			'applied-week': null,
 			'ended-week': null,
+			'published-timetable-id': null,
 			status: ETimetableStatus.Pending,
 		};
 		var newConfigurationData: IConfigurationStoreObject = {

@@ -45,6 +45,7 @@ import {
 } from '../_libs/constants';
 import ConfigurationAdjustModal from './timetable_modal_adjust';
 import TimetableEditModal from './timetable_modal_edit';
+import TimetableConfirmModal from './timetable_modal_confirm';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -72,6 +73,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 	const [isConfigurationOpen, openConfiguration] = useState<boolean>(false);
 	const [isTimetableGenerated, setIsTimetableGenerated] = useState<boolean>(false);
 	const [isTimetableEditModalOpen, openTimetableEditModal] = useState<boolean>(false);
+	const [isConfirmModalOpen, openConfirmModal] = useState<boolean>(false);
 
 	const [displayData, setDisplayData] = useState<ITimetableDisplayData[]>([]);
 
@@ -220,6 +222,11 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 		openTimetableEditModal(true);
 	};
 
+	const handleConfirmRegenerateTimetable = () => {
+		openConfirmModal(false);
+		handleGenerateTimetable();
+	};
+
 	const filteredData = useMemo(() => {
 		const tmpDisplayData = useFilterArray(displayData, ['classId']).sort((a, b) =>
 			a.className.localeCompare(b.className)
@@ -310,7 +317,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 						</LightTooltip>
 
 						<LightTooltip title='Xếp lại TKB' arrow>
-							<IconButton color='success' onClick={handleGenerateTimetable}>
+							<IconButton color='success' onClick={() => openConfirmModal(true)}>
 								<PostAddIcon />
 							</IconButton>
 						</LightTooltip>
@@ -503,6 +510,12 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 				open={isTimetableEditModalOpen}
 				setOpen={openTimetableEditModal}
 				data={displayData}
+			/>
+			<TimetableConfirmModal
+				open={isConfirmModalOpen}
+				setOpen={openConfirmModal}
+				handleConfirm={handleConfirmRegenerateTimetable}
+				message='Xếp lại toàn bộ TKB với những tham số đã tạo?'
 			/>
 		</div>
 	);

@@ -92,7 +92,7 @@ interface IFixedPeriodAssignmentProps {
 	mainSession: number;
 }
 
-const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
+const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 	const { selectedObject, open, setOpen, data, mainSession } = props;
 	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
@@ -578,4 +578,4 @@ const FixedPeriodAssignmentModal = (props: IFixedPeriodAssignmentProps) => {
 	);
 };
 
-export default FixedPeriodAssignmentModal;
+export default FixedPeriodEditModal;

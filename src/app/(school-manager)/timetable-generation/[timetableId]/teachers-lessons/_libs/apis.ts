@@ -114,3 +114,26 @@ export const getFetchCurriculumDetailApi = ({
 		localApi ?? api
 	}/api/schools/${schoolId}/academic-years/${schoolYearId}/curriculum/${curriculumId}`;
 };
+
+export const getFetchClassCombinationApi = ({
+	pageIndex,
+	pageSize,
+	schoolId,
+	termId,
+	classCombinationId,
+}: {
+	schoolId: string;
+	pageSize: number;
+	pageIndex: number;
+	termId: number;
+	classCombinationId?: number;
+}) => {
+	const queryString = new URLSearchParams({
+		schoolId: schoolId.toString(),
+		termId: termId?.toString(),
+		pageIndex: pageIndex.toString(),
+		pageSize: pageSize.toString(),
+		...(classCombinationId && { classCombinationId: classCombinationId.toString() }),
+	}).toString();
+	return `${api}/api/room-subjects?${queryString}`;
+};

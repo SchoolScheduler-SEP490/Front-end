@@ -22,7 +22,7 @@ import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRename
 import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
 import { ITeachersLessonsObject } from '../_libs/constants';
 import useGetSlotDetails from '../_hooks/useGetSlotDetails';
-import FixedPeriodAssignmentModal from './teachers_lessons_modal_edit';
+import FixedPeriodEditModal from './teachers_lessons_modal_edit';
 import useFetchCurriculumDetails from '../_hooks/useFetchCurriculumDetails';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
@@ -342,7 +342,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 					</TableContainer>
 				</Paper>
 			)}
-			<FixedPeriodAssignmentModal
+			<FixedPeriodEditModal
 				open={isAssignModalOpen}
 				setOpen={setIsAssignModalOpen}
 				selectedObject={selectedObject}

@@ -19,9 +19,7 @@ export default function SMSubject() {
 	const [page, setPage] = React.useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
-	const [subjectGroupTableData, setCurriculumTableData] = React.useState<ICurriculumTableData[]>(
-		[]
-	);
+	const [curriculumTableData, setCurriculumTableData] = React.useState<ICurriculumTableData[]>([]);
 	const [selectedCurriculumId, setSelectedCurriculumId] = React.useState<number>(0);
 	const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
 
@@ -54,6 +52,7 @@ export default function SMSubject() {
 					({
 						id: index++,
 						curriculumName: record['curriculum-name'],
+						curriculumCode: record['curriculum-code'],
 						curriculumKey: record.id,
 						grade: CLASSGROUP_TRANSLATOR[record.grade],
 					} as ICurriculumTableData)
@@ -111,7 +110,7 @@ export default function SMSubject() {
 						false ? 'justify-start items-start' : 'justify-center items-center'
 					} pl-[1.5vw] gap-[1vw]`}
 				>
-					<div className='w-[70%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
+					<div className='w-[80%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
 						<CurriculumTableSkeleton />
 					</div>
 				</div>
@@ -137,9 +136,9 @@ export default function SMSubject() {
 					false ? 'justify-start items-start' : 'justify-center items-center'
 				} pl-[1.5vw] gap-[1vw]`}
 			>
-				<div className='w-[70%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
+				<div className='w-[80%] h-[90%] overflow-y-scroll no-scrollbar flex justify-center items-start'>
 					<CurriculumTable
-						subjectGroupTableData={subjectGroupTableData ?? []}
+						curriculumTableData={curriculumTableData ?? []}
 						page={page}
 						setPage={setPage}
 						rowsPerPage={rowsPerPage}

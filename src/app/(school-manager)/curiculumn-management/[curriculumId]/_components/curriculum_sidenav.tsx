@@ -21,7 +21,7 @@ const CurriculumDetailsSidenav = (props: ICurriculumSidenavProps) => {
 	};
 
 	return (
-		<div className='w-[25%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
+		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200'>
 			<h1 className='text-title-small-strong w-full pl-3 py-3 text-left'>Nội dung</h1>
 			<Tabs
 				orientation='vertical'

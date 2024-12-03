@@ -8,6 +8,10 @@ import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/Accord
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { ITeachersLessonsSidenavData } from '../_libs/constants';
+import useFetchClassCombination from '../_hooks/useFetchClassCombination';
+import { useAppContext } from '@/context/app_provider';
+import { useDispatch, useSelector } from 'react-redux';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -54,6 +58,27 @@ interface TeachersLessonsSidenavProps {
 const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 	const { classData, selectedClass, setSelectedClass, setSelectedGrade } = props;
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
+	const { schoolId, sessionToken } = useAppContext();
+	const { timetableStored }: ITimetableGenerationState = useSelector(
+		(state: any) => state.timetableGeneration
+	);
+	const dispatch = useDispatch();
+
+	const [classCombinationSidenav, setClassCombinationSidenav] = useState<
+		ITeachersLessonsSidenavData[]
+	>([]);
+
+	const { data: classCombinationData, mutate: updateClassCombination } = useFetchClassCombination({
+		schoolId: schoolId,
+		sessionToken,
+		pageIndex: 1,
+		pageSize: 1000,
+		termId: timetableStored['term-id'],
+	});
+
+	useEffect(() => {
+		updateClassCombination();
+	});
 
 	const handleSelectCurriculum = (target: number, extra: string, grade: string) => {
 		// Implement logics here
@@ -61,14 +86,13 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 		setSelectedGrade(grade);
 	};
 
-	const toggleDropdown =
-		(panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-			if (newExpanded) {
-				setExpanded((prev: string[]) => [...prev, panel]);
-			} else {
-				setExpanded((prev: string[]) => prev.filter((item) => item !== panel));
-			}
-		};
+	const toggleDropdown = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+		if (newExpanded) {
+			setExpanded((prev: string[]) => [...prev, panel]);
+		} else {
+			setExpanded((prev: string[]) => prev.filter((item) => item !== panel));
+		}
+	};
 
 	useEffect(() => {
 		classData.map((item, index) => {
@@ -109,11 +133,7 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
 									${selectedClass === gradeClass.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
 								onClick={() =>
-									handleSelectCurriculum(
-										gradeClass.value,
-										gradeClass.extra,
-										grade.grade
-									)
+									handleSelectCurriculum(gradeClass.value, gradeClass.extra, grade.grade)
 								}
 							>
 								<p

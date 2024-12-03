@@ -93,7 +93,7 @@ export default function TeachersLessons() {
 			);
 			if (selectedClass) {
 				setSelectedHomeroom(selectedClass['homeroom-teacher-abbreviation']);
-				setSelectedMainSesion(selectedClass['main-session'] - 1);
+				setSelectedMainSesion(Math.abs(selectedClass['main-session'] - 1));
 				setSelectedCurriculumId(selectedClass['curriculum-id'] ?? 0);
 			}
 			const tmpEditingObjects: ITeachersLessonsObject[] = [];
@@ -180,6 +180,7 @@ export default function TeachersLessons() {
 		curriculumDetails,
 	]);
 
+	// Lấy data cho sidenav
 	useEffect(() => {
 		updateClass();
 		if (classData?.status === 200) {

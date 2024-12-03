@@ -1,12 +1,14 @@
 export interface ICurriculumResponse {
 	id: number;
 	'curriculum-name': string;
+	'curriculum-code': string;
 	grade: string;
 }
 // Table Curriculum Data
 export interface ICurriculumTableData {
 	id: number;
 	curriculumName: string;
+	curriculumCode: string;
 	grade: number;
 	curriculumKey: number;
 }

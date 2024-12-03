@@ -12,7 +12,7 @@ import {
 	Typography,
 } from '@mui/material';
 import Image from 'next/image';
-import { GroupedClasses, ICurriculumDetailResponse } from '../../_libs/constants';
+import { ICurriculumDetailResponse } from '../../_libs/constants';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -32,13 +32,12 @@ const GRADE_COLOR: { [key: number]: string } = {
 };
 
 interface ICurriculumDetailsProps {
-	availableClasses: GroupedClasses | null;
 	handleUpdateCurriculum: () => void;
 	subjectGroupDetails: ICurriculumDetailResponse | null;
 }
 
 const CurriculumDetails = (props: ICurriculumDetailsProps) => {
-	const { availableClasses, handleUpdateCurriculum, subjectGroupDetails } = props;
+	const { handleUpdateCurriculum, subjectGroupDetails } = props;
 
 	return (
 		<Paper sx={{ width: '80%', height: '90%', overflow: 'hidden', px: 2 }}>
@@ -54,10 +53,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 						</Typography>
 					</LightTooltip>
 					<LightTooltip title='Chỉnh sửa thông tin bộ môn'>
-						<IconButton
-							onClick={handleUpdateCurriculum}
-							className='translate-y-[1px] opacity-80'
-						>
+						<IconButton onClick={handleUpdateCurriculum} className='translate-y-[1px] opacity-80'>
 							<Image
 								src='/images/icons/compose.png'
 								alt='Chỉnh sửa'
@@ -75,9 +71,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 					<div className='w-full flex flex-col justify-start items-start'>
 						<h4 className='text-body-small text-basic-gray'>Tên Khung chương trình</h4>
 						{subjectGroupDetails?.['curriculum-name'] ? (
-							<h2 className='text-body-large-strong'>
-								{subjectGroupDetails?.['curriculum-name']}
-							</h2>
+							<h2 className='text-body-large-strong'>{subjectGroupDetails?.['curriculum-name']}</h2>
 						) : (
 							<Skeleton
 								className='!text-body-large-strong'
@@ -93,16 +87,12 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 							<h2
 								className='text-body-large-strong'
 								style={{
-									color: GRADE_COLOR[
-										CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]
-									],
+									color: GRADE_COLOR[CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]],
 								}}
 							>
 								{
 									CLASSGROUP_STRING_TYPE.find(
-										(item) =>
-											item.value ===
-											CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]
+										(item) => item.value === CLASSGROUP_TRANSLATOR[subjectGroupDetails?.grade]
 									)?.key
 								}
 							</h2>
@@ -120,9 +110,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 					<div className='w-full flex flex-col justify-start items-start'>
 						<h4 className='text-body-small text-basic-gray'>Mã Khung chương trình</h4>
 						{subjectGroupDetails?.['curriculum-code'] ? (
-							<h2 className='text-body-large-strong'>
-								{subjectGroupDetails?.['curriculum-code']}
-							</h2>
+							<h2 className='text-body-large-strong'>{subjectGroupDetails?.['curriculum-code']}</h2>
 						) : (
 							<Skeleton
 								className='!text-body-large-strong'
@@ -133,18 +121,13 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 						)}
 					</div>
 					<div className='w-full flex flex-col justify-start items-start'>
-						<h4 className='text-body-small text-basic-gray'>Lớp áp dụng</h4>
-						{availableClasses ? (
+						<h4 className='text-body-small text-basic-gray'>Nhóm lớp áp dụng</h4>
+						{subjectGroupDetails?.['student-class-group-view-names'] ? (
 							<ul className='list-disc pl-6 w-full'>
-								{Object.entries(availableClasses).map(([grade, classNames]) => (
-									<li key={grade}>
-										<div className='flex flex-row justify-start items-baseline gap-2'>
-											<h2 className='text-body-large font-medium min-w-[23%]'>
-												Khối {grade}:
-											</h2>
-											<h2 className='text-body-medium opacity-80'>
-												{(classNames as string[]).join(' - ')}
-											</h2>
+								{subjectGroupDetails?.['student-class-group-view-names'].map((item, index) => (
+									<li className='w-full h-fit' key={index}>
+										<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
+											<p className='max-w-[90%]'>{item}</p>
 										</div>
 									</li>
 								))}
@@ -163,11 +146,12 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 								))}
 							</ul>
 						)}
-						{availableClasses && Object.keys(availableClasses).length === 0 && (
-							<h2 className='text-body-small italic opacity-80'>
-								Chưa có lớp áp dụng Khung chương trình
-							</h2>
-						)}
+						{subjectGroupDetails?.['student-class-group-view-names'] &&
+							subjectGroupDetails?.['student-class-group-view-names'].length === 0 && (
+								<h2 className='text-body-small italic opacity-80'>
+									Chưa có nhóm lớp áp dụng Khung chương trình
+								</h2>
+							)}
 					</div>
 				</div>
 				<div className='w-full h-fit flex flex-row justify-start items-start'>
@@ -210,10 +194,9 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 						<h4 className='text-body-small text-basic-gray'>Môn chuyên đề</h4>
 						{subjectGroupDetails?.['subject-specializedt-views'] ? (
 							<ul className='list-disc pl-6 w-full'>
-								{useFilterArray(
-									subjectGroupDetails?.['subject-specializedt-views'],
-									['subject-name']
-								).map((item, index) => (
+								{useFilterArray(subjectGroupDetails?.['subject-specializedt-views'], [
+									'subject-name',
+								]).map((item, index) => (
 									<li className='w-full h-fit' key={item.abbreviation + index}>
 										<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 											<p className='max-w-[90%]'>{item['subject-name']}</p>

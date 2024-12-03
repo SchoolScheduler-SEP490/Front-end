@@ -3,6 +3,7 @@ import { useAppContext } from '@/context/app_provider';
 import {
 	ITimetableGenerationState,
 	setGeneratedScheduleStored,
+	setGeneratingStatus,
 	updateTimetableStored,
 } from '@/context/slice_timetable_generation';
 import useNotify from '@/hooks/useNotify';
@@ -24,14 +25,13 @@ export default function Home() {
 		timetableStored,
 		generatedScheduleFirestorename,
 		timetableId,
+		isTimetableGenerating,
 	}: ITimetableGenerationState = useSelector((state: any) => state.timetableGeneration);
 	const dispatch = useDispatch();
 
-	const [isTimetableGenerating, setIsTimetableGenerating] = useState<boolean>(false);
-
 	const handleGenerateTimetable = async () => {
 		if (dataStored && timetableStored) {
-			setIsTimetableGenerating(true);
+			dispatch(setGeneratingStatus(true));
 			const requestBody: IGenerateTimetableRequest = {
 				'start-week': timetableStored['applied-week'] ?? 0,
 				'end-week': timetableStored['ended-week'] ?? 0,
@@ -77,13 +77,13 @@ export default function Home() {
 								{ merge: true }
 							).then(() => {
 								dispatch(
+									setGeneratingStatus(false),
 									setGeneratedScheduleStored({ ...result }),
 									updateTimetableStored({
 										target: 'generated-schedule-id',
 										value: existingDoc.id,
 									})
 								);
-								setIsTimetableGenerating(false);
 								useNotify({
 									type: 'success',
 									message: data?.message,
@@ -131,12 +131,12 @@ export default function Home() {
 							});
 						} finally {
 							// Đảm bảo trạng thái được đặt lại sau khi kết thúc xử lý
-							setIsTimetableGenerating(false);
+							dispatch(setGeneratingStatus(false));
 						}
 					}
 				}
 			} else {
-				setIsTimetableGenerating(false);
+				dispatch(setGeneratingStatus(false));
 				useNotify({
 					type: 'error',
 					message: data?.Message,
