@@ -5,14 +5,13 @@ import { IconButton } from '@mui/material';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import UpdateCurriculumModal from '../_components/curiculumn_modal_update';
 import useFetchCurriculumDetails from '../_hooks/useFetchCuriculumnDetail';
-import useGroupByGrade from '../_hooks/useGroupByGrade';
-import { GroupedClasses, ICurriculumDetailResponse } from '../_libs/constants';
+import { ICurriculumDetailResponse } from '../_libs/constants';
 import CurriculumDetails from './_components/curriculum_details';
-import { useSelector } from 'react-redux';
-import CurriculumSideNav from '../../lesson-management/_components/lesson_sidenav';
 import CurriculumDetailsSidenav from './_components/curriculum_sidenav';
+import CurriculumLesson from './_components/curriculum_lessons';
 
 interface TabPanelProps {
 	children?: React.ReactNode;
@@ -47,10 +46,9 @@ export default function CurriculumDetailsPage() {
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
-	const [subjectGroupDetails, setSubjectDetails] = useState<ICurriculumDetailResponse | null>(
+	const [curriculumDetails, setCurriculumDetails] = useState<ICurriculumDetailResponse | null>(
 		null
 	);
-	const [availableClasses, setAvailableClasses] = useState<GroupedClasses | null>(null);
 	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
 	const [selectedTabIndex, setSelectedTabIndex] = useState<number>(0);
@@ -68,8 +66,7 @@ export default function CurriculumDetailsPage() {
 
 	useEffect(() => {
 		if (data?.status === 200) {
-			setSubjectDetails(data?.result);
-			setAvailableClasses(useGroupByGrade(data?.result?.['student-class-views'] ?? []));
+			setCurriculumDetails(data?.result);
 		}
 	}, [data]);
 
@@ -99,13 +96,12 @@ export default function CurriculumDetailsPage() {
 				<CurriculumDetailsSidenav value={selectedTabIndex} setValue={setSelectedTabIndex} />
 				<TabPanel value={selectedTabIndex} index={0}>
 					<CurriculumDetails
-						availableClasses={availableClasses}
 						handleUpdateCurriculum={handleUpdateCurriculum}
-						subjectGroupDetails={subjectGroupDetails}
+						subjectGroupDetails={curriculumDetails}
 					/>
 				</TabPanel>
 				<TabPanel value={selectedTabIndex} index={1}>
-					<h1>Hallo</h1>
+					<CurriculumLesson />
 				</TabPanel>
 			</div>
 			<UpdateCurriculumModal

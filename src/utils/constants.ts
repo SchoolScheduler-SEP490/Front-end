@@ -279,6 +279,8 @@ export interface ITimetableStoreObject {
 	'timetable-name': string;
 	'timetable-abbreviation': string;
 	'school-id': number;
+	// ID của TKB được công bố dưới DB
+	'published-timetable-id': number | null;
 	'year-id': number;
 	'year-name': string;
 	'term-name': string;

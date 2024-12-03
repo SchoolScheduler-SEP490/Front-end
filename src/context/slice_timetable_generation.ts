@@ -10,7 +10,7 @@ export interface ITimetableGenerationState {
 	dataFirestoreName: string;
 	timetableFirestoreName: string;
 	generatedScheduleFirestorename: string;
-	isModifying: boolean;
+	isTimetableGenerating: boolean;
 	dataStored: IConfigurationStoreObject;
 	timetableStored: ITimetableStoreObject;
 	generatedScheduleStored: IScheduleResponse;
@@ -31,7 +31,7 @@ const initialState: ITimetableGenerationState = {
 	dataFirestoreName: 'configurations',
 	timetableFirestoreName: 'timetables',
 	generatedScheduleFirestorename: 'schedule-responses',
-	isModifying: false,
+	isTimetableGenerating: false,
 	dataStored: {} as IConfigurationStoreObject,
 	timetableStored: {} as ITimetableStoreObject,
 	generatedScheduleStored: {} as IScheduleResponse,
@@ -50,16 +50,16 @@ export const timetableGenerationSlice = createSlice({
 		setGeneratedScheduleStored: (state, action: PayloadAction<IScheduleResponse>) => {
 			state.generatedScheduleStored = action.payload;
 		},
-		setModifyingStatus: (state, action: PayloadAction<boolean>) => {
-			state.isModifying = action.payload;
+		setGeneratingStatus: (state, action: PayloadAction<boolean>) => {
+			state.isTimetableGenerating = action.payload;
 		},
 		updateDataStored: (state, action: PayloadAction<IUpdateDataStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
-			state.isModifying = true;
+			state.isTimetableGenerating = true;
 		},
 		updateTimetableStored: (state, action: PayloadAction<IUpdateTimetableStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
-			state.isModifying = true;
+			state.isTimetableGenerating = true;
 		},
 		setTimetableId: (state, action: PayloadAction<string>) => {
 			state.timetableId = action.payload;
@@ -71,7 +71,7 @@ export const {
 	// Data initialization
 	setDataStored,
 	setTimetableStored,
-	setModifyingStatus,
+	setGeneratingStatus,
 	setGeneratedScheduleStored,
 
 	// Action with payload

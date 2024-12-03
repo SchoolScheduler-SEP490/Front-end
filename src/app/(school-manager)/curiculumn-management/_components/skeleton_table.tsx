@@ -42,6 +42,12 @@ const headCells: readonly HeadCell[] = [
 		label: 'Tên Khung chương trình',
 	},
 	{
+		id: 'subjectGroupCode' as keyof ICurriculumTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Mã Khung chương trình',
+	},
+	{
 		id: 'grade' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
@@ -72,10 +78,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						align={headCell.centered ? 'center' : 'left'}
 						padding={headCell.disablePadding ? 'none' : 'normal'}
 						sortDirection={orderBy === headCell.id ? order : false}
-						sx={[
-							{ fontWeight: 'bold' },
-							headCell.centered ? { paddingLeft: '3%' } : {},
-						]}
+						sx={[{ fontWeight: 'bold' }, headCell.centered ? { paddingLeft: '3%' } : {}]}
 					>
 						<TableSortLabel
 							active={orderBy === headCell.id}
@@ -84,10 +87,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						>
 							{headCell.label}
 							{orderBy === headCell.id ? (
-								<Box
-									component='span'
-									sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}
-								>
+								<Box component='span' sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}>
 									{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
 								</Box>
 							) : null}
@@ -144,22 +144,16 @@ const CurriculumTableSkeleton = () => {
 								{[1, 2, 3, 4, 5].map((row, index) => {
 									return (
 										<TableRow hover role='checkbox' tabIndex={-1} key={row}>
-											<TableCell
-												component='th'
-												scope='row'
-												padding='normal'
-												align='left'
-											>
+											<TableCell component='th' scope='row' padding='normal' align='left'>
 												<Skeleton animation='wave' variant='text' />{' '}
 											</TableCell>
 											<TableCell align='left'>
 												<Skeleton animation='wave' variant='text' />
 											</TableCell>
-											<TableCell
-												align='left'
-												width={200}
-												className='!font-semibold'
-											>
+											<TableCell align='left'>
+												<Skeleton animation='wave' variant='text' />
+											</TableCell>
+											<TableCell align='left' width={200} className='!font-semibold'>
 												<Skeleton animation='wave' variant='text' />
 											</TableCell>
 											<TableCell width={80}>

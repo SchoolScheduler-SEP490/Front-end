@@ -19,7 +19,7 @@ const TimetableTabs = () => {
 	const pathName = usePathname();
 	const [value, setValue] = useState(0);
 	const router = useRouter();
-	const { dataStored }: ITimetableGenerationState = useSelector(
+	const { dataStored, isTimetableGenerating }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 
@@ -62,7 +62,7 @@ const TimetableTabs = () => {
 				color='inherit'
 				startIcon={<ArrowBackIosIcon fontSize='small' />}
 				onClick={handleBack}
-				disabled={value === 0}
+				disabled={value === 0 || isTimetableGenerating}
 				sx={{
 					bgcolor: '#F5F5F5',
 					color: 'rgba(0, 0, 0, .6)',
@@ -83,17 +83,17 @@ const TimetableTabs = () => {
 				scrollButtons
 				allowScrollButtonsMobile
 			>
-				<Tab label='0. Thông tin chung' {...a11yProps(0)} />
-				<Tab label='1. Cấu hình ràng buộc' {...a11yProps(1)} />
-				<Tab label='2. Phân công giáo viên' {...a11yProps(1)} />
+				<Tab label='0. Thông tin chung' {...a11yProps(0)} disabled={isTimetableGenerating} />
+				<Tab label='1. Cấu hình ràng buộc' {...a11yProps(1)} disabled={isTimetableGenerating} />
+				<Tab label='2. Phân công giáo viên' {...a11yProps(1)} disabled={isTimetableGenerating} />
 				<Tab
 					label='3. Xếp tiết cố định'
-					disabled={dataStored['teacher-assignments']?.length === 0}
+					disabled={dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
 					{...a11yProps(3)}
 				/>
 				<Tab
 					label='4. Tạo thời khóa biểu'
-					disabled={dataStored['teacher-assignments']?.length === 0}
+					disabled={dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
 					{...a11yProps(3)}
 				/>
 			</Tabs>

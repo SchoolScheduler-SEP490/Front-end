@@ -327,6 +327,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 							<div className='w-[10vw] absolute top-[50%] right-[0%] -translate-y-[50%]'>
 								<Button
 									variant='contained'
+									color='success'
 									disabled={isWarning}
 									onClick={handleUpdateData}
 									sx={{ width: '100%', borderRadius: 0, boxShadow: 'none' }}

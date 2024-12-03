@@ -78,6 +78,12 @@ const headCells: readonly HeadCell[] = [
 		label: 'Tên Khung chương trình',
 	},
 	{
+		id: 'subjectGroupCode' as keyof ICurriculumTableData,
+		centered: false,
+		disablePadding: false,
+		label: 'Mã Khung chương trình',
+	},
+	{
 		id: 'grade' as keyof ICurriculumTableData,
 		centered: false,
 		disablePadding: false,
@@ -108,10 +114,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						align={headCell.centered ? 'center' : 'left'}
 						padding={headCell.disablePadding ? 'none' : 'normal'}
 						sortDirection={orderBy === headCell.id ? order : false}
-						sx={[
-							{ fontWeight: 'bold' },
-							headCell.centered ? { paddingLeft: '3%' } : {},
-						]}
+						sx={[{ fontWeight: 'bold' }, headCell.centered ? { paddingLeft: '3%' } : {}]}
 					>
 						<TableSortLabel
 							active={orderBy === headCell.id}
@@ -120,10 +123,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 						>
 							{headCell.label}
 							{orderBy === headCell.id ? (
-								<Box
-									component='span'
-									sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}
-								>
+								<Box component='span' sx={[visuallyHidden, { position: 'absolute', zIndex: 10 }]}>
 									{order === 'desc' ? 'sorted descending' : 'sorted ascending'}
 								</Box>
 							) : null}
@@ -139,7 +139,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface ICurriculumTableProps {
-	subjectGroupTableData: ICurriculumTableData[];
+	curriculumTableData: ICurriculumTableData[];
 	page: number;
 	setPage: React.Dispatch<React.SetStateAction<number>>;
 	rowsPerPage: number;
@@ -157,7 +157,7 @@ const GRADE_COLOR: { [key: number]: string } = {
 };
 const CurriculumTable = (props: ICurriculumTableProps) => {
 	const {
-		subjectGroupTableData,
+		curriculumTableData,
 		page,
 		setPage,
 		rowsPerPage,
@@ -216,12 +216,12 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 	};
 
 	const emptyRows =
-		subjectGroupTableData.length < rowsPerPage && rowsPerPage < 10
-			? rowsPerPage - subjectGroupTableData.length
+		curriculumTableData.length < rowsPerPage && rowsPerPage < 10
+			? rowsPerPage - curriculumTableData.length
 			: 0;
 
 	const visibleRows = React.useMemo(
-		() => [...subjectGroupTableData].sort(getComparator(order, orderBy)),
+		() => [...curriculumTableData].sort(getComparator(order, orderBy)),
 		[order, orderBy, page, rowsPerPage]
 	);
 	return (
@@ -259,7 +259,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 								order={order}
 								orderBy={orderBy}
 								onRequestSort={handleRequestSort}
-								rowCount={subjectGroupTableData.length}
+								rowCount={curriculumTableData.length}
 							/>
 							<TableBody>
 								{visibleRows.length === 0 && (
@@ -305,22 +305,30 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 											</TableCell>
 											<TableCell
 												align='left'
+												sx={{
+													whiteSpace: 'nowrap',
+													overflow: 'hidden',
+													textOverflow: 'ellipsis',
+													cursor: 'pointer',
+												}}
+												onClick={() => handleViewDetails(row)}
+											>
+												{row.curriculumCode}
+											</TableCell>
+											<TableCell
+												align='left'
 												className='!font-semibold'
 												sx={{ color: GRADE_COLOR[row.grade] }}
 											>
 												{row.grade > 0
-													? CLASSGROUP_STRING_TYPE.find(
-															(item) => item.value === row.grade
-													  )?.key
+													? CLASSGROUP_STRING_TYPE.find((item) => item.value === row.grade)?.key
 													: '- - -'}
 											</TableCell>
 											<TableCell width={80}>
 												<IconButton
 													color='error'
 													sx={{ zIndex: 10 }}
-													onClick={(event) =>
-														handleDeleteClick(event, row)
-													}
+													onClick={(event) => handleDeleteClick(event, row)}
 												>
 													<Image
 														src='/images/icons/delete.png'
@@ -352,7 +360,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 						labelDisplayedRows={({ from, to, count }) =>
 							`${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
 						}
-						count={totalRows ?? subjectGroupTableData.length}
+						count={totalRows ?? curriculumTableData.length}
 						rowsPerPage={rowsPerPage}
 						page={page}
 						onPageChange={handleChangePage}

@@ -45,10 +45,14 @@ export const getTeachableTeachersApi = ({
 	localApi,
 	schoolId,
 	subjectId,
+	grade,
 }: {
 	localApi?: string;
 	schoolId: number;
 	subjectId: number;
+	grade?: string;
 }) => {
-	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects`;
+	return `${localApi ?? api}/api/schools/${schoolId}/subjects/${subjectId}/teachable-subjects${
+		grade !== undefined ? `?grade=${grade}` : ''
+	}`;
 };

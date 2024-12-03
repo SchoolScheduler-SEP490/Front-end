@@ -2,18 +2,21 @@ import useSWR from 'swr';
 import { ICommonResponse } from '@/utils/constants';
 import { ITeachableTeacherResponse } from '../_libs/constants';
 import { getTeachableTeachersApi } from '../_libs/apis';
+import { CLASSGROUP_TRANSLATOR_REVERSED } from '@/utils/constants';
 
 interface IFetcherProps {
 	sessionToken: string;
 	schoolId: number;
 	subjectId: number;
+	grade?: number;
 }
 
 const useFetchTeachableTeacher = (props: IFetcherProps) => {
-	const { sessionToken, schoolId, subjectId } = props;
+	const { sessionToken, schoolId, subjectId, grade } = props;
 	const endpoint = getTeachableTeachersApi({
 		schoolId,
 		subjectId,
+		grade: grade ? CLASSGROUP_TRANSLATOR_REVERSED[grade] : undefined,
 	});
 
 	async function fetcher(url: string) {
