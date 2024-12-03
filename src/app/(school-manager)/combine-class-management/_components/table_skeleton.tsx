@@ -44,7 +44,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "roomSubjectCode" as keyof ICombineClassData,
-    label: "Mã phòng học",
+    label: "Mã lớp ghép",
     centered: false,
   },
   {
@@ -57,6 +57,11 @@ const headCells: readonly HeadCell[] = [
     label: "Học kỳ",
     centered: false,
   },
+  {
+    id: "teacherAbbreviation" as keyof ICombineClassData,
+    label: "Mã giáo viên",
+    centered: false,
+  }
 ];
 
 function EnhancedTableHead() {
@@ -144,6 +149,9 @@ const CombineClassTableSkeleton = () => {
                         padding="normal"
                         align="left"
                       >
+                        <Skeleton animation="wave" variant="text" />
+                      </TableCell>
+                      <TableCell align="left">
                         <Skeleton animation="wave" variant="text" />
                       </TableCell>
                       <TableCell align="left">

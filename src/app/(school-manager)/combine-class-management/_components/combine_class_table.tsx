@@ -25,6 +25,8 @@ import { KeyedMutator } from "swr";
 import { ICommonOption } from "@/utils/constants";
 import React from "react";
 import AddCombineClassModal from "./add_combine_class";
+import DeleteCombineClassModal from "./delete_combine_class";
+import UpdateCombineClassModal from "./update_combine_class";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -69,7 +71,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "roomSubjectCode" as keyof ICombineClassData,
-    label: "Mã phòng học",
+    label: "Mã lớp ghép",
     centered: false,
   },
   {
@@ -80,6 +82,11 @@ const headCells: readonly HeadCell[] = [
   {
     id: "termId" as keyof ICombineClassData,
     label: "Học kỳ",
+    centered: false,
+  },
+  {
+    id: "teacherAbbreviation" as keyof ICombineClassData,
+    label: "Mã giáo viên",
     centered: false,
   },
 ];
@@ -317,6 +324,9 @@ const CombineClassTable = (props: ICombineClassProps) => {
                       <TableCell align="left">{row.roomSubjectCode}</TableCell>
                       <TableCell align="left">{row.studentClass}</TableCell>
                       <TableCell align="left">{row.termId}</TableCell>
+                      <TableCell align="left">
+                        {row.teacherAbbreviation}
+                      </TableCell>
                       <TableCell
                         width={80}
                         onClick={(e) => e.stopPropagation()}
@@ -402,10 +412,23 @@ const CombineClassTable = (props: ICombineClassProps) => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
-          <AddCombineClassModal 
-                      open={openAddForm}
-                      onClose={setOpenAddForm}
-                      mutate={mutate}
+          <AddCombineClassModal
+            open={openAddForm}
+            onClose={setOpenAddForm}
+            mutate={mutate}
+          />
+          <DeleteCombineClassModal
+            open={openDeleteModal}
+            onClose={setOpenDeleteModal}
+            combineClassName={selectedRow?.roomSubjectCode ?? "Không xác định"}
+            combineClassId={selectedRow?.id ?? 0}
+            mutate={mutate}
+          />
+          <UpdateCombineClassModal
+            open={openUpdateModal}
+            onClose={setOpenUpdateModal}
+            combineClassId={selectedRow?.id ?? 0}
+            mutate={mutate}
           />
         </Paper>
       </Box>

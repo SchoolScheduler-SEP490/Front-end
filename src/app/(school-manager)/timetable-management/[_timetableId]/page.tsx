@@ -248,57 +248,99 @@ export default function TimetableDetail() {
             </Tooltip>
           </div>
 
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 750 }} aria-label="timetable">
-              <TableHead>
-                <TableRow>
-                  <TableCell className="!font-semibold">Thứ</TableCell>
-                  <TableCell className="!font-semibold">Tiết/Lớp</TableCell>
-                  <TableCell colSpan={visibleClasses.length + 2}>
-                    <div className="flex items-center justify-center gap-2 ">
-                      {classNames.map((className) => (
-                        <div
-                          key={className}
-                          className="font-semibold w-full text-center"
-                        >
-                          {className}
-                        </div>
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {WEEK_DAYS_FULL.map((day, dayIndex) =>
-                  TIMETABLE_SLOTS.map((session, sessionIndex) =>
-                    session.slots.map((slot, slotIndex) => (
-                      <TableRow key={`${day}-${session.period}-${slotIndex}`}>
-                        {slotIndex === 0 && sessionIndex === 0 && (
-                          <TableCell
-                            rowSpan={TIMETABLE_SLOTS.reduce(
-                              (acc, s) => acc + s.slots.length,
-                              0
-                            )}
-                            className="font-semibold"
-                            sx={{
-                              borderRight: "1px solid #e5e7eb",
-                              textAlign: "center",
-                            }}
+          <div className="w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]">
+            <TableContainer
+              sx={{ mb: 10, maxHeight: "100%" }}
+              className="!no-scrollbar"
+            >
+              <Table size="small" stickyHeader sx={{ position: "relative" }}>
+                <TableHead
+                  sx={{
+                    position: "sticky",
+                    top: 0,
+                    left: 0,
+                    zIndex: 100,
+                  }}
+                >
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        border: "1px solid #e5e7eb",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      Thứ
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        border: "1px solid #e5e7eb",
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        backgroundColor: "#f3f4f6",
+                      }}
+                    >
+                      Tiết
+                    </TableCell>
+                    {scheduleData?.["class-schedules"].map((classSchedule) => (
+                      <TableCell
+                        key={classSchedule["student-class-id"]}
+                        sx={{
+                          border: "1px solid #e5e7eb",
+                          fontWeight: "bold",
+                          textAlign: "center",
+                          backgroundColor: "#f3f4f6",
+                        }}
+                      >
+                        {classSchedule["student-class-name"]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {WEEK_DAYS_FULL.map((day, dayIndex) => (
+                    <>
+                      {TIMETABLE_SLOTS.map((session, sessionIndex) =>
+                        session.slots.map((slot, slotIndex) => (
+                          <TableRow
+                            key={`${day}-${session.period}-${slotIndex}`}
                           >
-                            {day}
-                          </TableCell>
-                        )}
-                        <TableCell component="th" scope="row">
-                          {slot}
-                        </TableCell>
-                        <TableCell
-                          colSpan={
-                            (scheduleData?.["class-schedules"]?.length ?? 0) + 2
-                          }
-                        >
-                          <div className="flex items-center justify-center gap-2">
-                            <div className="w-[40px]" />
+                            {slotIndex === 0 && sessionIndex === 0 && (
+                              <TableCell
+                                rowSpan={TIMETABLE_SLOTS.reduce(
+                                  (acc, s) => acc + s.slots.length,
+                                  0
+                                )}
+                                sx={{
+                                  border: "1px solid #e5e7eb",
+                                  minWidth: 10,
+                                  width: 10,
+                                  maxWidth: 10,
+                                  textAlign: "center",
+                                  fontWeight: "bold",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                {day}
+                              </TableCell>
+                            )}
+                            <TableCell
+                              sx={{
+                                border: "1px solid #e5e7eb",
+                                maxWidth: 10,
+                                textAlign: "center",
+                                fontWeight: "bold",
+                              }}
+                              className={`${
+                                sessionIndex < 2
+                                  ? "!text-primary-400"
+                                  : "!text-tertiary-normal"
+                              }`}
+                            >
+                              {sessionIndex * 5 + slotIndex + 1}
+                            </TableCell>
+
                             {scheduleData?.["class-schedules"].map(
                               (classSchedule) => {
                                 const currentSlotIndex =
@@ -318,34 +360,55 @@ export default function TimetableDetail() {
                                 );
 
                                 return (
-                                  <div
+                                  <TableCell
                                     key={`${classSchedule["student-class-id"]}-${currentSlotIndex}`}
-                                    className="w-full"
+                                    sx={{
+                                      border: "1px solid #e5e7eb",
+                                      maxWidth: 50,
+                                      height: "70px",
+                                      backgroundColor: period
+                                        ? "#f8faff"
+                                        : "white",
+                                      overflow: "hidden",
+                                      cursor: "pointer",
+                                      transition: "all 0.2s ease-in-out",
+                                      "&:hover": {
+                                        backgroundColor: period
+                                          ? "#e5e7eb"
+                                          : "#e5e7eb",
+                                        boxShadow: "inset 0 0 0 1px #fafafa",
+                                      },
+                                    }}
                                   >
-                                    <div className="min-h-[60px] p-2 border border-dashed border-gray-200 rounded flex flex-col justify-between">
-                                      <div className="text-sm font-medium text-center">
-                                        {period?.["subject-abbreviation"]}
+                                    {period && (
+                                      <div className="flex flex-col justify-center items-center h-full p-1 gap-1">
+                                        <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
+                                          {period["subject-abbreviation"]}
+                                        </strong>
+                                        <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                                          {period["teacher-abbreviation"]}
+                                        </p>
                                       </div>
-                                      <div className="flex justify-center text-xs text-gray-500">
-                                        <span>
-                                          {period?.["teacher-abbreviation"]}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
+                                    )}
+                                  </TableCell>
                                 );
                               }
                             )}
-                            <div className="w-[40px]" />
-                          </div>
-                        </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                      <TableRow>
+                        <TableCell
+                          sx={{ width: "100%", height: 1 }}
+                          colSpan={scheduleData?.["class-schedules"].length + 2}
+                        />
                       </TableRow>
-                    ))
-                  )
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    </>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
         </div>
       )}
     </div>

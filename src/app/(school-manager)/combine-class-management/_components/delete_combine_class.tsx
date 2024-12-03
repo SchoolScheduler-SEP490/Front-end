@@ -3,7 +3,7 @@ import { Box, IconButton, Modal, Typography } from "@mui/material";
 import ContainedButton from "@/commons/button-contained";
 import { KeyedMutator } from "swr";
 import CloseIcon from "@mui/icons-material/Close";
-import useDeleteBuilding from "../_hooks/useDeleteBuilding";
+import useDeleteCombineClass from "../_hooks/useDeleteCombineClass";
 
 const style = {
   position: "absolute",
@@ -18,21 +18,21 @@ const style = {
 interface DeleteConfirmationModalProps {
   open: boolean;
   onClose: (close: boolean) => void;
-  buildingName: string;
-  buildingId: number;
+  combineClassName: string;
+  combineClassId: number;
   mutate: KeyedMutator<any>;
 }
 
-const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
-  const { open, onClose, buildingName, buildingId, mutate } = props;
-  const { deleteBuilding } = useDeleteBuilding();
+const DeleteCombineClassModal = (props: DeleteConfirmationModalProps) => {
+  const { open, onClose, combineClassName, combineClassId, mutate } = props;
+  const { handleDeleteById } = useDeleteCombineClass();
 
   const handleClose = () => {
     onClose(false);
   };
 
   const handleDeleteBuilding = async () => {
-    const success = await deleteBuilding(buildingId);
+    const success = await handleDeleteById(combineClassId);
     if (success) {
       await mutate();
       handleClose();
@@ -60,7 +60,7 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
             component="h2"
             className="text-title-large-strong font-semibold"
           >
-            Xóa tòa nhà
+            Xóa lớp ghép
           </Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
@@ -68,8 +68,8 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
         </div>
         <div className="p-4 pl-5">
           <Typography className="text-title-small-strong">
-            Bạn có chắc muốn xóa tòa nhà <strong>{buildingName}</strong> không?
-            Thao tác này không thể hoàn tác.
+            Bạn có chắc muốn xóa lớp ghép <strong>{combineClassName}</strong>{" "}
+            không? Thao tác này không thể hoàn tác.
           </Typography>
         </div>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
@@ -90,4 +90,4 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
     </Modal>
   );
 };
-export default DeleteBuildingModal;
+export default DeleteCombineClassModal;

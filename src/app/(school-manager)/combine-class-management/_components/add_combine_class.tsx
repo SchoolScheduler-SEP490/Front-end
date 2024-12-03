@@ -26,6 +26,7 @@ import {
   IExistingCombineClass,
   IRoom,
   ISubject,
+  ITeachableSubject,
   ITerm,
 } from "../_libs/constants";
 import useAddCombineClass from "../_hooks/useAddCombineClass";
@@ -42,6 +43,7 @@ import {
   MAIN_SESSION_TRANSLATOR,
   ROOM_SUBJECT_MODEL,
 } from "@/utils/constants";
+import useTeachableSubject from "../_hooks/useTeachableSubject";
 
 interface AddCombineClassFormProps {
   open: boolean;
@@ -64,11 +66,16 @@ const MenuProps = {
 const AddCombineClassModal = (props: AddCombineClassFormProps) => {
   const { open, onClose, mutate } = props;
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-  const [availableClasses, setAvailableClasses] = useState<IClassCombination[]>([]);
+  const [availableClasses, setAvailableClasses] = useState<IClassCombination[]>(
+    []
+  );
   const [subjects, setSubjects] = useState<ISubject[]>([]);
   const [termName, setTermName] = useState<ITerm[]>([]);
   const [rooms, setRooms] = useState<IRoom[]>([]);
-  const [existingCombineClass, setExistingCombineClass] = useState<IExistingCombineClass[]>([]);
+  const [existingCombineClass, setExistingCombineClass] = useState<
+    IExistingCombineClass[]
+  >([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState<number>(0);
 
   const formik = useFormik({
     initialValues: {
@@ -92,7 +99,10 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
         "term-id": values["term-id"],
         "room-subject-code": values["room-subject-code"],
         "room-subject-name": values["room-subject-name"],
+        grade: values.grade,
         model: values["model"],
+        "teacher-id": selectedTeacherId,
+        session: values.session,
         "student-class-id": values["student-class-id"],
       };
 
@@ -170,11 +180,16 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
     const fetchRooms = async () => {
       const selectedClassCount = formik.values["student-class-id"].length;
       if (selectedClassCount > 0) {
-        const response = await getRoomName(sessionToken, schoolId, selectedClassCount);
+        const response = await getRoomName(
+          sessionToken,
+          schoolId,
+          selectedClassCount
+        );
         if (response.status === 200) {
           // Filter rooms based on max-class-per-time
           const filteredRooms = response.result.items.filter(
-            (room: { "max-class-per-time": number }) => room["max-class-per-time"] >= selectedClassCount
+            (room: { "max-class-per-time": number }) =>
+              room["max-class-per-time"] >= selectedClassCount
           );
           setRooms(filteredRooms);
         }
@@ -193,9 +208,16 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
       } catch (error) {
         console.error("Failed to load existing combine class:", error);
       }
-    }
+    };
     loadExistingCombineClass();
   }, [schoolId, sessionToken]);
+
+  const { data: teachableSubjects } = useTeachableSubject({
+    schoolId: Number(schoolId),
+    subjectId: formik.values["subject-id"],
+    grade: formik.values.grade,
+    sessionToken,
+  });
 
   const handleClose = () => {
     formik.handleReset(formik.initialValues);
@@ -423,6 +445,50 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
                   </FormControl>
                 </Grid>
               </Grid>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={2}>
+                <Grid
+                  item
+                  xs={3}
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                    Giáo viên
+                  </Typography>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl variant="standard" fullWidth>
+                    <Select
+                      name="teacher-id"
+                      value={selectedTeacherId}
+                      onChange={(e) =>
+                        setSelectedTeacherId(e.target.value as number)
+                      }
+                      MenuProps={MenuProps}
+                    >
+                      {Array.isArray(teachableSubjects?.result) &&
+                      teachableSubjects.result.length > 0 ? (
+                        teachableSubjects.result.map(
+                          (teacher: ITeachableSubject) => (
+                            <MenuItem
+                              key={teacher["teacher-id"]}
+                              value={teacher["teacher-id"]}
+                            >
+                              {teacher["teacher-name"]}
+                            </MenuItem>
+                          )
+                        )
+                      ) : (
+                        <MenuItem disabled>
+                          Không có giáo viên khả dụng
+                        </MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
               <Divider sx={{ mt: 4 }} />
             </Grid>
 
@@ -538,17 +604,17 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
+            title="Huỷ"
+            onClick={handleClose}
+            disableRipple
+            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
+          />
+          <ContainedButton
             title="Thêm lớp ghép"
             disableRipple
             type="submit"
             disabled={!formik.isValid}
             styles="bg-primary-300 text-white !py-1 px-4"
-          />
-          <ContainedButton
-            title="Huỷ"
-            onClick={handleClose}
-            disableRipple
-            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
         </div>
       </form>
