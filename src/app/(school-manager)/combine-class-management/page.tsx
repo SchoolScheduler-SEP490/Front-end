@@ -137,6 +137,7 @@ export default function SMCombineClass() {
             roomSubjectCode: item["room-subject-code"],
             studentClass: studentClassNames,
             termId: termData,
+            teacherAbbreviation: item["teacher-abbreviation"],
           };
         }      );
       setCombineClassTableData(combineClassData);
