@@ -19,7 +19,7 @@ export const ADMIN_SIDENAV: IAdminSidenav[] = [
 				icon: '/images/icons/schedule.png',
 			},
 			{
-				name: 'Đơn từ',
+				name: 'Đơn xét duyệt',
 				url: '/requests',
 				icon: '/images/icons/timeline.png',
 			},
@@ -29,29 +29,29 @@ export const ADMIN_SIDENAV: IAdminSidenav[] = [
 		category: 'Đối tượng',
 		items: [
 			{
+				name: 'Người dùng',
+				url: '/accounts',
+				icon: '/images/icons/multiple-users-silhouette.png',
+			},
+			{
 				name: 'Trường học',
 				url: '/school-management',
 				icon: '/images/icons/classroom.png',
 			},
 			{
-				name: 'Người dùng',
-				url: '/accounts',
-				icon: '/images/icons/training.png',
+				name: 'Môn học',
+				url: '/subjects',
+				icon: '/images/icons/books.png',
 			},
 			{
 				name: 'Vùng miền',
 				url: '/regions',
-				icon: '/images/icons/multiple-users-silhouette.png',
-			},
-			{
-				name: 'Môn học',
-				url: '/subjects',
-				icon: '/images/icons/multiple-users-silhouette.png',
+				icon: '/images/icons/map.png',
 			},
 			{
 				name: 'Năm học',
 				url: '/school-years',
-				icon: '/images/icons/multiple-users-silhouette.png',
+				icon: '/images/icons/calendar.png',
 			},
 		],
 	},

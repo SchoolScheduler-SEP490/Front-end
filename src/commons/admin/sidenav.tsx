@@ -13,6 +13,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import '../styles/admin_sidenav.css';
 import { useAppContext } from '@/context/app_provider';
+import { IAdminState } from '@/context/slice_admin';
+import { useAdminSelector } from '@/hooks/useReduxStore';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -53,7 +55,7 @@ const AdminSidenav = () => {
 	const currentPath = usePathname();
 	const router = useRouter();
 	const [expanded, setExpanded] = useState<string[]>(['panel0', 'panel1', 'panel2']);
-	const isMenuHidden: boolean = false;
+	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
 	const { logout } = useAppContext();
 
 	const handleLogout = async () => {
@@ -85,7 +87,7 @@ const AdminSidenav = () => {
 
 	return (
 		<Collapse
-			in={!isMenuHidden}
+			in={!isMenuOpen}
 			timeout={300}
 			unmountOnExit
 			orientation='horizontal'

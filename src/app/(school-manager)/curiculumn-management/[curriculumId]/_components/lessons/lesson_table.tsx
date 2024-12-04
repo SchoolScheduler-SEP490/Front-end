@@ -184,7 +184,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 					]}
 				>
 					{headCells[headCells.length - 1].label}
-					<p className='!italic !text-[11px] !font-light opacity-60'>(Chỉ đọc)</p>
 				</TableCell>
 			</TableRow>
 			<TableRow>
@@ -531,7 +530,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 						},
 					]}
 				>
-					<div className='w-full flex flex-row justify-start items-baseline'>
+					<div className='w-full flex flex-row justify-start items-baseline gap-5'>
 						<h2 className='text-title-small-strong font-semibold text-left'>
 							{selectedCurriculumName}
 						</h2>
@@ -598,7 +597,7 @@ const LessonTable: FC<ILessonTableProps> = (props: ILessonTableProps) => {
 							</>
 						)}
 						<Tooltip title='Chỉnh sửa'>
-							<IconButton onClick={() => setIsEditingMode((prev) => !prev)} color='error'>
+							<IconButton onClick={() => setIsEditingMode((prev) => !prev)} color='default'>
 								<Image
 									src={'/images/icons/compose.png'}
 									alt='Chỉnh sửa'

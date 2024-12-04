@@ -3,8 +3,9 @@ import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useNotification } from '@/app/(school-manager)/notification/_hooks/useNotification';
 import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
-import { toggleMenu } from '@/context/slice_school_manager';
+import { IAdminState, toggleMenu } from '@/context/slice_admin';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
+import { useAdminDispatch, useAdminSelector } from '@/hooks/useReduxStore';
 import { ISchoolYearResponse } from '@/utils/constants';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
@@ -12,15 +13,14 @@ import {
 	Menu,
 	MenuItem,
 	styled,
+	Tab,
+	Tabs,
 	Tooltip,
 	tooltipClasses,
 	TooltipProps,
-	Tabs,
-	Tab,
 } from '@mui/material';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -60,7 +60,7 @@ const StyledTabs = styled(Tabs)({
 });
 
 const AdminHeader = ({ children }: { children: ReactNode }) => {
-	const { schoolName, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
+	const { userRole, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
 	const [selectedSchoolYear, setSelectedSchoolYear] = useState<IDropdownOption<number> | null>(
 		null
 	);
@@ -72,8 +72,8 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	const { notifications, unreadCount, markAsRead, fetchUnreadCount, markAllAsRead } =
 		useNotification();
 	const [showNotifications, setShowNotifications] = useState(false);
-	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
-	const dispatch = useDispatch();
+	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
+	const dispatch = useAdminDispatch();
 
 	const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -239,7 +239,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 					)}
 				</div>
 				<div className='w-fit h-full flex flex-col justify-between items-end text-white pr-3'>
-					<h3 className='text-body-medium font-medium leading-4 pr-1'>{schoolName}</h3>
+					<h3 className='text-body-medium font-medium leading-4 pr-1'>{userRole}</h3>
 					<div
 						className='text-[0.75rem] leading-4 opacity-80 flex flex-row justify-between items-center cursor-pointer'
 						id='basic-button'
