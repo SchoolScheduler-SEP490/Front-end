@@ -3,8 +3,9 @@ import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useNotification } from '@/app/(school-manager)/notification/_hooks/useNotification';
 import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
-import { toggleMenu } from '@/context/slice_school_manager';
+import { IAdminState, toggleMenu } from '@/context/slice_admin';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
+import { useAdminDispatch, useAdminSelector } from '@/hooks/useReduxStore';
 import { ISchoolYearResponse } from '@/utils/constants';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
@@ -59,7 +60,7 @@ const StyledTabs = styled(Tabs)({
 });
 
 const AdminHeader = ({ children }: { children: ReactNode }) => {
-	const { schoolName, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
+	const { userRole, selectedSchoolYearId, setSelectedSchoolYearId } = useAppContext();
 	const [selectedSchoolYear, setSelectedSchoolYear] = useState<IDropdownOption<number> | null>(
 		null
 	);
@@ -71,7 +72,8 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	const { notifications, unreadCount, markAsRead, fetchUnreadCount, markAllAsRead } =
 		useNotification();
 	const [showNotifications, setShowNotifications] = useState(false);
-	const isMenuHidden: boolean = false;
+	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
+	const dispatch = useAdminDispatch();
 
 	const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -82,7 +84,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	};
 
 	const handleToggleMenu = () => {
-		// dispatch(toggleMenu());
+		dispatch(toggleMenu());
 	};
 
 	const handleUpdateYear = async (selectedId: number) => {
@@ -146,7 +148,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
 			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
 				<LightTooltip
-					title={!isMenuHidden ? 'Thu gọn Menu' : 'Mở rộng menu'}
+					title={!isMenuOpen ? 'Thu gọn Menu' : 'Mở rộng menu'}
 					placement='bottom'
 					arrow
 				>
@@ -155,7 +157,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 							<input
 								className='hidden peer'
 								type='checkbox'
-								checked={!isMenuHidden}
+								checked={!isMenuOpen}
 								onClick={handleToggleMenu}
 							/>
 							<div className='w-[50%] h-[2px] bg-white rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg]' />
@@ -237,7 +239,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 					)}
 				</div>
 				<div className='w-fit h-full flex flex-col justify-between items-end text-white pr-3'>
-					<h3 className='text-body-medium font-medium leading-4 pr-1'>{schoolName}</h3>
+					<h3 className='text-body-medium font-medium leading-4 pr-1'>{userRole}</h3>
 					<div
 						className='text-[0.75rem] leading-4 opacity-80 flex flex-row justify-between items-center cursor-pointer'
 						id='basic-button'

@@ -1,7 +1,9 @@
 'use client';
 import AdminSidenav from '@/commons/admin/sidenav';
 import { useAppContext } from '@/context/app_provider';
+import { adminStore } from '@/context/store_admin';
 import { notFound } from 'next/navigation';
+import { Provider } from 'react-redux';
 
 export default function AdminLayout({
 	children,
@@ -15,9 +17,11 @@ export default function AdminLayout({
 	}
 
 	return (
-		<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start overflow-y-hidden'>
-			<AdminSidenav />
-			{children}
-		</section>
+		<Provider store={adminStore}>
+			<section className='w-screen h-fit min-h-screen flex flex-row justify-start items-start overflow-y-hidden'>
+				<AdminSidenav />
+				{children}
+			</section>
+		</Provider>
 	);
 }

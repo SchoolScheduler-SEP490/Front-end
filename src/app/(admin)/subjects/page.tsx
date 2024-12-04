@@ -8,21 +8,26 @@ import SubjectDetails from './_components/subject_details';
 import SubjectTable from './_components/subject_table';
 import useFetchData from './_hooks/useFetchData';
 import { ISubject, ISubjectTableData } from './_libs/constants';
+import { IAdminState } from '@/context/slice_admin';
+import { useAdminSelector } from '@/hooks/useReduxStore';
 
 export default function SMSubject() {
+	const { sessionToken, selectedSchoolYearId } = useAppContext();
+	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
+
 	const [page, setPage] = React.useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
-	const { data, error, isLoading, isValidating, mutate } = useFetchData({
+	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
+	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
+	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
+	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
+
+	const { data, isValidating, mutate } = useFetchData({
 		sessionToken: sessionToken,
 		pageIndex: page,
 		pageSize: rowsPerPage,
 		schoolYearId: selectedSchoolYearId,
 	});
-	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
-	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
-	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
-	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -67,7 +72,11 @@ export default function SMSubject() {
 
 	if (isValidating) {
 		return (
-			<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar'>
+			<div
+				className={`w-[${
+					!isMenuOpen ? '84' : '100'
+				}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+			>
 				<AdminHeader>
 					<div>
 						<h3 className='text-title-small text-white font-semibold tracking-wider'>Môn học</h3>
@@ -79,7 +88,11 @@ export default function SMSubject() {
 	}
 
 	return (
-		<div className='w-[84%] h-screen flex flex-col justify-start items-start overflow-y-hidden overflow-x-hidden'>
+		<div
+			className={`w-[${
+				!isMenuOpen ? '84' : '100'
+			}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}
+		>
 			<AdminHeader>
 				<div>
 					<h3 className='text-title-small text-white font-semibold tracking-wider'>Môn học</h3>
