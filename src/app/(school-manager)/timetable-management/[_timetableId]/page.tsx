@@ -3,10 +3,7 @@
 import SMHeader from "@/commons/school_manager/header";
 import { useParams, useRouter } from "next/navigation";
 import {
-  WEEKDAYS,
-  TIME_SLOTS,
   SAMPLE_CLASSES,
-  ITimetableTableData,
 } from "../_libs/constants";
 import {
   Button,
