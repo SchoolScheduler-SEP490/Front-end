@@ -17,9 +17,7 @@ export default function NotFound() {
 						<span className='!text-primary-400'>4</span>
 					</h1>
 				</div>
-				<h2 className='!mt-3'>
-					Chúng tôi không thể tìm thấy trang mà bạn yêu cầu
-				</h2>
+				<h2 className='!mt-3'>Chúng tôi không thể tìm thấy trang mà bạn yêu cầu</h2>
 				<button
 					className='bg-basic-gray-hover text-center w-[15vw] h-14 relative text-black text-xl font-semibold group'
 					type='button'
@@ -32,10 +30,7 @@ export default function NotFound() {
 							height='25px'
 							width='25px'
 						>
-							<path
-								d='M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z'
-								fill='#000000'
-							></path>
+							<path d='M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z' fill='#000000'></path>
 							<path
 								d='m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z'
 								fill='#000000'

@@ -5,9 +5,6 @@ import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useNotify from '@/hooks/useNotify';
 import {
-	EClassSession,
-	ETimetableStatus,
-	IClassCombinationObject,
 	IConfigurationStoreObject,
 	ISchoolYearResponse,
 	ITermResponse,
@@ -30,8 +27,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
-import { IClassCombinationResponse, TIMETABLE_GENERATION_TABS } from './_libs/constants';
-import useFetchClassCombinations from './_hooks/useFetchClassCombination';
+import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -132,8 +128,9 @@ export default function Home() {
 			'config-id': '',
 			'applied-week': null,
 			'ended-week': null,
+			'internal-end-date': null,
 			'published-timetable-id': null,
-			status: ETimetableStatus.Pending,
+			status: 1,
 		};
 		var newConfigurationData: IConfigurationStoreObject = {
 			id: '',

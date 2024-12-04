@@ -14,7 +14,7 @@ export const ADMIN_SIDENAV: IAdminSidenav[] = [
 		category: 'Hoạt động',
 		items: [
 			{
-				name: 'Thống kê',
+				name: 'Tổng quan',
 				url: '/dashboard',
 				icon: '/images/icons/schedule.png',
 			},

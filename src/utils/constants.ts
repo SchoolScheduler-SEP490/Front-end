@@ -288,17 +288,12 @@ export interface ITimetableStoreObject {
 	'config-id': string;
 	// Id của thời khóa biểu đã tạo.
 	'generated-schedule-id': string | null;
+	// End date của công bố Nội bộ
+	'internal-end-date': string | null;
 	'applied-week': number | null;
 	'ended-week': number | null;
-	status: ETimetableStatus;
+	status: number;
 }
-
-export enum ETimetableStatus {
-	Published = 'Công bố',
-	Pending = 'Chờ duyệt',
-	Inactived = 'Vô hiệu',
-}
-
 // Record kết quả generate thời khóa biểu
 export interface IScheduleResponse {
 	'school-year-id': number;
@@ -310,10 +305,26 @@ export interface IScheduleResponse {
 	name: string;
 	'fitness-point': number;
 	'class-schedules': IClassSchedule[];
+	'class-combinations': IClassCombinationScheduleObject[];
+	'excute-time': number;
 	id: number;
 	'create-date': string;
 	'update-date': string | null;
 	'is-deleted': boolean;
+}
+
+export interface IClassCombinationScheduleObject {
+	'class-combination-id': number;
+	'class-combination-name': string;
+	'class-combination-code': string;
+	classes: { id: number; name: string }[];
+	'start-at': number[];
+	'teacher-id': number;
+	'teacher-abbreviation': string;
+	'teacher-name': string;
+	'subject-id': number;
+	'subject-name': string;
+	'subject-abbreviation': string;
 }
 
 export interface IClassSchedule {
@@ -345,6 +356,10 @@ export interface IClassPeriod {
 	'is-deleted': boolean;
 }
 
+export const TIMETABLE_FIRESTORE_NAME = 'timetables';
+export const CONFIGURATION_FIRESTORE_NAME = 'configurations';
+export const GENERATED_SCHEDULE_FIRESTORE_NAME = 'schedule-responses';
+
 export const SCHEDULE_STATUS: { key: string; value: number }[] = [
 	{ key: 'Draft', value: 1 },
 	{ key: 'Published', value: 2 },
@@ -359,4 +374,4 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	3: 'Nội bộ',
 	4: 'Hết hạn',
 	5: 'Vô hiệu',
-}
+};
