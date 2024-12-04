@@ -344,3 +344,19 @@ export interface IClassPeriod {
 	'update-date': string | null;
 	'is-deleted': boolean;
 }
+
+export const SCHEDULE_STATUS: { key: string; value: number }[] = [
+	{ key: 'Draft', value: 1 },
+	{ key: 'Published', value: 2 },
+	{ key: 'PublishedInternal', value: 3 },
+	{ key: 'Expired', value: 4 },
+	{ key: 'Disabled', value: 5 },
+];
+
+export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
+	1: 'Bản nháp',
+	2: 'Công bố',
+	3: 'Nội bộ',
+	4: 'Hết hạn',
+	5: 'Vô hiệu',
+}
