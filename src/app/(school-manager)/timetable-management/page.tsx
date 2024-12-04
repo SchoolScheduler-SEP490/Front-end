@@ -14,6 +14,7 @@ import { firestore } from "@/utils/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/app_provider";
+import { mutate } from "swr";
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -55,6 +56,7 @@ export default function TimetableManagement() {
             endedWeek: data["ended-week"],
             status: data["status"],
             termName: data["term-name"],
+            termId: data["term-id"],
             yearName: data["year-name"],
           };
         });
@@ -88,7 +90,7 @@ export default function TimetableManagement() {
         </div>
       </SMHeader>
       <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[5vh]">
-        <TimetableTable data={timetableData} />
+        <TimetableTable data={timetableData} mutate={mutate}/>
       </div>
       <div className="absolute w-fit h-fit overflow-visible bottom-[3vw] right-[3vw]">
         <LightTooltip title="Tạo Thời khóa biểu" placement="top" arrow>
