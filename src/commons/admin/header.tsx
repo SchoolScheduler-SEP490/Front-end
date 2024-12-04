@@ -12,15 +12,14 @@ import {
 	Menu,
 	MenuItem,
 	styled,
+	Tab,
+	Tabs,
 	Tooltip,
 	tooltipClasses,
 	TooltipProps,
-	Tabs,
-	Tab,
 } from '@mui/material';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -72,8 +71,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	const { notifications, unreadCount, markAsRead, fetchUnreadCount, markAllAsRead } =
 		useNotification();
 	const [showNotifications, setShowNotifications] = useState(false);
-	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
-	const dispatch = useDispatch();
+	const isMenuHidden: boolean = false;
 
 	const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -84,7 +82,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	};
 
 	const handleToggleMenu = () => {
-		dispatch(toggleMenu());
+		// dispatch(toggleMenu());
 	};
 
 	const handleUpdateYear = async (selectedId: number) => {
@@ -148,7 +146,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
 			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
 				<LightTooltip
-					title={!isMenuOpen ? 'Thu gọn Menu' : 'Mở rộng menu'}
+					title={!isMenuHidden ? 'Thu gọn Menu' : 'Mở rộng menu'}
 					placement='bottom'
 					arrow
 				>
@@ -157,7 +155,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 							<input
 								className='hidden peer'
 								type='checkbox'
-								checked={!isMenuOpen}
+								checked={!isMenuHidden}
 								onClick={handleToggleMenu}
 							/>
 							<div className='w-[50%] h-[2px] bg-white rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg]' />
