@@ -2,10 +2,7 @@
 
 import { useAppContext } from "@/context/app_provider";
 import useNotify from "@/hooks/useNotify";
-import {
-  SCHEDULE_STATUS,
-  SCHEDULE_STATUS_TRANSLATOR
-} from "@/utils/constants";
+import { SCHEDULE_STATUS, SCHEDULE_STATUS_TRANSLATOR } from "@/utils/constants";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { FormControl, MenuItem, Select } from "@mui/material";
@@ -29,6 +26,8 @@ import * as React from "react";
 import { KeyedMutator } from "swr";
 import { updateTimetableStatus } from "../_libs/apiTimetable";
 import { ITimetableTableData } from "../_libs/constants";
+import { firestore } from "@/utils/firebaseConfig";
+import { doc, updateDoc } from "firebase/firestore";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -267,21 +266,30 @@ const TimetableTable = (props: TimetableTableProps) => {
     newStatus: number
   ) => {
     const termId = row.termId;
-    const result = await updateTimetableStatus(
-      schoolId,
-      selectedSchoolYearId,
-      termId,
-      SCHEDULE_STATUS.find((status) => status.value === newStatus)?.key || "",
-      sessionToken
-    );
 
-    if (result) {
+    try {
+      // Update status via API
+      const result = await updateTimetableStatus(
+        schoolId,
+        selectedSchoolYearId,
+        termId,
+        SCHEDULE_STATUS.find((status) => status.value === newStatus)?.key || "",
+        sessionToken
+      );
+
+      // Update status in Firebase
+      const timetableRef = doc(firestore, "timetables", row.id);
+      await updateDoc(timetableRef, {
+        status: SCHEDULE_STATUS.find((status) => status.value === newStatus)
+          ?.key,
+      });
+
       useNotify({
         message: "Cập nhật trạng thái thành công",
         type: "success",
       });
       mutate();
-    } else {
+    } catch (error) {
       useNotify({
         message: "Cập nhật trạng thái thất bại",
         type: "error",
@@ -351,18 +359,7 @@ const TimetableTable = (props: TimetableTableProps) => {
                           }}
                         >
                           {SCHEDULE_STATUS.map((status) => (
-                            <MenuItem
-                              key={status.key}
-                              value={status.value}
-                              sx={{
-                                backgroundColor:
-                                  status.value === 2
-                                    ? "basic-positive-hover"
-                                    : status.value === 1
-                                    ? "basic-gray-hover"
-                                    : "basic-negative-hover",
-                              }}
-                            >
+                            <MenuItem key={status.key} value={status.value}>
                               {SCHEDULE_STATUS_TRANSLATOR[status.value]}
                             </MenuItem>
                           ))}
@@ -383,6 +380,10 @@ const TimetableTable = (props: TimetableTableProps) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
+          labelRowsPerPage="Số hàng"
+          labelDisplayedRows={({ from, to, count }) =>
+            `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+          }
           count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
