@@ -5,6 +5,7 @@ export interface ITimetableTableData {
     appliedWeek: string | null;
     endedWeek: string | null;
     status: string;
+    termId: number;
     termName: string;
     yearName: string;
 }
