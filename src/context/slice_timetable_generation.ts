@@ -1,7 +1,10 @@
 import {
+	CONFIGURATION_FIRESTORE_NAME,
+	GENERATED_SCHEDULE_FIRESTORE_NAME,
 	IConfigurationStoreObject,
 	IScheduleResponse,
 	ITimetableStoreObject,
+	TIMETABLE_FIRESTORE_NAME,
 } from '@/utils/constants';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -28,9 +31,9 @@ interface IUpdateTimetableStored {
 
 const initialState: ITimetableGenerationState = {
 	timetableId: '',
-	dataFirestoreName: 'configurations',
-	timetableFirestoreName: 'timetables',
-	generatedScheduleFirestorename: 'schedule-responses',
+	dataFirestoreName: CONFIGURATION_FIRESTORE_NAME,
+	timetableFirestoreName: TIMETABLE_FIRESTORE_NAME,
+	generatedScheduleFirestorename: GENERATED_SCHEDULE_FIRESTORE_NAME,
 	isTimetableGenerating: false,
 	dataStored: {} as IConfigurationStoreObject,
 	timetableStored: {} as ITimetableStoreObject,
