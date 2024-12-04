@@ -3,7 +3,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
 import { alpha } from "@mui/material/styles";
@@ -21,9 +20,16 @@ import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
 import { ITimetableTableData } from "../_libs/constants";
 import { useRouter } from "next/navigation";
-import { ETimetableStatus } from "@/utils/constants";
+import {
+  ETimetableStatus,
+  SCHEDULE_STATUS,
+  SCHEDULE_STATUS_TRANSLATOR,
+} from "@/utils/constants";
 import { FormControl, MenuItem, Select } from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
+import { updateTimetableStatus } from "../_libs/apiTimetable";
+import { useAppContext } from "@/context/app_provider";
+import useNotify from "@/hooks/useNotify";
+import { KeyedMutator } from "swr";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -199,9 +205,11 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 interface TimetableTableProps {
   data: ITimetableTableData[];
+  mutate: KeyedMutator<any>;
 }
 
-const TimetableTable = ({ data }: TimetableTableProps) => {
+const TimetableTable = (props: TimetableTableProps) => {
+  const { data, mutate } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
     React.useState<keyof ITimetableTableData>("timetableCode");
@@ -209,10 +217,8 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
-  const [selectedStatus, setSelectedStatus] = React.useState<ETimetableStatus>(
-    ETimetableStatus.Pending
-  );
 
+  const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
@@ -257,10 +263,31 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
     router.push(`/timetable-management/${row.id}`);
   };
 
+  const handleStatusChange = async (
+    row: ITimetableTableData,
+    newStatus: number
+  ) => {
+    const termId = row.termId;
+    const result = await updateTimetableStatus(
+      schoolId,
+      selectedSchoolYearId,
+      termId,
+      SCHEDULE_STATUS.find((status) => status.value === newStatus)?.key || "",
+      sessionToken
+    );
 
-  const handleStatusChange = (newStatus: ETimetableStatus) => {
-    setSelectedStatus(newStatus);
-    // Add API call to update status in backend
+    if (result) {
+      useNotify({
+        message: "Cập nhật trạng thái thành công",
+        type: "success",
+      });
+      mutate();
+    } else {
+      useNotify({
+        message: "Cập nhật trạng thái thất bại",
+        type: "error",
+      });
+    }
   };
 
   return (
@@ -313,31 +340,31 @@ const TimetableTable = ({ data }: TimetableTableProps) => {
                       >
                         <Select
                           value={row.status}
-                          onChange={(e) =>
-                            handleStatusChange(
-                              e.target.value as ETimetableStatus
-                            )
-                          }
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleStatusChange(row, Number(e.target.value));
+                          }}
                           sx={{
                             "&.MuiSelect-select": {
                               borderRadius: "4px",
                             },
                           }}
                         >
-                          {Object.values(ETimetableStatus).map((status) => (
+                          {SCHEDULE_STATUS.map((status) => (
                             <MenuItem
-                              key={status}
-                              value={status}
+                              key={status.key}
+                              value={status.value}
                               sx={{
                                 backgroundColor:
-                                  status === ETimetableStatus.Published
+                                  status.value === 2
                                     ? "basic-positive-hover"
-                                    : status === ETimetableStatus.Pending
+                                    : status.value === 1
                                     ? "basic-gray-hover"
                                     : "basic-negative-hover",
                               }}
                             >
-                              {status}
+                              {SCHEDULE_STATUS_TRANSLATOR[status.value]}
                             </MenuItem>
                           ))}
                         </Select>
