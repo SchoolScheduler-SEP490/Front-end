@@ -145,7 +145,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	};
 
 	return (
-		<div className='w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
+		<div className='w-full min-h-[50px] bg-primary-500 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
 			<div className='w-fit h-full flex flex-row justify-start items-center gap-5'>
 				<LightTooltip
 					title={!isMenuOpen ? 'Thu gọn Menu' : 'Mở rộng menu'}

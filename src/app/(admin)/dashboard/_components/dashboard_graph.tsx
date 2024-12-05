@@ -59,7 +59,15 @@ const DashboardGraph: FC<IDashboardGraphProps> = () => {
 			},
 		},
 		scales: {
+			x: {
+				grid: {
+					display: false, // Tắt grid dọc
+				},
+			},
 			y: {
+				grid: {
+					display: true, // Giữ grid ngang
+				},
 				beginAtZero: true,
 			},
 		},

@@ -19,11 +19,13 @@ export default function SMDepartment() {
 	const [page, setPage] = useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
+
 	const [isErrorShown, setIsErrorShown] = useState<boolean>(false);
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+	const [isDepartmentDetailsOpen, setIsDepartmentDetailsOpen] = useState<boolean>(false);
+
 	const [departmentTableData, setDepartmentTableData] = useState<IDepartmentTableData[]>([]);
 	const [selectedDepartmentId, setSelectedDepartmentId] = useState<number>(0);
-	const [isDepartmentDetailsOpen, setIsDepartmentDetailsOpen] = useState<boolean>(false);
-	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
 	const {
 		data: departmentData,
@@ -118,8 +120,8 @@ export default function SMDepartment() {
 				<div className='w-fit h-[90vh] pt-[5vh] pb-[5vh] px-2 overflow-y-scroll no-scrollbar flex justify-center items-start'>
 					<DepartmentTable
 						departmentData={departmentTableData}
-						page={page}
 						updateTable={updateDepartment}
+						page={page}
 						setPage={setPage}
 						rowsPerPage={rowsPerPage}
 						setRowsPerPage={setRowsPerPage}
