@@ -1,16 +1,14 @@
 'use client';
-import { useAppContext } from '@/context/app_provider';
-import { useEffect, useState } from 'react';
-import { IAccountResponse } from './_libs/constants';
-import useFetchAccounts from './_hooks/useFetchAccounts';
-import AccountsTable from './_components/accounts_table';
 import AdminHeader from '@/commons/admin/header';
-import { useAdminSelector } from '@/hooks/useReduxStore';
+import { useAppContext } from '@/context/app_provider';
 import { IAdminState } from '@/context/slice_admin';
+import { useAdminSelector } from '@/hooks/useReduxStore';
+import { useEffect, useState } from 'react';
 import { ACCOUNT_STATUS } from '../_utils/constants';
-import AccountTableSkeleton from './_components/skeleton_table';
-import { preconnect } from 'react-dom';
 import AccountsFilterable from './_components/accounts_filterable';
+import AccountsTable from './_components/accounts_table';
+import useFetchAccounts from './_hooks/useFetchAccounts';
+import { IAccountResponse } from './_libs/constants';
 
 export default function UserPage() {
 	const { sessionToken } = useAppContext();

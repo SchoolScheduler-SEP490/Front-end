@@ -35,11 +35,11 @@ export const ADMIN_SIDENAV: IAdminNavigation[] = [
 		url: '/regions',
 		icon: '/images/icons/map.png',
 	},
-	// {
-	// 	name: 'Năm học',
-	// 	url: '/school-years',
-	// 	icon: '/images/icons/calendar.png',
-	// },
+	{
+		name: 'Năm học',
+		url: '/school-years',
+		icon: '/images/icons/calendar.png',
+	},
 ];
 
 export const ACCOUNT_STATUS: { [key: string]: string } = {
