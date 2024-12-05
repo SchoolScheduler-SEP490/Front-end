@@ -59,7 +59,7 @@ export default function Home() {
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
 
-	const { data: schoolYearData, mutate } = useFetchSchoolYear();
+	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: true });
 	const {
 		data: termData,
 		error: termFetchError,
@@ -122,6 +122,7 @@ export default function Home() {
 			'school-id': Number(schoolId),
 			'year-id': selectedSchoolYearId,
 			'generated-schedule-id': null,
+			'generated-date': null,
 			'year-name': schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
 			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
 			'term-id': selectedTermId,

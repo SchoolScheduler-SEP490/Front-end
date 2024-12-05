@@ -7,7 +7,7 @@ import {
 	updateTimetableStored,
 } from '@/context/slice_timetable_generation';
 import useNotify from '@/hooks/useNotify';
-import { IScheduleResponse } from '@/utils/constants';
+import { IScheduleResponse, ITimetableStoreObject } from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import { addDoc, collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { useState } from 'react';
@@ -73,7 +73,11 @@ export default function Home() {
 							const docRef2 = doc(firestore, timetableFirestoreName, timetableId ?? '');
 							await setDoc(
 								docRef2,
-								{ ...timetableStored, 'generated-schedule-id': existingDoc.id },
+								{
+									...timetableStored,
+									'generated-schedule-id': existingDoc.id,
+									'generated-date': result['create-date'],
+								} as ITimetableStoreObject,
 								{ merge: true }
 							).then(() => {
 								dispatch(
@@ -106,7 +110,11 @@ export default function Home() {
 								);
 								await setDoc(
 									timetableDocRef,
-									{ ...dataStored, 'generated-schedule-id': resRef.id },
+									{
+										...timetableStored,
+										'generated-schedule-id': resRef.id,
+										'generated-date': result['create-date'],
+									} as ITimetableStoreObject,
 									{ merge: true }
 								).then(() => {
 									// Dispatch từng hành động một cách riêng biệt
