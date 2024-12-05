@@ -1,8 +1,12 @@
 import useSWR from 'swr';
 
-const useFetchSchoolYear = () => {
+interface IFetchSchoolYearProps {
+	includePrivate: boolean;
+}
+
+const useFetchSchoolYear = ({ includePrivate }: IFetchSchoolYearProps) => {
 	const api = process.env.NEXT_PUBLIC_API_URL ?? 'Unknown';
-	const endpoint = `${api}/api/academic-years`;
+	const endpoint = `${api}/api/academic-years?includePrivate=${includePrivate}`;
 
 	async function fetcher(url: string) {
 		const response = await fetch(url);

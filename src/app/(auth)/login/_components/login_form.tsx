@@ -62,28 +62,26 @@ export const LoginForm = () => {
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoggingIn, setIsLoggingIn] = useState(false);
-	const { data, mutate } = useFetchSchoolYear();
+	const { data, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState<number>(0);
 
 	useEffect(() => {
 		mutate();
 		if (data?.status === 200) {
-			const options: IDropdownOption<number>[] = data.result.map(
-				(item: ISchoolYearResponse) => {
-					const currentYear = new Date().getFullYear();
-					if (
-						parseInt(item['start-year']) <= currentYear &&
-						parseInt(item['end-year']) >= currentYear
-					) {
-						setSelectedSchoolYearId(item.id);
-					}
-					return {
-						label: `${item['start-year']} - ${item['end-year']}`,
-						value: item.id,
-					} as IDropdownOption<number>;
+			const options: IDropdownOption<number>[] = data.result.map((item: ISchoolYearResponse) => {
+				const currentYear = new Date().getFullYear();
+				if (
+					parseInt(item['start-year']) <= currentYear &&
+					parseInt(item['end-year']) >= currentYear
+				) {
+					setSelectedSchoolYearId(item.id);
 				}
-			);
+				return {
+					label: `${item['start-year']} - ${item['end-year']}`,
+					value: item.id,
+				} as IDropdownOption<number>;
+			});
 			setSchoolYearIdOptions(options.sort((a, b) => a.label.localeCompare(b.label)));
 		}
 	}, [data]);
@@ -113,9 +111,7 @@ export const LoginForm = () => {
 				const loginResponse: ILoginResponse = { ...(await response.json()) };
 				let data: IUser | undefined = undefined;
 				if (loginResponse.status === 200) {
-					const decodedToken: IJWTTokenPayload = jwtDecode(
-						loginResponse['jwt-token'] ?? ''
-					);
+					const decodedToken: IJWTTokenPayload = jwtDecode(loginResponse['jwt-token'] ?? '');
 					data = {
 						email: decodedToken?.email ?? '',
 						id: decodedToken?.accountId ?? '',
@@ -246,18 +242,10 @@ export const LoginForm = () => {
 					helperText={formik.touched.password && formik.errors.password}
 					InputProps={{
 						endAdornment: (
-							<IconButton
-								color='default'
-								aria-label='Hiện mật khẩu'
-								onClick={handleShowPassword}
-							>
+							<IconButton color='default' aria-label='Hiện mật khẩu' onClick={handleShowPassword}>
 								<Image
 									className='opacity-30'
-									src={
-										showPassword
-											? '/images/icons/hidden.png'
-											: '/images/icons/view.png'
-									}
+									src={showPassword ? '/images/icons/hidden.png' : '/images/icons/view.png'}
 									alt='eye'
 									width={20}
 									height={20}
@@ -277,9 +265,7 @@ export const LoginForm = () => {
 						value={
 							selectedSchoolYearId === 0
 								? ''
-								: schoolYearIdOptions.find(
-										(item) => item.value === selectedSchoolYearId
-								  )
+								: schoolYearIdOptions.find((item) => item.value === selectedSchoolYearId)
 						}
 						onChange={(event: any) => handleSelectSchoolYear(event.target.value)}
 						MenuProps={MenuProps}
@@ -296,11 +282,7 @@ export const LoginForm = () => {
 						{schoolYearIdOptions.map((item, index) => (
 							<MenuItem key={item.label + index} value={item.value}>
 								<Checkbox
-									checked={
-										selectedSchoolYearId === 0
-											? false
-											: selectedSchoolYearId === item.value
-									}
+									checked={selectedSchoolYearId === 0 ? false : selectedSchoolYearId === item.value}
 								/>
 								<ListItemText primary={item.label} />
 							</MenuItem>
@@ -321,9 +303,7 @@ export const LoginForm = () => {
 					id='login-btn'
 					className='mt-2 dis'
 				>
-					<h4 className='text-body-large-strong font-medium tracking-widest'>
-						ĐĂNG NHẬP
-					</h4>
+					<h4 className='text-body-large-strong font-medium tracking-widest'>ĐĂNG NHẬP</h4>
 				</CustomButton>
 				<h3 className='mt-12 text-body-medium font-normal text-gray-700'>
 					Chưa có tài khoản?{' '}

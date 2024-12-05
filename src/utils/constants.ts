@@ -288,6 +288,7 @@ export interface ITimetableStoreObject {
 	'config-id': string;
 	// Id của thời khóa biểu đã tạo.
 	'generated-schedule-id': string | null;
+	'generated-date': string | null;
 	// End date của công bố Nội bộ
 	'internal-end-date': string | null;
 	'applied-week': number | null;

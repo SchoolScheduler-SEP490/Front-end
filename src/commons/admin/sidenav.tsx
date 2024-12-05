@@ -67,16 +67,6 @@ const AdminSidenav = () => {
 		router.push(url);
 	};
 
-	useEffect(() => {
-		ADMIN_SIDENAV.map((item, index) => {
-			item.items.map((subItem) => {
-				if (currentPath.startsWith(subItem.url)) {
-					setExpanded((prev: string[]) => [...prev, `panel${index}`]);
-				}
-			});
-		});
-	}, [currentPath]);
-
 	const toggleDropdown = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
 		if (newExpanded) {
 			setExpanded((prev: string[]) => [...prev, panel]);
@@ -100,48 +90,38 @@ const AdminSidenav = () => {
 					</Link>
 				</div>
 				<div className='w-full h-fit pb-[70px] pt-[50px] flex flex-col justify-start items-center overflow-y-scroll no-scrollbar'>
-					{ADMIN_SIDENAV.map((item: IAdminSidenav, index: number) => (
-						<Accordion
-							key={item.category + index}
-							expanded={expanded.includes(`panel${index}`)}
-							onChange={toggleDropdown(`panel${index}`)}
-							className='w-full p-0 m-0'
-						>
-							<AccordionSummary
-								aria-controls={`panel${index}d-content`}
-								id={`panel${index}d-header`}
-								className='!text-primary-500 !bg-basic-gray-hover'
+					<div className='w-full h-full p-3'>
+						{ADMIN_SIDENAV.map((subItem: IAdminNavigation, index: number) => (
+							<div
+								key={subItem.name + index}
+								className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-4 pr-2 gap-3 rounded-[3px] hover:cursor-pointer 
+					${
+						currentPath.startsWith(subItem.url)
+							? 'bg-secondary-normal text-white'
+							: 'hover:bg-secondary-light'
+					}`}
+								onClick={() => handleNavigate(subItem.url)}
 							>
-								<Typography sx={{ userSelect: 'none' }}>{item.category}</Typography>
-							</AccordionSummary>
-							<AccordionDetails className='w-full !p-2'>
-								{item.items.map((subItem: IAdminNavigation) => (
-									<div
-										key={subItem.name}
-										className={`w-[100%] h-fit flex flex-row justify-start items-center py-3 pl-4 pr-2 gap-3 rounded-[3px] hover:cursor-pointer 
-									${currentPath.startsWith(subItem.url) ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
-										onClick={() => handleNavigate(subItem.url)}
-									>
-										<Image
-											className='opacity-60'
-											src={subItem.icon}
-											alt='sidebar-icon'
-											unoptimized={true}
-											width={23}
-											height={23}
-										/>
-										<p
-											className={`text-body-medium font-normal select-none ${
-												currentPath.startsWith(subItem.url) ? ' !font-semibold' : ''
-											}`}
-										>
-											{subItem.name}
-										</p>
-									</div>
-								))}
-							</AccordionDetails>
-						</Accordion>
-					))}
+								<Image
+									className={`${
+										currentPath.startsWith(subItem.url) ? 'invert !filter-invert' : 'opacity-60'
+									}`}
+									src={subItem.icon}
+									alt='sidebar-icon'
+									unoptimized={true}
+									width={23}
+									height={23}
+								/>
+								<p
+									className={`text-body-medium font-normal select-none ${
+										currentPath.startsWith(subItem.url) ? ' !font-semibold' : ''
+									}`}
+								>
+									{subItem.name}
+								</p>
+							</div>
+						))}
+					</div>
 				</div>
 				<div className='absolute bottom-0 right-0 w-full h-fit flex justify-center items-center bg-white py-3'>
 					<button

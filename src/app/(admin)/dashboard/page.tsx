@@ -18,14 +18,22 @@ export default function AdminHome() {
 				</div>
 			</AdminHeader>
 			<div className='w-full h-full flex flex-row justify-between items-start'>
-				<div className='w-[75%] h-full max-h-[95vh] overflow-y-scroll no-scrollbar'>
+				<div
+					className={`w-[${
+						!isMenuOpen ? '70' : '75'
+					}%] h-full max-h-[95vh] overflow-y-scroll no-scrollbar`}
+				>
 					<div className='w-full h-fit flex flex-col justify-start items-center pl-2 mb-[4vh] mt-[2vh]'>
 						<DashboardNumbers />
 						<DashboardGraph />
 						<DashboardSchools />
 					</div>
 				</div>
-				<div className='w-[25%] h-full max-h-[95vh] overflow-y-scroll no-scrollbar'>
+				<div
+					className={`w-[${
+						!isMenuOpen ? '30' : '25'
+					}%] h-full max-h-[95vh] overflow-y-scroll no-scrollbar`}
+				>
 					<DashboardRequests />
 				</div>
 			</div>
