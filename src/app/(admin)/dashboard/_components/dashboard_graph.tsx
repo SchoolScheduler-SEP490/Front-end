@@ -1,12 +1,14 @@
 import { WEEK_DAYS_FULL } from '@/utils/constants';
 import { Typography } from '@mui/material';
 import {
+	BarController,
 	BarElement,
 	CategoryScale,
 	ChartData,
 	Chart as ChartJS,
 	Legend,
 	LinearScale,
+	LineController,
 	LineElement,
 	PointElement,
 	Title,
@@ -21,11 +23,13 @@ interface IDashboardGraphProps {
 
 const DashboardGraph: FC<IDashboardGraphProps> = () => {
 	ChartJS.register(
-		CategoryScale,
-		LinearScale,
+		BarController,
+		LineController,
 		BarElement,
-		PointElement,
 		LineElement,
+		LinearScale,
+		CategoryScale,
+		PointElement,
 		Title,
 		Tooltip,
 		Legend
