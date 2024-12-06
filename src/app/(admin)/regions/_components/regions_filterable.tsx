@@ -150,7 +150,7 @@ const RegionsFilterable = (props: IAccountsFilterableProps) => {
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 				<div className='w-full flex flex-row justify-between items-center pt-1'>
 					<Typography variant='h6' className='text-title-small-strong font-normal w-full text-left'>
-						Bộ lọc
+						{isUpdateAction ? 'Cập nhật' : 'Thêm'} vùng miền
 					</Typography>
 					<IconButton onClick={handleClose} className='translate-x-2'>
 						<CloseIcon />

@@ -59,7 +59,7 @@ export default function Home() {
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
 
-	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: true });
+	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const {
 		data: termData,
 		error: termFetchError,

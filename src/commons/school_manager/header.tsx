@@ -65,7 +65,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 		null
 	);
 	const [schoolYearOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
-	const { data, mutate } = useFetchSchoolYear({ includePrivate: true });
+	const { data, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
 	const [activeTab, setActiveTab] = useState(0);

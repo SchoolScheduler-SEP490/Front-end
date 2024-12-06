@@ -66,6 +66,7 @@ export interface ISchoolYearResponse {
 	'start-year': string;
 	'end-year': string;
 	'school-year-code': string;
+	'is-public': boolean;
 }
 
 export interface ITermResponse {

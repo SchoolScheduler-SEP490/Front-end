@@ -241,16 +241,16 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 							Khung chương trình
 						</h2>
 						<div className='w-fit h-fit flex flex-row justify-center items-center'>
-							<LightTooltip title='Thêm Môn học'>
+							<LightTooltip title='Thêm Khung chương trình'>
 								<IconButton onClick={handleAddSubject}>
 									<AddIcon />
 								</IconButton>
 							</LightTooltip>
-							<LightTooltip title='Áp dụng Khung chương trình' arrow>
+							{/* <LightTooltip title='Áp dụng Khung chương trình' arrow>
 								<IconButton onClick={handleApplyCurriculum}>
 									<LayersIcon />
 								</IconButton>
-							</LightTooltip>
+							</LightTooltip> */}
 						</div>
 					</Toolbar>
 					<TableContainer>
@@ -313,7 +313,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 												}}
 												onClick={() => handleViewDetails(row)}
 											>
-												{row.curriculumCode}
+												{row.curriculumCode.length > 0 ? row.curriculumCode : '- - -'}
 											</TableCell>
 											<TableCell
 												align='left'
