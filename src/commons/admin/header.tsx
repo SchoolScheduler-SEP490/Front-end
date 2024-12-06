@@ -68,10 +68,10 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	const { data, mutate } = useFetchSchoolYear({ includePrivate: true });
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const open = Boolean(anchorEl);
-	const [activeTab, setActiveTab] = useState(0);
-	const { notifications, unreadCount, markAsRead, fetchUnreadCount, markAllAsRead } =
-		useNotification();
-	const [showNotifications, setShowNotifications] = useState(false);
+	// const [activeTab, setActiveTab] = useState(0);
+	// const { notifications, unreadCount, markAsRead, fetchUnreadCount, markAllAsRead } =
+	// 	useNotification();
+	// const [showNotifications, setShowNotifications] = useState(false);
 	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
 	const dispatch = useAdminDispatch();
 
@@ -125,24 +125,24 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 		}
 	}, [data, selectedSchoolYearId]);
 
-	useEffect(() => {
-		fetchUnreadCount();
-	}, [notifications]);
+	// useEffect(() => {
+	// 	fetchUnreadCount();
+	// }, [notifications]);
 
-	const filteredNotifications =
-		activeTab === 0
-			? notifications.filter(
-					(notification) =>
-						new Date(notification['create-date']).toDateString() === new Date().toDateString()
-			  )
-			: notifications.filter(
-					(notification) =>
-						new Date(notification['create-date']).toDateString() !== new Date().toDateString()
-			  );
+	// const filteredNotifications =
+	// 	activeTab === 0
+	// 		? notifications.filter(
+	// 				(notification) =>
+	// 					new Date(notification['create-date']).toDateString() === new Date().toDateString()
+	// 		  )
+	// 		: notifications.filter(
+	// 				(notification) =>
+	// 					new Date(notification['create-date']).toDateString() !== new Date().toDateString()
+	// 		  );
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-		setActiveTab(newValue);
-	};
+	// const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+	// 	setActiveTab(newValue);
+	// };
 
 	return (
 		<div className='w-full min-h-[50px] bg-primary-500 flex flex-row justify-between items-center pl-[1.5vw] pr-2'>
@@ -169,7 +169,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 				{children}
 			</div>
 			<div className='flex flex-row justify-end items-center gap-3'>
-				<div className='relative'>
+				{/* <div className='relative'>
 					<IconButton color='primary' onClick={() => setShowNotifications(!showNotifications)}>
 						<div className='relative'>
 							<Image
@@ -237,7 +237,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 							</div>
 						</div>
 					)}
-				</div>
+				</div> */}
 				<div className='w-fit h-full flex flex-col justify-between items-end text-white pr-3'>
 					<h3 className='text-body-medium font-medium leading-4 pr-1'>{userRole}</h3>
 					<div
