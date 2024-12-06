@@ -1,17 +1,17 @@
 'use client';
+import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import AdminHeader from '@/commons/admin/header';
 import { useAppContext } from '@/context/app_provider';
 import { IAdminState } from '@/context/slice_admin';
 import { useAdminSelector } from '@/hooks/useReduxStore';
 import { useEffect, useState } from 'react';
-import useFetchSchools from './_hooks/useFetchSchool';
-import { IDistrictResponse, IProvinceResponse, ISchoolResponse } from './_libs/constants';
-import AdminHeader from '@/commons/admin/header';
+import SchoolsFilterable from './_components/schools_filterable';
 import SchoolsTable from './_components/schools_table';
 import SchoolTableSkeleton from './_components/skeleton_table';
-import SchoolsFilterable from './_components/schools_filterable';
-import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import useFetchProvinces from './_hooks/useFetchProvince';
 import useFetchDistricts from './_hooks/useFetchDistrict';
+import useFetchProvinces from './_hooks/useFetchProvince';
+import useFetchSchools from './_hooks/useFetchSchool';
+import { IDistrictResponse, IProvinceResponse, ISchoolResponse } from './_libs/constants';
 
 export default function RegisteredSchoolPage() {
 	const { sessionToken } = useAppContext();
