@@ -8,6 +8,8 @@ export interface ITimetableTableData {
     termId: number;
     termName: string;
     yearName: string;
+    generatedScheduleId: string;
+    generatedDate: string;
 }
 
 export interface IClassPeriod {

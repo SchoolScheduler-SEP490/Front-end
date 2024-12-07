@@ -2,7 +2,11 @@
 
 import { useAppContext } from "@/context/app_provider";
 import useNotify from "@/hooks/useNotify";
-import { SCHEDULE_STATUS, SCHEDULE_STATUS_TRANSLATOR } from "@/utils/constants";
+import {
+  IScheduleResponse,
+  SCHEDULE_STATUS,
+  SCHEDULE_STATUS_TRANSLATOR,
+} from "@/utils/constants";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { FormControl, MenuItem, Select } from "@mui/material";
@@ -24,10 +28,20 @@ import { visuallyHidden } from "@mui/utils";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { KeyedMutator } from "swr";
-import { updateTimetableStatus } from "../_libs/apiTimetable";
+import { publishTimetable, updateTimetableStatus } from "../_libs/apiTimetable";
 import { ITimetableTableData } from "../_libs/constants";
 import { firestore } from "@/utils/firebaseConfig";
-import { doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import dayjs from "dayjs";
+import ConfirmStatusModal from "./confirm_status_modal";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -80,10 +94,10 @@ const headCells: readonly HeadCell[] = [
     label: "Học kỳ",
   },
   {
-    id: "yearName",
+    id: "generatedDate",
     centered: true,
     disablePadding: false,
-    label: "Năm học",
+    label: "Ngày tạo",
   },
   {
     id: "status",
@@ -215,6 +229,12 @@ const TimetableTable = (props: TimetableTableProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
+  const [confirmModal, setConfirmModal] = React.useState(false);
+  const [selectedStatus, setSelectedStatus] = React.useState<number | null>(
+    null
+  );
+  const [selectedRow, setSelectedRow] =
+    React.useState<ITimetableTableData | null>(null);
 
   const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
   const emptyRows =
@@ -261,33 +281,89 @@ const TimetableTable = (props: TimetableTableProps) => {
     router.push(`/timetable-management/${row.id}`);
   };
 
-  const handleStatusChange = async (
-    row: ITimetableTableData,
-    newStatus: number
-  ) => {
-    const termId = row.termId;
+  // Handle initial status selection
+  const handleStatusChange = (row: ITimetableTableData, newStatus: number) => {
+    setSelectedStatus(newStatus);
+    setSelectedRow(row);
+    setConfirmModal(true);
+  };
+
+  // Handle actual status update after confirmation
+  const handleConfirmStatus = async () => {
+    if (!selectedRow || selectedStatus === null) return;
 
     try {
+      const termId = selectedRow.termId;
+
+      if (selectedStatus === 2) {
+        const timetablesRef = collection(firestore, "timetables");
+        const q = query(
+          timetablesRef,
+          where("term-id", "==", termId),
+          where("status", "==", SCHEDULE_STATUS.find((s) => s.value === 2)?.key)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          useNotify({
+            message: "Trong 1 học kì chỉ có 1 thời khóa biểu được áp dụng.",
+            type: "error",
+          });
+          return;
+        }
+      }
+
       // Update status via API
-      const result = await updateTimetableStatus(
+      await updateTimetableStatus(
         schoolId,
         selectedSchoolYearId,
         termId,
-        SCHEDULE_STATUS.find((status) => status.value === newStatus)?.key || "",
+        SCHEDULE_STATUS.find((status) => status.value === selectedStatus)
+          ?.key || "",
         sessionToken
       );
 
+      if (selectedStatus === 2) {
+        const scheduleRef = doc(
+          firestore,
+          "schedule-responses",
+          selectedRow.generatedScheduleId
+        );
+        const scheduleSnap = await getDoc(scheduleRef);
+
+        if (scheduleSnap.exists()) {
+          const scheduleData = scheduleSnap.data() as IScheduleResponse;
+          const publishResult = await publishTimetable(
+            schoolId,
+            selectedSchoolYearId,
+            scheduleData,
+            sessionToken
+          );
+
+          if (publishResult) {
+            useNotify({
+              message: `Công bố thời khóa biểu ${selectedRow.timetableCode} thành công`,
+              type: "success",
+            });
+          }
+        }
+      }
+
       // Update status in Firebase
-      const timetableRef = doc(firestore, "timetables", row.id);
+      const timetableRef = doc(firestore, "timetables", selectedRow.id);
       await updateDoc(timetableRef, {
-        status: SCHEDULE_STATUS.find((status) => status.value === newStatus)
-          ?.key,
+        status: SCHEDULE_STATUS.find(
+          (status) => status.value === selectedStatus
+        )?.key,
       });
 
       useNotify({
         message: "Cập nhật trạng thái thành công",
         type: "success",
       });
+
+      setConfirmModal(false);
       mutate();
     } catch (error) {
       useNotify({
@@ -339,7 +415,9 @@ const TimetableTable = (props: TimetableTableProps) => {
                     </TableCell>
                     <TableCell align="left">{row.timetableName}</TableCell>
                     <TableCell align="center">{row.termName}</TableCell>
-                    <TableCell align="center">{row.yearName}</TableCell>
+                    <TableCell align="center">
+                      {dayjs(row.generatedDate).format("DD-MM-YYYY")}
+                    </TableCell>
                     <TableCell align="center">
                       <FormControl
                         variant="standard"
@@ -359,7 +437,14 @@ const TimetableTable = (props: TimetableTableProps) => {
                           }}
                         >
                           {SCHEDULE_STATUS.map((status) => (
-                            <MenuItem key={status.key} value={status.value}>
+                            <MenuItem
+                              key={status.key}
+                              value={status.value}
+                              disabled={
+                                (row.status === 2 && (status.value === 1 || status.value === 3)) || 
+                                (row.status === 4 && (status.value === 2 || status.value === 3))
+                              }
+                            >
                               {SCHEDULE_STATUS_TRANSLATOR[status.value]}
                             </MenuItem>
                           ))}
@@ -389,6 +474,17 @@ const TimetableTable = (props: TimetableTableProps) => {
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <ConfirmStatusModal
+          open={confirmModal}
+          onClose={() => setConfirmModal(false)}
+          onConfirm={handleConfirmStatus}
+          status={selectedStatus || 0}
+          timetableCode={selectedRow?.timetableCode || ""}
+          timetableName={selectedRow?.timetableName || ''}
+          termName={selectedRow?.termName || ''}
+          appliedWeek={selectedRow?.appliedWeek || null}
+          endedWeek={selectedRow?.endedWeek || null}
         />
       </Paper>
     </Box>
