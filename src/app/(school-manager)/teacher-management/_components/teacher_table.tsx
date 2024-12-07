@@ -372,7 +372,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
                       >
                         <Image
                           src="/images/icons/delete.png"
-                          alt="Xóa tổ bộ môn"
+                          alt="Xóa giáo viên"
                           width={15}
                           height={15}
                         />
