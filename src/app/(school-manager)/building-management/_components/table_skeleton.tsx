@@ -49,7 +49,7 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "floor" as keyof IBuildingTableData,
-    label: "Tầng",
+    label: "Số lượng tầng",
     centered: false,
   },
 ];
