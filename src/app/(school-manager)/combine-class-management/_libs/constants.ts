@@ -61,10 +61,17 @@ export interface IAddCombineClassRequest {
   "student-class-id": number[];
 }
 
+export interface IExistingClass {
+  id: number;
+  "student-class-name": string;
+}
+
 export interface IExistingCombineClass {
   id: number;
   "room-subject-name": string;
   "room-subject-code": string;
+  "subject-id": number;
+  "student-class": IExistingClass[];
 }
 
 export interface IExistingCombineClassResponse {

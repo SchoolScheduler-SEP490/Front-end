@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { IExistingCombineClass } from "./constants";
+import { IExistingClass, IExistingCombineClass } from "./constants";
 
 export const addCombineClassSchema = (
   existCombineClass: IExistingCombineClass[]
@@ -40,34 +40,90 @@ export const addCombineClassSchema = (
 
     "student-class-id": yup
       .array()
-      .of(yup.number().min(1, "Lớp học không hợp lệ"))
+      .of(yup.number())
       .required("Danh sách lớp không được để trống")
-      .min(1, "Phải có ít nhất một lớp học"),
+      .min(2, "Số lượng lớp phải lớn hơn 1")
+      .test(
+        "unique-class",
+        "Một số lớp đã được ghép trong môn học này",
+        function (value) {
+          if (!value) return true;
+
+          const subjectId = this.parent["subject-id"];
+
+          const conflictingClasses = existCombineClass.filter(
+            (combineClass) =>
+              // Check same subject and overlapping classes
+              combineClass["subject-id"] === subjectId &&
+              combineClass["student-class"].some((existingClass) =>
+                value.includes(existingClass.id)
+              )
+          );
+
+          return conflictingClasses.length === 0;
+        }
+      ),
   });
 
-export const updateCombineClassSchema = yup.object().shape({
+export const updateCombineClassSchema = (
+  existCombineClass: IExistingCombineClass[],
+  currentId: number
+) => {
+  if (!existCombineClass) {
+    existCombineClass = [];
+  }
 
-  "subject-id": yup.number().required("Vui lòng chọn môn học"),
+  return yup.object().shape({
+    "subject-id": yup.number().required("Vui lòng chọn môn học"),
 
-  "room-id": yup.number().required("Vui lòng chọn phòng học"),
+    "room-id": yup.number().required("Vui lòng chọn phòng học"),
 
-  "term-id": yup.number().required("Vui lòng chọn học kỳ"),
+    "term-id": yup.number().required("Vui lòng chọn học kỳ"),
 
-  "teacher-id": yup.number().required("Vui lòng chọn giáo viên"),
+    "teacher-id": yup.number().required("Vui lòng chọn giáo viên"),
 
-  "room-subject-code": yup
-    .string()
-    .required("Mã phòng học không được để trống"),
+    "room-subject-code": yup
+      .string()
+      .required("Mã phòng học không được để trống"),
 
-  "room-subject-name": yup
-    .string()
-    .required("Tên phòng học không được để trống"),
+    "room-subject-name": yup
+      .string()
+      .required("Tên phòng học không được để trống"),
 
-  session: yup.string().required("Vui lòng chọn buổi học"),
+    session: yup.string().required("Vui lòng chọn buổi học"),
 
-  "student-class-ids": yup
-    .array()
-    .of(yup.number().min(1, "Lớp học không hợp lệ"))
-    .required("Danh sách lớp không được để trống")
-    .min(1, "Phải có ít nhất một lớp học"),
-});
+    "student-class-ids": yup
+      .array()
+      .of(yup.number())
+      .required("Danh sách lớp không được để trống")
+      .min(1, "Phải có ít nhất một lớp học")
+      .test(
+        "unique-class",
+        "Một số lớp đã được ghép trong môn học này",
+        function (value) {
+          if (!value) return true;
+
+          const subjectId = this.parent["subject-id"];
+
+          // Add null checks
+          if (!existCombineClass || !Array.isArray(existCombineClass)) {
+            return true;
+          }
+
+          const otherCombineClasses = existCombineClass.filter(
+            (c) => c.id !== currentId
+          );
+
+          const conflictingClasses = otherCombineClasses.filter(
+            (combineClass) =>
+              combineClass["subject-id"] === subjectId &&
+              combineClass["student-class"].some((existingClass) =>
+                value.includes(existingClass.id)
+              )
+          );
+
+          return conflictingClasses.length === 0;
+        }
+      ),
+  });
+};
