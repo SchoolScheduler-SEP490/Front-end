@@ -25,7 +25,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 			},
 			{
 				name: 'Thời khóa biểu GV',
-				url: '/teacher-timetable?teacherId=',
+				url: '/teacher-timetable',
 				icon: '/images/icons/teacher-timetable.png',
 			}
 		],
