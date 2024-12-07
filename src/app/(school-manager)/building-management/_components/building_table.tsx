@@ -75,8 +75,8 @@ const headCells: readonly HeadCell[] = [
   },
   {
     id: "floor" as keyof IBuildingTableData,
-    label: "Tầng",
-    centered: false,
+    label: "Số lượng tầng",
+    centered: true,
   },
 ];
 
@@ -311,7 +311,7 @@ const BuildingTable = (props: IBuildingTableProps) => {
                       <TableCell align="left">{row.name}</TableCell>
                       <TableCell align="left">{row.buildingCode}</TableCell>
                       <TableCell align="left">{row.description}</TableCell>
-                      <TableCell align="left">{row.floor}</TableCell>
+                      <TableCell align="center">{row.floor}</TableCell>
                       <TableCell
                         width={80}
                         onClick={(e) => e.stopPropagation()}

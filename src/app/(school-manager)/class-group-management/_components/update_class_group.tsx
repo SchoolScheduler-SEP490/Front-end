@@ -69,7 +69,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
       if (
         existClassGroup.some((c) => c["group-name"] === values["group-name"] && c.id !== classGroupId)
       ) {
-        errors["group-name"] = "Tên tổ hợp đã tồn tại";
+        errors["group-name"] = "Tên nhóm lớp đã tồn tại";
       }
       if (
         existClassGroup.some((c) => c["student-class-group-code"] === values["student-class-group-code"] && c.id !== classGroupId)
@@ -89,7 +89,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
         mutate();
       } else {
         useNotify({
-          message: "Cập nhật nhóm lơp thất bại.",
+          message: "Cập nhật nhóm lớp thất bại.",
           type: "error",
         });
       }
@@ -172,14 +172,14 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tên tổ hợp
+                    Tên nhóm lớp
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <TextField
                     variant="standard"
                     fullWidth
-                    placeholder="Nhập tên lớp"
+                    placeholder="Nhập tên nhóm lớp"
                     name="group-name"
                     type="text"
                     value={formik.values["group-name"]}
@@ -213,7 +213,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
                   <TextField
                     variant="standard"
                     fullWidth
-                    placeholder="Nhập mô tả tổ hợp"
+                    placeholder="Nhập mô tả"
                     name="group-description"
                     type="text"
                     value={formik.values["group-description"]}

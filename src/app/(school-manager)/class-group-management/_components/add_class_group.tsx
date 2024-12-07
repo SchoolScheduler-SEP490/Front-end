@@ -129,14 +129,14 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tên tổ hợp
+                    Tên nhóm lớp
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
                   <TextField
                     variant="standard"
                     fullWidth
-                    placeholder="Nhập tên lớp"
+                    placeholder="Nhập tên nhóm lớp"
                     name="group-name"
                     type="text"
                     value={formik.values["group-name"]}
@@ -170,7 +170,7 @@ const AddClassGroupModal = (props: AddClassGroupFormProps) => {
                   <TextField
                     variant="standard"
                     fullWidth
-                    placeholder="Nhập mô tả tổ hợp"
+                    placeholder="Nhập mô tả"
                     name="group-description"
                     type="text"
                     value={formik.values["group-description"]}
