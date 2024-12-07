@@ -208,6 +208,14 @@ export const APPROPRIATE_LEVEL: { key: number; value: string }[] = [
 	{ key: 5, value: 'Mastery' },
 ];
 
+export const APPROPRIATE_LEVEL_TRANSLATOR: { [key: string]: number } = {
+	'Unqualified': 1,
+	'Basic': 2,
+	'Proficient': 3,
+	'Advanced': 4,
+	'Mastery': 5
+  };
+
 export const TIMETABLE_SLOTS = [
 	{ period: 'Sáng', slots: ['Tiết 1', 'Tiết 2', 'Tiết 3', 'Tiết 4', 'Tiết 5'] },
 	{ period: 'Chiều', slots: ['Tiết 6', 'Tiết 7', 'Tiết 8', 'Tiết 9', 'Tiết 10'] },
@@ -366,7 +374,6 @@ export const SCHEDULE_STATUS: { key: string; value: number }[] = [
 	{ key: 'Published', value: 2 },
 	{ key: 'PublishedInternal', value: 3 },
 	{ key: 'Expired', value: 4 },
-	{ key: 'Disabled', value: 5 },
 ];
 
 export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
@@ -374,5 +381,4 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	2: 'Công bố',
 	3: 'Nội bộ',
 	4: 'Hết hạn',
-	5: 'Vô hiệu',
 };
