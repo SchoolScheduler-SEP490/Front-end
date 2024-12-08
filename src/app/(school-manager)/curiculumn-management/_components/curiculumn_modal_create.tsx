@@ -101,7 +101,7 @@ const CreateCurriculumModal = (props: IAddSubjectModalProps) => {
 		pageSize: 1000,
 	});
 	const { data: schoolYearData, error: schoolYearError } = useFetchSchoolYear({
-		includePrivate: true,
+		includePrivate: false,
 	});
 
 	const handleClose = () => {

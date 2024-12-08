@@ -9,7 +9,7 @@ import {
 	WEEK_DAYS,
 } from '@/utils/constants';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import PostAddIcon from '@mui/icons-material/PostAdd';
+import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import {
 	Box,
 	Button,
@@ -44,8 +44,8 @@ import {
 	ITimetableDisplayData,
 } from '../_libs/constants';
 import ConfigurationAdjustModal from './timetable_modal_adjust';
-import TimetableEditModal from './timetable_modal_edit';
 import TimetableConfirmModal from './timetable_modal_confirm';
+import TimetableEditModal from './timetable_modal_edit';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -318,7 +318,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 
 						<LightTooltip title='Xếp lại TKB' arrow>
 							<IconButton color='success' onClick={() => openConfirmModal(true)}>
-								<PostAddIcon />
+								<EventRepeatIcon />
 							</IconButton>
 						</LightTooltip>
 

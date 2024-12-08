@@ -59,7 +59,7 @@ export default function Home() {
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
 
-	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: true });
+	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const {
 		data: termData,
 		error: termFetchError,
@@ -116,13 +116,15 @@ export default function Home() {
 
 	const handleCreateTimetable = async () => {
 		// Tạo timetable object lên Firebase
-		var newTimetableData: ITimetableStoreObject = {
+		let newTimetableData: ITimetableStoreObject = {
 			'timetable-name': timetableName,
 			'timetable-abbreviation': timetableAbbreviation,
 			'school-id': Number(schoolId),
 			'year-id': selectedSchoolYearId,
 			'generated-schedule-id': null,
 			'generated-date': null,
+			'fitness-point': 0,
+			'time-cost': 0,
 			'year-name': schoolYearIdOptions.find((item) => item.value === selectedYearId)?.label ?? '',
 			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
 			'term-id': selectedTermId,
@@ -133,7 +135,7 @@ export default function Home() {
 			'published-timetable-id': null,
 			status: 1,
 		};
-		var newConfigurationData: IConfigurationStoreObject = {
+		let newConfigurationData: IConfigurationStoreObject = {
 			id: '',
 			'timetable-id': '',
 			'teacher-assignments': [],

@@ -13,7 +13,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material';
-import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { IDistrictResponse, IProvinceResponse } from '../_libs/constants';
 
 interface IRegionsTableProps {
@@ -29,11 +29,11 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 		props;
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
-	const [expanded, setExpanded] = useState<string | false>(false);
+	const [expanded, setExpanded] = useState<number | false>(false);
 	const [selectedDistrictData, setSelectedDistrictData] = useState<IDistrictResponse[]>([]);
 
 	useEffect(() => {
-		if (districtData.length > 0 && selectedProvinceId === Number(expanded as string)) {
+		if (districtData.length > 0 && selectedProvinceId === expanded) {
 			setSelectedDistrictData(districtData);
 		}
 	}, [districtData]);
@@ -42,15 +42,15 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 		setSearchTerm(e.target.value.toLowerCase());
 	};
 
-	const filteredProvinces = data.filter((province) =>
-		province.name.toLowerCase().includes(searchTerm)
-	);
+	const filteredProvinces: IProvinceResponse[] = useMemo((): IProvinceResponse[] => {
+		return data.filter((province) => province.name.toLowerCase().includes(searchTerm));
+	}, [searchTerm, data]);
 
 	const handleChange =
-		(provinceId: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+		(provinceId: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
 			setExpanded(isExpanded ? provinceId : false);
 			if (isExpanded) {
-				setSelectedProvinceId(parseInt(provinceId));
+				setSelectedProvinceId(provinceId);
 			}
 		};
 
@@ -70,8 +70,8 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 			{filteredProvinces.map((province) => (
 				<Accordion
 					key={province.id}
-					expanded={expanded === province.id.toString()}
-					onChange={handleChange(province.id.toString())}
+					expanded={expanded === province.id}
+					onChange={handleChange(province.id)}
 				>
 					<AccordionSummary
 						expandIcon={<ExpandMoreIcon />}
@@ -79,6 +79,10 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 							flexDirection: 'row-reverse', // Đảo ngược icon và nội dung
 							'& .MuiAccordionSummary-content': {
 								marginLeft: 1, // Thêm khoảng cách giữa icon và nội dung
+							},
+							'&:hover': {
+								color: 'primary.main',
+								backgroundColor: 'action.hover',
 							},
 						}}
 					>

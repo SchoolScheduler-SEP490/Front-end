@@ -126,10 +126,11 @@ interface ITeachersLessonsTableProps {
 	maxSlot: number;
 	homeroomTeacher: string;
 	mainSession: number;
+	isCombinationClass: boolean;
 }
 
 const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
-	const { data, maxSlot, homeroomTeacher, mainSession } = props;
+	const { data, maxSlot, homeroomTeacher, mainSession, isCombinationClass } = props;
 
 	const [alignment, setAlignment] = useState<string>('list');
 	const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
@@ -242,10 +243,19 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 								</ToggleButton>
 							</ToggleButtonGroup>
 						</div>
-						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
-							<h3 className='text-body-medium opacity-80'>GVCN:</h3>
-							<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
-						</div>
+						{!isCombinationClass ? (
+							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
+								<h3 className='text-body-medium opacity-80'>GVCN:</h3>
+								<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
+							</div>
+						) : (
+							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
+								<h3 className='text-body-medium opacity-80'>{homeroomTeacher.split('|')[0]}: </h3>
+								<h2 className='text-body-medium-strong font-normal'>
+									{homeroomTeacher.split('|')[1]}
+								</h2>
+							</div>
+						)}
 					</Toolbar>
 					<TableContainer component={Paper} sx={{ maxWidth: 900, margin: 'auto' }}>
 						{/* <Table onMouseUp={handleMouseUp} size='small' onMouseLeave={handleMouseUp}> */}

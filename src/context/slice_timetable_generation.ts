@@ -58,11 +58,9 @@ export const timetableGenerationSlice = createSlice({
 		},
 		updateDataStored: (state, action: PayloadAction<IUpdateDataStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
-			state.isTimetableGenerating = true;
 		},
 		updateTimetableStored: (state, action: PayloadAction<IUpdateTimetableStored>) => {
 			(state.dataStored as any)[action.payload.target] = action.payload.value;
-			state.isTimetableGenerating = true;
 		},
 		setTimetableId: (state, action: PayloadAction<string>) => {
 			state.timetableId = action.payload;

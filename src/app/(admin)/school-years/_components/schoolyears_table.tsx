@@ -1,4 +1,4 @@
-'use client';
+import { ISchoolYearResponse } from '@/utils/constants';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
 	Chip,
@@ -17,39 +17,23 @@ import {
 } from '@mui/material';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ACCOUNT_STATUS, SCHOOL_STATUS } from '../../_utils/constants';
-import { ISchoolResponse } from '../_libs/constants';
 import styles from '../_styles/table_styles.module.css';
 
-const SCHOOL_STATUS_COLOR: { [key: string]: string } = {
-	Validating: 'warning',
-	Pending: 'default',
-	Active: 'success',
-	Inactive: 'error',
-};
-
-interface IAccountTableProps {
-	data: ISchoolResponse[];
+interface ISchoolYearTableProps {
+	data: ISchoolYearResponse[];
 	page: number;
 	setPage: Dispatch<SetStateAction<number>>;
 	rowsPerPage: number;
 	setRowsPerPage: Dispatch<SetStateAction<number>>;
 	totalRows?: number;
-	// selectedAccountStatus: string;
-	setIsFilterableModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	setIsFilterableModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const SchoolsTable = (props: IAccountTableProps) => {
-	const {
-		data,
-		page,
-		rowsPerPage,
-		setPage,
-		setRowsPerPage,
-		totalRows,
-		// selectedAccountStatus,
-		setIsFilterableModalOpen,
-	} = props;
+const SchoolYearTable = (props: ISchoolYearTableProps) => {
+	const { data, page, rowsPerPage, setPage, setRowsPerPage, totalRows, setIsFilterableModalOpen } =
+		props;
+
+	const visibleRows = useMemo(() => [...data], [page, rowsPerPage, data]);
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -63,10 +47,8 @@ const SchoolsTable = (props: IAccountTableProps) => {
 		setIsFilterableModalOpen((prev) => !prev);
 	};
 
-	const visibleRows = useMemo(() => [...data], [page, rowsPerPage, data]);
-
 	return (
-		<Paper>
+		<Paper sx={{ width: '100%' }}>
 			<Toolbar
 				sx={[
 					{
@@ -79,7 +61,7 @@ const SchoolsTable = (props: IAccountTableProps) => {
 				]}
 			>
 				<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-					Danh sách trường học
+					Danh sách năm học
 				</h2>
 				<Tooltip title='Lọc danh sách'>
 					<IconButton onClick={handleFilterable}>
@@ -92,15 +74,15 @@ const SchoolsTable = (props: IAccountTableProps) => {
 					<TableHead>
 						<TableRow>
 							<TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Tên trường</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Địa chỉ</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Tên tỉnh</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Mã năm học</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Năm bắt đầu</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Năm kết thúc</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Phân loại</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						<TransitionGroup component={null}>
-							{visibleRows.map((school: ISchoolResponse, index: number) => (
+							{visibleRows.map((school: ISchoolYearResponse, index: number) => (
 								<CSSTransition
 									key={school.id}
 									timeout={500}
@@ -122,7 +104,7 @@ const SchoolsTable = (props: IAccountTableProps) => {
 													fontSize: 14,
 												}}
 											>
-												{school.name}
+												{school['school-year-code']}
 											</Typography>
 										</TableCell>
 										<TableCell>
@@ -134,15 +116,15 @@ const SchoolsTable = (props: IAccountTableProps) => {
 													fontSize: 14,
 												}}
 											>
-												{school.address}
+												{school['start-year']}
 											</Typography>
 										</TableCell>
-										<TableCell>{school['province-name']}</TableCell>
+										<TableCell>{school['end-year']}</TableCell>
 										<TableCell>
 											<Chip
-												label={SCHOOL_STATUS[school.status]}
+												label={school['is-public'] ? 'Công khai' : 'Nội bộ'}
 												variant='outlined'
-												color={(SCHOOL_STATUS_COLOR[school.status] as any) ?? 'info'}
+												color={school['is-public'] ? 'success' : 'warning'}
 											/>
 										</TableCell>
 									</TableRow>
@@ -169,4 +151,4 @@ const SchoolsTable = (props: IAccountTableProps) => {
 	);
 };
 
-export default SchoolsTable;
+export default SchoolYearTable;

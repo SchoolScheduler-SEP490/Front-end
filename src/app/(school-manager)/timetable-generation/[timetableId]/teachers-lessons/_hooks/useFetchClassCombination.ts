@@ -1,5 +1,7 @@
 import useSWR from 'swr';
 import { getFetchClassCombinationApi } from '../_libs/apis';
+import { IPaginatedResponse } from '@/utils/constants';
+import { IClassCombinationResponse } from '../_libs/constants';
 
 interface IClassDataProps {
 	sessionToken: string;
@@ -27,7 +29,7 @@ const useFetchClassCombination = ({
 		if (!response.ok) {
 			throw new Error(data.message);
 		}
-		return data;
+		return data as IPaginatedResponse<IClassCombinationResponse>;
 	};
 
 	const endpoint = getFetchClassCombinationApi({
@@ -41,9 +43,10 @@ const useFetchClassCombination = ({
 		sessionToken ? endpoint : null,
 		fetcher,
 		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: true,
 			revalidateIfStale: false,
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
+			revalidateOnMount: false,
 			shouldRetryOnError: false,
 		}
 	);

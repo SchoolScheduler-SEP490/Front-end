@@ -110,7 +110,7 @@ const AccountsTable = (props: IAccountTableProps) => {
 							<TableCell sx={{ fontWeight: 'bold' }}>Tên trường</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Số điện thoại</TableCell>
-							<TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Trạng thái</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
