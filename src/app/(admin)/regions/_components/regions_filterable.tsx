@@ -206,6 +206,7 @@ const RegionsFilterable = (props: IAccountsFilterableProps) => {
 										/>
 										<IconButton
 											color='error'
+											className='!translate-y-2'
 											onClick={() => handleRemoveRow(index)}
 											sx={{ marginLeft: 1 }}
 											disabled={districtNames.length === 1}

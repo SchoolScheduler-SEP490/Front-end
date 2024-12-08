@@ -77,6 +77,8 @@ export default function Home() {
 									...timetableStored,
 									'generated-schedule-id': existingDoc.id,
 									'generated-date': result['create-date'],
+									'fitness-point': result['fitness-point'],
+									'time-cost': result['excute-time'],
 								} as ITimetableStoreObject,
 								{ merge: true }
 							).then(() => {
@@ -114,11 +116,14 @@ export default function Home() {
 										...timetableStored,
 										'generated-schedule-id': resRef.id,
 										'generated-date': result['create-date'],
+										'fitness-point': result['fitness-point'],
+										'time-cost': result['excute-time'],
 									} as ITimetableStoreObject,
 									{ merge: true }
 								).then(() => {
 									// Dispatch từng hành động một cách riêng biệt
 									dispatch(
+										setGeneratingStatus(false),
 										setGeneratedScheduleStored(result),
 										updateTimetableStored({
 											target: 'generated-schedule-id',

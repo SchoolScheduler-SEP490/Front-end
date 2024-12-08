@@ -48,6 +48,13 @@ export const ACCOUNT_STATUS: { [key: string]: string } = {
 	Inactive: 'Vô hiệu',
 };
 
+export const SCHOOL_STATUS: { [key: string]: string } = {
+	Validating: 'Đang xác thực',
+	Pending: 'Chưa hoạt động',
+	Active: 'Hoạt động',
+	Inactive: 'Vô hiệu',
+};
+
 export const DROPDOWN_ACCOUNT_STATUS: { [key: string]: string } = {
 	All: 'Tất cả',
 	Pending: 'Chờ duyệt',

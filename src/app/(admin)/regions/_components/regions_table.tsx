@@ -29,7 +29,6 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 		props;
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
-	const [isLoading, setIsLoading] = useState<boolean>(false); // Trạng thái loading
 	const [expanded, setExpanded] = useState<number | false>(false);
 	const [selectedDistrictData, setSelectedDistrictData] = useState<IDistrictResponse[]>([]);
 

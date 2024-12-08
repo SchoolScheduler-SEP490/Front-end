@@ -7,3 +7,7 @@ export interface IAccountResponse {
 	status: string;
 	'create-date': string;
 }
+
+export interface ITopSchoolObject extends IAccountResponse {
+	totalTimetable: number;
+}

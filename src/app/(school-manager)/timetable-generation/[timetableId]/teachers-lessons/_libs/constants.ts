@@ -126,3 +126,44 @@ export interface ISubjectInGroup {
 	'main-minimum-couple': number;
 	'sub-minimum-couple': number;
 }
+
+export interface IClassCombinationResponse {
+	id: number;
+	'subject-id': number;
+	'room-id': number;
+	'school-id': number;
+	'term-id': number;
+	'teacher-id': number;
+	'room-subject-code': string;
+	'room-subject-name': string;
+	'teacher-first-name': string;
+	'teacher-last-name': string;
+	'teacher-abbreviation': string;
+	'slot-per-week': number;
+	'e-grade': string;
+	model: string;
+	session: string;
+	'student-class': {
+		id: number;
+		'student-class-name': string;
+	}[];
+	'create-date': string;
+	'update-date': string | null;
+	'is-deleted': boolean;
+}
+
+export interface ISubjectResponse {
+	id: number;
+	'subject-name': string;
+	abbreviation: string;
+	'is-required': boolean;
+	description: string;
+	'create-date': string;
+	'update-date': string;
+	'is-deleted': boolean;
+	'subject-group-type': string;
+	'school-year-id': number;
+	'school-year-code': string;
+	'total-slot-in-year': number;
+	'slot-specialized': number;
+}

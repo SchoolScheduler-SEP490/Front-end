@@ -292,6 +292,8 @@ export interface ITimetableStoreObject {
 	'generated-date': string | null;
 	// End date của công bố Nội bộ
 	'internal-end-date': string | null;
+	'fitness-point': number;
+	'time-cost': number;
 	'applied-week': number | null;
 	'ended-week': number | null;
 	status: number;

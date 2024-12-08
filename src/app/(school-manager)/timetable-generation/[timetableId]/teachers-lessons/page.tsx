@@ -1,26 +1,30 @@
 'use client';
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import useNotify from '@/hooks/useNotify';
+import { IFixedPeriodObject, ITeachingAssignmentObject } from '@/utils/constants';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import TeachersLessonsSideNav from './_components/teachers_lessons_sidenav';
 import TeachersLessonsTable from './_components/teachers_lessons_table';
 import useFetchClassData from './_hooks/useFetchClass';
+import useFetchCurriculumDetails from './_hooks/useFetchCurriculumDetails';
 import useFetchSubject from './_hooks/useFetchSubject';
+import useFetchTeacher from './_hooks/useFetchTeacher';
 import useFetchTeachingAssignment from './_hooks/useFetchTeachingAssignment';
 import useSidenavDataConverter from './_hooks/useSidenavDataConverter';
 import {
 	IAssignmentResponse,
+	IClassCombinationResponse,
 	IClassResponse,
+	ICurriculumDetailResponse,
 	ISubjectInGroup,
+	ISubjectResponse,
 	ITeacherResponse,
 	ITeachersLessonsObject,
 	ITeachersLessonsSidenavData,
 } from './_libs/constants';
-import useFetchTeacher from './_hooks/useFetchTeacher';
-import useNotify from '@/hooks/useNotify';
-import { IFixedPeriodObject, ITeachingAssignmentObject } from '@/utils/constants';
-import useFetchCurriculumDetails from './_hooks/useFetchCurriculumDetails';
+import useFetchClassCombination from './_hooks/useFetchClassCombination';
 
 export default function TeachersLessons() {
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
@@ -35,8 +39,13 @@ export default function TeachersLessons() {
 	const [selectedCurriculumId, setSelectedCurriculumId] = useState<number>(0);
 	const [maxSlot, setMaxSlot] = useState<number>(5);
 
+	// Data của clascombination
+	const [selectedCombinationId, setSelectedCombinationId] = useState<number>(0);
+	const [isCombinationClass, setIsCombinationClass] = useState<boolean>(false);
+
 	const [editingObjects, setEditingObjects] = useState<ITeachersLessonsObject[]>([]);
 	const [sidenavData, setSidenavData] = useState<ITeachersLessonsSidenavData[]>([]);
+	const [classCombinationData, setClassCombinationData] = useState<IClassCombinationResponse[]>([]);
 
 	const { data: teacherData, mutate: updateTeacher } = useFetchTeacher({
 		sessionToken,
@@ -67,23 +76,79 @@ export default function TeachersLessons() {
 		termId: timetableStored['term-id'] ?? 0,
 	});
 
-	const { data: curriculumDetails, mutate: updateCurriculum } = useFetchCurriculumDetails({
+	const { data: curriculumData, mutate: updateCurriculum } = useFetchCurriculumDetails({
 		sessionToken,
 		schoolId: Number(schoolId),
 		schoolYearId: timetableStored['year-id'],
 		curriculumId: selectedCurriculumId,
 	});
 
+	const { data: classCombinationResponse, mutate: updateClassCombination } =
+		useFetchClassCombination({
+			schoolId: schoolId,
+			sessionToken,
+			pageIndex: 1,
+			pageSize: 1000,
+			termId: timetableStored['term-id'],
+		});
+
+	useEffect(() => {
+		updateClassCombination();
+		updateSubject();
+		setEditingObjects([]);
+		if (selectedCombinationId !== 0 && subjectData?.status === 200) {
+			const currentCombination: IClassCombinationResponse | undefined = classCombinationData.find(
+				(combination) => combination.id === selectedCombinationId
+			);
+			const currentSubject: ISubjectResponse | undefined = subjectData.result.items.find(
+				(subject: ISubjectResponse) => subject.id === currentCombination?.['subject-id']
+			);
+			if (currentCombination !== undefined && currentSubject !== undefined) {
+				const tmpRes: ITeachersLessonsObject = {
+					classId: 0,
+					teacherId: currentCombination['teacher-id'],
+					teacherName: `${currentCombination['teacher-last-name']} ${currentCombination['teacher-first-name']} (${currentCombination['teacher-abbreviation']})`,
+					slots: [],
+					subjectId: currentCombination['subject-id'],
+					subjectName: currentSubject['subject-name'],
+					subjectAbbreviation: currentSubject.abbreviation,
+					totalSlotPerWeek: currentCombination['slot-per-week'],
+					totalMainSlotsPerWeek: currentCombination['slot-per-week'],
+					totalSubSlotsPerWeek: currentCombination['slot-per-week'],
+					isDoubleSlot:
+						currentCombination['slot-per-week'] > 2 &&
+						currentCombination['slot-per-week'] % 2 === 0,
+					minimumMainCouple: 0,
+					minimumSubCouple: 0,
+					className: currentCombination['e-grade'],
+				} as ITeachersLessonsObject;
+				setSelectedHomeroom(
+					`${currentCombination['e-grade']}|${currentCombination['student-class']
+						.map((clazz) => clazz['student-class-name'])
+						.join(',')}`
+				);
+				setEditingObjects((prev) => [...prev, tmpRes]);
+			}
+		}
+	}, [selectedCombinationId, subjectData]);
+
+	useEffect(() => {
+		updateClassCombination();
+		if (classCombinationResponse?.status === 200) {
+			setClassCombinationData(classCombinationResponse.result.items);
+			setSelectedCombinationId(classCombinationResponse.result.items[0].id);
+		}
+	}, [classCombinationResponse]);
+
 	useEffect(() => {
 		setEditingObjects([]);
+		setSelectedHomeroom('');
 		updateAssignment();
 		updateCurriculum();
 		updateTeacher();
-		updateSubject();
 		updateClass();
 		if (
 			assignmentData?.status === 200 &&
-			subjectData?.status === 200 &&
 			classData?.status === 200 &&
 			teacherData?.status === 200 &&
 			dataStored
@@ -102,11 +167,11 @@ export default function TeachersLessons() {
 				...assignmentData.result['teacher-not-assignt-view'],
 			];
 			let availableCurriculumSubjects: ISubjectInGroup[] = [];
-			if (curriculumDetails?.status === 200) {
+			if (curriculumData?.status === 200) {
 				availableCurriculumSubjects = [
-					...curriculumDetails.result['subject-selective-views'],
-					...curriculumDetails.result['subject-specializedt-views'],
-					...curriculumDetails.result['subject-required-views'],
+					...curriculumData.result['subject-selective-views'],
+					...curriculumData.result['subject-specializedt-views'],
+					...curriculumData.result['subject-required-views'],
 				];
 			}
 			if (availableSubjects.length > 0 && availableCurriculumSubjects.length > 0) {
@@ -170,15 +235,7 @@ export default function TeachersLessons() {
 				}
 			}
 		}
-	}, [
-		assignmentData,
-		subjectData,
-		teacherData,
-		classData,
-		dataStored,
-		timetableStored,
-		curriculumDetails,
-	]);
+	}, [assignmentData, teacherData, classData, dataStored, timetableStored, curriculumData]);
 
 	// Lấy data cho sidenav
 	useEffect(() => {
@@ -189,7 +246,6 @@ export default function TeachersLessons() {
 			);
 			if (tmpData.length > 0) {
 				setSidenavData(tmpData);
-				setSelectedClassId(tmpData[0].items[0].value);
 				setSelectedGrade(tmpData[0].grade);
 			}
 		}
@@ -203,6 +259,10 @@ export default function TeachersLessons() {
 					setSelectedClass={setSelectedClassId}
 					classData={sidenavData}
 					setSelectedGrade={setSelectedGrade}
+					classCombinationData={classCombinationData}
+					selectedCombination={selectedCombinationId}
+					setIsCombinationClass={setIsCombinationClass}
+					setSelectedCombination={setSelectedCombinationId}
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start gap-5'>
 					<div className='w-full h-[85vh] pt-[5vh] px-[5vw] overflow-y-scroll no-scrollbar'>
@@ -211,6 +271,7 @@ export default function TeachersLessons() {
 							maxSlot={maxSlot}
 							homeroomTeacher={selectedHomeroom}
 							mainSession={selectedMainSesion}
+							isCombinationClass={isCombinationClass}
 						/>
 					</div>
 				</div>

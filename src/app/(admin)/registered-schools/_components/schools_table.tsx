@@ -17,9 +17,16 @@ import {
 } from '@mui/material';
 import { ChangeEvent, Dispatch, SetStateAction, useMemo } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ACCOUNT_STATUS } from '../../_utils/constants';
+import { ACCOUNT_STATUS, SCHOOL_STATUS } from '../../_utils/constants';
 import { ISchoolResponse } from '../_libs/constants';
 import styles from '../_styles/table_styles.module.css';
+
+const SCHOOL_STATUS_COLOR: { [key: string]: string } = {
+	Validating: 'warning',
+	Pending: 'default',
+	Active: 'success',
+	Inactive: 'error',
+};
 
 interface IAccountTableProps {
 	data: ISchoolResponse[];
@@ -72,7 +79,7 @@ const SchoolsTable = (props: IAccountTableProps) => {
 				]}
 			>
 				<h2 className='text-title-medium-strong font-semibold w-full text-left'>
-					Danh sách tài khoản
+					Danh sách trường học
 				</h2>
 				<Tooltip title='Lọc danh sách'>
 					<IconButton onClick={handleFilterable}>
@@ -133,15 +140,9 @@ const SchoolsTable = (props: IAccountTableProps) => {
 										<TableCell>{school['province-name']}</TableCell>
 										<TableCell>
 											<Chip
-												label={ACCOUNT_STATUS[school.status]}
+												label={SCHOOL_STATUS[school.status]}
 												variant='outlined'
-												color={
-													school.status === 'Active'
-														? 'success'
-														: school.status === 'Pending'
-														? 'warning'
-														: 'info'
-												}
+												color={(SCHOOL_STATUS_COLOR[school.status] as any) ?? 'info'}
 											/>
 										</TableCell>
 									</TableRow>

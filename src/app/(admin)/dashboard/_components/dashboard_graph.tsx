@@ -80,7 +80,7 @@ const DashboardGraph: FC<IDashboardGraphProps> = () => {
 	return (
 		<div className='relative w-full max-h-[45%] flex flex-col justify-center items-center'>
 			<Typography variant='h6' sx={{ p: 2, width: '100%' }}>
-				Top trường sử dụng
+				Số liệu chung
 			</Typography>
 			<div className='w-[70%] h-[70%]'>
 				<Chart data={data} options={options} type='bar' />

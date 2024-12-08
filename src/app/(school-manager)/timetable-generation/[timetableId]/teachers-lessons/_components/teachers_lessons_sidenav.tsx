@@ -7,7 +7,7 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { ITeachersLessonsSidenavData } from '../_libs/constants';
+import { IClassCombinationResponse, ITeachersLessonsSidenavData } from '../_libs/constants';
 import useFetchClassCombination from '../_hooks/useFetchClassCombination';
 import { useAppContext } from '@/context/app_provider';
 import { useDispatch, useSelector } from 'react-redux';
@@ -53,37 +53,66 @@ interface TeachersLessonsSidenavProps {
 	selectedClass: number;
 	setSelectedClass: React.Dispatch<React.SetStateAction<number>>;
 	setSelectedGrade: React.Dispatch<React.SetStateAction<string>>;
+	classCombinationData: IClassCombinationResponse[];
+	selectedCombination: number;
+	setSelectedCombination: React.Dispatch<React.SetStateAction<number>>;
+	setIsCombinationClass: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
-	const { classData, selectedClass, setSelectedClass, setSelectedGrade } = props;
+	const {
+		classData,
+		selectedClass,
+		setSelectedClass,
+		setSelectedGrade,
+		classCombinationData,
+		selectedCombination,
+		setSelectedCombination,
+		setIsCombinationClass,
+	} = props;
 	const [expanded, setExpanded] = useState<string[]>(['panel0']);
-	const { schoolId, sessionToken } = useAppContext();
-	const { timetableStored }: ITimetableGenerationState = useSelector(
-		(state: any) => state.timetableGeneration
-	);
-	const dispatch = useDispatch();
-
-	const [classCombinationSidenav, setClassCombinationSidenav] = useState<
-		ITeachersLessonsSidenavData[]
-	>([]);
-
-	const { data: classCombinationData, mutate: updateClassCombination } = useFetchClassCombination({
-		schoolId: schoolId,
-		sessionToken,
-		pageIndex: 1,
-		pageSize: 1000,
-		termId: timetableStored['term-id'],
-	});
+	const [sidenavData, setSidenavData] = useState<ITeachersLessonsSidenavData[]>([]);
 
 	useEffect(() => {
-		updateClassCombination();
-	});
+		setSidenavData([]);
+		if (classCombinationData.length > 0 && classData.length > 0) {
+			const tmpClassCombinationData: ITeachersLessonsSidenavData = {
+				title: 'Lớp ghép',
+				items: [],
+				grade: 'combination',
+			};
+			classCombinationData.forEach((item: IClassCombinationResponse) => {
+				tmpClassCombinationData.items.push({
+					key: item['room-subject-name'],
+					value: item.id,
+					extra: 'combination',
+				});
+			});
+			setSidenavData([tmpClassCombinationData, ...classData]);
+		} else setSidenavData(classData);
+	}, [classCombinationData, classData]);
+
+	useEffect(() => {
+		if (sidenavData.length > 0) {
+			if (classCombinationData.length > 0) {
+				setSelectedCombination(sidenavData[0].items[0].value);
+			} else {
+				setSelectedClass(sidenavData[0].items[0].value);
+			}
+		}
+	}, [sidenavData]);
 
 	const handleSelectCurriculum = (target: number, extra: string, grade: string) => {
-		// Implement logics here
-		setSelectedClass(target);
 		setSelectedGrade(grade);
+		if (extra === 'combination') {
+			setSelectedCombination(target);
+			setSelectedClass(0);
+			setIsCombinationClass(true);
+		} else {
+			setSelectedClass(target);
+			setSelectedCombination(0);
+			setIsCombinationClass(false);
+		}
 	};
 
 	const toggleDropdown = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -107,12 +136,12 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 	return (
 		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
 			<h1 className='text-body-large-strong w-full pl-3 py-3 text-left'>Lớp học</h1>
-			{classData.length === 0 && (
+			{sidenavData.length === 0 && (
 				<p className='text-body-medium w-full pl-3 py-3 text-left italic'>
 					Năm học chưa có lớp học
 				</p>
 			)}
-			{classData.map((grade, index) => (
+			{sidenavData.map((grade, index) => (
 				<Accordion
 					expanded={expanded.includes(`panel${index}`)}
 					onChange={toggleDropdown(`panel${index}`)}
@@ -131,7 +160,11 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 							<div
 								key={gradeClass.key + id}
 								className={`w-[100%] h-fit flex flex-row justify-start items-center py-2 pl-6 pr-3 gap-5 hover:cursor-pointer 
-									${selectedClass === gradeClass.value ? 'bg-basic-gray-active ' : 'hover:bg-basic-gray-hover'}`}
+									${
+										selectedClass === gradeClass.value || selectedCombination === gradeClass.value
+											? 'bg-basic-gray-active '
+											: 'hover:bg-basic-gray-hover'
+									}`}
 								onClick={() =>
 									handleSelectCurriculum(gradeClass.value, gradeClass.extra, grade.grade)
 								}

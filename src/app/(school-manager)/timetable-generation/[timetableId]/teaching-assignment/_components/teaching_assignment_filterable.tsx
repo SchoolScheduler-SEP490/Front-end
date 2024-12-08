@@ -79,7 +79,12 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 				setMinPeriodPerWeek(Number(value));
 				break;
 			case 'max':
-				setMaxPeriodPerWeek(Number(value));
+				if (Number(value) <= 17) {
+					setMaxPeriodPerWeek(Number(value));
+				} else {
+					setErrors((prev) => ({ ...prev, [name]: true }));
+					setMaxPeriodPerWeek(17);
+				}
 				break;
 		}
 
@@ -116,10 +121,7 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 				<div className='w-full flex flex-row justify-between items-center pt-1'>
-					<Typography
-						variant='h6'
-						className='text-title-small-strong font-normal w-full text-left'
-					>
+					<Typography variant='h6' className='text-title-small-strong font-normal w-full text-left'>
 						Tiết học
 					</Typography>
 					<IconButton onClick={handleClose} className='translate-x-2'>
