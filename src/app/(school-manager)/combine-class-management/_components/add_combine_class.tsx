@@ -92,6 +92,7 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
     },
     validationSchema: addCombineClassSchema(existingCombineClass),
     onSubmit: async (values) => {
+      console.log("Validating values:", values);
       const requestData = {
         "subject-id": values["subject-id"],
         "room-id": values["room-id"],
@@ -224,9 +225,11 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
     onClose(false);
   };
 
-  console.log("Value: ", formik.values);
-  console.log("Error: ", formik.errors);
-
+  console.log("Formik state:", {
+    values: formik.values,
+    errors: formik.errors,
+    touched: formik.touched,
+  });
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
@@ -423,18 +426,37 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
-                  <FormControl variant="standard" fullWidth>
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    error={
+                      formik.touched["student-class-id"] &&
+                      Boolean(formik.errors["student-class-id"])
+                    }
+                  >
                     <Select
                       multiple
                       name="student-class-id"
                       value={formik.values["student-class-id"]}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       MenuProps={MenuProps}
-                      displayEmpty
                     >
                       {availableClasses && availableClasses.length > 0 ? (
                         availableClasses.map((classItem) => (
-                          <MenuItem key={classItem.id} value={classItem.id}>
+                          <MenuItem
+                            key={classItem.id}
+                            value={classItem.id}
+                            disabled={existingCombineClass.some(
+                              (combine) => {
+                                return combine["subject-id"] ===
+                                  formik.values["subject-id"] &&
+                                combine["student-class"].some(
+                                  (studentClass) => studentClass.id === classItem.id
+                                )
+                              }
+                            )}
+                          >
                             {classItem.name}
                           </MenuItem>
                         ))
@@ -442,6 +464,12 @@ const AddCombineClassModal = (props: AddCombineClassFormProps) => {
                         <MenuItem disabled>Không có lớp học khả dụng</MenuItem>
                       )}
                     </Select>
+                    {formik.touched["student-class-id"] &&
+                      formik.errors["student-class-id"] && (
+                        <FormHelperText error>
+                          {formik.errors["student-class-id"]}
+                        </FormHelperText>
+                      )}
                   </FormControl>
                 </Grid>
               </Grid>

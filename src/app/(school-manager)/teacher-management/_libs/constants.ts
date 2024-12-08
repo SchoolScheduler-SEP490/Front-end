@@ -68,7 +68,7 @@ export interface IMainSubject {
 }
 
 export interface IAppropriateLevel {
-  "appropriate-level": string;
+  "appropriate-level": number;
   grade: string;
 }
 export interface IDepartment {

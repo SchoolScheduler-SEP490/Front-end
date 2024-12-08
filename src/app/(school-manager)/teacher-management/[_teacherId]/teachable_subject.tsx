@@ -15,11 +15,16 @@ import {
 } from "@mui/material";
 import { ITeachableSubject } from "../_libs/constants";
 import { getTeacherSubject } from "../_libs/apiTeacher";
-import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
+import {
+  APPROPRIATE_LEVEL_TRANSLATOR,
+  CLASSGROUP_TRANSLATOR,
+} from "@/utils/constants";
 import AddIcon from "@mui/icons-material/Add";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AddTeachableSubjectModal from "./add_teachable_subject";
 import useSWR, { KeyedMutator } from "swr";
+import Image from "next/image";
+import DeleteTeachableSubjectModal from "./delete_teachable_subject";
 
 interface TeachableSubjectTableProps {
   teacherId: string | null;
@@ -39,6 +44,10 @@ export default function TeachableSubjectTable({
   >([]);
   const [departmentName, setDepartmentName] = useState<string>("");
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
+  const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
+  const [selectedRow, setSelectedRow] = React.useState<
+    ITeachableSubject | undefined
+  >();
 
   const fetchData = async () => {
     if (teacherId) {
@@ -59,6 +68,15 @@ export default function TeachableSubjectTable({
   }, [teacherId, schoolId, sessionToken]);
 
   const handleOpenAddForm = () => setOpenAddForm(true);
+
+  const handleDeleteClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    row: ITeachableSubject
+  ) => {
+    event.stopPropagation();
+    setSelectedRow(row);
+    setOpenDeleteModal(true);
+  };
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -97,9 +115,11 @@ export default function TeachableSubjectTable({
                 <TableCell className="font-semibold">Môn học</TableCell>
                 <TableCell className="font-semibold">Mã môn học</TableCell>
                 <TableCell className="font-semibold">Khối lớp</TableCell>
+                <TableCell className="font-semibold">Trình độ</TableCell>
                 <TableCell className="font-semibold text-center">
                   Môn chính
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -131,6 +151,36 @@ export default function TeachableSubjectTable({
                       )
                     )}
                   </TableCell>
+                  <TableCell>
+                    {subject["list-approriate-level-by-grades"].map(
+                      (grade, idx) => (
+                        <div
+                          key={idx}
+                          className="flex justify-center items-center"
+                        >
+                          <span
+                            className={`font-medium ${
+                              APPROPRIATE_LEVEL_TRANSLATOR[
+                                grade["appropriate-level"]
+                              ] === 1
+                                ? "text-red-500"
+                                : APPROPRIATE_LEVEL_TRANSLATOR[
+                                    grade["appropriate-level"]
+                                  ] === 5
+                                ? "text-green-600"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {
+                              APPROPRIATE_LEVEL_TRANSLATOR[
+                                grade["appropriate-level"]
+                              ]
+                            }
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </TableCell>
 
                   <TableCell align="center">
                     <div className="w-full h-full flex justify-center items-center">
@@ -151,6 +201,20 @@ export default function TeachableSubjectTable({
                       </div>
                     </div>
                   </TableCell>
+                  <TableCell width={80}>
+                    <IconButton
+                      color="error"
+                      sx={{ zIndex: 10 }}
+                      onClick={(event) => handleDeleteClick(event, subject)}
+                    >
+                      <Image
+                        src="/images/icons/delete.png"
+                        alt="Xóa chuyên môn"
+                        width={15}
+                        height={15}
+                      />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -161,6 +225,13 @@ export default function TeachableSubjectTable({
           onClose={setOpenAddForm}
           teacherId={teacherId}
           mutate={fetchData}
+        />
+        <DeleteTeachableSubjectModal
+          open={openDeleteModal}
+          onClose={setOpenDeleteModal}
+          subjectName={selectedRow?.["subject-name"] ?? "Không xác định"}
+          subjectId={selectedRow?.["subject-id"] ?? 0}
+          mutate={mutate}
         />
       </Paper>
     </Box>

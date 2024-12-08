@@ -5,8 +5,8 @@ export const classGroupSchema = (existingClassGroup: IExistingClassGroup[]) =>
   yup.object().shape({
     "group-name": yup
       .string()
-      .required("Tên tổ hợp không được để trống")
-      .test("unique-name", "Tên tổ hợp đã tồn tại", function (value) {
+      .required("Tên nhóm lớp không được để trống")
+      .test("unique-name", "Tên nhóm lớp đã tồn tại", function (value) {
         if (!value) return true;
         return !existingClassGroup.some(
           (exist) => exist["group-name"].toLowerCase() === value.toLowerCase()
@@ -36,7 +36,7 @@ export const assignStudentClass = yup.object().shape({
 });
 
 export const updateClassGroupSchema = yup.object().shape({
-  "group-name": yup.string().required("Tên tổ hợp không được để trống"),
+  "group-name": yup.string().required("Tên nhóm lớp không được để trống"),
 
   "group-description": yup.string().required("Mô tả không được để trống"),
 

@@ -291,3 +291,25 @@ export const addNewTeachableSubject = async (
     return false;
   }
 };
+
+export const deleteTeachableSubject = async (
+  id: number,
+  schoolId: string,
+  sessionToken: string
+): Promise<void> => {
+  if (!sessionToken) {
+    throw new Error("Session token not found. Please log in.");
+  }
+  const url = `${api}/api/schools/${schoolId}/teachers/teachable-subject/${id}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${sessionToken}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+};
