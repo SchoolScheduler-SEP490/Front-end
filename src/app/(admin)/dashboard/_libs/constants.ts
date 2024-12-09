@@ -11,3 +11,10 @@ export interface IAccountResponse {
 export interface ITopSchoolObject extends IAccountResponse {
 	totalTimetable: number;
 }
+
+export interface ITotalNumberObject {
+	averageFitness: number;
+	averageTimeCost: number;
+	totalSchoolUsed: number;
+	totalSchoolPending: number;
+}
