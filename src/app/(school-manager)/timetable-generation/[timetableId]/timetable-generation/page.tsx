@@ -7,11 +7,10 @@ import {
 	updateTimetableStored,
 } from '@/context/slice_timetable_generation';
 import useNotify from '@/hooks/useNotify';
+import { useSMDispatch, useSMSelector } from '@/hooks/useReduxStore';
 import { IScheduleResponse, ITimetableStoreObject } from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import { addDoc, collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import TimetableLoading from './_components/timetable_loading';
 import PreviewScheduleTable from './_components/timetable_table_preview';
 import useGenerateTimetable from './_hooks/useGenerateTimetable';
@@ -26,8 +25,8 @@ export default function Home() {
 		generatedScheduleFirestorename,
 		timetableId,
 		isTimetableGenerating,
-	}: ITimetableGenerationState = useSelector((state: any) => state.timetableGeneration);
-	const dispatch = useDispatch();
+	}: ITimetableGenerationState = useSMSelector((state) => state.timetableGeneration);
+	const dispatch = useSMDispatch();
 
 	const handleGenerateTimetable = async () => {
 		if (dataStored && timetableStored) {
@@ -71,25 +70,21 @@ export default function Home() {
 							await setDoc(docRef, result, { merge: true });
 
 							const docRef2 = doc(firestore, timetableFirestoreName, timetableId ?? '');
-							await setDoc(
-								docRef2,
-								{
-									...timetableStored,
-									'generated-schedule-id': existingDoc.id,
-									'generated-date': result['create-date'],
-									'fitness-point': result['fitness-point'],
-									'time-cost': result['excute-time'],
-								} as ITimetableStoreObject,
-								{ merge: true }
-							).then(() => {
+							await setDoc(docRef2, {
+								...timetableStored,
+								'generated-schedule-id': existingDoc.id,
+								'generated-date': result['create-date'],
+								'fitness-point': result['fitness-point'],
+								'time-cost': result['excute-time'],
+							} as ITimetableStoreObject).then(async () => {
 								dispatch(
-									setGeneratingStatus(false),
-									setGeneratedScheduleStored({ ...result }),
 									updateTimetableStored({
 										target: 'generated-schedule-id',
 										value: existingDoc.id,
 									})
 								);
+								dispatch(setGeneratedScheduleStored({ ...result } as IScheduleResponse));
+								dispatch(setGeneratingStatus(false));
 								useNotify({
 									type: 'success',
 									message: data?.message,
@@ -110,26 +105,21 @@ export default function Home() {
 									timetableFirestoreName,
 									timetableId ?? 'Unknown'
 								);
-								await setDoc(
-									timetableDocRef,
-									{
-										...timetableStored,
-										'generated-schedule-id': resRef.id,
-										'generated-date': result['create-date'],
-										'fitness-point': result['fitness-point'],
-										'time-cost': result['excute-time'],
-									} as ITimetableStoreObject,
-									{ merge: true }
-								).then(() => {
+								await setDoc(timetableDocRef, {
+									...timetableStored,
+									'generated-schedule-id': resRef.id,
+									'generated-date': result['create-date'],
+									'fitness-point': result['fitness-point'],
+									'time-cost': result['excute-time'],
+								} as ITimetableStoreObject).then(async () => {
 									// Dispatch từng hành động một cách riêng biệt
 									dispatch(
-										setGeneratingStatus(false),
-										setGeneratedScheduleStored(result),
 										updateTimetableStored({
 											target: 'generated-schedule-id',
 											value: resRef.id,
 										})
 									);
+									dispatch(setGeneratedScheduleStored(result));
 									useNotify({
 										type: 'success',
 										message: data?.message,

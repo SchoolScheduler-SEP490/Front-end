@@ -210,12 +210,12 @@ export const APPROPRIATE_LEVEL: { key: number; value: string }[] = [
 ];
 
 export const APPROPRIATE_LEVEL_TRANSLATOR: { [key: string]: number } = {
-	'Unqualified': 1,
-	'Basic': 2,
-	'Proficient': 3,
-	'Advanced': 4,
-	'Mastery': 5
-  };
+	Unqualified: 1,
+	Basic: 2,
+	Proficient: 3,
+	Advanced: 4,
+	Mastery: 5,
+};
 
 export const TIMETABLE_SLOTS = [
 	{ period: 'Sáng', slots: ['Tiết 1', 'Tiết 2', 'Tiết 3', 'Tiết 4', 'Tiết 5'] },
@@ -304,7 +304,7 @@ export interface ITimetableStoreObject {
 	'time-cost': number;
 	'applied-week': number | null;
 	'ended-week': number | null;
-	status: number;
+	status: string;
 }
 // Record kết quả generate thời khóa biểu
 export interface IScheduleResponse {
