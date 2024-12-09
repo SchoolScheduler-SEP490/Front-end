@@ -1,6 +1,7 @@
 import { useAppContext } from '@/context/app_provider';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
+import { useSMSelector } from '@/hooks/useReduxStore';
 import {
 	IClassPeriod,
 	IClassSchedule,
@@ -30,7 +31,6 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
 import useFetchClassData from '../_hooks/useFetchClass';
 import useFetchSubject from '../_hooks/useFetchSubject';
 import useFetchTeacher from '../_hooks/useFetchTeacher';
@@ -67,7 +67,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 	const { handleGenerateTimetable, isTimetableGenerating } = props;
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
 	const { dataStored, timetableStored, generatedScheduleStored }: ITimetableGenerationState =
-		useSelector((state: any) => state.timetableGeneration);
+		useSMSelector((state) => state.timetableGeneration);
 
 	const [isDataLoading, setIsDataLoading] = useState<boolean>(true);
 	const [isConfigurationOpen, openConfiguration] = useState<boolean>(false);
@@ -212,7 +212,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 				setIsDataLoading(false);
 			}
 		}
-	}, [classData, teacherData, dataStored, timetableStored, subjectData, generatedScheduleStored]);
+	}, [classData, teacherData, subjectData, dataStored, timetableStored, generatedScheduleStored]);
 
 	const handleConfigurationButton = () => {
 		openConfiguration(true);

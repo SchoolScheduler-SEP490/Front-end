@@ -54,6 +54,8 @@ export default function Home() {
 	const [selectedYearId, setSelectedYearId] = useState<number>(0);
 	const [selectedTermId, setSelectedTermId] = useState<number>(0);
 	const [timetableName, setTimetableName] = useState<string>('');
+	const [startWeek, setStartWeek] = useState<number>(1);
+	const [endWeek, setEndWeek] = useState<number>(2);
 	const [timetableAbbreviation, setTimetableAbbreviation] = useState<string>('');
 
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
@@ -84,6 +86,13 @@ export default function Home() {
 				studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
 			);
 			setSelectedTermId(studyOptions[0].value);
+			const selectedTerm: ITermResponse = termData.result.items.find(
+				(item: ITermResponse) => item.id === studyOptions[0].value
+			);
+			if (selectedTerm) {
+				setStartWeek(selectedTerm['start-week']);
+				setEndWeek(selectedTerm['end-week']);
+			}
 		}
 	}, [termData]);
 
@@ -129,11 +138,11 @@ export default function Home() {
 			'term-name': termIdOptions.find((item) => item.value === selectedTermId)?.label ?? '',
 			'term-id': selectedTermId,
 			'config-id': '',
-			'applied-week': null,
-			'ended-week': null,
+			'applied-week': startWeek,
+			'ended-week': endWeek,
 			'internal-end-date': null,
 			'published-timetable-id': null,
-			status: 1,
+			status: 'Draft',
 		};
 		let newConfigurationData: IConfigurationStoreObject = {
 			id: '',
@@ -305,6 +314,60 @@ export default function Home() {
 							))}
 						</Select>
 					</FormControl>
+					<div className='w-full h-fit flex flex-row justify-between items-center'>
+						<FormControl sx={{ width: '45%' }}>
+							<InputLabel id='school-year-label' variant='standard'>
+								Tuần bắt đầu
+							</InputLabel>
+							<Select
+								labelId='school-year-label'
+								id='school-year'
+								variant='standard'
+								value={startWeek}
+								onChange={(event) => setStartWeek(Number(event.target.value))}
+								MenuProps={MenuProps}
+								renderValue={(selected) => {
+									return selected;
+								}}
+								sx={{ width: '100%', fontSize: '1.000rem' }}
+							>
+								{Array.from({ length: endWeek - startWeek }, (_, i) => startWeek + i).map(
+									(item, index) => (
+										<MenuItem key={item + index} value={item}>
+											<Checkbox checked={startWeek === 0 ? false : startWeek === item} />
+											<ListItemText primary={item} />
+										</MenuItem>
+									)
+								)}
+							</Select>
+						</FormControl>
+						<FormControl sx={{ width: '45%' }}>
+							<InputLabel id='school-year-label' variant='standard'>
+								Tuần kết thúc
+							</InputLabel>
+							<Select
+								labelId='school-year-label'
+								id='school-year'
+								variant='standard'
+								value={endWeek}
+								onChange={(event) => setEndWeek(Number(event.target.value))}
+								MenuProps={MenuProps}
+								renderValue={(selected) => {
+									return selected;
+								}}
+								sx={{ width: '100%', fontSize: '1.000rem' }}
+							>
+								{Array.from({ length: endWeek - startWeek }, (_, i) => startWeek + i + 1).map(
+									(item, index) => (
+										<MenuItem key={item + index} value={item}>
+											<Checkbox checked={endWeek === 0 ? false : endWeek === item} />
+											<ListItemText primary={item} />
+										</MenuItem>
+									)
+								)}
+							</Select>
+						</FormControl>
+					</div>
 					<Button
 						variant='contained'
 						fullWidth
