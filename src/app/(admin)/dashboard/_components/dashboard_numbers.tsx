@@ -70,7 +70,7 @@ const DashboardNumbers: FC<IDashboardNumbersProps> = (props) => {
 						className='bg-white p-2 rounded-[5px]'
 					/>
 					<div className='w-full h-fit pt-1 flex flex-col justify-start gap-1'>
-						<h1 className='text-title-small-strong font-bold leading-3 text-basic-positive'>
+						<h1 className='text-title-small-strong font-bold leading-3'>
 							{formatNumber(data?.totalSchoolUsed ?? 0)}
 						</h1>
 						<p className='text-body-small font-normal opacity-60'>Trường / cả nước</p>
@@ -79,7 +79,7 @@ const DashboardNumbers: FC<IDashboardNumbersProps> = (props) => {
 			</div>
 			<div className='w-[23%] max-w-[250px] h-fit flex flex-col justify-start items-start gap-2 bg-primary-50 rounded-[5px] p-2'>
 				<h1 className='w-full h-fit overflow-hidden text-ellipsis whitespace-nowrap text-left text-body-medium-strong font-medium opacity-80'>
-					Số trường chờ duyệt
+					Trung bình TKB/Trường
 				</h1>
 				<div className='w-full h-[50%] flex flex-row justify-between items-start gap-2'>
 					<Image
@@ -91,8 +91,8 @@ const DashboardNumbers: FC<IDashboardNumbersProps> = (props) => {
 						className='bg-white p-2 rounded-[5px]'
 					/>
 					<div className='w-full h-fit pt-1 flex flex-col justify-start gap-1'>
-						<h1 className='text-title-small-strong font-bold leading-3 text-tertiary-normal'>
-							{formatNumber(data?.totalSchoolPending ?? 0)}
+						<h1 className='text-title-small-strong font-bold leading-3'>
+							{formatNumber(data?.averageTimetablePerSchool ?? 0)}
 						</h1>
 						<p className='text-body-small font-normal opacity-60'>Trường / cả nước</p>
 					</div>

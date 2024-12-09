@@ -1,4 +1,5 @@
 'use client';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
 	Chip,
 	IconButton,
@@ -13,12 +14,13 @@ import {
 	Toolbar,
 	Tooltip,
 } from '@mui/material';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styles from '../_styles/table_styles.module.css';
-import { IAccountResponse } from '../_libs/constants';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ACCOUNT_STATUS } from '../../_utils/constants';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import { IAccountResponse } from '../_libs/constants';
+import styles from '../_styles/table_styles.module.css';
+import RuleIcon from '@mui/icons-material/Rule';
+import BlockIcon from '@mui/icons-material/Block';
 
 interface IAccountTableProps {
 	data: IAccountResponse[];
@@ -111,6 +113,7 @@ const AccountsTable = (props: IAccountTableProps) => {
 							<TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Số điện thoại</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}></TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -140,9 +143,26 @@ const AccountsTable = (props: IAccountTableProps) => {
 														? 'success'
 														: account.status === 'Pending'
 														? 'warning'
-														: 'info'
+														: 'default'
 												}
 											/>
+										</TableCell>
+										<TableCell>
+											{account.status === 'Pending' && (
+												<IconButton>
+													<RuleIcon />
+												</IconButton>
+											)}
+											{account.status === 'Active' && (
+												<IconButton>
+													<BlockIcon />
+												</IconButton>
+											)}
+											{account.status === 'Inactive' && (
+												<IconButton>
+													<RuleIcon />
+												</IconButton>
+											)}
 										</TableCell>
 									</TableRow>
 								</CSSTransition>

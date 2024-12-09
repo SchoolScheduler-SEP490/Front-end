@@ -37,3 +37,7 @@ export const getFetchSchoolApi = ({
 
 	return `${api}/api/schools?${queryString}`;
 };
+
+export const getActiveSchoolApi = () => {
+	return `${api}/api/users/status`;
+};

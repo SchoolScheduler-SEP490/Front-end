@@ -19,8 +19,7 @@ interface IDashboardRequestModalProps {
 	selectedAccount: IAccountResponse;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	handleConfirm: () => void;
-	handleReject: () => void;
+	handleProcess: (newStatus: string) => void;
 }
 
 const formatDateString = (dateString: string): string => {
@@ -32,7 +31,7 @@ const formatDateString = (dateString: string): string => {
 };
 
 const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
-	const { handleConfirm, setOpen, open, handleReject, selectedAccount: data } = props;
+	const { handleProcess, setOpen, open, selectedAccount: data } = props;
 
 	const handleClose = () => {
 		setOpen(false);
@@ -118,16 +117,16 @@ const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
 				>
 					<ContainedButton
 						title='Từ chối'
-						onClick={handleClose}
 						disableRipple
-						styles='!bg-tertiary-light-active !text-tertiary-normal !py-1 px-3'
+						onClick={() => handleProcess('Inactive')}
+						styles='!bg-basic-negative !text-white !py-1 px-3'
 					/>
 					<ContainedButton
 						title='xác nhận'
 						disableRipple
 						type='button'
 						styles='bg-primary-300 text-white !py-1 px-3'
-						onClick={handleConfirm}
+						onClick={() => handleProcess('Active')}
 					/>
 				</div>
 			</Box>

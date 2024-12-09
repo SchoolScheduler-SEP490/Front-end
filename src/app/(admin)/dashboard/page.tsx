@@ -18,6 +18,12 @@ interface ITimetableCountObject {
 	[key: number]: number;
 }
 
+const getAverageTimetablePerSchool = (timetableCountBySchoolId: ITimetableCountObject): number => {
+	const totalSchool = Object.keys(timetableCountBySchoolId).length;
+	const totalTimetable = Object.values(timetableCountBySchoolId).reduce((a, b) => a + b, 0);
+	return totalTimetable / totalSchool;
+};
+
 export default function AdminHome() {
 	const { sessionToken } = useAppContext();
 	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
@@ -26,7 +32,7 @@ export default function AdminHome() {
 		averageFitness: 0,
 		averageTimeCost: 0,
 		totalSchoolUsed: 0,
-		totalSchoolPending: 0,
+		averageTimetablePerSchool: 0,
 	});
 	// Data sử dụng cho trường đang ở trạng thái Pending
 	const [requestData, setRequestData] = useState<IAccountResponse[]>([]);
@@ -42,7 +48,11 @@ export default function AdminHome() {
 	// Chắc chắn phải load nhiều nên đặt trạng thái loading đỡ thời gian render
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
-	const { data: pendingAccountData, mutate: updatePendingAccountData } = useFetchAccounts({
+	const {
+		data: pendingAccountData,
+		mutate: updatePendingAccountData,
+		isValidating: isAccountValidating,
+	} = useFetchAccounts({
 		pageIndex: 1,
 		pageSize: 1000,
 		sessionToken,
@@ -89,6 +99,10 @@ export default function AdminHome() {
 			}
 			if (Object.keys(tmpTimetableCount).length > 0) {
 				setTimetableCountBySchoolId(tmpTimetableCount);
+				setNumberSummaryData((prev) => ({
+					...prev,
+					averageTimetablePerSchool: getAverageTimetablePerSchool(tmpTimetableCount),
+				}));
 			}
 			setIsLoading(false);
 		};
@@ -98,11 +112,6 @@ export default function AdminHome() {
 	useEffect(() => {
 		updatePendingAccountData();
 		if (pendingAccountData?.status === 200) {
-			setNumberSummaryData((prev) => ({
-				...prev,
-				totalSchoolPending: pendingAccountData.result['total-item-count'],
-			}));
-
 			const tmpRequestData: IAccountResponse[] = pendingAccountData.result.items;
 			if (tmpRequestData.length > 0) {
 				setRequestData(tmpRequestData);
@@ -171,7 +180,11 @@ export default function AdminHome() {
 						!isMenuOpen ? '30' : '25'
 					}%] h-full max-h-[95vh] overflow-y-scroll no-scrollbar`}
 				>
-					<DashboardRequests data={requestData} />
+					<DashboardRequests
+						data={requestData}
+						updateData={updatePendingAccountData}
+						isValidating={isAccountValidating}
+					/>
 				</div>
 			</div>
 		</div>
