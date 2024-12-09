@@ -21,7 +21,7 @@ export interface IJWT {
 export const publicPaths = ['/landing', '/community', '/contact', '/schools', '/schedules'];
 export const authPaths = ['/login', '/register', '/forgot-password'];
 export const adminPaths = ['/dashboard'];
-export const teacherPaths = ['/published-timetable'];
+export const teacherPaths = ['/teacher-dashboard'];
 export const schoolManagerPaths = [
 	'/timetable-management',
 	'/teacher-management',
@@ -374,14 +374,14 @@ export const GENERATED_SCHEDULE_FIRESTORE_NAME = 'schedule-responses';
 
 export const SCHEDULE_STATUS: { key: string; value: number }[] = [
 	{ key: 'Draft', value: 1 },
-	{ key: 'Published', value: 2 },
-	{ key: 'PublishedInternal', value: 3 },
+	{ key: 'PublishedInternal', value: 2 },
+	{ key: 'Published', value: 3 },
 	{ key: 'Expired', value: 4 },
 ];
 
 export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	1: 'Bản nháp',
-	2: 'Công bố',
-	3: 'Nội bộ',
+	2: 'Nội bộ',
+	3: 'Công bố',
 	4: 'Hết hạn',
-};
+}
