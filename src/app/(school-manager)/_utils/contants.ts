@@ -25,7 +25,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 			},
 			{
 				name: 'Lịch sử dụng phòng',
-				url: '/teacher-timetable',
+				url: '/room-availability',
 				icon: '/images/icons/teacher-timetable.png',
 			}
 		],
