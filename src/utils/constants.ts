@@ -23,7 +23,7 @@ export const authPaths = ['/login', '/register', '/forgot-password'];
 export const adminPaths = ['/dashboard'];
 export const teacherPaths = ['/teacher-dashboard'];
 export const schoolManagerPaths = [
-	'/timetable-management',
+	'/publish-timetable',
 	'/teacher-management',
 	'/subject-management',
 	'/subject-group-management',
