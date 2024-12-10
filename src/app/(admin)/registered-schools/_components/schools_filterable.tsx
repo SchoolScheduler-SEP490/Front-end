@@ -9,7 +9,7 @@ import {
 	Select,
 	Typography,
 } from '@mui/material';
-import { ACCOUNT_STATUS, DROPDOWN_ACCOUNT_STATUS } from '../../_utils/constants';
+import { ACCOUNT_STATUS, DROPDOWN_ACCOUNT_STATUS, SCHOOL_STATUS } from '../../_utils/constants';
 
 interface IAccountsFilterableProps {
 	open: boolean;
@@ -71,7 +71,7 @@ const SchoolsFilterable = (props: IAccountsFilterableProps) => {
 						onChange={(event) => setSelectedAccountStatus(event.target.value as string)}
 					>
 						<MenuItem value={'All'}>{DROPDOWN_ACCOUNT_STATUS['All']}</MenuItem>
-						{Object.entries(ACCOUNT_STATUS).map(([key, value], index) => (
+						{Object.entries(SCHOOL_STATUS).map(([key, value], index) => (
 							<MenuItem key={index} value={key}>
 								{value}
 							</MenuItem>

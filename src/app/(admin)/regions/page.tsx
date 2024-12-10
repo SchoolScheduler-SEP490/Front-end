@@ -13,7 +13,10 @@ export default function RegionPage() {
 	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
 
 	const [isFilterableModalOpen, setIsFilterableModalOpen] = useState<boolean>(true);
+	const [isUpdateAction, setIsUpdateAction] = useState<boolean>(false);
 	const [selectedProvinceId, setSelectedProvinceId] = useState<number>(0);
+	const [existingProvince, setExistingProvince] = useState<number>(0);
+	const [existingDistrict, setExistingDistrict] = useState<IDistrictResponse[]>([]);
 
 	const [provinceData, setProvinceData] = useState<IProvinceResponse[]>([]);
 	const [districtData, setDistrictData] = useState<IDistrictResponse[]>([]);
@@ -22,6 +25,7 @@ export default function RegionPage() {
 		pageIndex: 1,
 		pageSize: 999999,
 	});
+
 	const {
 		data: districtResponse,
 		mutate: updateDistrict,
@@ -30,6 +34,12 @@ export default function RegionPage() {
 		pageIndex: 1,
 		pageSize: 999999,
 		provinceId: selectedProvinceId,
+	});
+
+	const { data: modalDistrictResponse, mutate: updatemodalDistrict } = useFetchDistricts({
+		pageIndex: 1,
+		pageSize: 999999,
+		provinceId: existingProvince,
 	});
 
 	useEffect(() => {
@@ -47,6 +57,22 @@ export default function RegionPage() {
 			}
 		}
 	}, [districtResponse, selectedProvinceId]);
+
+	useEffect(() => {
+		if (existingProvince !== 0) {
+			updatemodalDistrict();
+			if (modalDistrictResponse?.status === 200) {
+				setExistingDistrict(
+					modalDistrictResponse.result.items.sort((a, b) => a.name.localeCompare(b.name))
+				);
+			}
+		}
+	}, [modalDistrictResponse, existingProvince, isUpdateAction]);
+
+	const handleUpdateProvince = (provinceId: number) => {
+		setExistingProvince(provinceId);
+		setIsUpdateAction(true);
+	};
 
 	return (
 		<div
@@ -71,15 +97,18 @@ export default function RegionPage() {
 						setSelectedProvinceId={setSelectedProvinceId}
 						districtData={districtData}
 						isDistrictValidating={isDistrictValidating}
+						handleUpdateProvince={handleUpdateProvince}
 					/>
 				</div>
 				<RegionsFilterable
 					open={isFilterableModalOpen}
 					setOpen={setIsFilterableModalOpen}
 					provinceData={provinceData}
-					districtData={districtData}
-					selectedProvinceId={selectedProvinceId}
-					setSelectedProvinceId={setSelectedProvinceId}
+					districtData={existingDistrict}
+					selectedProvinceId={existingProvince}
+					setSelectedProvinceId={setExistingProvince}
+					isUpdateAction={isUpdateAction}
+					setIsUpdateAction={setIsUpdateAction}
 				/>
 			</div>
 		</div>

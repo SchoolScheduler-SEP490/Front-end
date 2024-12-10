@@ -1,8 +1,16 @@
 import { ISchoolYearResponse } from '@/utils/constants';
+import BlockIcon from '@mui/icons-material/Block';
+import EditIcon from '@mui/icons-material/Edit';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import IosShareIcon from '@mui/icons-material/IosShare';
 import {
 	Chip,
 	IconButton,
+	ListItemIcon,
+	ListItemText,
+	Menu,
+	MenuItem,
 	Paper,
 	Table,
 	TableBody,
@@ -15,9 +23,16 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material';
-import { ChangeEvent, Dispatch, SetStateAction, useMemo } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styles from '../_styles/table_styles.module.css';
+import { getUpdateSchoolYearStatusApi } from '../_libs/apis';
+import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
+import PublishConfirmModal from './schoolyears_modal_confirm';
+import RevokeConfirmModal from './schoolyears_modal_revoke';
+import SchoolYearUpdateModal from './schoolyears_modal_update';
+import { KeyedMutator } from 'swr';
 
 interface ISchoolYearTableProps {
 	data: ISchoolYearResponse[];
@@ -27,13 +42,88 @@ interface ISchoolYearTableProps {
 	setRowsPerPage: Dispatch<SetStateAction<number>>;
 	totalRows?: number;
 	setIsFilterableModalOpen: Dispatch<SetStateAction<boolean>>;
+	updateData: KeyedMutator<any>;
 }
 
 const SchoolYearTable = (props: ISchoolYearTableProps) => {
-	const { data, page, rowsPerPage, setPage, setRowsPerPage, totalRows, setIsFilterableModalOpen } =
-		props;
+	const {
+		data,
+		page,
+		rowsPerPage,
+		setPage,
+		setRowsPerPage,
+		totalRows,
+		setIsFilterableModalOpen,
+		updateData,
+	} = props;
+	const { sessionToken } = useAppContext();
 
 	const visibleRows = useMemo(() => [...data], [page, rowsPerPage, data]);
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const open = Boolean(anchorEl);
+	const [selectedSchoolYear, setSelectedSchoolYear] = useState<ISchoolYearResponse | null>(null);
+
+	const [isConfirmPublishModalOpen, setIsConfirmPublishModalOpen] = useState<boolean>(false);
+	const [isConfirmRevokeModalOpen, setIsConfirmRevokeModalOpen] = useState<boolean>(false);
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+
+	const handleMenuOpen = (
+		event: React.MouseEvent<HTMLElement>,
+		schoolYear: ISchoolYearResponse
+	) => {
+		setAnchorEl(event.currentTarget);
+		setSelectedSchoolYear(schoolYear);
+	};
+
+	const handleMenuClose = () => {
+		setAnchorEl(null);
+	};
+
+	const handleUpdateSchoolYearStatus = async (newStatus: boolean) => {
+		const endpoint = getUpdateSchoolYearStatusApi(selectedSchoolYear?.id ?? 0, newStatus);
+		const response = await fetch(endpoint, {
+			method: 'PATCH',
+			headers: {
+				Authorization: `Bearer ${sessionToken}`,
+			},
+		});
+		if (response.ok) {
+			const data = await response.json();
+			useNotify({
+				message: data.message ?? 'Cập nhật trạng thái năm học thành công',
+				type: 'success',
+			});
+		}
+	};
+
+	const handleOptionClick = (featureIndex: number) => {
+		switch (featureIndex) {
+			case 1:
+				setIsConfirmPublishModalOpen(true);
+				break;
+			case 2:
+				setIsUpdateModalOpen(true);
+				break;
+			case 3:
+				setIsConfirmRevokeModalOpen(true);
+				break;
+			default:
+				break;
+		}
+		handleMenuClose();
+	};
+
+	const handlePublishSchoolYear = async () => {
+		await handleUpdateSchoolYearStatus(true);
+		updateData();
+		setIsConfirmPublishModalOpen(false);
+	};
+
+	const handleRevokeSchoolYear = async () => {
+		await handleUpdateSchoolYearStatus(false);
+		updateData();
+		setIsConfirmRevokeModalOpen(false);
+	};
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -77,7 +167,8 @@ const SchoolYearTable = (props: ISchoolYearTableProps) => {
 							<TableCell sx={{ fontWeight: 'bold' }}>Mã năm học</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Năm bắt đầu</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Năm kết thúc</TableCell>
-							<TableCell sx={{ fontWeight: 'bold' }}>Phân loại</TableCell>
+							<TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Phân loại</TableCell>
+							<TableCell width={50}></TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
@@ -120,12 +211,66 @@ const SchoolYearTable = (props: ISchoolYearTableProps) => {
 											</Typography>
 										</TableCell>
 										<TableCell>{school['end-year']}</TableCell>
-										<TableCell>
+										<TableCell width={50} sx={{ textAlign: 'center' }}>
 											<Chip
 												label={school['is-public'] ? 'Công khai' : 'Nội bộ'}
 												variant='outlined'
 												color={school['is-public'] ? 'success' : 'warning'}
 											/>
+										</TableCell>
+										<TableCell width={50}>
+											<IconButton
+												sx={{ zIndex: 10 }}
+												onClick={(event) => handleMenuOpen(event, school)}
+											>
+												<MoreVertIcon fontSize='small' />
+											</IconButton>
+											<Menu
+												anchorEl={anchorEl}
+												open={open}
+												onClose={handleMenuClose}
+												anchorOrigin={{
+													vertical: 'bottom',
+													horizontal: 'right',
+												}}
+												transformOrigin={{
+													vertical: 'top',
+													horizontal: 'right',
+												}}
+											>
+												<MenuItem
+													onClick={() => handleOptionClick(1)}
+													disabled={selectedSchoolYear?.['is-public']}
+												>
+													<ListItemIcon>
+														<IosShareIcon
+															fontSize='small'
+															color='inherit'
+															sx={{ color: '#1a659e' }}
+														/>
+													</ListItemIcon>
+													<ListItemText primary='Công bố năm học' />
+												</MenuItem>
+												<MenuItem
+													onClick={() => handleOptionClick(2)}
+													disabled={selectedSchoolYear?.['is-public']}
+												>
+													<ListItemIcon>
+														<EditIcon fontSize='small' />
+													</ListItemIcon>
+													<ListItemText primary='Cập nhật thông tin' />
+												</MenuItem>
+												<MenuItem
+													onClick={() => handleOptionClick(3)}
+													disabled={!selectedSchoolYear?.['is-public']}
+													sx={{ ':hover': { bgcolor: 'rgba(245, 75, 75, .2)' } }}
+												>
+													<ListItemIcon>
+														<BlockIcon fontSize='small' color='error' />
+													</ListItemIcon>
+													<ListItemText primary='Thu hồi năm học' />
+												</MenuItem>
+											</Menu>
 										</TableCell>
 									</TableRow>
 								</CSSTransition>
@@ -146,6 +291,23 @@ const SchoolYearTable = (props: ISchoolYearTableProps) => {
 				page={page}
 				onPageChange={handleChangePage}
 				onRowsPerPageChange={handleChangeRowsPerPage}
+			/>
+			<PublishConfirmModal
+				open={isConfirmPublishModalOpen}
+				setOpen={setIsConfirmPublishModalOpen}
+				handleConfirm={handlePublishSchoolYear}
+			/>
+			<RevokeConfirmModal
+				open={isConfirmRevokeModalOpen}
+				setOpen={setIsConfirmRevokeModalOpen}
+				handleConfirm={handleRevokeSchoolYear}
+			/>
+			<SchoolYearUpdateModal
+				open={isUpdateModalOpen}
+				setOpen={setIsUpdateModalOpen}
+				selectedSchoolYear={selectedSchoolYear ?? ({} as ISchoolYearResponse)}
+				yearData={data}
+				updateData={updateData}
 			/>
 		</Paper>
 	);

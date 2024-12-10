@@ -5,16 +5,15 @@ import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import { useAdminSelector } from '@/hooks/useReduxStore';
 import { ISchoolYearResponse } from '@/utils/constants';
 import { useEffect, useState } from 'react';
+import SchoolYearsFilterable from './_components/schoolyears_filterable';
 import SchoolYearTable from './_components/schoolyears_table';
 import SchoolYearTableSkeleton from './_components/skeleton_table';
-import SchoolYearsFilterable from './_components/schoolyears_filterable';
 
 export default function SchoolYearPage() {
 	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
 
 	const [page, setPage] = useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
-	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
 
 	const [isFilterableModalOpen, setIsFilterableModalOpen] = useState<boolean>(true);
 
@@ -47,8 +46,10 @@ export default function SchoolYearPage() {
 				</div>
 			</AdminHeader>
 			<div
-				className={`w-full h-max pt-[3vh] ${
-					isFilterableModalOpen ? 'flex flex-row justify-evenly items-start' : 'px-[5vw]'
+				className={`w-full h-max pt-[3vh] flex flex-row ${
+					isFilterableModalOpen
+						? 'justify-evenly items-start'
+						: 'justify-center items-start px-[5vw]'
 				}`}
 			>
 				<div className='w-full max-w-[65%] h-fit max-h-[90vh] overflow-y-scroll no-scrollbar p-1 flex flex-col justify-start items-center'>
@@ -62,6 +63,7 @@ export default function SchoolYearPage() {
 							rowsPerPage={rowsPerPage}
 							setRowsPerPage={setRowsPerPage}
 							setIsFilterableModalOpen={setIsFilterableModalOpen}
+							updateData={updateSchoolYear}
 						/>
 					)}
 				</div>
@@ -69,6 +71,7 @@ export default function SchoolYearPage() {
 					open={isFilterableModalOpen}
 					setOpen={setIsFilterableModalOpen}
 					yearData={schoolYearData}
+					updateData={updateSchoolYear}
 				/>
 			</div>
 		</div>

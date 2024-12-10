@@ -1,4 +1,5 @@
 'use client';
+import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
 	Chip,
@@ -15,9 +16,10 @@ import {
 	Tooltip,
 	Typography,
 } from '@mui/material';
-import { ChangeEvent, Dispatch, SetStateAction, useMemo } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useMemo, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { ACCOUNT_STATUS, SCHOOL_STATUS } from '../../_utils/constants';
+import { KeyedMutator } from 'swr';
+import { SCHOOL_STATUS } from '../../_utils/constants';
 import { ISchoolResponse } from '../_libs/constants';
 import styles from '../_styles/table_styles.module.css';
 
@@ -35,8 +37,8 @@ interface IAccountTableProps {
 	rowsPerPage: number;
 	setRowsPerPage: Dispatch<SetStateAction<number>>;
 	totalRows?: number;
-	// selectedAccountStatus: string;
 	setIsFilterableModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	mutate: KeyedMutator<any>;
 }
 
 const SchoolsTable = (props: IAccountTableProps) => {
@@ -47,9 +49,11 @@ const SchoolsTable = (props: IAccountTableProps) => {
 		setPage,
 		setRowsPerPage,
 		totalRows,
-		// selectedAccountStatus,
 		setIsFilterableModalOpen,
+		mutate,
 	} = props;
+
+	const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -81,6 +85,11 @@ const SchoolsTable = (props: IAccountTableProps) => {
 				<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 					Danh sách trường học
 				</h2>
+				<Tooltip title='Thêm trường học'>
+					<IconButton onClick={() => setIsCreateModalOpen(true)}>
+						<AddIcon />
+					</IconButton>
+				</Tooltip>
 				<Tooltip title='Lọc danh sách'>
 					<IconButton onClick={handleFilterable}>
 						<FilterListIcon />
@@ -138,7 +147,7 @@ const SchoolsTable = (props: IAccountTableProps) => {
 											</Typography>
 										</TableCell>
 										<TableCell>{school['province-name']}</TableCell>
-										<TableCell>
+										<TableCell sx={{ textAlign: 'center' }}>
 											<Chip
 												label={SCHOOL_STATUS[school.status]}
 												variant='outlined'
@@ -165,6 +174,11 @@ const SchoolsTable = (props: IAccountTableProps) => {
 				onPageChange={handleChangePage}
 				onRowsPerPageChange={handleChangeRowsPerPage}
 			/>
+			{/* <CreateSchoolModal
+				open={isCreateModalOpen}
+				setOpen={setIsCreateModalOpen}
+				mutate={mutate}
+			/> */}
 		</Paper>
 	);
 };

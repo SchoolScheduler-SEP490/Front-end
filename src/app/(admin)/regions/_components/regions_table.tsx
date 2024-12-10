@@ -22,11 +22,18 @@ interface IRegionsTableProps {
 	setSelectedProvinceId: Dispatch<SetStateAction<number>>;
 	districtData: IDistrictResponse[];
 	isDistrictValidating: boolean;
+	handleUpdateProvince: (provinceId: number) => void;
 }
 
 const RegionsTable: FC<IRegionsTableProps> = (props) => {
-	const { data, setSelectedProvinceId, districtData, isDistrictValidating, selectedProvinceId } =
-		props;
+	const {
+		data,
+		setSelectedProvinceId,
+		districtData,
+		isDistrictValidating,
+		selectedProvinceId,
+		handleUpdateProvince,
+	} = props;
 
 	const [searchTerm, setSearchTerm] = useState<string>('');
 	const [expanded, setExpanded] = useState<number | false>(false);
@@ -100,7 +107,7 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 								color='primary'
 								onClick={(e) => {
 									e.stopPropagation();
-									console.log(`Thêm ${province.name}`);
+									handleUpdateProvince(province.id);
 								}}
 							>
 								<AddIcon />

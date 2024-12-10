@@ -30,7 +30,6 @@ const CancelUpdateLessonModal = (props: ISubjectDeleteModalProps) => {
 			disableEnforceFocus
 			disableAutoFocus
 			disableRestoreFocus
-			keepMounted
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

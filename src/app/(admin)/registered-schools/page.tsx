@@ -120,8 +120,8 @@ export default function RegisteredSchoolPage() {
 							rowsPerPage={rowsPerPage}
 							setRowsPerPage={setRowsPerPage}
 							totalRows={totalRows}
-							// selectedAccountStatus={selectedAccountStatus}
 							setIsFilterableModalOpen={setIsFilterableModalOpen}
+							mutate={updateSchool}
 						/>
 					)}
 				</div>
