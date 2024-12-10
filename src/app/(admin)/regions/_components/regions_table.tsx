@@ -118,6 +118,11 @@ const RegionsTable: FC<IRegionsTableProps> = (props) => {
 					{/* Accordion Details */}
 					<AccordionDetails>
 						<Divider variant='middle' orientation='horizontal' />
+						{!isDistrictValidating && selectedDistrictData.length === 0 && (
+							<h3 className='text-body-small italic opacity-60 w-full text-center pt-2'>
+								Chưa có quận huyện nào trong tỉnh này
+							</h3>
+						)}
 						<Grid container spacing={2} sx={{ px: 3, mt: 1 }}>
 							{isDistrictValidating
 								? [1, 2, 3, 4, 5, 6].map((index) => (

@@ -72,7 +72,7 @@ const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
 					<Typography
 						variant='h6'
 						component='h2'
-						className='text-title-medium-strong font-normal opacity-60'
+						className='text-title-small-strong font-normal opacity-60'
 					>
 						Tài khoản chờ đăng ký
 					</Typography>

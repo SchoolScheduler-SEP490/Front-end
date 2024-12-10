@@ -52,6 +52,7 @@ export default function RegionPage() {
 	useEffect(() => {
 		if (selectedProvinceId !== 0) {
 			updateDistrict();
+			setDistrictData([]);
 			if (districtResponse?.status === 200) {
 				setDistrictData(districtResponse.result.items.sort((a, b) => a.name.localeCompare(b.name)));
 			}
@@ -109,6 +110,8 @@ export default function RegionPage() {
 					setSelectedProvinceId={setExistingProvince}
 					isUpdateAction={isUpdateAction}
 					setIsUpdateAction={setIsUpdateAction}
+					updateDistrict={updateDistrict}
+					updateProvince={updateProvince}
 				/>
 			</div>
 		</div>
