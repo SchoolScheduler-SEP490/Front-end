@@ -23,3 +23,7 @@ export const getFetchDistrictApi = ({
 }) => {
 	return `${api}/api/districts/provinces/${provinceId}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
 };
+
+export const getUpdateProvinceApi = (provinceId: number) => {
+	return `${api}/api/provinces/${provinceId}`;
+};

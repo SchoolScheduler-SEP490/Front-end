@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styles from '../_styles/table_styles.module.css';
 import { IDistrictResponse, IProvinceResponse } from '../_libs/constants';
-import RegionsCancelConfirmModal from './regions_modal_cancel';
+import styles from '../_styles/table_styles.module.css';
 import RegionsConfirmationModal from './regions_modal_apply_confirm';
+import RegionsCancelConfirmModal from './regions_modal_cancel';
 
 interface IAccountsFilterableProps {
 	open: boolean;
@@ -28,13 +28,22 @@ interface IAccountsFilterableProps {
 	districtData: IDistrictResponse[];
 	selectedProvinceId: number;
 	setSelectedProvinceId: React.Dispatch<React.SetStateAction<number>>;
+	isUpdateAction: boolean;
+	setIsUpdateAction: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RegionsFilterable = (props: IAccountsFilterableProps) => {
-	const { open, setOpen, provinceData, districtData, setSelectedProvinceId, selectedProvinceId } =
-		props;
+	const {
+		open,
+		setOpen,
+		provinceData,
+		districtData,
+		setSelectedProvinceId,
+		selectedProvinceId,
+		isUpdateAction,
+		setIsUpdateAction,
+	} = props;
 
-	const [isUpdateAction, setIsUpdateAction] = useState<boolean>(false);
 	const [isCancelConfirmModalOpen, setIsCancelConfirmModalOpen] = useState<boolean>(false);
 	const [isSaveChangesConfirmModalOpen, setIsSaveChangesConfirmModalOpen] =
 		useState<boolean>(false);
@@ -51,12 +60,20 @@ const RegionsFilterable = (props: IAccountsFilterableProps) => {
 		if (districtData.length > 0 && selectedProvinceId === existingProvince?.id && isUpdateAction) {
 			setDistrictNames(districtData.map((district) => district.name));
 		}
-	}, [districtData]);
+	}, [districtData, selectedProvinceId, existingProvince]);
 
 	// Set input refs
 	const setRef = (index: number, ref: HTMLInputElement | null) => {
 		inputRefs.current[index] = ref;
 	};
+
+	useEffect(() => {
+		if (selectedProvinceId !== 0) {
+			const existingProvince = provinceData.find((province) => province.id === selectedProvinceId);
+			setProvinceName(existingProvince?.name || '');
+			setExistingProvince(existingProvince ?? null);
+		}
+	}, [selectedProvinceId]);
 
 	// Validate province name
 	const handleProvinceChange = (value: string) => {
@@ -109,7 +126,6 @@ const RegionsFilterable = (props: IAccountsFilterableProps) => {
 
 	// Handle dialog actions
 	const handleDialogAccept = () => {
-		console.log(`Updating province: ${existingProvince?.name}`);
 		setDialogOpen(false);
 		setSelectedProvinceId(existingProvince?.id || 0); // Set selected province
 		setProvinceError(false);
@@ -133,8 +149,20 @@ const RegionsFilterable = (props: IAccountsFilterableProps) => {
 		setIsCancelConfirmModalOpen(false);
 	};
 
+	const handleUpdateProvince = () => {
+		alert('Update province');
+	};
+
+	const handleCreateProvince = () => {
+		alert('Create province');
+	};
+
 	const handleSaveChanges = () => {
-		// Add your logics here
+		if (isUpdateAction) {
+			handleUpdateProvince();
+		} else {
+			handleCreateProvince();
+		}
 	};
 
 	const handleClose = () => {

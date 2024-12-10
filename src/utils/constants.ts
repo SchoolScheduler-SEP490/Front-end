@@ -67,6 +67,16 @@ export interface ISchoolYearResponse {
 	'end-year': string;
 	'school-year-code': string;
 	'is-public': boolean;
+	'term-view-model': ITermInSchoolYear[];
+}
+
+export interface ITermInSchoolYear {
+	id: number;
+	name: string;
+	'start-week': number;
+	'end-week': number;
+	'start-date': string;
+	'end-date': string;
 }
 
 export interface ITermResponse {
@@ -384,4 +394,4 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	2: 'Nội bộ',
 	3: 'Công bố',
 	4: 'Hết hạn',
-}
+};
