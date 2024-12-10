@@ -1,4 +1,5 @@
 'use client';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
 	Chip,
 	IconButton,
@@ -13,12 +14,22 @@ import {
 	Toolbar,
 	Tooltip,
 } from '@mui/material';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import styles from '../_styles/table_styles.module.css';
-import { IAccountResponse } from '../_libs/constants';
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ACCOUNT_STATUS } from '../../_utils/constants';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import { IAccountResponse, IUpdateAccountRequest } from '../_libs/constants';
+import styles from '../_styles/table_styles.module.css';
+import RuleIcon from '@mui/icons-material/Rule';
+import BlockIcon from '@mui/icons-material/Block';
+import AccountRequestModal from './accounts_requests_modal';
+import { KeyedMutator } from 'swr';
+import useNotify from '@/hooks/useNotify';
+import { getActiveSchoolApi } from '../_libs/apis';
+import { useAppContext } from '@/context/app_provider';
+import { TRANSLATOR } from '@/utils/dictionary';
+import LoopIcon from '@mui/icons-material/Loop';
+import AccountInactiveModal from './accounts_modal_inactive';
+import AccountActiveModal from './accounts_modal_active';
 
 interface IAccountTableProps {
 	data: IAccountResponse[];
@@ -29,6 +40,7 @@ interface IAccountTableProps {
 	totalRows?: number;
 	selectedAccountStatus: string;
 	setIsFilterableModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	updateData: KeyedMutator<any>;
 }
 
 const AccountsTable = (props: IAccountTableProps) => {
@@ -41,10 +53,77 @@ const AccountsTable = (props: IAccountTableProps) => {
 		totalRows,
 		selectedAccountStatus,
 		setIsFilterableModalOpen,
+		updateData,
 	} = props;
+	const { sessionToken } = useAppContext();
 
-	const [visibleRows, setVisibleRows] = useState<IAccountResponse[]>([]);
-	const previousData = useRef<IAccountResponse[]>([]);
+	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+	const [isInactiveModalOpen, setIsInactiveModalOpen] = useState<boolean>(false);
+	const [isActiveModalOpen, setIsActiveModalOpen] = useState<boolean>(false);
+
+	const [selectedAccount, setSelectedAccount] = useState<IAccountResponse>({} as IAccountResponse);
+
+	const handleProcessAccount = async (newStatus: string) => {
+		const formProcessApi = getActiveSchoolApi();
+		const formData: IUpdateAccountRequest = {
+			'account-id': selectedAccount.id,
+			'account-status': newStatus,
+		};
+		const response = await fetch(formProcessApi, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${sessionToken}`,
+			},
+			body: JSON.stringify(formData),
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			updateData();
+			useNotify({
+				message: TRANSLATOR[data.message] ?? data.message ?? 'Thao tác thành công',
+				type: 'success',
+			});
+		} else {
+			const data = await response.json();
+			updateData();
+			useNotify({
+				message: TRANSLATOR[data.message] ?? data.message ?? 'Thao tác thất bại',
+				type: 'error',
+			});
+		}
+	};
+
+	const handleProcessPendingAccount = async (newStatus: string) => {
+		await handleProcessAccount(newStatus);
+		setIsConfirmModalOpen(false);
+	};
+
+	const handleInactiveAccount = async () => {
+		await handleProcessAccount('Inactive');
+		setIsInactiveModalOpen(false);
+	};
+
+	const handleActiveAccount = async () => {
+		await handleProcessAccount('Active');
+		setIsActiveModalOpen(false);
+	};
+
+	const handleSelectPendingAccount = (account: IAccountResponse) => {
+		setSelectedAccount(account);
+		setIsConfirmModalOpen(true);
+	};
+
+	const handleSelectActiveAccount = (account: IAccountResponse) => {
+		setSelectedAccount(account);
+		setIsInactiveModalOpen(true);
+	};
+
+	const handleSelectInactiveAccount = (account: IAccountResponse) => {
+		setSelectedAccount(account);
+		setIsActiveModalOpen(true);
+	};
 
 	const handleChangePage = (event: unknown, newPage: number) => {
 		setPage(newPage);
@@ -58,27 +137,8 @@ const AccountsTable = (props: IAccountTableProps) => {
 		setIsFilterableModalOpen((prev) => !prev);
 	};
 
-	// Theo dõi thay đổi của data và chỉ thêm phần tử mới
-	useEffect(() => {
-		const newData = data.filter(
-			(item) => !previousData.current.some((prevItem) => prevItem.id === item.id)
-		);
-		if (newData.length > 0) {
-			setVisibleRows((prevVisibleRows) => [...newData, ...prevVisibleRows]);
-			previousData.current = data;
-		}
-	}, [data]);
-
-	// Hiển thị các hàng phù hợp với trang hiện tại
-	const paginatedRows = useMemo(
-		() =>
-			visibleRows
-				.filter((item) => item.status === selectedAccountStatus || selectedAccountStatus === 'All')
-				.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-		[page, rowsPerPage, visibleRows, selectedAccountStatus]
-	);
-
-	const emptyRows = paginatedRows.length < rowsPerPage ? rowsPerPage - paginatedRows.length : 0;
+	const visibleRows = useMemo(() => [...data], [page, rowsPerPage, data]);
+	const emptyRows = rowsPerPage - Math.min(rowsPerPage, Math.abs(data.length - page) * rowsPerPage);
 
 	return (
 		<Paper>
@@ -111,11 +171,12 @@ const AccountsTable = (props: IAccountTableProps) => {
 							<TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Số điện thoại</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Trạng thái</TableCell>
+							<TableCell sx={{ fontWeight: 'bold' }}></TableCell>
 						</TableRow>
 					</TableHead>
 					<TableBody>
 						<TransitionGroup component={null}>
-							{paginatedRows.map((account: IAccountResponse, index: number) => (
+							{visibleRows.map((account: IAccountResponse, index: number) => (
 								<CSSTransition
 									key={account.id}
 									timeout={500}
@@ -131,7 +192,7 @@ const AccountsTable = (props: IAccountTableProps) => {
 										<TableCell>{account['school-name']}</TableCell>
 										<TableCell>{account.email}</TableCell>
 										<TableCell>{account.phone}</TableCell>
-										<TableCell>
+										<TableCell width={100} sx={{ textAlign: 'center' }}>
 											<Chip
 												label={ACCOUNT_STATUS[account.status]}
 												variant='outlined'
@@ -140,9 +201,32 @@ const AccountsTable = (props: IAccountTableProps) => {
 														? 'success'
 														: account.status === 'Pending'
 														? 'warning'
-														: 'info'
+														: 'default'
 												}
 											/>
+										</TableCell>
+										<TableCell width={50}>
+											{account.status === 'Pending' && (
+												<IconButton onClick={() => handleSelectPendingAccount(account)}>
+													<RuleIcon />
+												</IconButton>
+											)}
+											{account.status === 'Active' && (
+												<IconButton
+													color='error'
+													onClick={() => handleSelectActiveAccount(account)}
+												>
+													<BlockIcon fontSize='small' />
+												</IconButton>
+											)}
+											{account.status === 'Inactive' && (
+												<IconButton
+													color='success'
+													onClick={() => handleSelectInactiveAccount(account)}
+												>
+													<LoopIcon />
+												</IconButton>
+											)}
 										</TableCell>
 									</TableRow>
 								</CSSTransition>
@@ -167,11 +251,30 @@ const AccountsTable = (props: IAccountTableProps) => {
 				labelDisplayedRows={({ from, to, count }) =>
 					`${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
 				}
-				count={totalRows ?? visibleRows.length}
+				count={totalRows ?? data.length}
 				rowsPerPage={rowsPerPage}
 				page={page}
 				onPageChange={handleChangePage}
 				onRowsPerPageChange={handleChangeRowsPerPage}
+			/>
+			<AccountRequestModal
+				open={isConfirmModalOpen}
+				setOpen={setIsConfirmModalOpen}
+				selectedAccount={selectedAccount}
+				handleProcess={handleProcessPendingAccount}
+			/>
+			<AccountInactiveModal
+				open={isInactiveModalOpen}
+				setOpen={setIsInactiveModalOpen}
+				handleConfirm={handleInactiveAccount}
+				selectedAccountName={selectedAccount['school-name']}
+			/>
+
+			<AccountActiveModal
+				open={isActiveModalOpen}
+				setOpen={setIsActiveModalOpen}
+				handleConfirm={handleActiveAccount}
+				selectedAccountName={selectedAccount['school-name']}
 			/>
 		</Paper>
 	);
