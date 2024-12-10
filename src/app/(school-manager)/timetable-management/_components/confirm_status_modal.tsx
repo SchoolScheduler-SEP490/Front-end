@@ -26,49 +26,75 @@ interface ConfirmStatusModalProps {
 }
 
 const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
-  const { open, onClose, onConfirm, status, timetableCode, timetableName, termName, appliedWeek, endedWeek } = props;
+  const {
+    open,
+    onClose,
+    onConfirm,
+    status,
+    timetableCode,
+    timetableName,
+    termName,
+    appliedWeek,
+    endedWeek,
+  } = props;
 
   const getStatusMessage = () => {
     switch (status) {
       case 2:
-        return (
-            <div className="flex flex-col gap-2">
-              <span>Bạn có chắc chắn muốn công bố thời khóa biểu <strong>"{timetableCode}"</strong>?</span>
-              <div className="mt-4 p-4 bg-gray-50 rounded">
-                <div className="grid grid-cols-2 gap-2">
-                  <span className="text-gray-600 font-semibold">Mã thời khóa biểu:</span>
-                  <span className="font-normal text-sm">{timetableCode}</span>
-                  
-                  <span className="text-gray-600 font-semibold">Tên thời khóa biểu:</span>
-                  <span className="font-normal text-sm">{timetableName}</span>
-                  
-                  <span className="text-gray-600 font-semibold">Học kỳ:</span>
-                  <span className="font-normal text-sm">{termName}</span>
-                  
-                  <span className="text-gray-600 font-semibold">Tuần áp dụng:</span>
-                  <span className="ffont-normal text-sm">{appliedWeek || 'Chưa xác định'}</span>
-                  
-                  <span className="text-gray-600 font-semibold">Tuần kết thúc:</span>
-                  <span className="font-normal text-sm">{endedWeek || 'Chưa xác định'}</span>
-                </div>
-              </div>
-            </div>
-          );
-
-      case 3:
         return (
           <span>
             Bạn có chắc chắn muốn công bố nội bộ thời khóa biểu{" "}
             <strong>{timetableCode}</strong>?
           </span>
         );
-        case 4:
-            return (
-              <span>
-                Bạn có chắc chắn muốn đánh dấu hết hạn thời khóa biểu{" "}
-                <strong>{timetableCode}</strong>?
-              </span>
-            );
+
+      case 3:
+        return (
+          <div className="flex flex-col gap-2">
+            <span>
+              Bạn có chắc chắn muốn công bố thời khóa biểu{" "}
+              <strong>"{timetableCode}"</strong>?
+            </span>
+            <div className="mt-4 p-4 bg-gray-50 rounded">
+              <div className="grid grid-cols-2 gap-2">
+                <span className="text-gray-600 font-semibold">
+                  Mã thời khóa biểu:
+                </span>
+                <span className="font-normal text-sm">{timetableCode}</span>
+
+                <span className="text-gray-600 font-semibold">
+                  Tên thời khóa biểu:
+                </span>
+                <span className="font-normal text-sm">{timetableName}</span>
+
+                <span className="text-gray-600 font-semibold">Học kỳ:</span>
+                <span className="font-normal text-sm">{termName}</span>
+
+                <span className="text-gray-600 font-semibold">
+                  Tuần áp dụng:
+                </span>
+                <span className="ffont-normal text-sm">
+                  {appliedWeek || "Chưa xác định"}
+                </span>
+
+                <span className="text-gray-600 font-semibold">
+                  Tuần kết thúc:
+                </span>
+                <span className="font-normal text-sm">
+                  {endedWeek || "Chưa xác định"}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <span>
+            Bạn có chắc chắn muốn đánh dấu hết hạn thời khóa biểu{" "}
+            <strong>{timetableCode}</strong>?
+          </span>
+        );
       default:
         return (
           <span>
