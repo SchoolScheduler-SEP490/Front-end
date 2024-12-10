@@ -1,17 +1,21 @@
 "use client";
 
 import SMHeader from "@/commons/school_manager/header";
-import { useParams, useRouter } from "next/navigation";
 import {
-  SAMPLE_CLASSES,
-} from "../_libs/constants";
+  IScheduleResponse,
+  TIMETABLE_SLOTS,
+  WEEK_DAYS_FULL,
+} from "@/utils/constants";
+import { firestore } from "@/utils/firebaseConfig";
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import TuneIcon from "@mui/icons-material/Tune";
 import {
   Button,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Table,
   TableBody,
@@ -20,30 +24,16 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useEffect, useMemo, useRef, useState } from "react";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import {
-  collection,
   doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
+  getDoc
 } from "firebase/firestore";
-import { firestore } from "@/utils/firebaseConfig";
-import {
-  IScheduleResponse,
-  TIMETABLE_SLOTS,
-  WEEK_DAYS_FULL,
-} from "@/utils/constants";
-import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
-import AddIcon from "@mui/icons-material/Add";
-import TuneIcon from "@mui/icons-material/Tune";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function TimetableDetail() {
   const params = useParams();
@@ -65,17 +55,6 @@ export default function TimetableDetail() {
     router.push("/timetable-management");
   };
 
-  const grades = Array.from(new Set(SAMPLE_CLASSES.map((c) => c.grade)));
-  const filteredClasses =
-    selectedGrade === "all"
-      ? SAMPLE_CLASSES
-      : SAMPLE_CLASSES.filter((c) => c.grade === selectedGrade);
-
-  const visibleClasses = filteredClasses.slice(
-    startIndex,
-    startIndex + displayCount
-  );
-
   const teacherNames = useMemo(() => {
     if (!scheduleData) return [];
     const teachers = new Set();
@@ -86,18 +65,6 @@ export default function TimetableDetail() {
     });
     return Array.from(teachers) as string[];
   }, [scheduleData]);
-
-  const handleScrollLeft = () => {
-    if (startIndex > 0) {
-      setStartIndex((prev) => prev - 1);
-    }
-  };
-
-  const handleScrollRight = () => {
-    if (startIndex + displayCount < filteredClasses.length) {
-      setStartIndex((prev) => prev + 1);
-    }
-  };
 
   useEffect(() => {
     const fetchScheduleData = async () => {

@@ -11,11 +11,11 @@ export interface ISMNavigation extends INavigation {
 
 export const SM_SIDENAV: ISMSidenav[] = [
 	{
-		category: 'Thời khóa biểu',
+		category: 'Thời khóa biểu chính thức',
 		items: [
 			{
-				name: 'Thời khóa biểu trường',
-				url: '/timetable-management',
+				name: 'Thời khóa biểu',
+				url: '/publish-timetable',
 				icon: '/images/icons/schedule.png',
 			},
 			{
@@ -24,10 +24,25 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				icon: '/images/icons/timeline.png',
 			},
 			{
-				name: 'Thời khóa biểu GV',
+				name: 'Lịch sử dụng phòng',
 				url: '/teacher-timetable',
 				icon: '/images/icons/teacher-timetable.png',
 			}
+		],
+	},
+	{
+		category: 'Cấu hình',
+		items: [
+			{
+				name: 'Bản thảo TKB',
+				url: '/timetable-management',
+				icon: '/images/icons/schedule.png',
+			},
+			{
+				name: 'Nhập TKB',
+				url: '/import-timetable',
+				icon: '/images/icons/Import.png',
+			},
 		],
 	},
 	{
@@ -92,21 +107,6 @@ export const SM_SIDENAV: ISMSidenav[] = [
 				name: 'Tòa nhà',
 				url: '/building-management',
 				icon: '/images/icons/building.png',
-			},
-		],
-	},
-	{
-		category: 'Cấu hình',
-		items: [
-			{
-				name: 'Nhập TKB',
-				url: '/import-timetable',
-				icon: '/images/icons/Import.png',
-			},
-			{
-				name: 'Cấu hình chung',
-				url: '/general-configurations',
-				icon: '/images/icons/constraint.png',
 			},
 		],
 	},
