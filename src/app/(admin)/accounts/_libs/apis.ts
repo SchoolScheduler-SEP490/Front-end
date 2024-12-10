@@ -13,3 +13,7 @@ export const getFetchAccountApi = ({
 		accountStatus ? `accountStatus=${accountStatus}` : ''
 	}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
 };
+
+export const getActiveSchoolApi = () => {
+	return `${api}/api/users/status`;
+};

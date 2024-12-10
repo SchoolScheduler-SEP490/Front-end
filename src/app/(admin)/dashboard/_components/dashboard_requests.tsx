@@ -1,94 +1,176 @@
-import { Button, Typography } from '@mui/material';
-import { FC } from 'react';
-
-type Request = {
-	id: string;
-	schoolName: string;
-	requestType: string;
-	requestCode: string;
-	region: string;
-	dueDate: string;
-};
-
-const requests: Request[] = [
-	{
-		id: '1',
-		schoolName: 'Trường THPT Chuyên Đà Nẵng',
-		requestType: 'Yêu cầu sử dụng Chương trình tự chọn',
-		requestCode: 'CRND001',
-		region: 'Đà Nẵng',
-		dueDate: '1/12/2024',
-	},
-	{
-		id: '2',
-		schoolName: 'Trường THPT Amsterdam Hà Nội',
-		requestType: 'Đăng ký tạo tài khoản',
-		requestCode: 'CASM001',
-		region: 'Hà Nội',
-		dueDate: '1/12/2024',
-	},
-	{
-		id: '3',
-		schoolName: 'Trường THPT Nguyễn Tất Thành',
-		requestType: 'Yêu cầu hủy tài khoản',
-		requestCode: 'DASM001',
-		region: 'TP.HCM',
-		dueDate: '1/12/2024',
-	},
-	{
-		id: '4',
-		schoolName: 'Trường THPT Nguyễn Du',
-		requestType: 'Đăng ký ràng buộc hệ thống',
-		requestCode: 'RCSM001',
-		region: 'Đắk Lắk',
-		dueDate: '1/12/2024',
-	},
-	{
-		id: '5',
-		schoolName: 'Trường THPT Nguyễn Du',
-		requestType: 'Yêu cầu sử dụng Chương trình tự chọn',
-		requestCode: 'CRND001',
-		region: 'Đắk Lắk',
-		dueDate: '1/12/2024',
-	},
-];
+'use client';
+import { Button, Skeleton, Typography } from '@mui/material';
+import { FC, useMemo, useState } from 'react';
+import { ACCOUNT_STATUS } from '../../_utils/constants';
+import { IAccountResponse, IUpdateAccountRequest } from '../_libs/constants';
+import DashboardRequestModal from './dashboard_requests_modal';
+import { getActiveSchoolApi } from '../_libs/apis';
+import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
+import { KeyedMutator } from 'swr';
+import { TRANSLATOR } from '@/utils/dictionary';
 
 interface IDashboardRequestsProps {
-	// Add your data here
+	data: IAccountResponse[];
+	updateData: KeyedMutator<any>;
+	isValidating: boolean;
 }
 
+const formatDateString = (dateString: string): string => {
+	const date = new Date(dateString);
+	const day = String(date.getDate()).padStart(2, '0');
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const year = date.getFullYear();
+	return `${day}/${month}/${year}`;
+};
+
 const DashboardRequests: FC<IDashboardRequestsProps> = (props) => {
-	const {} = props;
+	const { data, isValidating, updateData } = props;
+	const { sessionToken } = useAppContext();
+
+	const [selectedAccount, setSelectedAccount] = useState<IAccountResponse>({} as IAccountResponse);
+	const [isConfirmRequestOpen, setIsConfirmRequestOpen] = useState<boolean>(false);
+	const formProcessApi = getActiveSchoolApi();
+
+	const handleSelectAccount = (account: IAccountResponse) => {
+		setSelectedAccount(account);
+		setIsConfirmRequestOpen(true);
+	};
+
+	const handleProcessRequest = async (newStatus: string) => {
+		const formData: IUpdateAccountRequest = {
+			'account-id': selectedAccount.id,
+			'account-status': newStatus,
+		};
+		const response = await fetch(formProcessApi, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${sessionToken}`,
+			},
+			body: JSON.stringify(formData),
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+			updateData();
+			useNotify({
+				message: TRANSLATOR[data.message] ?? data.message ?? 'Thao tác thành công',
+				type: 'success',
+			});
+		} else {
+			const data = await response.json();
+			updateData();
+			useNotify({
+				message: TRANSLATOR[data.message] ?? data.message ?? 'Thao tác thất bại',
+				type: 'error',
+			});
+		}
+		setIsConfirmRequestOpen(false);
+	};
+
+	const sortedData = useMemo((): IAccountResponse[] => {
+		return data
+			? data.sort(
+					(a, b) => new Date(a['create-date']).getTime() - new Date(b['create-date']).getTime()
+			  )
+			: [];
+	}, [data]);
 
 	return (
 		<div className='w-full h-fit mb-[5vh]'>
 			<div className='relative p-4'>
 				<h2 className='text-body-xlarge font-semibold sticky top-0 left-0 z-10 bg-white px-2 py-3'>
-					Yêu cầu chờ xử lý
+					Đơn đăng ký trường ({sortedData.length})
 				</h2>
 				<div className='flex flex-col gap-4'>
-					{requests.map((request) => (
-						<div key={request.id} className='p-4 bg-basic-gray-hover'>
-							<h3 className='text-body-large-strong'>{request.schoolName}</h3>
-							<p className='text-sm text-gray-600 mb-2'>{request.requestType}</p>
+					{isValidating &&
+						[1, 2, 3, 4, 5].map((index: number) => (
+							<div key={index} className='p-4 bg-basic-gray-hover'>
+								<h3 className='text-body-large-strong'>
+									<Skeleton variant='text' animation='wave' />
+								</h3>
+								<p className='text-sm text-gray-600 mb-2'>Đăng ký tài khoản trường học</p>
+								<div className='w-full h-fit flex flex-row justify-between items-start'>
+									<div className='w-full h-full flex flex-col justify-between items-start gap-2'>
+										<p className='text-sm'>
+											Mã đơn:{' '}
+											<span className='font-semibold'>
+												<Skeleton variant='text' animation='wave' />
+											</span>
+										</p>
+										<p className='text-sm mb-4'>
+											Trạng thái:{' '}
+											<span>
+												<Skeleton variant='text' animation='wave' />
+											</span>
+										</p>
+									</div>
+									<div className='w-full h-full flex flex-col justify-between items-end gap-1'>
+										<p className='text-sm'>
+											Ngày tạo:{' '}
+											<span className='font-semibold'>
+												<Skeleton variant='text' animation='wave' />
+											</span>
+										</p>
+										<Button
+											variant='contained'
+											color='inherit'
+											size='small'
+											disabled
+											sx={{
+												bgcolor: '#004e89',
+												color: 'white',
+												boxShadow: 'none',
+												borderRadius: 0,
+											}}
+										>
+											<Typography fontSize={13}>Xem chi tiết</Typography>
+										</Button>
+									</div>
+								</div>
+							</div>
+						))}
+					{sortedData.length === 0 && !isValidating && (
+						<div className='py-4'>
+							<h3 className='text-body-small italic w-full text-center'>Không có yêu cầu nào</h3>
+						</div>
+					)}
+					{sortedData.map((request: IAccountResponse, index: number) => (
+						<div key={index} className='p-4 pb-2 bg-basic-gray-hover'>
+							<h3 className='text-body-large-strong'>{request['school-name']}</h3>
+							<p className='text-sm text-gray-600 mb-2'>Đăng ký tài khoản trường học</p>
 							<div className='w-full h-fit flex flex-row justify-between items-start'>
 								<div className='w-full h-full flex flex-col justify-between items-start gap-2'>
 									<p className='text-sm'>
-										Mã đơn: <span className='font-semibold'>{request.requestCode}</span>
+										Ngày tạo:{' '}
+										<span className='font-semibold'>
+											{formatDateString(request['create-date'])}
+										</span>
 									</p>
 									<p className='text-sm mb-4'>
-										Hạn xử lý: <span className='font-semibold'>{request.dueDate}</span>
+										Trạng thái:{' '}
+										<span
+											className={`font-semibold ${
+												request.status === 'Pending' ? 'text-tertiary-normal' : ''
+											}`}
+										>
+											{ACCOUNT_STATUS[request.status]}
+										</span>
 									</p>
 								</div>
-								<div className='w-full h-full flex flex-col justify-between items-end gap-1'>
-									<p className='text-sm'>
-										Khu vực: <span className='font-semibold'>{request.region}</span>
-									</p>
+								<div className='w-full h-full flex flex-col justify-end items-end gap-1 pt-5'>
 									<Button
 										variant='contained'
 										color='inherit'
 										size='small'
-										sx={{ bgcolor: '#004e89', color: 'white', boxShadow: 'none', borderRadius: 0 }}
+										onClick={() => handleSelectAccount(request)}
+										sx={{
+											bgcolor: '#004e89',
+											color: 'white',
+											boxShadow: 'none',
+											borderRadius: 0,
+										}}
 									>
 										<Typography fontSize={13}>Xem chi tiết</Typography>
 									</Button>
@@ -98,6 +180,12 @@ const DashboardRequests: FC<IDashboardRequestsProps> = (props) => {
 					))}
 				</div>
 			</div>
+			<DashboardRequestModal
+				selectedAccount={selectedAccount}
+				open={isConfirmRequestOpen}
+				setOpen={setIsConfirmRequestOpen}
+				handleProcess={handleProcessRequest}
+			/>
 		</div>
 	);
 };

@@ -8,66 +8,25 @@ import {
 	TableRow,
 	Typography,
 } from '@mui/material';
-import { FC } from 'react';
-
-type School = {
-	id: number;
-	name: string;
-	createdDate: string;
-	region: string;
-	schedulesCreated: number;
-	status: 'Hoạt động' | 'Vô hiệu';
-};
-
-const schools: School[] = [
-	{
-		id: 1,
-		name: 'THPT Chuyên Nguyễn Du',
-		createdDate: '20/08/2010',
-		region: 'Đắk Lắk',
-		schedulesCreated: 100,
-		status: 'Hoạt động',
-	},
-	{
-		id: 2,
-		name: 'THPT Chuyên Hùng Vương',
-		createdDate: '18/07/2012',
-		region: 'Đà Nẵng',
-		schedulesCreated: 80,
-		status: 'Hoạt động',
-	},
-	{
-		id: 3,
-		name: 'THPT Amsterdam',
-		createdDate: '07/12/2018',
-		region: 'Hà Nội',
-		schedulesCreated: 50,
-		status: 'Hoạt động',
-	},
-	{
-		id: 4,
-		name: 'Trường THPT Nguyễn Tất Thành',
-		createdDate: '09/09/2020',
-		region: 'TP.HCM',
-		schedulesCreated: 30,
-		status: 'Hoạt động',
-	},
-	{
-		id: 5,
-		name: 'Trường THPT Chuyên Lào Cai',
-		createdDate: '10/01/2024',
-		region: 'Lào Cai',
-		schedulesCreated: 10,
-		status: 'Vô hiệu',
-	},
-];
+import { FC, useMemo } from 'react';
+import { ITopSchoolObject } from '../_libs/constants';
+import { SCHOOL_STATUS } from '../../_utils/constants';
 
 interface IDashboardSchoolsProps {
-	// Add your data here
+	data: ITopSchoolObject[];
 }
 
 const DashboardSchools: FC<IDashboardSchoolsProps> = (props) => {
-	const {} = props;
+	const { data } = props;
+
+	const sortedData = useMemo((): ITopSchoolObject[] => {
+		return data
+			? data
+					.sort((a, b) => a.totalTimetable - b.totalTimetable)
+					.reverse()
+					.slice(0, 5)
+			: [];
+	}, [data]);
 	return (
 		<div className='w-full h-[40%] px-2 mb-[5vh]'>
 			<Typography variant='h6' sx={{ p: 2 }}>
@@ -87,9 +46,6 @@ const DashboardSchools: FC<IDashboardSchoolsProps> = (props) => {
 								Ngày tạo
 							</TableCell>
 							<TableCell align='center' sx={{ fontWeight: 'bold' }}>
-								Khu vực
-							</TableCell>
-							<TableCell align='center' sx={{ fontWeight: 'bold' }}>
 								Số TKB đã tạo
 							</TableCell>
 							<TableCell align='center' sx={{ fontWeight: 'bold' }}>
@@ -98,17 +54,16 @@ const DashboardSchools: FC<IDashboardSchoolsProps> = (props) => {
 						</TableRow>
 					</TableHead>
 					<TableBody>
-						{schools.map((school) => (
+						{sortedData.map((school: ITopSchoolObject, index: number) => (
 							<TableRow key={school.id}>
-								<TableCell align='center'>{school.id}</TableCell>
-								<TableCell align='left'>{school.name}</TableCell>
-								<TableCell align='center'>{school.createdDate}</TableCell>
-								<TableCell align='center'>{school.region}</TableCell>
-								<TableCell align='center'>{school.schedulesCreated}</TableCell>
+								<TableCell align='center'>{index + 1}</TableCell>
+								<TableCell align='left'>{school['school-name']}</TableCell>
+								<TableCell align='center'>{school['create-date']}</TableCell>
+								<TableCell align='center'>{school.totalTimetable}</TableCell>
 								<TableCell align='center'>
 									<Chip
-										label={school.status}
-										color={school.status === 'Hoạt động' ? 'success' : 'error'}
+										label={SCHOOL_STATUS[school.status]}
+										color={SCHOOL_STATUS[school.status] === 'Hoạt động' ? 'success' : 'error'}
 										variant='outlined'
 										sx={{
 											fontWeight: 'bold',

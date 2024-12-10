@@ -16,8 +16,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	// Forgot password messages
 	'Send otp reset password success.': 'Mã OTP đã được gửi vào email của bạn',
-	'Send otp reset password failed.':
-		'Mã OTP gửi không thành công, vui lòng kiểm tra lại thông tin',
+	'Send otp reset password failed.': 'Mã OTP gửi không thành công, vui lòng kiểm tra lại thông tin',
 	'OTP unvalid.': 'Mã OTP không hợp lệ',
 	'Confirm otp reset password success. You can reset password now.': 'Xác nhận mã OTP thành công',
 
@@ -121,6 +120,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 	'Department name or code does existed.': 'Tên/Mã tổ bộ môn đã tồn tại',
 
 	'Quick assign success!': 'Xếp tiết thành công',
+	'Account status change success.': 'Cập nhật trạng thái thành công',
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};
