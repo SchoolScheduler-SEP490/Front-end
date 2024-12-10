@@ -148,9 +148,7 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 
 			const selectedTeacher = teacherOptions.find((opt) => opt.value === teacherId);
 			if (selectedTeacher) {
-				setSelectedTeachers((prev) =>
-					useFilterArray([...prev, selectedTeacher], ['value'])
-				);
+				setSelectedTeachers((prev) => useFilterArray([...prev, selectedTeacher], ['value']));
 			}
 		}
 	};
@@ -189,7 +187,7 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 						component='h2'
 						className='text-title-medium-strong font-normal opacity-60'
 					>
-						Thêm tổ bộ môn
+						Phân công tổ trưởng TBM
 					</Typography>
 					<IconButton onClick={handleClose}>
 						<CloseIcon />
@@ -197,10 +195,7 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 				</div>
 				<div className='w-full h-[50vh] p-3 flex flex-col justify-start items-start gap-3 overflow-y-scroll no-scrollbar'>
 					{departmentData.map((department: IDepartmentTableData, index) => (
-						<div
-							className='w-full flex flex-row justify-between items-baseline'
-							key={index}
-						>
+						<div className='w-full flex flex-row justify-between items-baseline' key={index}>
 							<h1>{department.departmentName}</h1>
 							<FormControl sx={{ width: '70%' }}>
 								<InputLabel id='elective-label' variant='standard'>
@@ -211,23 +206,18 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 									id='department-head'
 									variant='standard'
 									value={
-										editingObjects.find(
-											(obj) => obj['department-id'] === department.id
-										)?.['teacher-id']
+										editingObjects.find((obj) => obj['department-id'] === department.id)?.[
+											'teacher-id'
+										]
 									}
 									onOpen={() => handleChangeDropdownOptions(department.id)}
 									onChange={(event: SelectChangeEvent<number>) => {
-										handleSelectTeacher(
-											department.id,
-											Number(event.target.value)
-										);
+										handleSelectTeacher(department.id, Number(event.target.value));
 									}}
 									MenuProps={MenuProps}
 									sx={{ width: '100%', height: 32 }}
 									renderValue={(selected) =>
-										selectedTeachers.find(
-											(teacher) => teacher.value === selected
-										)?.label
+										selectedTeachers.find((teacher) => teacher.value === selected)?.label
 									}
 								>
 									{teacherOptions.length === 0 && (
@@ -235,17 +225,15 @@ const DepartmentHeadAssignmentModal = (props: IDepartmentHeadAssignmentProps) =>
 											Không tìm thấy giáo viên phù hợp
 										</MenuItem>
 									)}
-									{teacherOptions.map(
-										(teacher: IDropdownOption<number>, index: number) => (
-											<MenuItem
-												key={teacher.label + index}
-												value={teacher.value}
-												style={getStyles(teacher, teacherOptions, theme)}
-											>
-												<ListItemText primary={teacher.label} />
-											</MenuItem>
-										)
-									)}
+									{teacherOptions.map((teacher: IDropdownOption<number>, index: number) => (
+										<MenuItem
+											key={teacher.label + index}
+											value={teacher.value}
+											style={getStyles(teacher, teacherOptions, theme)}
+										>
+											<ListItemText primary={teacher.label} />
+										</MenuItem>
+									))}
 								</Select>
 							</FormControl>
 						</div>

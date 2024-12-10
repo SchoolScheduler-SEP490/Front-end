@@ -221,7 +221,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 						sx={[
 							{
 								pl: { sm: 2 },
-								pr: { xs: 1, sm: 1 },
+								pr: { xs: 4, sm: 4 },
 								width: '100%',
 							},
 						]}

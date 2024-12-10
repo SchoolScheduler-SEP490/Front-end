@@ -27,3 +27,31 @@ export const getFetchDistrictApi = ({
 export const getUpdateProvinceApi = (provinceId: number) => {
 	return `${api}/api/provinces/${provinceId}`;
 };
+
+export const getUpdateDistrictApi = ({
+	provinceId,
+	districtCode,
+}: {
+	provinceId: number;
+	districtCode: number;
+}) => {
+	return `${api}/${districtCode}/provinces/${provinceId}`;
+};
+
+export const getDeleteDistrictApi = ({
+	provinceId,
+	districtCode,
+}: {
+	provinceId: number;
+	districtCode: number;
+}) => {
+	return `${api}/${districtCode}/provinces/${provinceId}`;
+};
+
+export const getCreateDistrictApi = (provinceId: number) => {
+	return `${api}/api/districts/provinces/${provinceId}`;
+};
+
+export const getCreateProvinceApi = () => {
+	return `${api}/api/provinces`;
+};

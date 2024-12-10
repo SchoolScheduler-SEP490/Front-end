@@ -85,11 +85,11 @@ const SchoolsTable = (props: IAccountTableProps) => {
 				<h2 className='text-title-medium-strong font-semibold w-full text-left'>
 					Danh sách trường học
 				</h2>
-				<Tooltip title='Thêm trường học'>
+				{/* <Tooltip title='Thêm trường học'>
 					<IconButton onClick={() => setIsCreateModalOpen(true)}>
 						<AddIcon />
 					</IconButton>
-				</Tooltip>
+				</Tooltip> */}
 				<Tooltip title='Lọc danh sách'>
 					<IconButton onClick={handleFilterable}>
 						<FilterListIcon />

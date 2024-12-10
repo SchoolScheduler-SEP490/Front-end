@@ -3,7 +3,7 @@ import { Button, Skeleton, Typography } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
 import { ACCOUNT_STATUS } from '../../_utils/constants';
 import { IAccountResponse, IUpdateAccountRequest } from '../_libs/constants';
-import DashboardRequestModal from './dashboard_requests_modal';
+import DashboardRequestModal from './dashboard_modal_requests';
 import { getActiveSchoolApi } from '../_libs/apis';
 import { useAppContext } from '@/context/app_provider';
 import useNotify from '@/hooks/useNotify';

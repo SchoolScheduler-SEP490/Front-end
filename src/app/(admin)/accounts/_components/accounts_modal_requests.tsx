@@ -72,7 +72,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 					<Typography
 						variant='h6'
 						component='h2'
-						className='text-title-medium-strong font-normal opacity-60'
+						className='text-title-small-strong font-normal opacity-60'
 					>
 						Tài khoản chờ đăng ký
 					</Typography>
@@ -82,7 +82,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 				</div>
 				<div className='w-full h-fit p-3 flex flex-col justify-start items-start '>
 					<div className='w-full h-fit flex flex-row justify-start item-center gap-2 py-2'>
-						<Typography variant='body1' sx={{ fontWeight: 'bold', display: 'inline' }}>
+						<Typography variant='body1' sx={{ display: 'inline', opacity: 0.6 }}>
 							Tên trường:
 						</Typography>{' '}
 						<Typography variant='body1' sx={{ display: 'inline' }}>
@@ -90,7 +90,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 						</Typography>
 					</div>{' '}
 					<div className='w-full h-fit flex flex-row justify-start item-center gap-2 py-2'>
-						<Typography variant='body1' sx={{ fontWeight: 'bold', display: 'inline' }}>
+						<Typography variant='body1' sx={{ display: 'inline', opacity: 0.6 }}>
 							Email:
 						</Typography>{' '}
 						<Typography variant='body1' sx={{ display: 'inline' }}>
@@ -98,7 +98,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 						</Typography>
 					</div>{' '}
 					<div className='w-full h-fit flex flex-row justify-start item-center gap-2 py-2'>
-						<Typography variant='body1' sx={{ fontWeight: 'bold', display: 'inline' }}>
+						<Typography variant='body1' sx={{ display: 'inline', opacity: 0.6 }}>
 							Số điện thoại:
 						</Typography>{' '}
 						<Typography variant='body1' sx={{ display: 'inline' }}>
@@ -106,7 +106,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 						</Typography>
 					</div>{' '}
 					<div className='w-full h-fit flex flex-row justify-start item-center gap-2 py-2'>
-						<Typography variant='body1' sx={{ fontWeight: 'bold', display: 'inline' }}>
+						<Typography variant='body1' sx={{ display: 'inline', opacity: 0.6 }}>
 							Trạng thái:
 						</Typography>{' '}
 						<Typography variant='body1' sx={{ display: 'inline' }}>
@@ -120,7 +120,7 @@ const AccountRequestModal = (props: IAccountRequestModalProps) => {
 						</Typography>
 					</div>{' '}
 					<div className='w-full h-fit flex flex-row justify-start item-center gap-2 py-2'>
-						<Typography variant='body1' sx={{ fontWeight: 'bold', display: 'inline' }}>
+						<Typography variant='body1' sx={{ display: 'inline', opacity: 0.6 }}>
 							Ngày tạo:
 						</Typography>{' '}
 						<Typography variant='body1' sx={{ display: 'inline' }}>

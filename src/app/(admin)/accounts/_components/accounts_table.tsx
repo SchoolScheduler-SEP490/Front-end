@@ -21,7 +21,7 @@ import { IAccountResponse, IUpdateAccountRequest } from '../_libs/constants';
 import styles from '../_styles/table_styles.module.css';
 import RuleIcon from '@mui/icons-material/Rule';
 import BlockIcon from '@mui/icons-material/Block';
-import AccountRequestModal from './accounts_requests_modal';
+import AccountRequestModal from './accounts_modal_requests';
 import { KeyedMutator } from 'swr';
 import useNotify from '@/hooks/useNotify';
 import { getActiveSchoolApi } from '../_libs/apis';
