@@ -94,7 +94,7 @@ const DashboardNumbers: FC<IDashboardNumbersProps> = (props) => {
 						<h1 className='text-title-small-strong font-bold leading-3'>
 							{formatNumber(data?.averageTimetablePerSchool ?? 0)}
 						</h1>
-						<p className='text-body-small font-normal opacity-60'>Trường / cả nước</p>
+						<p className='text-body-small font-normal opacity-60'>TKB / trường</p>
 					</div>
 				</div>
 			</div>

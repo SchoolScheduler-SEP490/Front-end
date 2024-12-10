@@ -7,3 +7,8 @@ export interface IAccountResponse {
 	status: string;
 	'create-date': string;
 }
+
+export interface IUpdateAccountRequest {
+	'account-id': number;
+	'account-status': string;
+}

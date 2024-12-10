@@ -3,10 +3,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, IconButton, Modal, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { ACCOUNT_STATUS } from '../../_utils/constants';
-import { IAccountResponse } from '../_libs/constants';
-import DashboardConfirmModal from './dashboard_modal_confirm';
+import AccountConfirmModal from './accounts_modal_confirm';
 import zIndex from '@mui/material/styles/zIndex';
-import DashboardRejectModal from './dashboard_modal_reject';
+import AccountRejectModal from './accounts_modal_reject';
+import { IAccountResponse } from '../_libs/constants';
 
 const style = {
 	position: 'absolute',
@@ -19,13 +19,6 @@ const style = {
 	zIndex: 999,
 };
 
-interface IDashboardRequestModalProps {
-	selectedAccount: IAccountResponse;
-	open: boolean;
-	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	handleProcess: (newStatus: string) => void;
-}
-
 const formatDateString = (dateString: string): string => {
 	const date = new Date(dateString);
 	const day = String(date.getDate()).padStart(2, '0');
@@ -34,7 +27,14 @@ const formatDateString = (dateString: string): string => {
 	return `${day}/${month}/${year}`;
 };
 
-const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
+interface IAccountRequestModalProps {
+	selectedAccount: IAccountResponse;
+	open: boolean;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	handleProcess: (newStatus: string) => void;
+}
+
+const AccountRequestModal = (props: IAccountRequestModalProps) => {
 	const { handleProcess, setOpen, open, selectedAccount: data } = props;
 
 	const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
@@ -146,12 +146,12 @@ const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
 						onClick={() => setIsConfirmOpen(true)}
 					/>
 				</div>
-				<DashboardConfirmModal
+				<AccountConfirmModal
 					open={isConfirmOpen}
 					setOpen={setIsConfirmOpen}
 					handleConfirm={handleConfirm}
 				/>
-				<DashboardRejectModal
+				<AccountRejectModal
 					open={isRejectConfirmOpen}
 					setOpen={setIsRejectConfirmOpen}
 					handleConfirm={handleRejectConfirm}
@@ -161,4 +161,4 @@ const DashboardRequestModal = (props: IDashboardRequestModalProps) => {
 	);
 };
 
-export default DashboardRequestModal;
+export default AccountRequestModal;

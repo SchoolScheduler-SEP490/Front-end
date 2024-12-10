@@ -18,7 +18,7 @@ export default function UserPage() {
 	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 	const [totalRows, setTotalRows] = useState<number | undefined>(undefined);
 
-	const [isFilterableModalOpen, setIsFilterableModalOpen] = useState<boolean>(false);
+	const [isFilterableModalOpen, setIsFilterableModalOpen] = useState<boolean>(true);
 	const [selectedAccountStatus, setSelectedAccountStatus] = useState<string>('All');
 
 	const [accountData, setAccountData] = useState<IAccountResponse[]>([]);
@@ -29,8 +29,8 @@ export default function UserPage() {
 		isValidating: isAccountValidating,
 	} = useFetchAccounts({
 		sessionToken,
-		pageIndex: 1,
-		pageSize: 999999,
+		pageIndex: page + 1,
+		pageSize: rowsPerPage,
 		...(selectedAccountStatus !== 'All' && { accountStatus: selectedAccountStatus }),
 	});
 
@@ -38,19 +38,10 @@ export default function UserPage() {
 		setAccountData([]);
 		updateAccount();
 		if (accountResponse?.status === 200) {
-			const tmpAccountData: IAccountResponse[] = [];
-			Object.entries(ACCOUNT_STATUS).forEach(([key, value]) => {
-				const accountsByStatus: IAccountResponse[] = accountResponse.result.items.filter(
-					(item: IAccountResponse) =>
-						item.status === key && !accountData.some((existing) => existing.id === item.id)
-				);
-				tmpAccountData.push(...accountsByStatus);
-			});
-
-			setAccountData((prev) => [...prev, ...tmpAccountData]);
+			setAccountData(accountResponse.result.items);
 			setTotalRows(accountResponse.result['total-item-count']);
 		}
-	}, [accountResponse]);
+	}, [accountResponse, page, rowsPerPage, selectedAccountStatus]);
 
 	return (
 		<div
@@ -82,6 +73,7 @@ export default function UserPage() {
 						totalRows={totalRows}
 						selectedAccountStatus={selectedAccountStatus}
 						setIsFilterableModalOpen={setIsFilterableModalOpen}
+						updateData={updateAccount}
 					/>
 				</div>
 				<AccountsFilterable
