@@ -21,8 +21,6 @@ import {
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import MenuIcon from '@mui/icons-material/Menu';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -154,13 +152,19 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 					placement='bottom'
 					arrow
 				>
-					<IconButton onClick={handleToggleMenu} color='default'>
-						{!isMenuOpen ? (
-							<MenuOpenIcon color='inherit' sx={{ color: 'white' }} />
-						) : (
-							<MenuIcon color='inherit' sx={{ color: 'white' }} />
-						)}
-					</IconButton>
+					<label className='select-none'>
+						<div className='w-9 h-10 cursor-pointer flex flex-col items-center justify-center'>
+							<input
+								className='hidden peer'
+								type='checkbox'
+								checked={!isMenuOpen}
+								onClick={handleToggleMenu}
+							/>
+							<div className='w-[50%] h-[2px] bg-white rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg]' />
+							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-center peer-checked:hidden' />
+							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-left -translate-y-[0.45rem] peer-checked:rotate-[45deg]' />
+						</div>
+					</label>
 				</LightTooltip>
 				{children}
 			</div>
@@ -182,15 +186,15 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 					</IconButton>
 
 					{showNotifications && (
-						<div className='absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto no-scrollbar'>
+						<div className='absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar '>
 							<div className='p-4'>
 								<div className='flex justify-between items-center mb-2'>
 									<h5 className='text-lg font-semibold'>Thông báo</h5>
 								</div>
 								<div className='flex justify-between items-center'>
 									<StyledTabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)}>
-										<Tab label='Hôm nay' disableRipple />
-										<Tab label='Trước đó' disableRipple />
+										<Tab label='Tất cả' disableRipple />
+										<Tab label='Chưa đọc' disableRipple />
 									</StyledTabs>
 									<button
 										onClick={markAllAsRead}
@@ -222,8 +226,22 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 										>
 											<div className='font-medium'>{notification.title}</div>
 											<div className='text-sm text-gray-600'>{notification.message}</div>
-											<div className='text-xs text-gray-400 mt-1'>
-												{new Date(notification['create-date']).toLocaleString()}
+											<div className='text-xs text-gray-400 mt-2 flex justify-between items-center'>
+												<span>
+													{new Date(notification['create-date']).toLocaleDateString('vi-VN', {
+														year: 'numeric',
+														month: '2-digit',
+														day: '2-digit',
+													})}
+												</span>
+												<span>
+													{new Date(notification['create-date']).toLocaleTimeString('vi-VN', {
+														hour12: false,
+														hour: '2-digit',
+														minute: '2-digit',
+														second: '2-digit',
+													})}
+												</span>
 											</div>
 										</div>
 									))

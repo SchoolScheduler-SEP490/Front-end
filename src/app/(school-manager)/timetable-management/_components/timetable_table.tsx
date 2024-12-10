@@ -300,7 +300,7 @@ const TimetableTable = (props: TimetableTableProps) => {
         const q = query(
           timetablesRef,
           where("term-id", "==", termId),
-          where("status", "==", SCHEDULE_STATUS.find((s) => s.value === 2)?.key)
+          where("status", "==", SCHEDULE_STATUS.find((s) => s.value === 3)?.key)
         );
 
         const snapshot = await getDocs(q);
@@ -324,7 +324,7 @@ const TimetableTable = (props: TimetableTableProps) => {
         sessionToken
       );
 
-      if (selectedStatus === 2) {
+      if (selectedStatus === 3) {
         const scheduleRef = doc(
           firestore,
           "schedule-responses",
@@ -441,7 +441,7 @@ const TimetableTable = (props: TimetableTableProps) => {
                               key={status.key}
                               value={status.value}
                               disabled={
-                                (row.status === 2 && (status.value === 1 || status.value === 3)) || 
+                                (row.status === 3 && (status.value === 1 || status.value === 2)) || 
                                 (row.status === 4 && (status.value === 2 || status.value === 3))
                               }
                             >
