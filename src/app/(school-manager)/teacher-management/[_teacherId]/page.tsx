@@ -29,9 +29,13 @@ export default function TeacherDetails() {
   const router = useRouter();
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [activeTab, setActiveTab] = useState(0);
-  
-  const { data: teacherData, isLoading, mutate } = useSWR(
-    teacherId ? ['teacher-detail', schoolId, teacherId] : null,
+
+  const {
+    data: teacherData,
+    isLoading,
+    mutate,
+  } = useSWR(
+    teacherId ? ["teacher-detail", schoolId, teacherId] : null,
     async () => {
       const response = await fetch(
         `${api}/api/schools/${schoolId}/teachers/${teacherId}`,
@@ -50,7 +54,7 @@ export default function TeacherDetails() {
       revalidateOnReconnect: false,
       revalidateOnMount: true,
     }
-  );  
+  );
 
   const handleBack = () => {
     router.push("/teacher-management");
@@ -59,7 +63,7 @@ export default function TeacherDetails() {
     setActiveTab(newValue);
   };
   return (
-    <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
+    <div className="w-[84%] h-screen flex flex-col items-center overflow-y-scroll no-scrollbar">
       <SMHeader>
         <div className="flex items-center gap-4">
           <IconButton onClick={handleBack} sx={{ color: "white" }}>
@@ -72,12 +76,12 @@ export default function TeacherDetails() {
       </SMHeader>
 
       {!isLoading && teacherData && (
-        <div className="flex flex-col h-full py-20">
+        <div className="flex flex-col w-full h-full py-20">
           <TeacherSidenav
             activeTab={activeTab}
             handleTabChange={handleTabChange}
           />
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 w-full">
             {activeTab === 0 && (
               <div className="w-full p-7 flex justify-center">
                 <UpdateTeacherModal
@@ -256,13 +260,13 @@ export default function TeacherDetails() {
               </div>
             )}
             {activeTab === 1 && (
-              <div className="p-7 flex flex-col items-center ">
-                <TeachableSubjectTable
-                  teacherId={teacherId}
-                  schoolId={schoolId}
-                  sessionToken={sessionToken}
-                  mutate={mutate}
-                />
+              <div className="w-full px-24 py-7">
+                  <TeachableSubjectTable
+                    teacherId={teacherId}
+                    schoolId={schoolId}
+                    sessionToken={sessionToken}
+                    mutate={mutate}
+                  />
               </div>
             )}
           </div>
@@ -270,5 +274,4 @@ export default function TeacherDetails() {
       )}
     </div>
   );
-
 }
