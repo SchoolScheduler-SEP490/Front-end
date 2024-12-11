@@ -20,7 +20,11 @@ import Image from "next/image";
 import { visuallyHidden } from "@mui/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
-import { CLASSGROUP_STRING_TYPE, ICommonOption } from "@/utils/constants";
+import {
+  CLASSGROUP_STRING_TYPE,
+  ICommonOption,
+  MAIN_SESSION_TRANSLATOR,
+} from "@/utils/constants";
 import { KeyedMutator } from "swr";
 import { IClassTableData } from "../_libs/constants";
 import AddClassModal from "./add_class";
@@ -157,6 +161,7 @@ interface IClassTableProps {
   mutate: KeyedMutator<any>;
   isFilterable: boolean;
   setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedGrade: number | null;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -174,7 +179,8 @@ const ClassTable = (props: IClassTableProps) => {
     totalRows,
     mutate,
     isFilterable,
-		setIsFilterable,
+    setIsFilterable,
+    selectedGrade,
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
@@ -192,13 +198,12 @@ const ClassTable = (props: IClassTableProps) => {
   const handleRowClick = (classId: number) => {
     router.push(`/class-management/detail?id=${classId}`);
   };
-  
 
   const handleFilterable = () => {
     setIsFilterable(!isFilterable);
     mutate();
   };
-  
+
   const handleClick = (
     event: React.MouseEvent<HTMLButtonElement>,
     row: IClassTableData
@@ -218,7 +223,7 @@ const ClassTable = (props: IClassTableProps) => {
     setOrderBy(property);
   };
 
-  const handleMenuItemClick = (index: number,  event: React.MouseEvent) => {
+  const handleMenuItemClick = (index: number, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     switch (index) {
@@ -244,10 +249,15 @@ const ClassTable = (props: IClassTableProps) => {
     setRowsPerPage(parseInt(event.target.value));
   };
 
-  const visibleRows = React.useMemo(
-    () => [...classTableData].sort(getComparator(order, orderBy)),
-    [order, orderBy, page, rowsPerPage, classTableData]
-  );
+  const visibleRows = React.useMemo(() => {
+    let filteredData = [...classTableData];
+    if (selectedGrade !== null) {
+      filteredData = classTableData.filter(
+        (row) => row.grade === selectedGrade
+      );
+    }
+    return filteredData.sort(getComparator(order, orderBy));
+  }, [order, orderBy, classTableData, selectedGrade]);
 
   const emptyRows =
     classTableData.length < rowsPerPage && rowsPerPage < 10
@@ -301,21 +311,27 @@ const ClassTable = (props: IClassTableProps) => {
                 rowCount={classTableData.length}
               />
               <TableBody>
-              {visibleRows.length === 0 && (
-									<TableRow>
-										<TableCell colSpan={8} align='center'>
-											<h1 className='text-body-large-strong italic text-basic-gray'>
-												Lớp học chưa có dữ liệu
-											</h1>
-										</TableCell>
-									</TableRow>
-								)}
+                {visibleRows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center">
+                      <h1 className="text-body-large-strong italic text-basic-gray">
+                        {selectedGrade !== null
+                          ? `Lớp học chưa có dữ liệu ${
+                              CLASSGROUP_STRING_TYPE.find(
+                                (item) => item.value === selectedGrade
+                              )?.key
+                            }`
+                          : "Lớp học chưa có dữ liệu"}
+                      </h1>
+                    </TableCell>
+                  </TableRow>
+                )}
                 {visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
                     <TableRow
                       hover
-                      onClick={() =>  handleRowClick(row.id)}
+                      onClick={() => handleRowClick(row.id)}
                       role="checkbox"
                       tabIndex={-1}
                       key={row.id}
@@ -342,8 +358,14 @@ const ClassTable = (props: IClassTableProps) => {
                         {row.homeroomTeacherName}
                       </TableCell>
                       <TableCell align="center">{row.schoolYear}</TableCell>
-                      <TableCell align="center">{row.mainSession}</TableCell>
-                      <TableCell width={80} onClick={(e) => e.stopPropagation()}>
+                      <TableCell align="center">
+                        {MAIN_SESSION_TRANSLATOR[row.mainSession]}
+                      </TableCell>
+
+                      <TableCell
+                        width={80}
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <IconButton
                           color="success"
                           sx={{ zIndex: 10 }}
@@ -400,6 +422,7 @@ const ClassTable = (props: IClassTableProps) => {
                     </TableRow>
                   );
                 })}
+
                 {emptyRows > 0 && (
                   <TableRow
                     style={{
@@ -415,9 +438,9 @@ const ClassTable = (props: IClassTableProps) => {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            labelRowsPerPage='Số hàng'
-            labelDisplayedRows={({from, to, count}) => 
-                `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            labelRowsPerPage="Số hàng"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
             }
             count={totalRows ?? classTableData.length}
             rowsPerPage={rowsPerPage}

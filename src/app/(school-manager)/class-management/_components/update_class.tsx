@@ -32,7 +32,11 @@ import { updateClassSchema } from "../_libs/class_schema";
 import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
 import { useUpdateClass } from "../_hooks/useUpdateClass";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
+import {
+  CLASSGROUP_STRING_TYPE,
+  MAIN_SESSION,
+  MAIN_SESSION_TRANSLATOR,
+} from "@/utils/constants";
 import { ISubjectGroup } from "../_libs/constants";
 import {
   getExistingClasses,
@@ -152,6 +156,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
           }
         );
         const data = await response.json();
+        console.log("API Response:", data.result["main-session"]);
         if (data.status === 200) {
           const gradeNumber = Number(data.result.grade.split("_")[1]);
           setClassData(data);
@@ -165,6 +170,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
             "room-id": data.result["room-id"],
           });
         }
+        console.log("Formik values after set:", formik.values);
         setIsLoading(false);
       } catch (error) {
         useNotify({
@@ -434,25 +440,21 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
-                  <FormControl component="fieldset">
-                    <RadioGroup
-                      row
-                      name="main-session"
-                      value={formik.values["main-session"]}
-                      onChange={formik.handleChange}
-                    >
+                  <RadioGroup
+                    row
+                    name="main-session"
+                    value={formik.values["main-session"].toString()} // Ensure string conversion
+                    onChange={formik.handleChange}
+                  >
+                    {MAIN_SESSION.map((session) => (
                       <FormControlLabel
-                        value="0"
+                        key={session.key}
+                        value={session.value.toString()} // Change to match API value format
                         control={<Radio />}
-                        label="Chiều"
+                        label={MAIN_SESSION_TRANSLATOR[session.value]}
                       />
-                      <FormControlLabel
-                        value="1"
-                        control={<Radio />}
-                        label="Sáng"
-                      />
-                    </RadioGroup>
-                  </FormControl>
+                    ))}
+                  </RadioGroup>
                 </Grid>
               </Grid>
             </Grid>

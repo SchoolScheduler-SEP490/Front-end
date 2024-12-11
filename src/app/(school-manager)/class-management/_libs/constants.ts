@@ -4,7 +4,7 @@ export interface IClassTableData {
   grade: number;
   homeroomTeacherName: string;
   schoolYear: string;
-  mainSession: string;
+  mainSession: number;
   room: string;
 }
 export interface IClass {
@@ -14,6 +14,7 @@ export interface IClass {
   "homeroom-teacher-name": string;
   "school-year-code"?: string;
   "main-session-text": string;
+  "main-session": number;
   "room-name": string;
 }
 export interface ISchoolYear {
