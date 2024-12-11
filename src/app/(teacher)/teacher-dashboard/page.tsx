@@ -18,7 +18,7 @@ export default function TeacherDashboardPage() {
     <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
       <TeacherHeader>
         <h3 className="text-title-small text-white font-semibold tracking-wider">
-          Lịch dạy học giáo viên
+          Lịch dạy học dự kiến
         </h3>
       </TeacherHeader>
 

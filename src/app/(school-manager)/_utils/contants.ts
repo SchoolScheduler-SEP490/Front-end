@@ -115,7 +115,7 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		items: [
 			{
 				name: 'Đơn xin nghỉ',
-				url: '/import-timetable',
+				url: '/application-form',
 				icon: '/images/icons/Import.png',
 			},
 		],
