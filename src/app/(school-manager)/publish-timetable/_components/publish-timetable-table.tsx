@@ -1,5 +1,6 @@
 import { useAppContext } from "@/context/app_provider";
 import {
+  IClassCombinationScheduleObject,
   IClassPeriod,
   IClassSchedule,
   ITermResponse,
@@ -83,6 +84,7 @@ export default function PublishTimetableTable({
   const { selectedSchoolYearId } = useAppContext();
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -167,14 +169,14 @@ export default function PublishTimetableTable({
         </div>
       </div>
 
-      {!scheduleData ? (
+      {!scheduleData && !isValidating ? (
         <div className="flex flex-col justify-center items-center w-full h-full gap-8 p-12">
           <div className="flex justify-center transform transition-all duration-500 hover:scale-110">
             <Image
               src="/images/icons/empty-folder.png"
               alt="No schedule available"
-              width={350}
-              height={300}
+              width={250}
+              height={200}
               unoptimized={true}
               className="opacity-90 drop-shadow-lg"
             />
@@ -194,7 +196,7 @@ export default function PublishTimetableTable({
 
           <Button
             variant="contained"
-            size="large"
+            size="medium"
             className="!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s 
                transform transition-all duration-300 hover:scale-105 hover:shadow-lg
                flex items-center gap-2"
@@ -285,7 +287,31 @@ export default function PublishTimetableTable({
                                   sx={periodCellStyle(Boolean(period))}
                                 >
                                   {period && (
-                                    <div className="flex flex-col justify-center items-center h-full p-1 gap-1">
+                                    <div className="flex flex-col justify-center items-center h-full p-1 gap-1 relative">
+                                      {scheduleData?.[
+                                        "class-combinations"
+                                      ]?.some(
+                                        (
+                                          combination: IClassCombinationScheduleObject
+                                        ) =>
+                                          combination[
+                                            "subject-abbreviation"
+                                          ] ===
+                                            period["subject-abbreviation"] &&
+                                          combination["start-at"].includes(
+                                            currentSlotIndex
+                                          ) &&
+                                          combination.classes.some(
+                                            (classItem) =>
+                                              classItem.id ===
+                                              classSchedule["student-class-id"]
+                                          )
+                                      ) && (
+                                        <div className="absolute top-0 right-0 bg-warning-100 text-warning-500 text-[10px] px-1 rounded-bl">
+                                          Lớp ghép
+                                        </div>
+                                      )}
+
                                       <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
                                         {period["subject-abbreviation"]}
                                       </strong>
