@@ -202,8 +202,8 @@ export default function RoomTimetableTable({
             <Image
               src="/images/icons/empty-folder.png"
               alt="No schedule available"
-              width={350}
-              height={300}
+              width={250}
+              height={200}
               unoptimized={true}
               className="opacity-90 drop-shadow-lg"
             />
@@ -223,7 +223,7 @@ export default function RoomTimetableTable({
 
           <Button
             variant="contained"
-            size="large"
+            size="medium"
             className="!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s 
                      transform transition-all duration-300 hover:scale-105 hover:shadow-lg
                      flex items-center gap-2"
