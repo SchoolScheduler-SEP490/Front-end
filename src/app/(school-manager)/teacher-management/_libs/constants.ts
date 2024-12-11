@@ -68,6 +68,8 @@ export interface IMainSubject {
 }
 
 export interface IAppropriateLevel {
+  id: number,
+  "is-main": boolean,
   "appropriate-level": number;
   grade: string;
 }

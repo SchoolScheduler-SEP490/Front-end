@@ -32,10 +32,13 @@ const DeleteTeachableSubjectModal = (props: DeleteConfirmationModalProps) => {
   };
 
   const deleteTeachableSubject = async () => {
-    await handleDeleteTeachableSubject(subjectId);
-    mutate();
-    handleClose();
-  };
+    const success = await handleDeleteTeachableSubject(subjectId);
+    if (success) {
+        mutate();  
+        handleClose();
+    }
+};
+
   return (
     <Modal
       keepMounted
