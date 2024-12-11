@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import TeachersLessonsSideNav from './_components/teachers_lessons_sidenav';
 import TeachersLessonsTable from './_components/teachers_lessons_table';
 import useFetchClassData from './_hooks/useFetchClass';
+import useFetchClassCombination from './_hooks/useFetchClassCombination';
 import useFetchCurriculumDetails from './_hooks/useFetchCurriculumDetails';
 import useFetchSubject from './_hooks/useFetchSubject';
 import useFetchTeacher from './_hooks/useFetchTeacher';
@@ -17,18 +18,17 @@ import {
 	IAssignmentResponse,
 	IClassCombinationResponse,
 	IClassResponse,
-	ICurriculumDetailResponse,
 	ISubjectInGroup,
 	ISubjectResponse,
 	ITeacherResponse,
 	ITeachersLessonsObject,
 	ITeachersLessonsSidenavData,
 } from './_libs/constants';
-import useFetchClassCombination from './_hooks/useFetchClassCombination';
+import useFilterArray from '@/hooks/useFilterArray';
 
 export default function TeachersLessons() {
 	const { selectedSchoolYearId, schoolId, sessionToken } = useAppContext();
-	const { dataFirestoreName, timetableStored, dataStored }: ITimetableGenerationState = useSelector(
+	const { timetableStored, dataStored }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 
@@ -68,6 +68,7 @@ export default function TeachersLessons() {
 		pageSize: 100,
 		pageIndex: 1,
 	});
+
 	const { data: assignmentData, mutate: updateAssignment } = useFetchTeachingAssignment({
 		sessionToken,
 		schoolId: Number(schoolId),
@@ -93,10 +94,9 @@ export default function TeachersLessons() {
 		});
 
 	useEffect(() => {
-		updateClassCombination();
 		updateSubject();
-		setEditingObjects([]);
 		if (selectedCombinationId !== 0 && subjectData?.status === 200) {
+			setEditingObjects([]);
 			const currentCombination: IClassCombinationResponse | undefined = classCombinationData.find(
 				(combination) => combination.id === selectedCombinationId
 			);
@@ -107,41 +107,61 @@ export default function TeachersLessons() {
 				const tmpRes: ITeachersLessonsObject = {
 					classId: 0,
 					teacherId: currentCombination['teacher-id'],
-					teacherName: `${currentCombination['teacher-last-name']} ${currentCombination['teacher-first-name']} (${currentCombination['teacher-abbreviation']})`,
-					slots: [],
+					teacherName: currentCombination['teacher-abbreviation'],
+					slots:
+						dataStored['fixed-periods-para']?.length > 0
+							? useFilterArray(
+									dataStored['fixed-periods-para'].filter(
+										(item) =>
+											item['is-combination'] === true &&
+											item['teacher-id'] === currentCombination['teacher-id']
+									),
+									['teacher-id', 'start-at']
+							  )
+									.map((item) => item['start-at'])
+									.sort((a, b) => a - b)
+							: [],
 					subjectId: currentCombination['subject-id'],
 					subjectName: currentSubject['subject-name'],
 					subjectAbbreviation: currentSubject.abbreviation,
 					totalSlotPerWeek: currentCombination['slot-per-week'],
 					totalMainSlotsPerWeek: currentCombination['slot-per-week'],
-					totalSubSlotsPerWeek: currentCombination['slot-per-week'],
+					totalSubSlotsPerWeek: 0,
 					isDoubleSlot:
-						currentCombination['slot-per-week'] > 2 &&
+						currentCombination['slot-per-week'] >= 2 &&
 						currentCombination['slot-per-week'] % 2 === 0,
 					minimumMainCouple: 0,
 					minimumSubCouple: 0,
 					className: currentCombination['e-grade'],
+					appliedClass: currentCombination['student-class'].map(
+						(clazz) =>
+							({
+								id: clazz.id,
+								name: clazz['student-class-name'],
+							} as { id: number; name: string })
+					),
 				} as ITeachersLessonsObject;
+				setEditingObjects((prev) => [...prev, tmpRes]);
 				setSelectedHomeroom(
 					`${currentCombination['e-grade']}|${currentCombination['student-class']
 						.map((clazz) => clazz['student-class-name'])
 						.join(',')}`
 				);
-				setEditingObjects((prev) => [...prev, tmpRes]);
+				setSelectedMainSesion(currentCombination.session === 'Morning' ? 0 : 1);
+				setIsCombinationClass(true);
 			}
 		}
-	}, [selectedCombinationId, subjectData]);
+	}, [selectedCombinationId, classCombinationData, subjectData, dataStored]);
 
 	useEffect(() => {
 		updateClassCombination();
 		if (classCombinationResponse?.status === 200) {
 			setClassCombinationData(classCombinationResponse.result.items);
-			setSelectedCombinationId(classCombinationResponse.result.items[0].id);
+			// setSelectedCombinationId(classCombinationResponse.result.items[0].id);
 		}
 	}, [classCombinationResponse]);
 
 	useEffect(() => {
-		setEditingObjects([]);
 		setSelectedHomeroom('');
 		updateAssignment();
 		updateCurriculum();
@@ -153,6 +173,7 @@ export default function TeachersLessons() {
 			teacherData?.status === 200 &&
 			dataStored
 		) {
+			setEditingObjects([]);
 			const selectedClass: IClassResponse | undefined = classData.result.items.find(
 				(item: IClassResponse) => item.id === selectedClassId
 			);
@@ -221,6 +242,12 @@ export default function TeachersLessons() {
 								setMaxSlot(tmpEditingObjects[existingIndex].totalSlotPerWeek);
 							}
 							tmpEditingObjects[existingIndex].slots.push(obj['start-at']);
+						}
+						if (
+							tmpEditingObjects[existingIndex]?.slots &&
+							tmpEditingObjects[existingIndex].slots.length > 0
+						) {
+							tmpEditingObjects[existingIndex].slots.sort((a, b) => a - b);
 						}
 					});
 				}

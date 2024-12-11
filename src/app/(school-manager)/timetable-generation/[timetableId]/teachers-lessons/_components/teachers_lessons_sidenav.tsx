@@ -1,17 +1,13 @@
 'use client';
 import { inter } from '@/utils/fonts';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { IClassCombinationResponse, ITeachersLessonsSidenavData } from '../_libs/constants';
-import useFetchClassCombination from '../_hooks/useFetchClassCombination';
-import { useAppContext } from '@/context/app_provider';
-import { useDispatch, useSelector } from 'react-redux';
-import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -89,24 +85,19 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 				});
 			});
 			setSidenavData([tmpClassCombinationData, ...classData]);
-		} else setSidenavData(classData);
-	}, [classCombinationData, classData]);
-
-	useEffect(() => {
-		if (sidenavData.length > 0) {
 			if (classCombinationData.length > 0) {
-				setSelectedCombination(sidenavData[0].items[0].value);
+				setSelectedCombination(tmpClassCombinationData.items[0].value);
 			} else {
 				setSelectedClass(sidenavData[0].items[0].value);
 			}
-		}
-	}, [sidenavData]);
+		} else setSidenavData(classData);
+	}, [classCombinationData, classData]);
 
 	const handleSelectCurriculum = (target: number, extra: string, grade: string) => {
 		setSelectedGrade(grade);
 		if (extra === 'combination') {
-			setSelectedCombination(target);
 			setSelectedClass(0);
+			setSelectedCombination(target);
 			setIsCombinationClass(true);
 		} else {
 			setSelectedClass(target);

@@ -90,10 +90,11 @@ interface IFixedPeriodAssignmentProps {
 	data: ITeachersLessonsObject[];
 	selectedObject: ITeachersLessonsObject;
 	mainSession: number;
+	isClassCombination: boolean;
 }
 
 const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
-	const { selectedObject, open, setOpen, data, mainSession } = props;
+	const { selectedObject, open, setOpen, data, mainSession, isClassCombination } = props;
 	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
@@ -212,7 +213,7 @@ const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 					item['class-id'] !== selectedObject.classId
 			);
 			if (occupiedSlots.length > 0) {
-				if (occupiedSlots.some((item) => item['start-at'] === cellId)) {
+				if (occupiedSlots.some((item) => item['start-at'] === cellId) && !isClassCombination) {
 					return true;
 				} else return false;
 			}
@@ -276,27 +277,59 @@ const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 
 	const handleSaveResult = async () => {
 		if (dataStored && dataStored.id && dataFirestoreName) {
-			let newResult = [];
-			newResult = useFilterArray(
-				[
-					...dataStored['fixed-periods-para'].filter(
-						(item: IFixedPeriodObject) =>
-							item['class-id'] !== selectedObject.classId ||
-							item['subject-id'] !== selectedObject.subjectId ||
-							selectedCells.includes(item['start-at'])
-					),
-					...selectedCells.map(
-						(cellId: number) =>
-							({
-								'class-id': selectedObject.classId,
-								'subject-id': selectedObject.subjectId,
-								'start-at': cellId,
-								'teacher-id': selectedObject.teacherId,
-							} as IFixedPeriodObject)
-					),
-				],
-				['subject-id', 'class-id', 'start-at']
-			);
+			let newResult: IFixedPeriodObject[] = [];
+			if (!isClassCombination) {
+				newResult = useFilterArray(
+					[
+						...dataStored['fixed-periods-para'].filter(
+							(item: IFixedPeriodObject) =>
+								item['class-id'] !== selectedObject.classId ||
+								item['subject-id'] !== selectedObject.subjectId ||
+								selectedCells.includes(item['start-at'])
+						),
+						...selectedCells.map(
+							(cellId: number) =>
+								({
+									'class-id': selectedObject.classId,
+									'subject-id': selectedObject.subjectId,
+									'start-at': cellId,
+									'teacher-id': selectedObject.teacherId,
+									'is-combination': isClassCombination,
+								} as IFixedPeriodObject)
+						),
+					],
+					['subject-id', 'class-id', 'start-at']
+				);
+			} else {
+				// Case là combination class
+				const combinationIncludedFixedPeriods: IFixedPeriodObject[] = [];
+				selectedObject.appliedClass?.forEach((item) =>
+					combinationIncludedFixedPeriods.push(
+						...selectedCells.map(
+							(cellId: number) =>
+								({
+									'class-id': item.id,
+									'subject-id': selectedObject.subjectId,
+									'start-at': cellId,
+									'teacher-id': selectedObject.teacherId,
+									'is-combination': isClassCombination,
+								} as IFixedPeriodObject)
+						)
+					)
+				);
+				newResult = useFilterArray(
+					[
+						...dataStored['fixed-periods-para'].filter(
+							(item: IFixedPeriodObject) =>
+								!selectedObject.appliedClass?.some(
+									(classItem) => classItem.id === item['class-id']
+								) || item['subject-id'] !== selectedObject.subjectId
+						),
+						...combinationIncludedFixedPeriods,
+					],
+					['subject-id', 'class-id', 'start-at']
+				);
+			}
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(
 				docRef,

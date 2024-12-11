@@ -55,6 +55,7 @@ interface ITeacherSelectTableProps {
 	selectedTarget: ISwitchPeriod | null;
 	setSelectedTarget: Dispatch<SetStateAction<ISwitchPeriod | null>>;
 	selectedSlotUnavailability: IPeriodDisplayData[];
+	setSelectedSlot: Dispatch<SetStateAction<ISwitchPeriod | null>>;
 }
 
 const TeacherTargetTable = (props: ITeacherSelectTableProps) => {
@@ -67,6 +68,7 @@ const TeacherTargetTable = (props: ITeacherSelectTableProps) => {
 		selectedTarget,
 		setSelectedTarget,
 		selectedSlotUnavailability,
+		setSelectedSlot,
 	} = props;
 
 	const handleSelectTarget = (slot: IPeriodDisplayData) => {
@@ -148,10 +150,7 @@ const TeacherTargetTable = (props: ITeacherSelectTableProps) => {
 										key={cellId}
 										align='center'
 										sx={{
-											cursor:
-												selectedSlot?.slot === existingSlot?.slot || isOccupiedSlot
-													? 'default'
-													: 'pointer',
+											cursor: isOccupiedSlot ? 'default' : 'pointer',
 											userSelect: 'none',
 											border: '1px solid #ddd',
 											':hover': {
@@ -166,7 +165,9 @@ const TeacherTargetTable = (props: ITeacherSelectTableProps) => {
 											p: 0,
 										}}
 										onClick={() => {
-											if (
+											if (selectedSlot?.slot === cellId) {
+												setSelectedSlot(null);
+											} else if (
 												selectedSlot?.slot !== cellId &&
 												!(selectedSlot?.subjectId === existingSlot?.subjectId) &&
 												!isOccupiedSlot
@@ -181,7 +182,10 @@ const TeacherTargetTable = (props: ITeacherSelectTableProps) => {
 															slot: cellId,
 														} as IPeriodDisplayData)
 												);
-											} else if (selectedSlot?.subjectId === existingSlot?.subjectId) {
+											} else if (
+												selectedSlot?.subjectId === existingSlot?.subjectId &&
+												(selectedSlot?.subjectId !== 0 || existingSlot?.subjectId !== 0)
+											) {
 												useNotify({
 													message: 'Không thể đổi tiết của cùng một môn học',
 													type: 'error',

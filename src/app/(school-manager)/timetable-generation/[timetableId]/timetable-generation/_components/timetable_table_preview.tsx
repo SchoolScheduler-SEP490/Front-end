@@ -3,6 +3,7 @@ import { ITimetableGenerationState } from '@/context/slice_timetable_generation'
 import useFilterArray from '@/hooks/useFilterArray';
 import { useSMSelector } from '@/hooks/useReduxStore';
 import {
+	IClassCombinationScheduleObject,
 	IClassPeriod,
 	IClassSchedule,
 	IFixedPeriodObject,
@@ -74,6 +75,9 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 	const [isTimetableGenerated, setIsTimetableGenerated] = useState<boolean>(false);
 	const [isTimetableEditModalOpen, openTimetableEditModal] = useState<boolean>(false);
 	const [isConfirmModalOpen, openConfirmModal] = useState<boolean>(false);
+	const [existingCombination, setExistingCombination] = useState<IClassCombinationScheduleObject[]>(
+		[]
+	);
 
 	const [displayData, setDisplayData] = useState<ITimetableDisplayData[]>([]);
 
@@ -113,6 +117,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 		) {
 			setIsDataLoading(true);
 			if (generatedScheduleStored && generatedScheduleStored.id) {
+				// Nếu đã có thời khóa biểu được tạo ra
 				openConfiguration(false);
 				setIsTimetableGenerated(true);
 				const tmpDisplayData: ITimetableDisplayData[] = generatedScheduleStored[
@@ -135,6 +140,9 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 									classId: clazz['student-class-id'],
 									className: clazz['student-class-name'],
 									teacherName: period['teacher-abbreviation'],
+									roomId: period['room-id'],
+									roomName: period['room-code'],
+									priority: period.priority,
 								} as IPeriodDisplayData)
 						),
 					} as ITimetableDisplayData;
@@ -143,7 +151,11 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 					setDisplayData(tmpDisplayData);
 					setIsDataLoading(false);
 				}
+				if (generatedScheduleStored['class-combinations'].length > 0) {
+					setExistingCombination(generatedScheduleStored['class-combinations']);
+				}
 			} else {
+				// Nếu chưa có thời khóa biểu được tạo ra
 				openConfiguration(true);
 				setIsTimetableGenerated(false);
 				classData.result.items.map(async (clazz: IClassResponse) => {
@@ -456,6 +468,15 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 														const period = clazz.periods.find(
 															(item) => item.slot === slot + weekdayIndex * 10
 														);
+														const isCombination =
+															existingCombination.length > 0 &&
+															existingCombination.some(
+																(combination) =>
+																	combination.classes.some(
+																		(clazz) => clazz.id === period?.classId
+																	) && combination['start-at'].includes(period?.slot ?? 0)
+																// combination['teacher-id'] === period?.teacherId
+															);
 														if (period) {
 															return (
 																<TableCell
@@ -463,18 +484,34 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 																		border: '1px solid #ddd',
 																		maxWidth: 50,
 																		maxHeight: 100,
-																		backgroundColor: '#f0f0f0',
+																		backgroundColor: '#f5f5f5',
 																		overflow: 'hidden',
+																		m: 0,
+																		p: 0,
 																	}}
 																>
-																	<div className='flex flex-col justify-center items-center opacity-80'>
-																		<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
-																			{period.subjectAbbreviation}
-																		</strong>
-																		<p className='text-ellipsis text-nowrap overflow-hidden'>
-																			{period.teacherName}
-																		</p>{' '}
-																	</div>
+																	{!isCombination ? (
+																		<div className='flex flex-col justify-center items-center opacity-80 '>
+																			<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
+																				{period.subjectAbbreviation}
+																			</strong>
+																			<p className='text-ellipsis text-nowrap overflow-hidden'>
+																				{period.teacherName}
+																			</p>
+																		</div>
+																	) : (
+																		<LightTooltip title='Tiết học lớp gộp'>
+																			<div className='relative flex flex-col justify-center items-center opacity-80 overflow-hidden'>
+																				<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
+																					{period.subjectAbbreviation}
+																				</strong>
+																				<p className='text-ellipsis text-nowrap overflow-hidden'>
+																					{period.teacherName}
+																				</p>
+																				<div className='absolute top-0 right-0 -translate-y-[50%] translate-x-[10%] bg-tertiary-normal w-[20%] h-[130%] flex flex-row justify-center items-center -rotate-[50deg]'></div>
+																			</div>
+																		</LightTooltip>
+																	)}
 																</TableCell>
 															);
 														}

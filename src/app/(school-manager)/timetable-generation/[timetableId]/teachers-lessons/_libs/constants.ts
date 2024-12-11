@@ -76,6 +76,7 @@ export interface ITeachersLessonsObject {
 	isDoubleSlot: boolean;
 	minimumMainCouple: number;
 	minimumSubCouple: number;
+	appliedClass?: { id: number; name: string }[];
 }
 
 export interface IAssignmentResponse {

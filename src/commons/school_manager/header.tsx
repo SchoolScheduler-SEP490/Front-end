@@ -7,16 +7,18 @@ import { toggleMenu } from '@/context/slice_school_manager';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import { ISchoolYearResponse } from '@/utils/constants';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import {
 	IconButton,
 	Menu,
 	MenuItem,
 	styled,
+	Tab,
+	Tabs,
 	Tooltip,
 	tooltipClasses,
 	TooltipProps,
-	Tabs,
-	Tab,
 } from '@mui/material';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
@@ -152,19 +154,13 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
 					placement='bottom'
 					arrow
 				>
-					<label className='select-none'>
-						<div className='w-9 h-10 cursor-pointer flex flex-col items-center justify-center'>
-							<input
-								className='hidden peer'
-								type='checkbox'
-								checked={!isMenuOpen}
-								onClick={handleToggleMenu}
-							/>
-							<div className='w-[50%] h-[2px] bg-white rounded-sm transition-all duration-300 origin-left translate-y-[0.45rem] peer-checked:rotate-[-45deg]' />
-							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-center peer-checked:hidden' />
-							<div className='w-[50%] h-[2px] bg-white rounded-md transition-all duration-300 origin-left -translate-y-[0.45rem] peer-checked:rotate-[45deg]' />
-						</div>
-					</label>
+					<IconButton onClick={handleToggleMenu}>
+						{!isMenuOpen ? (
+							<MenuOpenIcon color='inherit' sx={{ color: 'white' }} />
+						) : (
+							<MenuIcon color='inherit' sx={{ color: 'white' }} />
+						)}
+					</IconButton>
 				</LightTooltip>
 				{children}
 			</div>

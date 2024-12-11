@@ -107,6 +107,9 @@ export interface IPeriodDisplayData {
 	classId: number;
 	className: string;
 	slot: number;
+	roomId: number;
+	roomName: string;
+	priority: 'Fixed' | 'Double' | 'Combination' | 'Medium' | 'Low' | 'None';
 }
 
 export interface ISwitchPeriod extends IPeriodDisplayData {
