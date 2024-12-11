@@ -1,9 +1,11 @@
 'use client';
-import { WEEK_DAYS } from '@/utils/constants';
+import { INoAssignPeriodObject, WEEK_DAYS } from '@/utils/constants';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { IPeriodDisplayData, ITimetableDisplayData } from '../../_libs/constants';
 import useNotify from '@/hooks/useNotify';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSMSelector } from '@/hooks/useReduxStore';
 
 const getExistingSlot = (data: IPeriodDisplayData[], cellId: number) => {
 	return data.find((slot) => slot.slot === cellId);
@@ -24,10 +26,15 @@ const TeacherTargetUnavailabilityTable = (props: ITeacherTargetUnavailabilityTab
 		props;
 
 	const [warningObject, setWarningObject] = useState<IPeriodDisplayData | null>(null);
+	const { dataStored }: ITimetableGenerationState = useSMSelector(
+		(state) => state.timetableGeneration
+	);
 
 	const teacherUnavailability: IPeriodDisplayData[] = useMemo((): IPeriodDisplayData[] => {
 		if (data && selectedTarget && selectedTarget?.teacherId !== 0) {
 			const tmpUnavailability: IPeriodDisplayData[] = [];
+
+			// Tìm lịch dạy của giáo viên được chọn
 			data.forEach((item: ITimetableDisplayData) => {
 				item.periods.forEach((period: IPeriodDisplayData) => {
 					if (period.teacherId === selectedTarget.teacherId) {
@@ -35,6 +42,25 @@ const TeacherTargetUnavailabilityTable = (props: ITeacherTargetUnavailabilityTab
 					}
 				});
 			});
+
+			// Tìm lịch bận của giáo viên
+			if (dataStored['no-assign-periods-para'].length > 0) {
+				dataStored['no-assign-periods-para'].forEach((item: INoAssignPeriodObject) => {
+					if (item['teacher-id'] === selectedTarget.teacherId) {
+						tmpUnavailability.push({
+							slot: item['start-at'],
+							classId: 0,
+							className: '',
+							roomId: 0,
+							roomName: '',
+							subjectAbbreviation: 'BẬN',
+							subjectId: 0,
+							teacherId: item['teacher-id'],
+							teacherName: selectedTarget.teacherName,
+						} as IPeriodDisplayData);
+					}
+				});
+			}
 			if (tmpUnavailability.length > 0) {
 				return tmpUnavailability;
 			}

@@ -248,6 +248,7 @@ export interface IFixedPeriodObject {
 	'class-id': number;
 	'start-at': number;
 	'teacher-id': number;
+	'is-combination'?: boolean;
 }
 
 // Tiết không xếp

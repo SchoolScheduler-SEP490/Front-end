@@ -1,3 +1,5 @@
+import { CLASSGROUP_TRANSLATOR, TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
+import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';
 import ListIcon from '@mui/icons-material/List';
 import TableChartSharpIcon from '@mui/icons-material/TableChartSharp';
 import {
@@ -17,16 +19,10 @@ import {
 	tooltipClasses,
 	TooltipProps,
 } from '@mui/material';
-import { MouseEvent, useEffect, useState } from 'react';
-import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';
-import { TIMETABLE_SLOTS, WEEK_DAYS } from '@/utils/constants';
-import { ITeachersLessonsObject } from '../_libs/constants';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import useGetSlotDetails from '../_hooks/useGetSlotDetails';
+import { ITeachersLessonsObject } from '../_libs/constants';
 import FixedPeriodEditModal from './teachers_lessons_modal_edit';
-import useFetchCurriculumDetails from '../_hooks/useFetchCurriculumDetails';
-import { useAppContext } from '@/context/app_provider';
-import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
-import { useSelector } from 'react-redux';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -121,7 +117,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 interface ITeachersLessonsTableProps {
-	// Add something here
 	data: ITeachersLessonsObject[];
 	maxSlot: number;
 	homeroomTeacher: string;
@@ -149,6 +144,10 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 		setIsAssignModalOpen(true);
 	};
 
+	const sortedData = useMemo(() => {
+		return data ? data.sort((a, b) => a.subjectName.localeCompare(b.subjectName)) : [];
+	}, [data]);
+
 	return (
 		<div className='w-full h-fit flex justify-start items-center '>
 			{alignment === 'list' && (
@@ -173,16 +172,28 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 								</ToggleButton>
 							</ToggleButtonGroup>
 						</div>
-						<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
-							<h3 className='text-body-medium opacity-80'>GVCN: </h3>
-							<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
-						</div>
+						{!isCombinationClass ? (
+							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
+								<h3 className='text-body-medium opacity-80'>GVCN:</h3>
+								<h2 className='text-body-medium-strong font-normal'>{homeroomTeacher}</h2>
+							</div>
+						) : (
+							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
+								<h3 className='text-body-medium opacity-80'>
+									Khối {CLASSGROUP_TRANSLATOR[selectedObject.className ?? '']}:{' '}
+								</h3>
+								<h2 className='text-body-medium-strong font-normal'>
+									{homeroomTeacher.split('|')[1] ??
+										selectedObject.appliedClass?.map((item) => item.name).join(', ')}
+								</h2>
+							</div>
+						)}
 					</Toolbar>
 					<TableContainer>
 						<Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size='small'>
 							<EnhancedTableHead numberOfSlots={maxSlot} />
 							<TableBody>
-								{data.map((row, index) => (
+								{sortedData.map((row, index) => (
 									<TableRow key={index}>
 										<TableCell>{row.subjectName}</TableCell>
 										<TableCell>{row.teacherName}</TableCell>
@@ -243,6 +254,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 								</ToggleButton>
 							</ToggleButtonGroup>
 						</div>
+						isCombinationClass
 						{!isCombinationClass ? (
 							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 								<h3 className='text-body-medium opacity-80'>GVCN:</h3>
@@ -250,9 +262,12 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 							</div>
 						) : (
 							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
-								<h3 className='text-body-medium opacity-80'>{homeroomTeacher.split('|')[0]}: </h3>
+								<h3 className='text-body-medium opacity-80'>
+									Khối {CLASSGROUP_TRANSLATOR[selectedObject.className ?? '']}:{' '}
+								</h3>
 								<h2 className='text-body-medium-strong font-normal'>
-									{homeroomTeacher.split('|')[1]}
+									{homeroomTeacher.split('|')[1] ??
+										selectedObject.appliedClass?.map((item) => item.name).join(', ')}
 								</h2>
 							</div>
 						)}
@@ -358,6 +373,7 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 				selectedObject={selectedObject}
 				data={data}
 				mainSession={mainSession}
+				isClassCombination={isCombinationClass}
 			/>
 		</div>
 	);

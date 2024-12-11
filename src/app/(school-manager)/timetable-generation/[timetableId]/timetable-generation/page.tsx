@@ -67,7 +67,7 @@ export default function Home() {
 						// Update record đã tồn tại
 						querySnapshot.forEach(async (existingDoc) => {
 							const docRef = doc(firestore, generatedScheduleFirestorename, existingDoc.id);
-							await setDoc(docRef, result, { merge: true });
+							await setDoc(docRef, result);
 
 							const docRef2 = doc(firestore, timetableFirestoreName, timetableId ?? '');
 							await setDoc(docRef2, {

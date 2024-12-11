@@ -26,9 +26,9 @@ const useGenerateTimetable = async (props: IGenerateTimetableProps) => {
 			body: JSON.stringify(formData),
 		});
 		const data = await response.json();
-		if (!response.ok) {
-			throw new Error((await data).Message);
-		}
+		// if (!response.ok) {
+		// 	throw new Error((await data).Message);
+		// }
 		return data;
 	}
 

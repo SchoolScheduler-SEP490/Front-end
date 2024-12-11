@@ -28,13 +28,22 @@ interface ITeacherSelectTableProps {
 	data: IPeriodDisplayData[];
 	isMainSession: boolean;
 	session: number;
-	selectedTarget: IPeriodDisplayData | null;
 	selectedSlot: ISwitchPeriod | null;
 	setSelectedSlot: Dispatch<SetStateAction<ISwitchPeriod | null>>;
+	selectedTarget: IPeriodDisplayData | null;
+	setSelectedTarget: Dispatch<SetStateAction<ISwitchPeriod | null>>;
 }
 
 const TeacherSelectTable = (props: ITeacherSelectTableProps) => {
-	const { data, isMainSession, session, selectedSlot, setSelectedSlot, selectedTarget } = props;
+	const {
+		data,
+		isMainSession,
+		session,
+		selectedSlot,
+		setSelectedSlot,
+		selectedTarget,
+		setSelectedTarget,
+	} = props;
 
 	const handleSelectSlot = (slot: IPeriodDisplayData | null) => {
 		if (!slot) {
@@ -115,7 +124,7 @@ const TeacherSelectTable = (props: ITeacherSelectTableProps) => {
 										key={cellId}
 										align='center'
 										sx={{
-											cursor: selectedTarget?.slot === existingSlot?.slot ? 'default' : 'pointer',
+											cursor: 'pointer',
 											userSelect: 'none',
 											border: '1px solid #ddd',
 											':hover': {
@@ -130,14 +139,18 @@ const TeacherSelectTable = (props: ITeacherSelectTableProps) => {
 											p: 0,
 										}}
 										onClick={() => {
-											if (
+											if (selectedTarget?.slot === cellId) {
+												// Nếu click vào slot đã chọn thì bỏ chọn
+												setSelectedTarget(null);
+											} else if (
 												selectedTarget?.slot !== cellId &&
 												!(selectedTarget?.subjectId === existingSlot?.subjectId)
 											) {
+												// Nếu click vào slot khác và khác môn thì chọn slot đó
 												handleSelectSlot(existingSlot ?? null);
 											} else if (selectedTarget?.subjectId === existingSlot?.subjectId) {
 												useNotify({
-													message: 'Không thể đổi tiết của cùng một môn học',
+													message: 'Không thể chọn tiết trống/tiết của cùng một môn',
 													type: 'error',
 												});
 											}

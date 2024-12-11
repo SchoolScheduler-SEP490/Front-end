@@ -18,6 +18,7 @@ import TeacherSelectTable from './modal/table_teacher_select';
 import TeacherSelectUnavailabilityTable from './modal/table_teacher_select_unavailability';
 import TeacherTargetTable from './modal/table_teacher_target';
 import TeacherTargetUnavailabilityTable from './modal/table_teacher_target_unavailability';
+import TimetableCancelConfirmModal from './timetable_modal_close_confirm';
 
 const style = {
 	position: 'absolute',
@@ -55,6 +56,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 		IPeriodDisplayData[]
 	>([]);
 	const [isWarning, setIsWarning] = useState<boolean>(false);
+	const [isCloseConfirmModalOpen, setIsCloseConfirmModalOpen] = useState<boolean>(false);
 
 	const [editingData, setEditingData] = useState<ITimetableDisplayData[]>([]);
 	const [classOptions, setClassOptions] = useState<IDropdownOption<number>[]>([]);
@@ -118,7 +120,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 		}
 	}, [open, selectedClassId, selectedSession, editingData]);
 
-	const handleClose = () => {
+	const handleClearData = () => {
 		setOpen(false);
 		setSelectedClassId(0);
 		setSelectedSession(0);
@@ -130,6 +132,11 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 		setEditingData([]);
 		setClassOptions([]);
 		setSessionOptions([]);
+	};
+
+	const handleClose = () => {
+		handleClearData();
+		setIsCloseConfirmModalOpen(false);
 	};
 
 	const handleUpdateData = () => {
@@ -259,7 +266,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 			disableAutoFocus
 			disableRestoreFocus
 			open={open}
-			onClose={handleClose}
+			onClose={() => setIsCloseConfirmModalOpen(true)}
 			aria-labelledby='keep-mounted-modal-title'
 			aria-describedby='keep-mounted-modal-description'
 		>
@@ -275,7 +282,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 					>
 						Điều chỉnh Thời khóa biểu
 					</Typography>
-					<IconButton onClick={handleClose}>
+					<IconButton onClick={() => setIsCloseConfirmModalOpen(true)}>
 						<CloseIcon />
 					</IconButton>
 				</div>
@@ -349,9 +356,10 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 								data={selectedClassData}
 								isMainSession={selectedSession === mainSession}
 								session={selectedSession}
-								selectedTarget={selectedTarget}
 								selectedSlot={selectedSlot}
 								setSelectedSlot={setSelectedSlot}
+								selectedTarget={selectedTarget}
+								setSelectedTarget={setSelectedTarget}
 							/>
 						</div>
 						<div className='w-[48%] h-fit flex flex-col justify-start items-start'>
@@ -364,6 +372,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 								isMainSession={selectedSession === mainSession}
 								session={selectedSession}
 								selectedSlot={selectedSlot}
+								setSelectedSlot={setSelectedSlot}
 								selectedTarget={selectedTarget}
 								setSelectedTarget={setSelectedTarget}
 								selectedSlotUnavailability={selectedSlotUnavailability}
@@ -393,7 +402,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 							<p className='text-body-small italic opacity-80 pl-5 py-2'>
 								(*) Lịch dạy của giáo viên{' '}
 								<strong className='text-basic-positive font-bold text-body'>
-									{selectedTarget?.teacherName ?? ''}
+									{selectedTarget?.subjectId !== 0 ? selectedTarget?.teacherName : ''}
 								</strong>
 							</p>
 							<TeacherTargetUnavailabilityTable
@@ -414,7 +423,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 				>
 					<ContainedButton
 						title='Huỷ'
-						onClick={handleClose}
+						onClick={() => setIsCloseConfirmModalOpen(true)}
 						disableRipple
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
@@ -426,6 +435,11 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 						onClick={handleApplyChanges}
 					/>
 				</div>
+				<TimetableCancelConfirmModal
+					open={isCloseConfirmModalOpen}
+					setOpen={setIsCloseConfirmModalOpen}
+					handleApprove={handleClose}
+				/>
 			</Box>
 		</Modal>
 	);

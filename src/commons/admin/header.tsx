@@ -1,6 +1,5 @@
 'use client';
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
-import { useNotification } from '@/app/(school-manager)/notification/_hooks/useNotification';
 import '@/commons/styles/sm_header.css';
 import { useAppContext } from '@/context/app_provider';
 import { IAdminState, toggleMenu } from '@/context/slice_admin';
@@ -8,21 +7,19 @@ import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import { useAdminDispatch, useAdminSelector } from '@/hooks/useReduxStore';
 import { ISchoolYearResponse } from '@/utils/constants';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import {
 	IconButton,
 	Menu,
 	MenuItem,
 	styled,
-	Tab,
 	Tabs,
 	Tooltip,
 	tooltipClasses,
 	TooltipProps,
 } from '@mui/material';
-import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import MenuIcon from '@mui/icons-material/Menu';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
