@@ -3,6 +3,7 @@ import { IRegisterForm } from "@/app/(auth)/_utils/constants";
 import { useAppContext } from "@/context/app_provider";
 import { inter } from "@/utils/fonts";
 import {
+  Box,
   FormControl,
   IconButton,
   InputLabel,
@@ -10,6 +11,7 @@ import {
   Select,
   SelectChangeEvent,
   styled,
+  Typography,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -61,6 +63,15 @@ export const RegisterForm = () => {
   const [selectedDistrictCode, setSelectedDistrictCode] = useState<number>(0);
   const [searchSchoolValue, setSearchSchoolValue] = useState<string>("");
   const [selectedSchoolId, setSelectedSchoolId] = useState<number>(0);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
 
   const handleLogin = () => {
     router.push("/login");
@@ -82,8 +93,7 @@ export const RegisterForm = () => {
       "confirm-account-password": "",
     },
     validationSchema: registerSchema,
-    onSubmit: async (values) => {
-    },
+    onSubmit: async (values) => {},
   });
 
   const handleFormSubmit = async (formData: IRegisterForm) => {
@@ -159,6 +169,24 @@ export const RegisterForm = () => {
     e.preventDefault();
   };
 
+  const sortedProvinces = provinces.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  const sortedDistricts = districts.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  const checkPasswordRequirements = (password: string) => {
+    setPasswordRequirements({
+      length: password.length >= 8 && password.length <= 12,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    });
+  };
+
   return (
     <div className="w-full">
       <form
@@ -187,7 +215,7 @@ export const RegisterForm = () => {
             onChange={handleProvinceChange}
             MenuProps={MenuProps}
           >
-            {provinces.map((province) => (
+            {sortedProvinces.map((province) => (
               <MenuItem key={province.id} value={province.id}>
                 {province.name}
               </MenuItem>
@@ -206,7 +234,7 @@ export const RegisterForm = () => {
             onChange={handleDistrictChange}
             MenuProps={MenuProps}
           >
-            {districts.map((district) => (
+            {sortedDistricts.map((district) => (
               <MenuItem
                 key={district["district-code"]}
                 value={district["district-code"]}
@@ -301,8 +329,15 @@ export const RegisterForm = () => {
           label="Nhập mật khẩu"
           type={showPassword ? "text" : "password"}
           value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
+          onChange={(e) => {
+            formik.handleChange(e);
+            checkPasswordRequirements(e.target.value);
+          }}
+          onFocus={() => setIsPasswordFocused(true)}
+          onBlur={(e) => {
+            formik.handleBlur(e);
+            setIsPasswordFocused(false);
+          }}
           error={formik.touched.password && Boolean(formik.errors.password)}
           helperText={formik.touched.password && formik.errors.password}
           InputProps={{
@@ -327,6 +362,81 @@ export const RegisterForm = () => {
             ),
           }}
         />
+        <Box sx={{ width: "100%" }}>
+          {isPasswordFocused && (
+            <>
+              {!passwordRequirements.length && (
+                <Typography
+                  sx={{
+                    color: formik.values.password
+                      ? "error.main"
+                      : "text.primary",
+                    fontSize: "0.875rem",
+                    marginBottom: "4px",
+                  }}
+                >
+                  • Mật khẩu phải từ 8 - 12 ký tự
+                </Typography>
+              )}
+
+              {!passwordRequirements.uppercase && (
+                <Typography
+                  sx={{
+                    color: formik.values.password
+                      ? "error.main"
+                      : "text.primary",
+                    fontSize: "0.875rem",
+                    marginBottom: "2px",
+                  }}
+                >
+                  • Mật khẩu phải chứa ít nhất 1 chữ in hoa
+                </Typography>
+              )}
+
+              {!passwordRequirements.lowercase && (
+                <Typography
+                  sx={{
+                    color: formik.values.password
+                      ? "error.main"
+                      : "text.primary",
+                    fontSize: "0.875rem",
+                    marginBottom: "2px",
+                  }}
+                >
+                  • Mật khẩu phải chứa ít nhất 1 chữ thường
+                </Typography>
+              )}
+
+              {!passwordRequirements.special && (
+                <Typography
+                  sx={{
+                    color: formik.values.password
+                      ? "error.main"
+                      : "text.primary",
+                    fontSize: "0.875rem",
+                    marginBottom: "2px",
+                  }}
+                >
+                  • Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt
+                </Typography>
+              )}
+
+              {!passwordRequirements.number && (
+                <Typography
+                  sx={{
+                    color: formik.values.password
+                      ? "error.main"
+                      : "text.primary",
+                    fontSize: "0.875rem",
+                    marginBottom: "2px",
+                  }}
+                >
+                  • Mật khẩu phải chứa ít nhất 1 số
+                </Typography>
+              )}
+            </>
+          )}
+        </Box>
         <TextField
           fullWidth
           variant="standard"
