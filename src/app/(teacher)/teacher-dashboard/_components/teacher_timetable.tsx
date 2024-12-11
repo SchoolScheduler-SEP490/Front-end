@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -16,7 +16,13 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { firestore } from "@/utils/firebaseConfig";
-import { TIMETABLE_SLOTS, WEEK_DAYS_FULL } from "@/utils/constants";
+import {
+  IClassPeriod,
+  IClassSchedule,
+  TIMETABLE_SLOTS,
+  WEEK_DAYS_FULL,
+} from "@/utils/constants";
+import { useTeacherSelector } from "@/hooks/useReduxStore";
 
 interface TeacherTimetableProps {
   schoolId: string;
@@ -55,15 +61,13 @@ const periodCellStyle = (hasPeriod: boolean) => ({
 export default function TeacherTimetable({
   schoolId,
   sessionToken,
-  teacherAbbr,
 }: TeacherTimetableProps) {
+  const { teacherInfo } = useTeacherSelector((state) => state.teacher);
   const [publishedTimetable, setPublishedTimetable] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPublishedTimetable = async () => {
       try {
-        setLoading(true);
         const timetablesRef = collection(firestore, "timetables");
         const q = query(
           timetablesRef,
@@ -72,39 +76,28 @@ export default function TeacherTimetable({
         );
 
         const snapshot = await getDocs(q);
-        
         if (!snapshot.empty) {
           const timetableDoc = snapshot.docs[0];
-          const scheduleId = timetableDoc.data()["generated-schedule-id"];
-          
-          console.log("Schedule ID to fetch:", scheduleId); // Debug log
-          
-          if (scheduleId) {
-            const scheduleRef = doc(firestore, "schedule-responses", scheduleId);
-            const scheduleSnap = await getDoc(scheduleRef);
+          const scheduleRef = doc(
+            firestore,
+            "schedule-responses",
+            timetableDoc.data()["generated-schedule-id"]
+          );
+          const scheduleSnap = await getDoc(scheduleRef);
 
-            if (scheduleSnap.exists()) {
-              const scheduleData = scheduleSnap.data();
-              console.log("Schedule Data:", scheduleData); // Debug log
-              console.log("Looking for teacher:", teacherAbbr); // Debug log
-              setPublishedTimetable(scheduleData);
-            } else {
-              console.log("No schedule document found"); // Debug log
-            }
+          if (scheduleSnap.exists()) {
+            setPublishedTimetable(scheduleSnap.data());
           }
         }
       } catch (error) {
         console.error("Error fetching timetable:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    if (schoolId && teacherAbbr) {
+    if (schoolId && teacherInfo?.id) {
       fetchPublishedTimetable();
     }
-  }, [schoolId, teacherAbbr]);
-
+  }, [schoolId, teacherInfo]);
 
   return (
     <div className="w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]">
@@ -135,14 +128,26 @@ export default function TeacherTimetable({
                   {WEEK_DAYS_FULL.map((day, dayIndex) => {
                     const currentSlotIndex =
                       dayIndex * 10 + sessionIndex * 5 + slotIndex + 1;
-                    const period = publishedTimetable?.["class-schedules"]
-                      .flatMap((cs: any) => cs["class-periods"])
-                      .find(
+
+                    // Find the schedule that contains the period
+                    const schedule = publishedTimetable?.[
+                      "class-schedules"
+                    ].find((cs: any) =>
+                      cs["class-periods"].some(
                         (p: any) =>
                           p["start-at"] === currentSlotIndex &&
                           !p["is-deleted"] &&
-                          p["teacher-abbreviation"] === teacherAbbr
-                      );
+                          p["teacher-id"] === teacherInfo?.id
+                      )
+                    );
+
+                    // Get the period from found schedule
+                    const period = schedule?.["class-periods"].find(
+                      (p: any) =>
+                        p["start-at"] === currentSlotIndex &&
+                        !p["is-deleted"] &&
+                        p["teacher-id"] === teacherInfo?.id
+                    );
 
                     return (
                       <TableCell
@@ -154,9 +159,14 @@ export default function TeacherTimetable({
                             <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
                               {period["subject-abbreviation"]}
                             </strong>
-                            <span className="text-xs text-gray-600">
-                              {period["class-name"]}
-                            </span>
+                            <div className="flex justify-between w-full">
+                            <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                              {schedule["student-class-name"]}
+                            </p>
+                            <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                              {period["room-code"]}
+                            </p>
+                            </div>
                           </div>
                         )}
                       </TableCell>

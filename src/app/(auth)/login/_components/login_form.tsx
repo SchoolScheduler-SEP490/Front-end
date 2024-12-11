@@ -26,6 +26,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
+import { setTeacherInfo } from '@/context/slice_teacher';
+import { useTeacherDispatch } from '@/hooks/useReduxStore';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -65,6 +67,7 @@ export const LoginForm = () => {
 	const { data, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState<number>(0);
+	const dispatch = useTeacherDispatch();
 
 	useEffect(() => {
 		mutate();
@@ -112,6 +115,22 @@ export const LoginForm = () => {
 				let data: IUser | undefined = undefined;
 				if (loginResponse.status === 200) {
 					const decodedToken: IJWTTokenPayload = jwtDecode(loginResponse['jwt-token'] ?? '');
+
+					if(decodedToken?.role === 'Teacher') {
+						const teacherResponse = await fetch(
+							`${api}/api/schools/${decodedToken.schoolId}/teachers/${decodedToken.email}/info`,
+							{
+							  headers: {
+								Authorization: `Bearer ${loginResponse['jwt-token']}`,
+							  },
+							}
+						  );
+						  const teacherData = await teacherResponse.json();
+						  if (teacherData.status === 200) {
+							localStorage.setItem('teacherInfo', JSON.stringify(teacherData.result));
+							dispatch(setTeacherInfo(teacherData.result));
+						  }
+					}
 					data = {
 						email: decodedToken?.email ?? '',
 						id: decodedToken?.accountId ?? '',

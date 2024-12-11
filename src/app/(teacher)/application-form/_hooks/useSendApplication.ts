@@ -7,13 +7,12 @@ export const useSendApplication = () => {
   const [loading, setLoading] = useState(false);
 
   const submitApplication = async (
-    schoolId: string,
     sessionToken: string,
     formData: ISendApplication
   ) => {
     try {
       setLoading(true);
-      const result = await sendApplication(schoolId, sessionToken, formData);
+      const result = await sendApplication(sessionToken, formData);
       useNotify({
         type: "success",
         message: "Gửi đơn thành công",

@@ -11,12 +11,12 @@ export interface ITeacherNavigation extends INavigation {
 
 export const TEACHER_SIDENAV: ITeacherNavigation[] = [
 	{
-		name: 'Lịch dạy học',
+		name: 'Lịch dạy học dự kiến',
 		url: '/teacher-dashboard',
 		icon: '/images/icons/schedule.png',
 	},
 	{
-		name: 'Thời khóa biểu',
+		name: 'Thời khóa biểu chính thức',
 		url: '/timetable',
 		icon: '/images/icons/teacher-calendar.png',
 	},
