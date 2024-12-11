@@ -11,7 +11,7 @@ import { firestore } from '@/utils/firebaseConfig';
 import { IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TimetableTabs from '../_components/timetable-tabs';
@@ -22,6 +22,8 @@ import {
 	IScheduleResponse,
 	ITimetableStoreObject,
 } from '@/utils/constants';
+import IframeLayout from '@/app/(iframe)/layout';
+
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -61,6 +63,8 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 	const pathName = usePathname();
 	const router = useRouter();
 	const dispatch = useDispatch();
+	const searchParams = useSearchParams();
+	const isIframe = searchParams.get('iframe') === 'true';
 
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 	const [value, setValue] = useState<number>(0);
@@ -136,6 +140,10 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 			setValue(tabIndex);
 		}
 	}, [pathName]);
+	
+	if (isIframe) {
+		return <IframeLayout>{children}</IframeLayout>;
+	  }
 
 	return (
 		<section
@@ -167,6 +175,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 				</div>
 			</SMHeader>
 			<TimetableTabs />
+			{children}
 			<CustomTabPanel value={value} index={value}>
 				{children}
 			</CustomTabPanel>

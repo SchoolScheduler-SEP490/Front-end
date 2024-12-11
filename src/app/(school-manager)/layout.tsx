@@ -2,7 +2,7 @@
 import SMSidenav from '@/commons/school_manager/sidenav';
 import { useAppContext } from '@/context/app_provider';
 import { schoolManagerStore } from '@/context/store_school_manager';
-import { notFound } from 'next/navigation';
+import { notFound, usePathname } from 'next/navigation';
 import { Provider } from 'react-redux';
 
 export default function SMLayout({
@@ -11,10 +11,15 @@ export default function SMLayout({
 	children: React.ReactNode;
 }>) {
 	const { userRole } = useAppContext();
+	const pathname = usePathname();
+	const isIframe = pathname.includes('iframe');
 
 	if ((userRole?.toLowerCase() ?? '') !== 'schoolmanager') {
 		notFound();
 	}
+	if (isIframe) {
+		return <div className="w-full h-full">{children}</div>;
+	  }
 
 	return (
 		<Provider store={schoolManagerStore}>

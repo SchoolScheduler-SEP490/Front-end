@@ -78,6 +78,10 @@ export default function TimetableManagement() {
     router.push("timetable-generation");
   };
 
+  const filteredTimetableData = timetableData.filter(
+    (timetable) => timetable.status !== SCHEDULE_STATUS.find(s => s.key === 'Published')?.value
+  );
+
   return (
     <div
       className={`w-[${
@@ -92,7 +96,7 @@ export default function TimetableManagement() {
         </div>
       </SMHeader>
       <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[5vh]">
-        <TimetableTable data={timetableData} mutate={mutate} />
+        <TimetableTable data={filteredTimetableData} mutate={mutate} />
       </div>
       <div className="absolute w-fit h-fit overflow-visible bottom-[3vw] right-[3vw]">
         <LightTooltip title="Tạo Thời khóa biểu" placement="top" arrow>
