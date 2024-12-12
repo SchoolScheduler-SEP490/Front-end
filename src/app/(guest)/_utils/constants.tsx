@@ -35,10 +35,6 @@ export const NAV_LINKS: INavigation[] = [
 		url: '/schedules',
 	},
 	{
-		name: 'Trường học',
-		url: '/schools',
-	},
-	{
 		name: 'Cộng đồng',
 		url: '/community',
 	},

@@ -386,7 +386,7 @@ const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 						>
 							{selectedObject.totalMainSlotsPerWeek}
 						</strong>{' '}
-						tiết học chính khóa và{' '}
+						tiết học chính khóa {selectedObject.isDoubleSlot ? '(có tiết đôi)' : ''} và{' '}
 						<strong
 							className={`font-bold ${
 								selectedObject.totalSubSlotsPerWeek !== 0
@@ -551,7 +551,7 @@ const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 																</LightTooltip>
 															)}
 															{existingSlot && !(selectedObject?.slots === existingSlot?.slots) && (
-																<LightTooltip title={existingSlot.subjectName}>
+																<LightTooltip title={existingSlot.subjectName} placement='right'>
 																	<div className='w-full h-full flex flex-col justify-center items-center px-1'>
 																		<p className='w-full overflow-hidden text-ellipsis whitespace-nowrap font-semibold'>
 																			{existingSlot.subjectName}
@@ -561,7 +561,7 @@ const FixedPeriodEditModal = (props: IFixedPeriodAssignmentProps) => {
 																</LightTooltip>
 															)}
 															{selectedCells.includes(cellId) && (
-																<LightTooltip title={selectedObject.subjectName}>
+																<LightTooltip title={selectedObject.subjectName} placement='right'>
 																	<div className='w-full h-full flex flex-col justify-center items-center px-1'>
 																		<p className='text-body-small-strong font-semibold text-center w-full overflow-hidden text-ellipsis whitespace-nowrap'>
 																			{selectedObject.subjectName}

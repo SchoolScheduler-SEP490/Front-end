@@ -254,7 +254,6 @@ const TeachersLessonsTable = (props: ITeachersLessonsTableProps) => {
 								</ToggleButton>
 							</ToggleButtonGroup>
 						</div>
-						isCombinationClass
 						{!isCombinationClass ? (
 							<div className='w-full h-[5vh] flex flex-row justify-end items-end gap-1'>
 								<h3 className='text-body-medium opacity-80'>GVCN:</h3>

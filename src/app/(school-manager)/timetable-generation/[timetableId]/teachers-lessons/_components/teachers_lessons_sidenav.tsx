@@ -125,7 +125,7 @@ const TeachersLessonsSideNav = (props: TeachersLessonsSidenavProps) => {
 	}, [selectedClass]);
 
 	return (
-		<div className='w-[20%] h-full flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
+		<div className='w-[20%] h-full max-h-[90%] pb-[5vh] flex flex-col justify-start items-start border-r-1 border-gray-200 overflow-y-scroll no-scrollbar'>
 			<h1 className='text-body-large-strong w-full pl-3 py-3 text-left'>Lớp học</h1>
 			{sidenavData.length === 0 && (
 				<p className='text-body-medium w-full pl-3 py-3 text-left italic'>

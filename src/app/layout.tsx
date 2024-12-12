@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 	icons: ['/images/logo.png'],
 	title: {
 		template: 'Schedulify | %s',
-		default: 'Schedulify | Trang chủ',
+		default: 'Schedulify',
 	},
 	description: 'Hệ thống xây dựng Thời khóa biểu online',
 	metadataBase: new URL('https://schedulify.id.vn'),
