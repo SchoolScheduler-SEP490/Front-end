@@ -21,7 +21,12 @@ export default function SMSubject() {
 	const [subjectTableData, setSubjectTableData] = React.useState<ISubjectTableData[]>([]);
 	const [isDetailsShown, setIsDetailsShown] = React.useState<boolean>(false);
 	const [selectedSubjectId, setSelectedSubjectId] = React.useState<number>(0);
-
+	const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState<boolean>(false);
+	
+	const handleUpdateCurriculum = () => {
+		setIsUpdateModalOpen(true);
+	};
+	
 	const { data, isValidating, mutate } = useFetchData({
 		sessionToken: sessionToken,
 		pageIndex: page,
@@ -116,12 +121,15 @@ export default function SMSubject() {
 						setSelectedSubjectId={setSelectedSubjectId}
 						isDetailsShown={isDetailsShown}
 						setIsDetailsShown={setIsDetailsShown}
+						isUpdateModalOpen={isUpdateModalOpen}
+						setIsUpdateModalOpen={setIsUpdateModalOpen}
 					/>
 				</div>
 				<SubjectDetails
 					open={isDetailsShown}
 					setOpen={setIsDetailsShown}
 					subjectId={selectedSubjectId}
+					handleUpdateCurriculum={handleUpdateCurriculum}
 				/>
 			</div>
 		</div>
