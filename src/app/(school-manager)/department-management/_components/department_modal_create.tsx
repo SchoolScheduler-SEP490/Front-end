@@ -318,6 +318,7 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 				...tmpEditingDepartment,
 			]);
 		}
+		handleClose();
 	};
 
 	const handleUpdateDepartment = (
@@ -501,9 +502,7 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 									>
 										<ListItemIcon>
 											<Checkbox
-												checked={
-													selectingItems.length === subjectOptions.length
-												}
+												checked={selectingItems.length === subjectOptions.length}
 												disabled={subjectOptions.length === 0}
 											/>
 										</ListItemIcon>
@@ -511,15 +510,11 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 									</ListItem>
 									<div
 										className={`w-fit h-fit mr-2 overflow-visible ${
-											selectingItems.length === 0 &&
-											'hidden disabled:opacity-0'
+											selectingItems.length === 0 && 'hidden disabled:opacity-0'
 										}`}
 									>
 										<Tooltip title={'Thêm tổ bộ môn với những môn đã chọn'}>
-											<IconButton
-												color='primary'
-												onClick={handleAddDepartment}
-											>
+											<IconButton color='primary' onClick={handleAddDepartment}>
 												<ControlPointIcon />
 											</IconButton>
 										</Tooltip>
