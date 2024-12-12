@@ -16,6 +16,7 @@ import {
 	TableHead,
 	TableRow,
 	Paper,
+	Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
@@ -138,8 +139,7 @@ export default function ClassDetails() {
 									<strong>GVCN:</strong> {classData['homeroom-teacher-name']}
 								</p>
 								<p>
-									<strong>Mã GVCN:</strong>{' '}
-									{classData['homeroom-teacher-abbreviation']}
+									<strong>Mã GVCN:</strong> {classData['homeroom-teacher-abbreviation']}
 								</p>
 								<p>
 									<strong>Ca học:</strong> {classData['main-session-text']}
@@ -157,31 +157,25 @@ export default function ClassDetails() {
 									<strong>Tổ bộ môn:</strong> {classData['subject-group-name']}
 								</p>
 								<p>
-									<strong>Học cả ngày:</strong>{' '}
-									{classData['is-full-day'] ? 'Có' : 'Không'}
+									<strong>Học cả ngày:</strong> {classData['is-full-day'] ? 'Có' : 'Không'}
 								</p>
 								<p>
 									<strong>Năm học:</strong>{' '}
-									{schoolYear
-										? `${schoolYear['start-year']} - ${schoolYear['end-year']}`
-										: ''}
+									{schoolYear ? `${schoolYear['start-year']} - ${schoolYear['end-year']}` : ''}
 								</p>
 							</div>
 						</div>
 
-						<h2
-							className='text-title-medium font-semibold text-gray-800 border-b pb-2 mb-4 tracking-wider leading-loose cursor-pointer'
+						<Button
+							variant='contained'
+							color='inherit'
+							sx={{ bgcolor: '#004e89', color: 'white', borderRadius: 0 }}
 							onClick={handleOpenModal}
 						>
-							Phân công giáo viên
-						</h2>
+							<Typography>Phân công giáo viên</Typography>
+						</Button>
 
-						<Dialog
-							open={isModalOpen}
-							onClose={handleCloseModal}
-							maxWidth='md'
-							fullWidth
-						>
+						<Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth='md' fullWidth>
 							<div
 								id='modal-header'
 								className='w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3'
@@ -241,103 +235,90 @@ export default function ClassDetails() {
 										</TableHead>
 										<TableBody>
 											{subjectAssignments.map((subject) => {
-												const teacherAssignments =
-													subject['assignment-details'];
+												const teacherAssignments = subject['assignment-details'];
 												let currentTeacher = '';
 												let currentTeacherRowSpan = 0;
 
-												return teacherAssignments.map(
-													(assignment, index) => {
-														const teacherName = `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
-														let teacherCell = null;
-														const rowId = `${subject['subject-id']}-${index}`;
+												return teacherAssignments.map((assignment, index) => {
+													const teacherName = `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
+													let teacherCell = null;
+													const rowId = `${subject['subject-id']}-${index}`;
 
-														if (teacherName !== currentTeacher) {
-															currentTeacher = teacherName;
-															currentTeacherRowSpan =
-																teacherAssignments.filter(
-																	(a) =>
-																		`${a['teacher-last-name']} ${a['teacher-first-name']}` ===
-																		teacherName
-																).length;
-															teacherCell = (
-																<TableCell
-																	rowSpan={currentTeacherRowSpan}
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{teacherName}
-																</TableCell>
-															);
-														}
-
-														return (
-															<TableRow key={rowId}>
-																{index === 0 && (
-																	<TableCell
-																		rowSpan={
-																			teacherAssignments.length
-																		}
-																		sx={{
-																			borderRight:
-																				'1px solid rgba(224, 224, 224, 1)',
-																		}}
-																	>
-																		{subject['subject-name']}
-																	</TableCell>
-																)}
-																{teacherCell}
-																<TableCell
-																	className='text-center'
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{assignment['term-name']}
-																</TableCell>
-																<TableCell
-																	className='text-center'
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{assignment['total-period']}
-																</TableCell>
-																<TableCell
-																	className='text-center'
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{assignment['start-week']}
-																</TableCell>
-																<TableCell
-																	className='text-center'
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{assignment['end-week']}
-																</TableCell>
-																<TableCell
-																	className='text-center'
-																	sx={{
-																		borderRight:
-																			'1px solid rgba(224, 224, 224, 1)',
-																	}}
-																>
-																	{subject['total-slot-in-year']}
-																</TableCell>
-															</TableRow>
+													if (teacherName !== currentTeacher) {
+														currentTeacher = teacherName;
+														currentTeacherRowSpan = teacherAssignments.filter(
+															(a) =>
+																`${a['teacher-last-name']} ${a['teacher-first-name']}` ===
+																teacherName
+														).length;
+														teacherCell = (
+															<TableCell
+																rowSpan={currentTeacherRowSpan}
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{teacherName}
+															</TableCell>
 														);
 													}
-												);
+
+													return (
+														<TableRow key={rowId}>
+															{index === 0 && (
+																<TableCell
+																	rowSpan={teacherAssignments.length}
+																	sx={{
+																		borderRight: '1px solid rgba(224, 224, 224, 1)',
+																	}}
+																>
+																	{subject['subject-name']}
+																</TableCell>
+															)}
+															{teacherCell}
+															<TableCell
+																className='text-center'
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{assignment['term-name']}
+															</TableCell>
+															<TableCell
+																className='text-center'
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{assignment['total-period']}
+															</TableCell>
+															<TableCell
+																className='text-center'
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{assignment['start-week']}
+															</TableCell>
+															<TableCell
+																className='text-center'
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{assignment['end-week']}
+															</TableCell>
+															<TableCell
+																className='text-center'
+																sx={{
+																	borderRight: '1px solid rgba(224, 224, 224, 1)',
+																}}
+															>
+																{subject['total-slot-in-year']}
+															</TableCell>
+														</TableRow>
+													);
+												});
 											})}
 										</TableBody>
 									</Table>
