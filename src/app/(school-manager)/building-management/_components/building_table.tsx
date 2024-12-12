@@ -256,7 +256,7 @@ const BuildingTable = (props: IBuildingTableProps) => {
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
               Tòa nhà
             </h2>
-            <Tooltip title="Thêm lớp ghép">
+            <Tooltip title="Thêm tòa nhà">
               <IconButton onClick={handleOpenAddForm}>
                 <AddIcon />
               </IconButton>

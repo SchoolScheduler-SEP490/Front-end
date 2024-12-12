@@ -175,7 +175,6 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 				</div>
 			</SMHeader>
 			<TimetableTabs />
-			{children}
 			<CustomTabPanel value={value} index={value}>
 				{children}
 			</CustomTabPanel>
