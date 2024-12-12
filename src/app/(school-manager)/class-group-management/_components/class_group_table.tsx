@@ -195,7 +195,9 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [selectedRow, setSelectedRow] = React.useState<IClassGroupTableData | undefined>();
+  const [selectedRow, setSelectedRow] = React.useState<
+    IClassGroupTableData | undefined
+  >();
   const open = Boolean(anchorEl);
   const [openAssignModal, setOpenAssignModal] = React.useState<boolean>(false);
   const [openCurriculumModal, setOpenCurriculumModal] =
@@ -396,15 +398,17 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                         <Menu
                           id={`basic-menu${index}`}
                           anchorEl={anchorEl}
-                          elevation={1}
-                          open={Boolean(anchorEl) && selectedRow === row}
+                          open={Boolean(anchorEl) && selectedRow?.id === row.id}
                           onClose={handleMenuClose}
                           MenuListProps={{
                             "aria-labelledby": "basic-button",
+                            onClick: (e) => e.stopPropagation(),
                           }}
+                          disablePortal
                           keepMounted
                           disableAutoFocus
                           disableEnforceFocus
+                          disableRestoreFocus
                         >
                           {dropdownOptions.map((option, index) => (
                             <MenuItem
