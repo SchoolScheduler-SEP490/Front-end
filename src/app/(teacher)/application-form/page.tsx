@@ -1,27 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
+import ContainedButton from "@/commons/button-contained";
+import TeacherHeader from "@/commons/teacher/header";
 import { useAppContext } from "@/context/app_provider";
+import useNotify from "@/hooks/useNotify";
+import { useTeacherSelector } from "@/hooks/useReduxStore";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  Input,
+  MenuItem,
+  Select,
+  TextField,
+  Typography
+} from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
 import { useSendApplication } from "./_hooks/useSendApplication";
 import {
-  REQUEST_TYPE,
   ISendApplication,
+  REQUEST_TYPE,
   REQUEST_TYPE_TRANSLATOR,
 } from "./_libs/constants";
-import {
-  FormControl,
-  TextField,
-  Select,
-  MenuItem,
-  Button,
-} from "@mui/material";
-import TeacherHeader from "@/commons/teacher/header";
 
 export default function ApplicationFormPage() {
-  const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
+  const { sessionToken, selectedSchoolYearId } = useAppContext();
   const { loading, submitApplication } = useSendApplication();
+  const { teacherInfo } = useTeacherSelector((state) => state.teacher);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileName, setFileName] = useState<string>("");
+  const MAX_FILE_SIZE = 1 * 1024 * 1024;
+
   const [formData, setFormData] = useState<ISendApplication>({
-    "teacher-id": 0,
+    "teacher-id": teacherInfo?.id || 0,
     "school-year-id": selectedSchoolYearId,
     "request-type": "",
     "request-description": "",
@@ -30,18 +45,115 @@ export default function ApplicationFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!teacherInfo?.id) {
+      useNotify({
+        type: "error",
+        message: "Teacher ID not found",
+      });
+      return;
+    }
+
     try {
-      await submitApplication(schoolId, sessionToken, formData);
-      // Reset form after successful submission
+      await submitApplication(sessionToken, {
+        ...formData,
+        "teacher-id": teacherInfo.id,
+      });
+
       setFormData({
-        "teacher-id": 0,
+        "teacher-id": teacherInfo.id,
         "school-year-id": selectedSchoolYearId,
-        "request-type": "",
+        "request-type": "Other",
         "request-description": "",
         "attached-file": "",
       });
+      setFileName("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error("Submit error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (teacherInfo?.id) {
+      setFormData((prev) => ({
+        ...prev,
+        "teacher-id": teacherInfo.id,
+      }));
+    }
+  }, [teacherInfo]);
+
+  const validateFile = (file: File): boolean => {
+    if (file.size > MAX_FILE_SIZE) {
+      useNotify({
+        type: "error",
+        message: "File không được vượt quá 1MB",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file && validateFile(file)) {
+      const base64 = await convertFileToBase64(file);
+      setFileName(file.name);
+      setFormData({
+        ...formData,
+        "attached-file": base64,
+      });
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const base64 = await convertFileToBase64(file);
+      setFileName(file.name);
+      setFormData({
+        ...formData,
+        "attached-file": base64,
+      });
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFileName("");
+    setFormData({
+      ...formData,
+      "attached-file": "",
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -61,6 +173,7 @@ export default function ApplicationFormPage() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
+                  "request-type": e.target.value,
                 })
               }
             >
@@ -86,15 +199,73 @@ export default function ApplicationFormPage() {
             }
           />
 
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={loading}
-            fullWidth
-          >
-            {loading ? "Đang gửi..." : "Gửi đơn"}
-          </Button>
+          <FormControl fullWidth>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Tệp đính kèm
+            </Typography>
+            <Box
+              sx={{
+                border: "1px dashed",
+                borderColor: isDragging ? "primary.main" : "#ccc",
+                borderRadius: 1,
+                p: 2,
+                cursor: "pointer",
+                bgcolor: isDragging ? "rgba(0, 0, 0, 0.04)" : "transparent",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "rgba(0, 0, 0, 0.04)",
+                },
+              }}
+              onClick={() => !fileName && fileInputRef.current?.click()}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <AttachFileIcon color="primary" />
+                <Typography>
+                  {fileName ? (
+                    <div className="flex items-center gap-2">
+                      <span>{fileName}</span>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveFile();
+                        }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </div>
+                  ) : (
+                    "Chọn file hoặc kéo thả vào đây"
+                  )}
+                </Typography>
+              </div>
+              <Input
+                type="file"
+                inputRef={fileInputRef}
+                onChange={handleFileChange}
+                sx={{ display: "none" }}
+                inputProps={{
+                  accept: ".pdf,.doc,.docx",
+                }}
+              />
+            </Box>
+            <FormHelperText>
+              Định dạng hỗ trợ: pdf, doc, docx (Tối đa 1MB)
+            </FormHelperText>
+          </FormControl>
+
+          <div className="flex justify-end mt-6">
+            <ContainedButton
+              title="Gửi đơn"
+              disableRipple
+              type="submit"
+              styles="bg-primary-300 text-white !py-1 px-4"
+            />
+          </div>
         </form>
       </div>
     </div>

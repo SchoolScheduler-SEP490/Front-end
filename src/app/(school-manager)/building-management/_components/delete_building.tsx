@@ -74,7 +74,7 @@ const DeleteBuildingModal = (props: DeleteConfirmationModalProps) => {
         </div>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Xóa lớp học"
+            title="Xóa tòa nhà"
             disableRipple
             onClick={handleDeleteBuilding}
             styles="bg-red-200 text-basic-negative text-normal !py-1 px-4"

@@ -22,7 +22,10 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
 import { KeyedMutator } from "swr";
 import { IClassGroupTableData } from "../_libs/constants";
-import { CLASSGROUP_TRANSLATOR_REVERSED, ICommonOption } from "@/utils/constants";
+import {
+  CLASSGROUP_TRANSLATOR_REVERSED,
+  ICommonOption,
+} from "@/utils/constants";
 import AddClassGroupModal from "./add_class_group";
 import DeleteClassGroupModal from "./delete_class_group";
 import AssignClassModal from "./assign_class";
@@ -79,7 +82,7 @@ const headCells: readonly HeadCell[] = [
     id: "curriculum" as keyof IClassGroupTableData,
     label: "Khung chương trình",
     centered: false,
-  }
+  },
 ];
 
 interface EnhancedTableProps {
@@ -154,11 +157,11 @@ interface IClassGroupTableProps {
   mutate: KeyedMutator<any>;
   isFilterable: boolean;
   setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedGrade: number | null; 
+  selectedGrade: number | null;
   selectedClassGroupId: number;
   setSelectedClassGroupId: React.Dispatch<React.SetStateAction<number>>;
   isDetailsShown: boolean;
-	setIsDetailsShown: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsDetailsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -178,20 +181,20 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     totalRows,
     mutate,
     isFilterable,
-		setIsFilterable,
-    selectedGrade, 
+    setIsFilterable,
+    selectedGrade,
     selectedClassGroupId,
     setSelectedClassGroupId,
     isDetailsShown,
-    setIsDetailsShown
+    setIsDetailsShown,
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
     React.useState<keyof IClassGroupTableData>("groupName");
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<
     IClassGroupTableData | undefined
   >();
@@ -220,7 +223,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
     setSelectedClassGroupId(row.id);
     setIsDetailsShown(true);
     setIsFilterable(false);
-  }
+  };
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -308,7 +311,7 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Lọc danh sách">
-              <IconButton onClick={handleFilterable} >
+              <IconButton onClick={handleFilterable}>
                 <FilterListIcon />
               </IconButton>
             </Tooltip>
@@ -331,9 +334,9 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                   <TableRow>
                     <TableCell colSpan={8} align="center">
                       <h1 className="text-body-large-strong italic text-basic-gray">
-                      {selectedGrade !== null 
-                      ? `Nhóm lớp chưa có dữ liệu khối ${selectedGrade}`
-                      : "Nhóm lớp chưa có dữ liệu"}
+                        {selectedGrade !== null
+                          ? `Nhóm lớp chưa có dữ liệu khối ${selectedGrade}`
+                          : "Nhóm lớp chưa có dữ liệu"}
                       </h1>
                     </TableCell>
                   </TableRow>
@@ -341,94 +344,97 @@ const ClassGroupTable = (props: IClassGroupTableProps) => {
                 {visibleRows.map((row, index) => {
                   const labelId = `enhanced-table-checkbox-${index}`;
                   return (
-                      <TableRow
-                        hover
-                        role="checkbox"
-                        tabIndex={-1}
-                        sx={[
-                          { cursor: 'pointer' },
-                          selectedClassGroupId === row.id &&
-                            isDetailsShown && {
-                              backgroundColor: '#f5f5f5',
-                            },
-                        ]}
-                        onClick={() => handleSelectClassGroup(row)}
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      sx={[
+                        { cursor: "pointer" },
+                        selectedClassGroupId === row.id &&
+                          isDetailsShown && {
+                            backgroundColor: "#f5f5f5",
+                          },
+                      ]}
+                      onClick={() => handleSelectClassGroup(row)}
+                    >
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
                       >
-                        <TableCell
-                          component="th"
-                          id={labelId}
-                          scope="row"
-                          align="left"
-                        >
-                          {index + 1 + page * rowsPerPage}
-                        </TableCell>
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
 
-                        <TableCell>
-                            {row.groupName}
-                        </TableCell>
-                        <TableCell align="left">
-                          {row.studentClassGroupCode}
-                        </TableCell>
-                        <TableCell align="left">{`Khối ${row.grade}`}</TableCell>
-                        <TableCell align="left">{row.curriculum}</TableCell>
-                        <TableCell
-                          width={80}
-                          onClick={(e) => e.stopPropagation()}
+                      <TableCell>{row.groupName}</TableCell>
+                      <TableCell align="left">
+                        {row.studentClassGroupCode}
+                      </TableCell>
+                      <TableCell align="left">{`Khối ${row.grade}`}</TableCell>
+                      <TableCell align="left">{row.curriculum}</TableCell>
+                      <TableCell
+                        width={80}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <IconButton
+                          color="success"
+                          sx={{ zIndex: 10 }}
+                          id="basic-button"
+                          aria-controls={
+                            open ? `basic-menu${index}` : undefined
+                          }
+                          aria-haspopup="true"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(event) => handleClick(event, row)}
                         >
-                          <IconButton
-                            color="success"
-                            sx={{ zIndex: 10 }}
-                            id="basic-button"
-                            aria-controls={
-                              open ? `basic-menu${index}` : undefined
-                            }
-                            aria-haspopup="true"
-                            aria-expanded={open ? "true" : undefined}
-                            onClick={(event) => handleClick(event, row)}
-                          >
-                            <Image
-                              src="/images/icons/menu.png"
-                              alt="notification-icon"
-                              unoptimized={true}
-                              width={20}
-                              height={20}
-                            />
-                          </IconButton>
-                          <Menu
-                            id={`basic-menu${index}`}
-                            anchorEl={anchorEl}
-                            elevation={1}
-                            open={Boolean(anchorEl) && selectedRow === row}
-                            onClose={handleMenuClose}
-                            MenuListProps={{
-                              "aria-labelledby": "basic-button",
-                            }}
-                          >
-                            {dropdownOptions.map((option, index) => (
-                              <MenuItem
-                                key={option.title}
-                                onClick={(e) => handleMenuItemClick(index, e)}
-                                className={`flex flex-row items-center ${
-                                  index === dropdownOptions.length - 1 &&
-                                  "hover:bg-basic-negative-hover hover:text-basic-negative"
-                                }`}
-                              >
-                                <Image
-                                  className="mr-4"
-                                  src={option.img}
-                                  alt={option.title}
-                                  unoptimized={true}
-                                  width={15}
-                                  height={15}
-                                />
-                                <h2 className="text-body-medium">
-                                  {option.title}
-                                </h2>
-                              </MenuItem>
-                            ))}
-                          </Menu>
-                        </TableCell>
-                      </TableRow>
+                          <Image
+                            src="/images/icons/menu.png"
+                            alt="notification-icon"
+                            unoptimized={true}
+                            width={20}
+                            height={20}
+                          />
+                        </IconButton>
+                        <Menu
+                          id={`basic-menu${index}`}
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl) && selectedRow?.id === row.id}
+                          onClose={handleMenuClose}
+                          MenuListProps={{
+                            "aria-labelledby": "basic-button",
+                            onClick: (e) => e.stopPropagation(),
+                          }}
+                          disablePortal
+                          keepMounted
+                          disableAutoFocus
+                          disableEnforceFocus
+                          disableRestoreFocus
+                        >
+                          {dropdownOptions.map((option, index) => (
+                            <MenuItem
+                              key={option.title}
+                              onClick={(e) => handleMenuItemClick(index, e)}
+                              className={`flex flex-row items-center ${
+                                index === dropdownOptions.length - 1 &&
+                                "hover:bg-basic-negative-hover hover:text-basic-negative"
+                              }`}
+                            >
+                              <Image
+                                className="mr-4"
+                                src={option.img}
+                                alt={option.title}
+                                unoptimized={true}
+                                width={15}
+                                height={15}
+                              />
+                              <h2 className="text-body-medium">
+                                {option.title}
+                              </h2>
+                            </MenuItem>
+                          ))}
+                        </Menu>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
                 {emptyRows > 0 && (

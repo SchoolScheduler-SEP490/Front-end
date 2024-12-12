@@ -293,14 +293,14 @@ export const addNewTeachableSubject = async (
 };
 
 export const deleteTeachableSubject = async (
-  id: number,
+  appropriateLevelId: number,
   schoolId: string,
   sessionToken: string
 ): Promise<void> => {
   if (!sessionToken) {
     throw new Error("Session token not found. Please log in.");
   }
-  const url = `${api}/api/schools/${schoolId}/teachers/teachable-subject/${id}`;
+  const url = `${api}/api/schools/${schoolId}/teachers/teachable-subject/${appropriateLevelId}`;
 
   const response = await fetch(url, {
     method: "DELETE",

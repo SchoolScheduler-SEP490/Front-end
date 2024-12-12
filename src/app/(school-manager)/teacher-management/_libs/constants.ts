@@ -68,6 +68,8 @@ export interface IMainSubject {
 }
 
 export interface IAppropriateLevel {
+  id: number,
+  "is-main": boolean,
   "appropriate-level": number;
   grade: string;
 }
@@ -81,6 +83,7 @@ export interface ISubject {
   id: number;
   "subject-name": string;
   abbreviation: string;
+  "is-teached-by-homeroom-teacher": boolean;
 }
 
 // use to get teachable subjects
@@ -129,10 +132,11 @@ export interface IAssignmentDetail {
 export interface ITeachableSubjectRequest {
   "subject-abreviation": string;
   "list-approriate-level-by-grades": Array<{
-    grade: string;
+    id: number;
+    "is-main": boolean;
     "appropriate-level": string;
+    grade: string;
   }>;
-  "is-main": boolean;
 }
 
 export interface ITeachableSubjectResponse {

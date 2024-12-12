@@ -23,6 +23,7 @@ const TeacherSidenav = () => {
   const { logout } = useAppContext();
 
   const handleLogout = async () => {
+    localStorage.removeItem('teacherInfo');
     await logout();
   };
 

@@ -48,6 +48,10 @@ export default function TeachableSubjectTable({
   const [selectedRow, setSelectedRow] = React.useState<
     ITeachableSubject | undefined
   >();
+  const [selectedSubject, setSelectedSubject] = useState<{
+    name: string;
+    id: number;
+  } | null>(null);
 
   const fetchData = async () => {
     if (teacherId) {
@@ -71,10 +75,14 @@ export default function TeachableSubjectTable({
 
   const handleDeleteClick = (
     event: React.MouseEvent<HTMLButtonElement>,
-    row: ITeachableSubject
+    subject: ITeachableSubject,
+    appropriateLevelId: number
   ) => {
     event.stopPropagation();
-    setSelectedRow(row);
+    setSelectedSubject({
+      name: subject["subject-name"],
+      id: appropriateLevelId,
+    });
     setOpenDeleteModal(true);
   };
 
@@ -123,49 +131,67 @@ export default function TeachableSubjectTable({
               </TableRow>
             </TableHead>
             <TableBody>
-              {teachableSubjects.map((subject, index) => (
-                <TableRow key={index} hover className="hover:bg-gray-50">
-                  <TableCell
-                    rowSpan={index === 0 ? teachableSubjects.length : 0}
-                    style={{
-                      display: index === 0 ? "table-cell" : "none",
-                      borderRight: "1px solid #e0e0e0",
-                    }}
-                  >
-                    {departmentName}
-                  </TableCell>
-                  <TableCell>{subject["subject-name"]}</TableCell>
-                  <TableCell className="text-center">
-                    {subject.abbreviation}
-                  </TableCell>
-                  <TableCell>
-                    {subject["list-approriate-level-by-grades"].map(
-                      (grade, idx) => (
-                        <span key={idx}>
-                          {`Khối ${CLASSGROUP_TRANSLATOR[grade.grade]}`}
-                          {idx <
-                          subject["list-approriate-level-by-grades"].length - 1
-                            ? ", "
-                            : ""}
-                        </span>
-                      )
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {subject["list-approriate-level-by-grades"].map(
-                      (grade, idx) => (
-                        <div
-                          key={idx}
-                          className="flex justify-center items-center"
+              {teachableSubjects.flatMap((subject, index) =>
+                subject["list-approriate-level-by-grades"].map(
+                  (gradeLevel, gradeIndex) => (
+                    <TableRow
+                      key={`${index}-${gradeIndex}`}
+                      hover
+                      className="hover:bg-gray-50"
+                    >
+                      {index === 0 && gradeIndex === 0 && (
+                        <TableCell
+                          rowSpan={teachableSubjects.reduce(
+                            (total, subj) =>
+                              total +
+                              subj["list-approriate-level-by-grades"].length,
+                            0
+                          )}
+                          style={{
+                            borderRight: "1px solid #e0e0e0",
+                          }}
                         >
+                          {departmentName}
+                        </TableCell>
+                      )}
+
+                      {gradeIndex === 0 && (
+                        <TableCell
+                          rowSpan={
+                            subject["list-approriate-level-by-grades"].length
+                          }
+                          sx={{
+                            borderRight: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {subject["subject-name"]}
+                        </TableCell>
+                      )}
+                      {gradeIndex === 0 && (
+                        <TableCell
+                          rowSpan={
+                            subject["list-approriate-level-by-grades"].length
+                          }
+                          sx={{
+                            borderRight: "1px solid #e0e0e0",
+                          }}
+                        >
+                          {subject.abbreviation}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        {`Khối ${CLASSGROUP_TRANSLATOR[gradeLevel.grade]}`}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-center items-center">
                           <span
                             className={`font-medium ${
                               APPROPRIATE_LEVEL_TRANSLATOR[
-                                grade["appropriate-level"]
+                                gradeLevel["appropriate-level"]
                               ] === 1
                                 ? "text-red-500"
                                 : APPROPRIATE_LEVEL_TRANSLATOR[
-                                    grade["appropriate-level"]
+                                    gradeLevel["appropriate-level"]
                                   ] === 5
                                 ? "text-green-600"
                                 : "text-gray-700"
@@ -173,50 +199,45 @@ export default function TeachableSubjectTable({
                           >
                             {
                               APPROPRIATE_LEVEL_TRANSLATOR[
-                                grade["appropriate-level"]
+                                gradeLevel["appropriate-level"]
                               ]
                             }
                           </span>
                         </div>
-                      )
-                    )}
-                  </TableCell>
-
-                  <TableCell align="center">
-                    <div className="w-full h-full flex justify-center items-center">
-                      <div
-                        className={`w-full h-fit px-[6%] py-[2%] rounded-[5px] font-semibold ${
-                          subject["is-main"]
-                            ? "bg-basic-positive-hover text-basic-positive"
-                            : "bg-basic-gray-hover text-basic-gray"
-                        }`}
-                        style={{
-                          whiteSpace: "nowrap",
-                          margin: "0 auto",
-                          display: "flex",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {subject["is-main"] ? "Có" : "Không"}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell width={80}>
-                    <IconButton
-                      color="error"
-                      sx={{ zIndex: 10 }}
-                      onClick={(event) => handleDeleteClick(event, subject)}
-                    >
-                      <Image
-                        src="/images/icons/delete.png"
-                        alt="Xóa chuyên môn"
-                        width={15}
-                        height={15}
-                      />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </TableCell>
+                      <TableCell align="center">
+                        <div className="w-full h-full flex justify-center items-center">
+                          <div
+                            className={`w-full h-fit px-[6%] py-[2%] rounded-[5px] font-semibold ${
+                              gradeLevel["is-main"]
+                                ? "bg-basic-positive-hover text-basic-positive"
+                                : "bg-basic-gray-hover text-basic-gray"
+                            }`}
+                          >
+                            {gradeLevel["is-main"] ? "Có" : "Không"}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell width={80}>
+                        <IconButton
+                          color="error"
+                          sx={{ zIndex: 10 }}
+                          onClick={(event) =>
+                            handleDeleteClick(event, subject, gradeLevel.id)
+                          }
+                        >
+                          <Image
+                            src="/images/icons/delete.png"
+                            alt="Xóa chuyên môn"
+                            width={15}
+                            height={15}
+                          />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  )
+                )
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -229,9 +250,9 @@ export default function TeachableSubjectTable({
         <DeleteTeachableSubjectModal
           open={openDeleteModal}
           onClose={setOpenDeleteModal}
-          subjectName={selectedRow?.["subject-name"] ?? "Không xác định"}
-          subjectId={selectedRow?.["subject-id"] ?? 0}
-          mutate={mutate}
+          subjectName={selectedSubject?.name || ""}
+          subjectId={selectedSubject?.id || 0}
+          mutate={fetchData}
         />
       </Paper>
     </Box>

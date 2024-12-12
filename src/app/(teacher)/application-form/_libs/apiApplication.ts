@@ -3,12 +3,11 @@ import { ISendApplication } from "./constants";
 const api = process.env.NEXT_PUBLIC_API_URL;
 
 export const sendApplication = async (
-  schoolId: string,
   sessionToken: string,
   formData: ISendApplication
 ) => {
   try {
-    const url = `${api}/api/schools/${schoolId}/submit-requests`;
+    const url = `${api}/api/submit-requests`;
     const response = await fetch(url, {
       method: "POST",
       headers: {

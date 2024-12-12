@@ -35,7 +35,11 @@ import {
   getSubjectGroup,
   getTeacherName,
 } from "../_libs/apiClass";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
+import {
+  CLASSGROUP_STRING_TYPE,
+  MAIN_SESSION,
+  MAIN_SESSION_TRANSLATOR,
+} from "@/utils/constants";
 
 interface AddClassFormProps {
   open: boolean;
@@ -59,7 +63,9 @@ const AddClassModal = (props: AddClassFormProps) => {
   const [teachers, setTeachers] = React.useState<ITeacher[]>([]);
   const [subjectGroups, setSubjectGroups] = React.useState<ISubjectGroup[]>([]);
   const [rooms, setRooms] = React.useState<IRoom[]>([]);
-  const [existingClasses, setExistingClasses] = React.useState<IExistingClass[]>([]);
+  const [existingClasses, setExistingClasses] = React.useState<
+    IExistingClass[]
+  >([]);
 
   React.useEffect(() => {
     const loadTeachers = async () => {
@@ -155,6 +161,8 @@ const AddClassModal = (props: AddClassFormProps) => {
     },
   });
 
+  console.log("Values: ", formik.values)
+  
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
@@ -366,16 +374,14 @@ const AddClassModal = (props: AddClassFormProps) => {
                       value={formik.values["main-session"]}
                       onChange={formik.handleChange}
                     >
-                      <FormControlLabel
-                        value="0"
-                        control={<Radio />}
-                        label="Chiều"
-                      />
-                      <FormControlLabel
-                        value="1"
-                        control={<Radio />}
-                        label="Sáng"
-                      />
+                      {MAIN_SESSION.map((session) => (
+                        <FormControlLabel
+                          key={session.key}
+                          value={session.value}
+                          control={<Radio />}
+                          label={MAIN_SESSION_TRANSLATOR[session.value]}
+                        />
+                      ))}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
