@@ -84,7 +84,6 @@ export const addTeachableSubject = yup.object().shape({
             .required("Vui lòng chọn khối")
         })
       ).min(1, "Vui lòng chọn ít nhất một khối"),
-      "is-main": yup.boolean().required("Vui lòng chọn loại môn học")
     })
   )
 });

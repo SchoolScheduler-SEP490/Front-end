@@ -12,7 +12,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TuneIcon from "@mui/icons-material/Tune";
 import {
   Button,
-  CircularProgress,
   FormControl,
   IconButton,
   InputLabel,
@@ -40,13 +39,8 @@ export default function TimetableDetail() {
   const params = useParams();
   const timetableId = params._timetableId;
   const router = useRouter();
-  const [selectedGrade, setSelectedGrade] = useState("all");
   const [selectedTeacher, setSelectedTeacher] = useState("all");
-  const [displayCount, setDisplayCount] = useState(5);
-  const [startIndex, setStartIndex] = useState(0);
-  const [scheduleData, setScheduleData] = useState<IScheduleResponse | null>(
-    null
-  );
+  const [scheduleData, setScheduleData] = useState<IScheduleResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isMenuOpen = useSelector(
     (state: any) => state.schoolManager.isMenuOpen
@@ -183,19 +177,6 @@ export default function TimetableDetail() {
       {activeTab === 0 && (
         <div className="w-full flex flex-col">
           <Box sx={{ width: "100%", mt: 3 }} component={Paper}>
-            <Tabs
-              value={configTab}
-              onChange={handleConfigTabChange}
-              sx={{
-                borderBottom: 1,
-                borderColor: "divider",
-              }}
-            >
-              <Tab label="Thông tin" />
-              <Tab label="Ràng buộc" />
-              <Tab label="Phân công giảng dạy" />
-              <Tab label="Tiết học" />
-            </Tabs>
           </Box>
 
           <div className="relative w-full h-[80vh]">
@@ -412,7 +393,7 @@ export default function TimetableDetail() {
                                         key={`${classSchedule["student-class-id"]}-${currentSlotIndex}`}
                                         sx={{
                                           border: "1px solid #e5e7eb",
-                                          maxWidth: 50,
+                                          maxWidth: 110,
                                           height: "70px",
                                           backgroundColor: period
                                             ? "#f8faff"
@@ -434,7 +415,7 @@ export default function TimetableDetail() {
                                             <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
                                               {period["subject-abbreviation"]}
                                             </strong>
-                                            <div className="flex justify-center gap-2 mt-1">
+                                            <div className="flex justify-between gap-3">
                                               <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
                                                 {period["room-code"]}
                                               </p>

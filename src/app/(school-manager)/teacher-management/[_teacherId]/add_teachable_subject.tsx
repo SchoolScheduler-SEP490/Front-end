@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,17 +6,14 @@ import {
   Grid,
   MenuItem,
   Select,
-  FormHelperText,
   IconButton,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
   Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
   InputLabel,
+  Checkbox,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -54,14 +51,16 @@ interface FormValues {
   subjects: {
     "subject-abreviation": string;
     "list-approriate-level-by-grades": GradeLevel[];
-    "is-main": boolean;
   }[];
 }
+
 interface GradeLevel {
+  id: number;
   grade: string;
   "appropriate-level": string;
   "is-main": boolean;
 }
+
 type FormErrors = {
   subjects?: {
     "list-approriate-level-by-grades"?: {
@@ -76,6 +75,8 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const [gradeFields, setGradeFields] = React.useState([{ id: 0 }]);
   const [expandedAccordion, setExpandedAccordion] = React.useState<number>(0);
+  const [expandedAccordions, setExpandedAccordions] = useState<number[]>([0]);
+
 
   React.useEffect(() => {
     const loadSubjects = async () => {
@@ -94,13 +95,29 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
 
   const handleFormSubmit = async (values: FormValues) => {
     if (teacherId) {
-      const result = await useAddTeachableSubject({
+      const teachableSubject: ITeachableSubjectRequest[] = [
+        {
+          "subject-abreviation": values.subjects[0]["subject-abreviation"],
+          "list-approriate-level-by-grades": values.subjects[0][
+            "list-approriate-level-by-grades"
+          ].map((grade) => ({
+            id: 0,
+            grade: grade.grade,
+            "appropriate-level": grade["appropriate-level"],
+            "is-main": grade["is-main"],
+          })),
+        },
+      ];
+
+      const { handleAddTeachableSubject } = useAddTeachableSubject({
         schoolId,
         teacherId: Number(teacherId),
-        teachableData: values.subjects[0],
+        teachableData: teachableSubject,
         sessionToken,
       });
-      if (result) {
+
+      const success = await handleAddTeachableSubject();
+      if (success) {
         await mutate();
         handleClose();
       }
@@ -113,7 +130,6 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
         {
           "subject-abreviation": "",
           "list-approriate-level-by-grades": [] as GradeLevel[],
-          "is-main": false,
         },
       ],
     },
@@ -136,7 +152,6 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
           "subject-abreviation": newSubject["subject-abreviation"],
           "list-approriate-level-by-grades":
             newSubject["list-approriate-level-by-grades"],
-          "is-main": newSubject["is-main"],
         },
       ],
     });
@@ -144,23 +159,20 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   };
 
   const removeSubject = (index: number) => {
-    const newSubjects = [formik.values];
+    const newSubjects = [...formik.values.subjects];
     newSubjects.splice(index, 1);
-    formik.setValues(newSubjects[0]);
+    formik.setValues({
+      subjects: newSubjects
+    });
     setExpandedAccordion(Math.max(0, index - 1));
   };
-
+  
   const handleGradeChange = (event: any, index: number, gradeIndex: number) => {
     const selectedGrade = event.target.value;
     const currentGrades = [
       ...formik.values.subjects[index]["list-approriate-level-by-grades"],
     ];
 
-    const isDuplicate = currentGrades.some(
-      (grade, idx) => idx !== gradeIndex && grade.grade === selectedGrade
-    );
-
-    // Update values
     if (currentGrades[gradeIndex]) {
       currentGrades[gradeIndex] = {
         ...currentGrades[gradeIndex],
@@ -168,6 +180,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
       };
     } else {
       currentGrades[gradeIndex] = {
+        id: 0,
         grade: selectedGrade,
         "appropriate-level": "",
         "is-main": false,
@@ -178,21 +191,18 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
       `subjects.${index}.list-approriate-level-by-grades`,
       currentGrades
     );
-    if (isDuplicate) {
-      formik.setFieldError(
-        `subjects[${index}].list-approriate-level-by-grades[${gradeIndex}].grade`,
-        "Khối học này đã được chọn"
-      );
-    } else {
-      formik.setFieldError(
-        `subjects[${index}].list-approriate-level-by-grades[${gradeIndex}].grade`,
-        undefined
-      );
-    }
   };
 
-  console.log(formik.values);
-  console.log(formik.errors);
+  const handleAccordionChange = (index: number) => {
+    setExpandedAccordions((prev: number[]) => {
+      if (prev.includes(index)) {
+        return prev.filter(i => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    });
+  };
+
   return (
     <Dialog
       open={open}
@@ -226,9 +236,9 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
         <DialogContent>
           {formik.values.subjects.map((subject, index) => (
             <Accordion
-              key={index}
-              expanded={expandedAccordion === index}
-              onChange={() => setExpandedAccordion(index)}
+            key={index}
+            expanded={expandedAccordions.includes(index)}
+            onChange={() => handleAccordionChange(index)}
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -241,7 +251,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                   {index > 0 && (
                     <IconButton
                       onClick={(e) => {
-                        // e.stopPropagation();
+                        e.stopPropagation();
                         removeSubject(index);
                       }}
                       color="error"
@@ -283,14 +293,18 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                             MenuProps={MenuProps}
                           >
                             <MenuItem value="">--Chọn môn học--</MenuItem>
-                            {subjects.map((s) => (
-                              <MenuItem
-                                key={s.abbreviation}
-                                value={s.abbreviation}
-                              >
-                                {s["subject-name"]}
-                              </MenuItem>
-                            ))}
+                            {subjects
+                              .filter(
+                                (s) => !s["is-teached-by-homeroom-teacher"]
+                              )
+                              .map((s) => (
+                                <MenuItem
+                                  key={s.abbreviation}
+                                  value={s.abbreviation}
+                                >
+                                  {s["subject-name"]}
+                                </MenuItem>
+                              ))}
                           </Select>
                         </FormControl>
                       </Grid>
@@ -329,22 +343,10 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                       </Grid>
                       <Grid item xs={9}>
                         {gradeFields.map((field, gradeIndex) => (
-                          <div
-                            key={field.id}
-                            className="mb-4 flex gap-4 items-center"
-                          >
+                          <div key={field.id} className="mb-4">
                             <Grid container spacing={2}>
-                              <Grid item xs={6}>
-                                <FormControl
-                                  fullWidth
-                                  error={Boolean(
-                                    (formik.errors as FormErrors)?.subjects?.[
-                                      index
-                                    ]?.["list-approriate-level-by-grades"]?.[
-                                      gradeIndex
-                                    ]?.grade
-                                  )}
-                                >
+                              <Grid item xs={4}>
+                                <FormControl fullWidth>
                                   <InputLabel>Khối</InputLabel>
                                   <Select
                                     variant="standard"
@@ -360,7 +362,6 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                         gradeIndex
                                       )
                                     }
-                                    MenuProps={MenuProps}
                                   >
                                     {Object.entries(CLASSGROUP_TRANSLATOR).map(
                                       ([grade, value]) => (
@@ -370,19 +371,10 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                       )
                                     )}
                                   </Select>
-                                  <FormHelperText error>
-                                    {
-                                      (formik.errors as FormErrors)?.subjects?.[
-                                        index
-                                      ]?.["list-approriate-level-by-grades"]?.[
-                                        gradeIndex
-                                      ]?.grade
-                                    }
-                                  </FormHelperText>
                                 </FormControl>
                               </Grid>
 
-                              <Grid item xs={5}>
+                              <Grid item xs={4}>
                                 <FormControl fullWidth>
                                   <InputLabel>Độ phù hợp</InputLabel>
                                   <Select
@@ -393,21 +385,29 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                       ][gradeIndex]?.["appropriate-level"] || ""
                                     }
                                     onChange={(event) => {
-                                      const selectedLevel = event.target.value;
-                                      const currentGrades = [
-                                        ...formik.values.subjects[index][
+                                      const currentGrades =
+                                        formik.values.subjects[index][
                                           "list-approriate-level-by-grades"
-                                        ],
-                                      ];
-                                      if (currentGrades[gradeIndex]) {
-                                        currentGrades[gradeIndex] = {
-                                          ...currentGrades[gradeIndex],
-                                          "appropriate-level": selectedLevel,
+                                        ];
+                                      const updatedGrades = [...currentGrades];
+                                      if (!updatedGrades[gradeIndex]) {
+                                        updatedGrades[gradeIndex] = {
+                                          id: 0,
+                                          grade: "",
+                                          "appropriate-level":
+                                            event.target.value,
+                                          "is-main": false,
+                                        };
+                                      } else {
+                                        updatedGrades[gradeIndex] = {
+                                          ...updatedGrades[gradeIndex],
+                                          "appropriate-level":
+                                            event.target.value,
                                         };
                                       }
                                       formik.setFieldValue(
                                         `subjects.${index}.list-approriate-level-by-grades`,
-                                        currentGrades
+                                        updatedGrades
                                       );
                                     }}
                                   >
@@ -422,94 +422,54 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                   </Select>
                                 </FormControl>
                               </Grid>
-                              {gradeIndex > 0 && (
-                                <Grid
-                                  item
-                                  xs={1}
-                                  sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <IconButton
-                                    onClick={() => {
-                                      const newFields = gradeFields.filter(
-                                        (_, i) => i !== gradeIndex
-                                      );
-                                      setGradeFields(newFields);
-                                      const currentGrades = [
-                                        ...formik.values.subjects[index][
+
+                              <Grid item xs={3}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Môn chính</InputLabel>
+                                  <Select
+                                    variant="standard"
+                                    value={
+                                      formik.values.subjects[index][
+                                        "list-approriate-level-by-grades"
+                                      ][gradeIndex]?.["is-main"]
+                                        ? "true"
+                                        : "false"
+                                    }
+                                    onChange={(event) => {
+                                      const currentGrades =
+                                        formik.values.subjects[index][
                                           "list-approriate-level-by-grades"
-                                        ],
-                                      ];
-                                      currentGrades.splice(gradeIndex, 1);
+                                        ];
+                                      const updatedGrades = [...currentGrades];
+                                      if (!updatedGrades[gradeIndex]) {
+                                        updatedGrades[gradeIndex] = {
+                                          id: 0,
+                                          grade: "",
+                                          "appropriate-level": "",
+                                          "is-main":
+                                            event.target.value === "true",
+                                        };
+                                      } else {
+                                        updatedGrades[gradeIndex] = {
+                                          ...updatedGrades[gradeIndex],
+                                          "is-main":
+                                            event.target.value === "true",
+                                        };
+                                      }
                                       formik.setFieldValue(
                                         `subjects.${index}.list-approriate-level-by-grades`,
-                                        currentGrades
+                                        updatedGrades
                                       );
                                     }}
                                   >
-                                    <DeleteIcon
-                                      sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        height: "100%",
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Grid>
-                              )}
+                                    <MenuItem value="true">Có</MenuItem>
+                                    <MenuItem value="false">Không</MenuItem>
+                                  </Select>
+                                </FormControl>
+                              </Grid>
                             </Grid>
                           </div>
                         ))}
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  {/* Is Main Radio */}
-                  <Grid item xs={12}>
-                    <Grid container spacing={2} sx={{ mb: 2 }}>
-                      <Grid item xs={3}>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontWeight: "bold",
-                            display: "flex",
-                            alignItems: "center",
-                            height: "100%",
-                          }}
-                        >
-                          Loại môn học
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={9}>
-                        <FormControl>
-                          <RadioGroup
-                            row
-                            name={`subjects.${index}.is-main`}
-                            value={
-                              formik.values.subjects[index]["is-main"] || false
-                            }
-                            onChange={(e) => {
-                              const boolValue = e.target.value === "true";
-                              formik.setFieldValue(
-                                `subjects.${index}.is-main`,
-                                boolValue
-                              );
-                            }}
-                          >
-                            <FormControlLabel
-                              value="true"
-                              control={<Radio />}
-                              label="Môn chính"
-                            />
-                            <FormControlLabel
-                              value="false"
-                              control={<Radio />}
-                              label="Môn phụ"
-                            />
-                          </RadioGroup>
-                        </FormControl>
                       </Grid>
                     </Grid>
                   </Grid>
@@ -525,7 +485,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
             fullWidth
             className="mt-4"
           >
-            Thêm môn học
+            Thêm chuyên môn
           </Button>
         </DialogContent>
 
@@ -537,7 +497,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
             styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
           <ContainedButton
-            title="Thêm môn học"
+            title="Thêm chuyên môn"
             type="submit"
             disableRipple
             disabled={!formik.isValid}
