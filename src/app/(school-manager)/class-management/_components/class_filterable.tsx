@@ -1,5 +1,6 @@
 "use client";
 
+import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   FormControl,
@@ -11,12 +12,7 @@ import {
   SelectChangeEvent,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
-import { IDropdownOption, ISchoolYear } from "../_libs/constants";
-import useGetSchoolYear from "../_hooks/useGetSchoolYear";
-import { useAppContext } from "@/context/app_provider";
-import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 
 interface IClassFilterableProps {
   open: boolean;
@@ -28,7 +24,7 @@ interface IClassFilterableProps {
 
 
 const ClassFilterable = (props: IClassFilterableProps) => {
-  const { open, setOpen, selectedGrade, setSelectedGrade } = props;
+  const { open, setOpen, selectedGrade, setSelectedGrade, mutate } = props;
 
   const handleGradeSelect = (event: SelectChangeEvent<number | string>) => {
     const value = event.target.value;
@@ -37,6 +33,7 @@ const ClassFilterable = (props: IClassFilterableProps) => {
     } else {
       setSelectedGrade(Number(value));
     }
+    // mutate();
   };
 
   const handleClose = () => {
