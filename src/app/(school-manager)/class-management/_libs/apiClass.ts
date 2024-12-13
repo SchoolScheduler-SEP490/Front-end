@@ -50,7 +50,7 @@ export const getTeacherName = async (
 export const addClass = async (
   schoolId: string,
   sessionToken: string,
-  classData: IAddClassData,
+  classData: IAddClassData[],
   schoolYearId: number
 ): Promise<any> => {
   if (!sessionToken) {
@@ -58,7 +58,7 @@ export const addClass = async (
     return false;
   }
   const url = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes`;
-  const requestBody = [classData];
+  const requestBody = classData;
   console.log("Request Body:", requestBody);
 
   const response = await fetch(url, {
@@ -70,9 +70,9 @@ export const addClass = async (
     body: JSON.stringify(requestBody),
   });
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
+  // if (!response.ok) {
+  //   throw new Error(data.message);
+  // }
   return data;
 };
 

@@ -20,6 +20,7 @@ import Image from "next/image";
 import { visuallyHidden } from "@mui/utils";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import AddIcon from "@mui/icons-material/Add";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import {
   CLASSGROUP_STRING_TYPE,
   ICommonOption,
@@ -31,6 +32,7 @@ import AddClassModal from "./add_class";
 import DeleteClassModal from "./delete_class";
 import UpdateClassModal from "./update_class";
 import { useRouter } from "next/navigation";
+import ImportClassSelectModal from "./import_classes";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
   if (b[orderBy] < a[orderBy]) return -1;
@@ -187,6 +189,7 @@ const ClassTable = (props: IClassTableProps) => {
     React.useState<keyof IClassTableData>("className");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
+  const [openImportForm, setOpenImportForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [selectedRow, setSelectedRow] = React.useState<
@@ -269,6 +272,7 @@ const ClassTable = (props: IClassTableProps) => {
   };
 
   const handleOpenAddForm = () => setOpenAddForm(true);
+  const handleOpenInportForm = () => setOpenImportForm(true);
 
   return (
     <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[2vh]">
@@ -289,6 +293,11 @@ const ClassTable = (props: IClassTableProps) => {
             <Tooltip title="Thêm lớp học">
               <IconButton onClick={handleOpenAddForm}>
                 <AddIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Nhập lớp học">
+              <IconButton onClick={handleOpenInportForm}>
+                <FileUploadOutlinedIcon />
               </IconButton>
             </Tooltip>
             <Tooltip title="Lọc danh sách">
@@ -451,6 +460,12 @@ const ClassTable = (props: IClassTableProps) => {
           <AddClassModal
             open={openAddForm}
             onClose={setOpenAddForm}
+            mutate={mutate}
+          />
+
+          <ImportClassSelectModal
+            open={openImportForm}
+            onClose={setOpenImportForm}
             mutate={mutate}
           />
           <DeleteClassModal
