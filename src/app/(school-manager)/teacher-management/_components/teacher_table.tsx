@@ -387,7 +387,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
                     height: 50 * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={8} />
+                  <TableCell colSpan={10} />
                 </TableRow>
               )}
             </TableBody>
