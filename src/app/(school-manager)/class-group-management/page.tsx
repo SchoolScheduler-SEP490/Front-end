@@ -42,7 +42,7 @@ export default function SMClassGroup() {
   const { data, error, isValidating, mutate } = useClassGroupData({
     sessionToken,
     schoolId,
-    pageSize: rowsPerPage,
+    pageSize: selectedGrade !== null ? 100 : rowsPerPage,
     pageIndex: page + 1,
     schoolYearId: selectedSchoolYearId,
   });
@@ -85,36 +85,30 @@ export default function SMClassGroup() {
 
   React.useEffect(() => {
     if (data?.status === 200) {
-      let filteredItems = [...data.result.items];
-
-      if (selectedGrade !== null) {
-        filteredItems = filteredItems.filter(
-          (item: IClassGroup) => item.grade === selectedGrade
-        );
-      }
-
-      const classGroupData: IClassGroupTableData[] = filteredItems.map(
-        (item: IClassGroup) => {
-          const curriculumName =
-            curriculums.find((c) => c.id === item["curriculum-id"])?.[
-              "curriculum-name"
-            ] || "Chưa có dữ liệu";
-          return {
-            id: item.id,
-            groupName: item["group-name"],
-            studentClassGroupCode: item["student-class-group-code"],
-            grade: item.grade,
-            curriculum: curriculumName,
-            createDate: item["create-date"],
-            classes: item.classes || [],
-          };
-        }
+      const allClassGroupData: IClassGroupTableData[] = data.result.items.map(
+        (item: IClassGroup) => ({
+          id: item.id,
+          groupName: item["group-name"],
+          studentClassGroupCode: item["student-class-group-code"],
+          grade: item.grade,
+          curriculum: curriculums.find((c) => c.id === item["curriculum-id"])?.["curriculum-name"] || "Chưa có dữ liệu",
+          createDate: item["create-date"],
+          classes: item.classes || [],
+        })
       );
 
-      setClassGroupTableData(classGroupData);
-      setTotalRows(filteredItems.length);
+      let filteredData = [...allClassGroupData];
+      if (selectedGrade !== null) {
+        filteredData = allClassGroupData.filter(item => item.grade === selectedGrade);
+        setTotalRows(filteredData.length);
+      } else {
+        setTotalRows(data.result["total-item-count"]);
+      }
+  
+      setClassGroupTableData(filteredData);
     }
   }, [data, selectedGrade, curriculums]);
+   
 
   React.useEffect(() => {
     if (error && !isErrorShown) {
@@ -189,6 +183,7 @@ export default function SMClassGroup() {
           selectedGrade={selectedGrade}
           setSelectedGrade={setSelectedGrade}
           mutate={mutate}
+          setPage={setPage}
         />
         <ClassGroupDetails
           open={isDetailsShown}

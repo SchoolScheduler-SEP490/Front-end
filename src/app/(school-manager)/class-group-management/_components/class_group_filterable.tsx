@@ -18,21 +18,23 @@ interface IClassGroupFilterableProps {
   selectedGrade: number | null;
   setSelectedGrade: (grade: number | null) => void;
   mutate: KeyedMutator<any>;
+  setPage: (page: number) => void;
 }
 
 const ClassGroupFilterable = (props: IClassGroupFilterableProps) => {
-  const { open, setOpen, selectedGrade, setSelectedGrade, mutate } = props;
+  const { open, setOpen, selectedGrade, setSelectedGrade, mutate, setPage } = props;
 
   const handleGradeSelect = (event: SelectChangeEvent<number | string>) => {
     const value = event.target.value;
     if (value === 'all') {
       setSelectedGrade(null);
-      // mutate(); 
     } else {
       setSelectedGrade(Number(value));
     }
+    setPage(0);
+    mutate();
   };
-  
+   
   const handleClose = () => {
     setOpen(false);
   };

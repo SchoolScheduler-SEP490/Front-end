@@ -13,6 +13,7 @@ import {
   FormHelperText,
   IconButton,
   Input,
+  InputLabel,
   MenuItem,
   Select,
   TextField,
@@ -62,7 +63,7 @@ export default function ApplicationFormPage() {
       setFormData({
         "teacher-id": teacherInfo.id,
         "school-year-id": selectedSchoolYearId,
-        "request-type": "Other",
+        "request-type": "",
         "request-description": "",
         "attached-file": "",
       });
@@ -168,6 +169,7 @@ export default function ApplicationFormPage() {
       <div className="w-full max-w-2xl mx-auto p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <FormControl fullWidth>
+            <InputLabel>Chọn loại đơn</InputLabel>
             <Select
               value={formData["request-type"]}
               onChange={(e) =>
@@ -176,6 +178,7 @@ export default function ApplicationFormPage() {
                   "request-type": e.target.value,
                 })
               }
+              label="Chọn loại đơn"
             >
               {REQUEST_TYPE.map((type) => (
                 <MenuItem key={type.key} value={type.key}>
@@ -188,7 +191,7 @@ export default function ApplicationFormPage() {
           <TextField
             fullWidth
             multiline
-            rows={4}
+            rows={7}
             label="Mô tả chi tiết"
             value={formData["request-description"]}
             onChange={(e) =>
@@ -197,6 +200,8 @@ export default function ApplicationFormPage() {
                 "request-description": e.target.value,
               })
             }
+            spellCheck="false"
+            lang="vi"
           />
 
           <FormControl fullWidth>
