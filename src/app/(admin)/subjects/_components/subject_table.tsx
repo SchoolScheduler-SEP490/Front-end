@@ -142,6 +142,8 @@ interface ISubjectTableProps {
 	setSelectedSubjectId: React.Dispatch<React.SetStateAction<number>>;
 	isDetailsShown: boolean;
 	setIsDetailsShown: React.Dispatch<React.SetStateAction<boolean>>;
+	isUpdateModalOpen: boolean;
+	setIsUpdateModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const SubjectTable = (props: ISubjectTableProps) => {
@@ -157,6 +159,7 @@ const SubjectTable = (props: ISubjectTableProps) => {
 		setIsDetailsShown,
 		isDetailsShown,
 		setSelectedSubjectId,
+		isUpdateModalOpen,setIsUpdateModalOpen,
 	} = props;
 
 	const [order, setOrder] = React.useState<Order>('asc');
@@ -164,7 +167,6 @@ const SubjectTable = (props: ISubjectTableProps) => {
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 	const [isAddModalOpen, setIsAddModalOpen] = React.useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState<boolean>(false);
-	const [iUpdateModalOpen, setIUpdateModalOpen] = React.useState<boolean>(false);
 	const [selectedRow, setSelectedRow] = React.useState<ISubjectTableData | undefined>();
 
 	const open = Boolean(anchorEl);
@@ -349,9 +351,9 @@ const SubjectTable = (props: ISubjectTableProps) => {
 				mutate={mutate}
 			/>
 			<UpdateSubjectModal
-				open={iUpdateModalOpen}
-				setOpen={setIUpdateModalOpen}
-				subjectId={selectedRow?.subjectKey ?? 0}
+				open={isUpdateModalOpen}
+				setOpen={setIsUpdateModalOpen}
+				subjectId={selectedSubjectId ?? 0}
 				mutate={mutate}
 			/>
 		</div>
