@@ -9,7 +9,10 @@ import { useAppContext } from "@/context/app_provider";
 import { IClass, IClassTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
 import { fetchSchoolYear } from "./_libs/apiClass";
-import { CLASSGROUP_TRANSLATOR } from "@/utils/constants";
+import {
+  CLASSGROUP_TRANSLATOR,
+  CLASSGROUP_TRANSLATOR_REVERSED,
+} from "@/utils/constants";
 import ClassFilterable from "./_components/class_filterable";
 import { TRANSLATOR } from "@/utils/dictionary";
 import { useSelector } from "react-redux";
@@ -27,6 +30,7 @@ export default function SMClass() {
   const [isErrorShown, setIsErrorShown] = React.useState<boolean>(false);
   const [selectedYearId, setSelectedYearId] =
     React.useState(selectedSchoolYearId);
+  const [selectedGrade, setSelectedGrade] = React.useState<number | null>(null);
 
   const { data, error, isValidating, mutate } = useClassData({
     sessionToken,
@@ -34,6 +38,10 @@ export default function SMClass() {
     pageSize: rowsPerPage,
     pageIndex: page + 1,
     schoolYearId: selectedSchoolYearId,
+    grade:
+      selectedGrade !== null
+        ? CLASSGROUP_TRANSLATOR_REVERSED[selectedGrade]
+        : undefined,
   });
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
     undefined
@@ -41,7 +49,6 @@ export default function SMClass() {
   const [classTableData, setClassTableData] = React.useState<IClassTableData[]>(
     []
   );
-  const [selectedGrade, setSelectedGrade] = React.useState<number | null>(null);
 
   const getMaxPage = () => {
     if (totalRows === 0) return 1;
@@ -157,7 +164,7 @@ export default function SMClass() {
           isFilterable={isFilterable}
           setIsFilterable={setIsFilterable}
           mutate={mutate}
-		  selectedGrade={selectedGrade}
+          selectedGrade={selectedGrade}
         />
         <ClassFilterable
           open={isFilterable}
