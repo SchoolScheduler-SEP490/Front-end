@@ -1,15 +1,22 @@
-import useSWR from 'swr';
+import useSWR from "swr";
 
 interface ITeacherDataProps {
   sessionToken: string;
   schoolId: string;
   pageSize: number;
   pageIndex: number;
+  departmentId?: number | null;
 }
 
-const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeacherDataProps) => {
-  const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
-  
+const useTeacherData = ({
+  sessionToken,
+  schoolId,
+  pageSize,
+  pageIndex,
+  departmentId,
+}: ITeacherDataProps) => {
+  const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
+
   const fetcher = async (url: string) => {
     const response = await fetch(url, {
       headers: {
@@ -23,8 +30,10 @@ const useTeacherData = ({ sessionToken, schoolId, pageSize, pageIndex }: ITeache
     return data;
   };
 
-  const endpoint = `${api}/api/schools/${schoolId}/teachers?includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
-
+  const endpoint = `${api}/api/schools/${schoolId}/teachers?${
+    departmentId ? `departmentId=${departmentId}&` : ""
+  }includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
+  
   const { data, error, isValidating, mutate } = useSWR(
     sessionToken ? endpoint : null,
     fetcher,
