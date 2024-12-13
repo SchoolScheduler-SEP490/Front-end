@@ -50,7 +50,7 @@ const cellStyle = {
 
 const periodCellStyle = (hasPeriod: boolean) => ({
   border: "1px solid #e5e7eb",
-  maxWidth: 50,
+  maxWidth: 110,
   height: "70px",
   backgroundColor: hasPeriod ? "#f8faff" : "white",
   overflow: "hidden",

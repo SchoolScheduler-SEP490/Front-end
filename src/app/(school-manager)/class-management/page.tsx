@@ -171,6 +171,7 @@ export default function SMClass() {
           setOpen={setIsFilterable}
           selectedGrade={selectedGrade}
           setSelectedGrade={setSelectedGrade}
+          setPage={setPage}
           mutate={mutate}
         />
       </div>

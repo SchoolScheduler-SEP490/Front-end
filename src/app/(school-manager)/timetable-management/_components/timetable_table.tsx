@@ -295,7 +295,7 @@ const TimetableTable = (props: TimetableTableProps) => {
     try {
       const termId = selectedRow.termId;
 
-      if (selectedStatus === 2) {
+      if (selectedStatus === 3) {
         const timetablesRef = collection(firestore, "timetables");
         const q = query(
           timetablesRef,
@@ -340,6 +340,7 @@ const TimetableTable = (props: TimetableTableProps) => {
             scheduleData,
             sessionToken
           );
+          console.log('Publish response:', publishResult);
 
           if (publishResult) {
             useNotify({

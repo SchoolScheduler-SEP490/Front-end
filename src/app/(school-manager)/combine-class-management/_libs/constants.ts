@@ -55,7 +55,7 @@ export interface IAddCombineClassRequest {
   "room-subject-code": string;
   "room-subject-name": string;
   grade: string;
-  "model": typeof ROOM_SUBJECT_MODEL[number]['key'];
+  model: (typeof ROOM_SUBJECT_MODEL)[number]["key"];
   "teacher-id": number;
   session: string;
   "student-class-id": number[];
@@ -101,7 +101,7 @@ export interface IUpdateCombineClass {
   "room-subject-code": string;
   "room-subject-name": string;
   grade: string;
-  model: typeof ROOM_SUBJECT_MODEL[number]['key'];
+  model: (typeof ROOM_SUBJECT_MODEL)[number]["key"];
   session: string;
   "student-class-ids": number[];
 }
@@ -118,10 +118,12 @@ export interface ICombineClassDetail {
   "room-subject-code": string;
   "room-subject-name": string;
   "teacher-id": number;
+  "teacher-first-name": string;
+  "teacher-last-name": string;
   "teacher-abbreviation": string;
   "student-class": IStudentClass[];
   "e-grade": string;
   session: string;
-  model: typeof ROOM_SUBJECT_MODEL[number]['key'];
+  model: (typeof ROOM_SUBJECT_MODEL)[number]["key"];
   grade: string;
 }

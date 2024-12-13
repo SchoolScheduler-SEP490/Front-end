@@ -20,11 +20,12 @@ interface IClassFilterableProps {
   selectedGrade: number | null;
   setSelectedGrade: (grade: number | null) => void;
   mutate: KeyedMutator<any>;
+  setPage: (page: number) => void;
 }
 
 
 const ClassFilterable = (props: IClassFilterableProps) => {
-  const { open, setOpen, selectedGrade, setSelectedGrade, mutate } = props;
+  const { open, setOpen, selectedGrade, setSelectedGrade, mutate, setPage } = props;
 
   const handleGradeSelect = (event: SelectChangeEvent<number | string>) => {
     const value = event.target.value;
@@ -33,7 +34,8 @@ const ClassFilterable = (props: IClassFilterableProps) => {
     } else {
       setSelectedGrade(Number(value));
     }
-    // mutate();
+    setPage(0);
+    mutate();
   };
 
   const handleClose = () => {

@@ -20,6 +20,18 @@ interface TeacherFilterableProps {
   mutate: () => void;
 }
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+      scrollbars: "none",
+    },
+  },
+};
+
 const TeacherFilterable = (props: TeacherFilterableProps) => {
   const { open, setOpen, selectedDepartment, setSelectedDepartment, departments } = props;
 
@@ -48,6 +60,7 @@ const TeacherFilterable = (props: TeacherFilterableProps) => {
           <Select
             value={selectedDepartment === null ? 'all' : selectedDepartment}
             onChange={handleDepartmentSelect}
+            MenuProps={MenuProps}
           >
             <MenuItem value="all">Tất cả tổ bộ môn</MenuItem>
             {departments.map((dept) => (
