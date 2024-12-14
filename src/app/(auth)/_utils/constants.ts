@@ -17,7 +17,7 @@ export interface IJWTTokenPayload {
 	schoolId: string;
 	schoolName: string;
 	jti: string;
-	role: string;
+	role: string | string[];
 	exp: number;
 	iss: string;
 	aud: string;
@@ -29,4 +29,11 @@ export interface IRegisterForm {
 	phone: string,
 	password: string,
 	"confirm-account-password": string
+}
+
+export const USER_ROLE_TRANSLATOR: { [key: string]: string } = {
+	'Teacher': 'Giáo viên',
+	'TeacherDepartmentHead': 'Trưởng bộ môn',
+	'Admin': 'Quản trị viên',
+	'SchoolManager': 'Quản lý trường',
 }

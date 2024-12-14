@@ -3,8 +3,10 @@ import { IJWTTokenPayload, ILoginForm, ILoginResponse } from '@/app/(auth)/_util
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
+import { setTeacherInfo } from '@/context/slice_teacher';
 import useFetchSchoolYear from '@/hooks/useFetchSchoolYear';
 import useNotify from '@/hooks/useNotify';
+import { useTeacherDispatch } from '@/hooks/useReduxStore';
 import { ISchoolYearResponse, IUser } from '@/utils/constants';
 import { TRANSLATOR } from '@/utils/dictionary';
 import { inter } from '@/utils/fonts';
@@ -26,8 +28,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
-import { setTeacherInfo } from '@/context/slice_teacher';
-import { useTeacherDispatch } from '@/hooks/useReduxStore';
+import LoginRoleSelector from './login_modal_role';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -68,6 +69,11 @@ export const LoginForm = () => {
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState<number>(0);
 	const dispatch = useTeacherDispatch();
+
+	const [loginResult, setLoginResult] = useState<IUser | undefined>(undefined);
+	const [isMultiRole, setIsMultiRole] = useState<boolean>(false);
+	const [roleOptions, setRoleOptions] = useState<string[]>([]);
+	const [selectedRole, setSelectedRole] = useState<string>('');
 
 	useEffect(() => {
 		mutate();
@@ -116,25 +122,35 @@ export const LoginForm = () => {
 				if (loginResponse.status === 200) {
 					const decodedToken: IJWTTokenPayload = jwtDecode(loginResponse['jwt-token'] ?? '');
 
-					if(decodedToken?.role === 'Teacher') {
+					if (Array.isArray(decodedToken?.role)) {
+						setIsMultiRole(true);
+						setRoleOptions(decodedToken.role);
+					}
+
+					if (
+						(decodedToken?.role as string) === 'Teacher' ||
+						(decodedToken?.role as string[]).includes('Teacher')
+					) {
 						const teacherResponse = await fetch(
 							`${api}/api/schools/${decodedToken.schoolId}/teachers/${decodedToken.email}/info`,
 							{
-							  headers: {
-								Authorization: `Bearer ${loginResponse['jwt-token']}`,
-							  },
+								headers: {
+									Authorization: `Bearer ${loginResponse['jwt-token']}`,
+								},
 							}
-						  );
-						  const teacherData = await teacherResponse.json();
-						  if (teacherData.status === 200) {
+						);
+						const teacherData = await teacherResponse.json();
+						if (teacherData.status === 200) {
 							localStorage.setItem('teacherInfo', JSON.stringify(teacherData.result));
 							dispatch(setTeacherInfo(teacherData.result));
-						  }
+						}
 					}
 					data = {
 						email: decodedToken?.email ?? '',
 						id: decodedToken?.accountId ?? '',
-						role: decodedToken?.role ?? '',
+						role: Array.isArray(decodedToken?.role)
+							? decodedToken?.role[0]
+							: decodedToken?.role ?? '',
 						jwt: {
 							token: loginResponse['jwt-token'] ?? '',
 							refreshToken: loginResponse['jwt-refresh-token'] ?? '',
@@ -146,7 +162,7 @@ export const LoginForm = () => {
 				} else {
 					setIsLoggingIn(false);
 					useNotify({
-						message: TRANSLATOR[loginResponse.message] ?? 'Đã có lỗi xảy ra',
+						message: TRANSLATOR[loginResponse.message] ?? 'Không thể xác thực người dùng',
 						type: 'error',
 						position: 'top-right',
 						variant: 'light',
@@ -154,35 +170,50 @@ export const LoginForm = () => {
 				}
 				return data;
 			});
-			const resultFromNextServer = await fetch('/api/auth', {
-				method: 'POST',
-				body: JSON.stringify({ ...result, selectedSchoolYearId }),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			}).then(async (res) => {
-				const payload = await res.json();
-				const data = {
-					status: res.status,
-					payload,
-				};
-				if (!res.ok) {
-					throw data;
-				}
-				return data;
-			});
-			setSessionToken(resultFromNextServer.payload.jwt.token);
-			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
-			setUserRole(resultFromNextServer.payload.role);
-			setSchoolYear(resultFromNextServer.payload.selectedSchoolYearId);
+			
+			setLoginResult(result);
 			setIsLoggingIn(false);
-
-			// Redirect to landing page of each role after login
-			router.push('/');
 		} catch (error: any) {
 			console.log('>>>ERROR: ', error);
 		}
 	};
+
+	const saveClientLoginData = async (userData:IUser) => {
+		const resultFromNextServer = await fetch('/api/auth', {
+			method: 'POST',
+			body: JSON.stringify({ ...userData, selectedSchoolYearId }),
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}).then(async (res) => {
+			const payload = await res.json();
+			const data = {
+				status: res.status,
+				payload,
+			};
+			if (!res.ok) {
+				throw data;
+			}
+			return data;
+		});
+
+		if (resultFromNextServer && resultFromNextServer.status === 200) {
+			setSessionToken(resultFromNextServer.payload.jwt.token);
+			setRefreshToken(resultFromNextServer.payload.jwt.refreshToken);
+			setUserRole(resultFromNextServer.payload.role);
+			setSchoolYear(resultFromNextServer.payload.selectedSchoolYearId);
+		}
+	};
+
+	useEffect(() => {
+		if (loginResult !== undefined) {
+			if (isMultiRole && selectedRole.length > 0) {
+				saveClientLoginData({...loginResult, role: selectedRole});
+			} else if (!isMultiRole) {
+				saveClientLoginData(loginResult);
+			}
+		}
+	}, [loginResult, selectedRole]);
 
 	useEffect(() => {
 		if (isLoggingIn) {
@@ -334,6 +365,13 @@ export const LoginForm = () => {
 					</span>
 				</h3>
 			</form>
+			<LoginRoleSelector
+				open={isMultiRole}
+				setOpen={setIsMultiRole}
+				roleOptions={roleOptions}
+				selected={selectedRole}
+				setSelected={setSelectedRole}
+			/>
 		</div>
 	);
 };
