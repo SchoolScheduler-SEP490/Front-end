@@ -13,7 +13,7 @@ const useAddTeacher = async (props: IAddTeacherProps) => {
   const api = process.env.NEXT_PUBLIC_API_URL || 'Unknown';
 
   try {
-    const response = await addTeacher(api, schoolId, sessionToken, formData[0]);
+    const response = await addTeacher(api, schoolId, sessionToken, formData);
     useNotify({
       message: 'Thêm giáo viên thành công',
       type: response ? 'success' : 'error',

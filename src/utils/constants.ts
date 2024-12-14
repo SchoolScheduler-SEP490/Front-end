@@ -139,6 +139,14 @@ export const TEACHER_STATUS: { key: string; value: number }[] = [
 	{ key: 'NgungHoatDong', value: 5 },
 ];
 
+export const TEACHER_STATUS_REVERSED: { [key: number]: string } = {
+	1: 'HoatDong',
+	2: 'CongTac',
+	3: 'HauSan',
+	4: 'DinhChi',
+	5: 'NgungHoatDong',
+};
+
 export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 	1: 'Hoạt động',
 	2: 'Công tác',
@@ -147,14 +155,32 @@ export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 	5: 'Ngừng hoạt động',
 };
 
+export const TEACHER_STATUS_TRANSLATOR_REVERSED: { [key: string]: number } = {
+	'hoạt động':1,
+	'công tác':2,
+	'hậu sản':3,
+	'định chỉ':4,
+	'ngừng hoạt động':5,
+};
+
 export const TEACHER_ROLE: { key: string; value: number }[] = [
 	{ key: 'TEACHER', value: 1 },
 	{ key: 'TEACHER_DEPARTMENT_HEAD', value: 2 },
 ];
 
+export const TEACHER_ROLE_REVERSED:  { [key: number]: string } = {
+	1: 'TEACHER',
+	2: 'TEACHER_DEPARTMENT_HEAD',
+}
+
 export const TEACHER_ROLE_TRANSLATOR: { [key: number]: string } = {
 	1: 'Giáo viên',
 	2: 'Trưởng bộ môn',
+};
+
+export const TEACHER_ROLE_TRANSLATOR_REVERSED: { [key: string]: number } = {
+	 'giáo viên':1,
+	'trưởng bộ môn':2,
 };
 
 export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
@@ -185,9 +211,19 @@ export const TEACHER_GENDER: { key: string; value: number }[] = [
 	{ key: 'Female', value: 2 },
 ];
 
+export const TEACHER_GENDER_REVERSED: { [key: number]: string  } = {
+	1: 'Male',
+	2: 'Female',
+}
+
 export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	1: 'Nam',
 	2: 'Nữ',
+};
+
+export const TEACHER_GENDER_TRANSLATOR_REVERSED: { [key: string]: number } = {
+	'nam':1,
+	'nữ':2,
 };
 
 export const ROOM_SUBJECT_MODEL: { key: string; value: number }[] = [
