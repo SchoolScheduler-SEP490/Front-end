@@ -31,8 +31,9 @@ export default function SMTeacher() {
   const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
     schoolId,
-    pageSize: selectedDepartment ? 100 : rowsPerPage,
+    pageSize: rowsPerPage,
     pageIndex: page + 1,
+    departmentId: selectedDepartment
   });
 
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
@@ -64,17 +65,8 @@ export default function SMTeacher() {
 
   React.useEffect(() => {
     if (data?.status === 200) {
-      const filteredTeachers = data.result.items.filter((item: ITeacher) =>
-        selectedDepartment ? item["department-id"] === selectedDepartment : true
-      );
-
-      if (selectedDepartment) {
-        setTotalRows(filteredTeachers.length);
-      } else {
-        setTotalRows(data.result["total-item-count"]);
-      }
-
-      const teacherData = filteredTeachers.map((item: ITeacher) => ({
+      setTotalRows(data.result["total-item-count"]);
+      const teacherData: ITeacherTableData[] = data.result.items.map((item: ITeacher) => ({
         id: item.id,
         teacherName: `${item["first-name"]} ${item["last-name"]}`,
         nameAbbreviation: item.abbreviation,
@@ -84,12 +76,13 @@ export default function SMTeacher() {
         email: item.email,
         phoneNumber: item.phone || "N/A",
         status: item.status,
-        teachableSubjects: item["teachable-subjects"].map(subject =>  subject["subject-name"]). join(" - ")
+        teachableSubjects: item["teachable-subjects"]
+          .map((subject) => subject["subject-name"])
+          .join(" - "),
       }));
-
       setTeacherTableData(teacherData);
     }
-  }, [data, selectedDepartment, departments]);
+  }, [data, departments]);
 
   React.useEffect(() => {
     setPage((prev) => Math.min(prev, getMaxPage() - 1));
@@ -147,11 +140,7 @@ export default function SMTeacher() {
       </SMHeader>
       <div className="w-full h-fit flex flex-col justify-center items-center px-[1vw] pt-[5vh]">
         <div className="w-full h-fit flex flex-row justify-center items-start gap-6">
-          <div
-            className={`${
-              isFilterable ? "w-[79%]" : "w-full"
-            }`}
-          >
+          <div className={`${isFilterable ? "w-[79%]" : "w-full"}`}>
             <TeacherTable
               teacherTableData={teacherTableData}
               page={page}
@@ -172,6 +161,7 @@ export default function SMTeacher() {
               setSelectedDepartment={setSelectedDepartment}
               departments={departments}
               mutate={mutate}
+              setPage={setPage}
             />
           )}
         </div>

@@ -18,6 +18,7 @@ interface TeacherFilterableProps {
   setSelectedDepartment: (departmentId: number | null) => void;
   departments: IDepartment[];
   mutate: () => void;
+  setPage: (page: number) => void;
 }
 
 const ITEM_HEIGHT = 48;
@@ -33,11 +34,13 @@ const MenuProps = {
 };
 
 const TeacherFilterable = (props: TeacherFilterableProps) => {
-  const { open, setOpen, selectedDepartment, setSelectedDepartment, departments } = props;
+  const { open, setOpen, selectedDepartment, setSelectedDepartment, departments, mutate, setPage } = props;
 
   const handleDepartmentSelect = (event: SelectChangeEvent<number | string>) => {
     const value = event.target.value;
     setSelectedDepartment(value === 'all' ? null : Number(value));
+    setPage(0);
+    mutate();
   };
 
   return (

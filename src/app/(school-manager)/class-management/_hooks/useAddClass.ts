@@ -12,11 +12,13 @@ interface IAddClassProps {
 const useAddClass = async (props: IAddClassProps) => {
   const { schoolId, formData, sessionToken, schoolYearId } = props;
   try {
-      const response = await addClass(schoolId, sessionToken, formData[0], schoolYearId);
-      useNotify({
-        message: 'Thêm lớp học thành công',
-        type: 'success',
-      });
+      const response = await addClass(schoolId, sessionToken, formData, schoolYearId);
+      if(response.status == 200 || response.status == 201){
+        useNotify({
+          message: 'Thêm lớp học thành công',
+          type: 'success',
+        });  
+      }
       return response;
     } catch (err: any) {
       useNotify({
