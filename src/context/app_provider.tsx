@@ -18,6 +18,8 @@ const AppContext = createContext({
 	setSchoolName: (schoolName: string) => {},
 	selectedSchoolYearId: 0,
 	setSelectedSchoolYearId: (selectedSchoolYearId: number) => {},
+	accountId: 0,
+	setAccountId: (accountId: number) => {},
 	logout: async (): Promise<any> => {},
 });
 export const useAppContext = () => {
@@ -35,6 +37,7 @@ export default function AppProvider({
 	initSchoolId = '',
 	initSchoolName = '',
 	initSelectedSchoolYearId = 0,
+	initAccountId = 0
 }: {
 	children: React.ReactNode;
 	inititalSessionToken?: string;
@@ -43,12 +46,14 @@ export default function AppProvider({
 	initSchoolId?: string;
 	initSchoolName?: string;
 	initSelectedSchoolYearId?: number;
+	initAccountId?: number;
 }) {
 	const [sessionToken, setSessionToken] = useState(inititalSessionToken);
 	const [refreshToken, setRefreshToken] = useState(inititalRefreshToken);
 	const [userRole, setUserRole] = useState(initUserRole);
 	const [schoolId, setSchoolId] = useState(initSchoolId);
 	const [schoolName, setSchoolName] = useState(initSchoolName);
+	const [accountId, setAccountId] = useState(initAccountId)
 	const [selectedSchoolYearId, setSelectedSchoolYearId] = useState(initSelectedSchoolYearId);
 	const serverApi = process.env.NEXT_PUBLIC_NEXT_SERVER_URL ?? 'http://localhost:3000';
 	const router = useRouter();
@@ -69,6 +74,7 @@ export default function AppProvider({
 					setSchoolId('');
 					setSchoolName('');
 					setSelectedSchoolYearId(0);
+					setAccountId(0);
 				}
 				return res.json();
 			});
@@ -130,6 +136,8 @@ export default function AppProvider({
 				setSchoolName,
 				selectedSchoolYearId,
 				setSelectedSchoolYearId,
+				accountId,
+				setAccountId,
 				logout: handleLogout,
 			}}
 		>
