@@ -1,7 +1,7 @@
 'use client';
 import LoadingComponent from '@/commons/loading';
 import { useAppContext } from '@/context/app_provider';
-import { adminPaths, schoolManagerPaths, teacherPaths } from '@/utils/constants';
+import { adminPaths, schoolManagerPaths, teacherDepartmentHeadPaths, teacherPaths } from '@/utils/constants';
 import { redirect } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -17,8 +17,8 @@ export default function Home(): JSX.Element {
 					redirect(adminPaths[0]);
 				case 'teacher':
 					redirect(teacherPaths[0]);
-				case 'teacher':
-					redirect(teacherPaths[0]);
+				case 'teacherdepartmenthead':
+					redirect(teacherDepartmentHeadPaths[0]);
 				default:
 					redirect('/landing');
 			}
