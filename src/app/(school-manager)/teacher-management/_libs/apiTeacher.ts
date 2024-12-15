@@ -33,7 +33,7 @@ export const addTeacher = async (
   api: string,
   schoolId: string,
   sessionToken: string,
-  teacherData: IAddTeacherData
+  teacherData: IAddTeacherData[]
 ): Promise<any> => {
   if (!sessionToken) {
     console.error("Session token is not found. Please log in.");
@@ -41,7 +41,7 @@ export const addTeacher = async (
   }
 
   const url = `${api}/api/schools/${schoolId}/teachers`;
-  const requestBody = [teacherData];
+  const requestBody = teacherData;
   console.log("Request Body:", requestBody);
 
   const response = await fetch(url, {

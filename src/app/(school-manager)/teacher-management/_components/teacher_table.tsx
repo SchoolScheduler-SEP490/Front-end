@@ -27,6 +27,8 @@ import UpdateTeacherModal from "./update_teacher";
 import { KeyedMutator } from "swr";
 import AddTeacherModal from "./add_teacher";
 import { useRouter } from "next/navigation";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import ImportTeacherSelectModal from "./import_teachers";
 
 //Teacher's data table
 
@@ -189,6 +191,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
     React.useState<keyof ITeacherTableData>("teacherName");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [openAddForm, setOpenAddForm] = React.useState<boolean>(false);
+  const [openImportForm, setOpenImportForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
   const [selectedRow, setSelectedRow] = React.useState<
@@ -258,6 +261,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
   };
 
   const handleOpenAddForm = () => setOpenAddForm(true);
+  const handleOpenImportForm = () => setOpenImportForm(true);
 
   const handleFilterable = () => {
     setIsFilterable(!isFilterable);
@@ -274,10 +278,15 @@ const TeacherTable = (props: ITeacherTableProps) => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2,         
-      "& .MuiDialog-paper": {
-          overflowX: "auto"
-        }}}>
+      <Paper
+        sx={{
+          width: "100%",
+          mb: 2,
+          "& .MuiDialog-paper": {
+            overflowX: "auto",
+          },
+        }}
+      >
         <Toolbar
           sx={[
             {
@@ -293,6 +302,11 @@ const TeacherTable = (props: ITeacherTableProps) => {
           <Tooltip title="Thêm giáo viên">
             <IconButton onClick={handleOpenAddForm}>
               <AddIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Nhập giáo viên">
+            <IconButton onClick={handleOpenImportForm}>
+              <FileUploadOutlinedIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Lọc danh sách">
@@ -418,6 +432,12 @@ const TeacherTable = (props: ITeacherTableProps) => {
         open={openAddForm}
         onClose={setOpenAddForm}
         mutate={mutate}
+      />
+      <ImportTeacherSelectModal
+        open={openImportForm}
+        onClose={setOpenImportForm}
+        mutate={mutate}
+        existedTeachers={visibleRows}
       />
       <UpdateTeacherModal
         open={openUpdateModal}
