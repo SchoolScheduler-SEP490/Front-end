@@ -7,9 +7,10 @@ import {
   SCHEDULE_STATUS,
   SCHEDULE_STATUS_TRANSLATOR,
 } from "@/utils/constants";
+import { firestore } from "@/utils/firebaseConfig";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { FormControl, MenuItem, Select } from "@mui/material";
+import { Chip, Menu, MenuItem } from "@mui/material";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
@@ -25,22 +26,26 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import { visuallyHidden } from "@mui/utils";
+import dayjs from "dayjs";
+import {
+  doc,
+  getDoc,
+  updateDoc
+} from "firebase/firestore";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { KeyedMutator } from "swr";
-import { publishTimetable, updateTimetableStatus } from "../_libs/apiTimetable";
-import { ITimetableTableData } from "../_libs/constants";
-import { firestore } from "@/utils/firebaseConfig";
 import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import dayjs from "dayjs";
+  getTerms,
+  publishTimetable,
+  updateTimetableStatus,
+} from "../_libs/apiTimetable";
+import {
+  ITerm,
+  ITimetableTableData,
+  IUpdateTimetableStatus,
+} from "../_libs/constants";
 import ConfirmStatusModal from "./confirm_status_modal";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -98,6 +103,18 @@ const headCells: readonly HeadCell[] = [
     centered: true,
     disablePadding: false,
     label: "Ngày tạo",
+  },
+  {
+    id: "appliedWeek",
+    centered: true,
+    disablePadding: false,
+    label: "Tuần áp dụng",
+  },
+  {
+    id: "endedWeek",
+    centered: true,
+    disablePadding: false,
+    label: "Tuần kết thúc",
   },
   {
     id: "status",
@@ -161,6 +178,9 @@ function EnhancedTableHead(props: EnhancedTableProps) {
             </TableSortLabel>
           </TableCell>
         ))}
+        <TableCell>
+          <h2 className="font-semibold text-white"></h2>
+        </TableCell>
       </TableRow>
     </TableHead>
   );
@@ -230,11 +250,12 @@ const TimetableTable = (props: TimetableTableProps) => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const router = useRouter();
   const [confirmModal, setConfirmModal] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [selectedRow, setSelectedRow] =
+    React.useState<ITimetableTableData | null>(null);
   const [selectedStatus, setSelectedStatus] = React.useState<number | null>(
     null
   );
-  const [selectedRow, setSelectedRow] =
-    React.useState<ITimetableTableData | null>(null);
 
   const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
   const emptyRows =
@@ -281,98 +302,137 @@ const TimetableTable = (props: TimetableTableProps) => {
     router.push(`/timetable-management/${row.id}`);
   };
 
+  const handleMenuClick = (
+    event: React.MouseEvent<HTMLElement>,
+    row: ITimetableTableData
+  ) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setAnchorEl(event.currentTarget);
+    setSelectedRow(row);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    // setSelectedRow(null);
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmModal(false);
+  };
+
   // Handle initial status selection
   const handleStatusChange = (row: ITimetableTableData, newStatus: number) => {
-    setSelectedStatus(newStatus);
+    console.log("Status Change:", { row, newStatus });
     setSelectedRow(row);
+    setSelectedStatus(newStatus);
+    handleMenuClose();
     setConfirmModal(true);
   };
 
-  // Handle actual status update after confirmation
-  const handleConfirmStatus = async () => {
+  const handleConfirmStatus = async (termId?: number, startWeek?: number, endWeek?: number) => {
     if (!selectedRow || selectedStatus === null) return;
-
+  
     try {
-      const termId = selectedRow.termId;
-
-      if (selectedStatus === 3) {
-        const timetablesRef = collection(firestore, "timetables");
-        const q = query(
-          timetablesRef,
-          where("term-id", "==", termId),
-          where("status", "==", SCHEDULE_STATUS.find((s) => s.value === 3)?.key)
+      // For non-publish status updates
+      if (selectedStatus !== 3) {
+        const statusData: IUpdateTimetableStatus = {
+          "term-id": selectedRow.termId,
+          "start-week": Number(selectedRow.appliedWeek),
+          "end-week": Number(selectedRow.endedWeek),
+          "schedule-status": SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || ""
+        };
+  
+        const result = await updateTimetableStatus(
+          schoolId,
+          selectedSchoolYearId,
+          statusData,
+          sessionToken
         );
-
-        const snapshot = await getDocs(q);
-
-        if (!snapshot.empty) {
-          useNotify({
-            message: "Trong 1 học kì chỉ có 1 thời khóa biểu được áp dụng.",
-            type: "error",
+  
+        if (result) {
+          const timetableRef = doc(firestore, "timetables", selectedRow.id);
+          await updateDoc(timetableRef, {
+            status: statusData["schedule-status"]
           });
-          return;
+  
+          useNotify({
+            message: "Cập nhật trạng thái thành công",
+            type: "success"
+          });
+  
+          handleConfirmClose();
+          mutate();
         }
+        return;
       }
-
-      // Update status via API
-      await updateTimetableStatus(
+  
+      // For publish status (status === 3)
+      const statusData: IUpdateTimetableStatus = {
+        "term-id": termId || selectedRow.termId,
+        "start-week": startWeek || Number(selectedRow.appliedWeek),
+        "end-week": endWeek || Number(selectedRow.endedWeek),
+        "schedule-status": SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || ""
+      };
+  
+      const result = await updateTimetableStatus(
         schoolId,
         selectedSchoolYearId,
-        termId,
-        SCHEDULE_STATUS.find((status) => status.value === selectedStatus)
-          ?.key || "",
+        statusData,
         sessionToken
       );
-
-      if (selectedStatus === 3) {
-        const scheduleRef = doc(
-          firestore,
-          "schedule-responses",
-          selectedRow.generatedScheduleId
-        );
+  
+      if (result) {
+        const scheduleRef = doc(firestore, "schedule-responses", selectedRow.generatedScheduleId);
         const scheduleSnap = await getDoc(scheduleRef);
-
+  
         if (scheduleSnap.exists()) {
           const scheduleData = scheduleSnap.data() as IScheduleResponse;
-          const publishResult = await publishTimetable(
+          const updatedScheduleData = {
+            ...scheduleData,
+            "term-id": termId || scheduleData["term-id"],
+            "start-week": startWeek || scheduleData["start-week"],
+            "end-week": endWeek || scheduleData["end-week"]
+          };
+  
+          await publishTimetable(
             schoolId,
             selectedSchoolYearId,
-            scheduleData,
+            updatedScheduleData,
             sessionToken
           );
-          console.log('Publish response:', publishResult);
-
-          if (publishResult) {
-            useNotify({
-              message: `Công bố thời khóa biểu ${selectedRow.timetableCode} thành công`,
-              type: "success",
-            });
-          }
         }
+  
+        const termsData = await getTerms(sessionToken, selectedSchoolYearId);
+        const termsList = termsData.result.items;
+        const newTermName = termsList.find((t: ITerm) => t.id === termId)?.name;
+  
+        const timetableRef = doc(firestore, "timetables", selectedRow.id);
+        const updateData = {
+          status: statusData["schedule-status"],
+          "term-id": termId || selectedRow.termId,
+          "applied-week": startWeek?.toString() || selectedRow.appliedWeek,
+          "ended-week": endWeek?.toString() || selectedRow.endedWeek,
+          "term-name": newTermName || selectedRow.termName
+        };
+  
+        await updateDoc(timetableRef, updateData);
+  
+        useNotify({
+          message: selectedStatus === 3
+            ? `Công bố thời khóa biểu ${selectedRow.timetableCode} thành công`
+            : "Cập nhật trạng thái thành công",
+          type: "success"
+        });
+  
+        handleConfirmClose();
+        mutate();
       }
-
-      // Update status in Firebase
-      const timetableRef = doc(firestore, "timetables", selectedRow.id);
-      await updateDoc(timetableRef, {
-        status: SCHEDULE_STATUS.find(
-          (status) => status.value === selectedStatus
-        )?.key,
-      });
-
-      useNotify({
-        message: "Cập nhật trạng thái thành công",
-        type: "success",
-      });
-
-      setConfirmModal(false);
-      mutate();
     } catch (error) {
-      useNotify({
-        message: "Cập nhật trạng thái thất bại",
-        type: "error",
-      });
+      console.error("Update failed:", error);
     }
   };
+  
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -417,40 +477,97 @@ const TimetableTable = (props: TimetableTableProps) => {
                     <TableCell align="left">{row.timetableName}</TableCell>
                     <TableCell align="center">{row.termName}</TableCell>
                     <TableCell align="center">
-                      {dayjs(row.generatedDate).format("DD-MM-YYYY")}
+                      {dayjs(row.generatedDate).format("DD-MM-YYYY HH:mm")}
                     </TableCell>
                     <TableCell align="center">
-                      <FormControl
-                        variant="standard"
-                        sx={{ m: 1, minWidth: 100 }}
+                      {row.appliedWeek ? `Tuần ${row.appliedWeek}` : "-"}
+                    </TableCell>
+                    <TableCell align="center">
+                      {row.endedWeek ? `Tuần ${row.endedWeek}` : "-"}
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Chip
+                        label={SCHEDULE_STATUS_TRANSLATOR[row.status]}
+                        variant="outlined"
+                        color={
+                          row.status === 1
+                            ? "default"
+                            : row.status === 2
+                            ? "info"
+                            : row.status === 3
+                            ? "success"
+                            : row.status === 5
+                            ? "warning"
+                            : "error"
+                        }
+                        sx={{ fontWeight: 500, minWidth: 100 }}
+                      />
+                    </TableCell>
+
+                    <TableCell
+                      align="center"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <IconButton
+                        onClick={(e) => handleMenuClick(e, row)}
+                        size="small"
                       >
-                        <Select
-                          value={row.status}
-                          onClick={(e) => e.stopPropagation()}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleStatusChange(row, Number(e.target.value));
-                          }}
-                          sx={{
-                            "&.MuiSelect-select": {
-                              borderRadius: "4px",
-                            },
-                          }}
-                        >
-                          {SCHEDULE_STATUS.map((status) => (
-                            <MenuItem
-                              key={status.key}
-                              value={status.value}
-                              disabled={
-                                (row.status === 3 && (status.value === 1 || status.value === 2)) || 
-                                (row.status === 4 && (status.value === 2 || status.value === 3))
+                        <Image
+                          src="/images/icons/menu.png"
+                          alt="menu"
+                          width={20}
+                          height={20}
+                          unoptimized={true}
+                        />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl) && selectedRow?.id === row.id}
+                        onClose={handleMenuClose}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {SCHEDULE_STATUS.map((status) => (
+                          <MenuItem
+                            key={status.key}
+                            onClick={() => {
+                              handleStatusChange(row, status.value);
+                            }}
+                            disabled={
+                              (row.status === 3 &&
+                                (status.value === 1 || status.value === 2 || status.value === 5)) ||
+                              (row.status === 4 &&
+                                (status.value === 2 || status.value === 3)) ||
+                              (row.status == 1 &&
+                                (status.value === 3 ||
+                                  status.value === 4 ||
+                                  status.value === 5)) ||
+                              (row.status == 2 &&
+                                (status.value === 1 || status.value === 4 )) ||
+                                (row.status == 5 && 
+                                  (status.value === 2 || status.value === 3 || status.value === 4))
+                                
+                            }
+                          >
+                            <Chip
+                              label={SCHEDULE_STATUS_TRANSLATOR[status.value]}
+                              variant="outlined"
+                              color={
+                                status.value === 1
+                                  ? "default"
+                                  : status.value === 2
+                                  ? "info"
+                                  : status.value === 3
+                                  ? "success"
+                                  : status.value === 5
+                                  ? "warning"
+                                  : "error"
                               }
-                            >
-                              {SCHEDULE_STATUS_TRANSLATOR[status.value]}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                              size="small"
+                            />
+                          </MenuItem>
+                        ))}
+                      </Menu>
                     </TableCell>
                   </TableRow>
                 );
@@ -478,12 +595,12 @@ const TimetableTable = (props: TimetableTableProps) => {
         />
         <ConfirmStatusModal
           open={confirmModal}
-          onClose={() => setConfirmModal(false)}
+          onClose={handleConfirmClose}
           onConfirm={handleConfirmStatus}
           status={selectedStatus || 0}
           timetableCode={selectedRow?.timetableCode || ""}
-          timetableName={selectedRow?.timetableName || ''}
-          termName={selectedRow?.termName || ''}
+          timetableName={selectedRow?.timetableName || ""}
+          termId={selectedRow?.termId || 0}
           appliedWeek={selectedRow?.appliedWeek || null}
           endedWeek={selectedRow?.endedWeek || null}
         />

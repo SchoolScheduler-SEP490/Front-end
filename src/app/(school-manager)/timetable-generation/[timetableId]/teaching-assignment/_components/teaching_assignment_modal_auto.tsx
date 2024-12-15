@@ -25,6 +25,7 @@ import {
 	ITeachingAssignmentAvailabilityResponse as ITAAvailabilityResponse,
 	ITeacherAssignmentRequest,
 } from '../_libs/constants';
+import TeachingAssignmentCancelConfirmModal from './teaching_assignment_modal_close_confirm';
 
 const style = {
 	position: 'absolute',
@@ -79,8 +80,9 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 		{} as ITAAvailabilityResponse
 	);
 	const [isAutomationAvaialable, setIsAutomationAvailable] = useState<boolean>(false);
+	const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
 
-	const { data } = useCheckAutoAssignAvailability({
+	const { data, isValidating: isAutoCheckValidating } = useCheckAutoAssignAvailability({
 		schoolId: Number(schoolId),
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
@@ -190,9 +192,13 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 	}, [data, open]);
 
 	const handleClose = () => {
-		setOpen(false);
-		setErrorObject(undefined);
-		setRecoveredObjects({} as ITAAvailabilityResponse);
+		if (!isValidating ) {
+			setOpen(false);
+			setErrorObject(undefined);
+			setRecoveredObjects({} as ITAAvailabilityResponse);
+			setIsAutomationAvailable(false);
+			setIsCancelModalOpen(false);
+		}
 	};
 
 	return (
@@ -201,7 +207,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 			disableAutoFocus
 			disableRestoreFocus
 			open={open}
-			onClose={handleClose}
+			onClose={() => setIsCancelModalOpen(true)}
 			aria-labelledby='keep-mounted-modal-title'
 			aria-describedby='keep-mounted-modal-description'
 		>
@@ -217,11 +223,11 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 					>
 						Phân công tự động
 					</Typography>
-					<IconButton onClick={handleClose}>
+					<IconButton onClick={() => setIsCancelModalOpen(true)}>
 						<CloseIcon />
 					</IconButton>
 				</div>
-				{isValidating ? (
+				{isValidating || isAutoCheckValidating? (
 					<div className='w-full h-fit max-h-[50vh] p-3 flex justify-center items-center overflow-y-scroll no-scrollbar'>
 						<Box sx={{ position: 'relative' }}>
 							<CircularProgress
@@ -338,7 +344,7 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 				>
 					<ContainedButton
 						title='Huỷ'
-						onClick={handleClose}
+						onClick={() => setIsCancelModalOpen(true)}
 						disableRipple
 						disabled={isValidating}
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
@@ -352,6 +358,11 @@ const TeachingAssignmentAutoApplyModal = (props: IApplyModalProps) => {
 						onClick={handleAutoAssignment}
 					/>
 				</div>
+				<TeachingAssignmentCancelConfirmModal
+					open={isCancelModalOpen}
+					setOpen={setIsCancelModalOpen}
+					handleApprove={handleClose}
+				/>
 			</Box>
 		</Modal>
 	);

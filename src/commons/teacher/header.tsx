@@ -1,5 +1,5 @@
 "use client";
-import { IJWTTokenPayload } from "@/app/(auth)/_utils/constants";
+
 import { IDropdownOption } from "@/app/(school-manager)/_utils/contants";
 import { useNotification } from "@/app/(school-manager)/notification/_hooks/useNotification";
 import "@/commons/styles/sm_header.css";
@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -81,7 +81,16 @@ const TeacherHeader = ({ children }: { children: ReactNode }) => {
   const { data, mutate } = useFetchSchoolYear({ includePrivate: true });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const userData: IJWTTokenPayload = jwtDecode(sessionToken);
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    fetchUnreadCount,
+    markAllAsRead,
+  } = useNotification();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState(0);
   const { isMenuOpen }: ITeacherState = useTeacherSelector(
     (state) => state.teacher
   );
@@ -147,39 +156,47 @@ const TeacherHeader = ({ children }: { children: ReactNode }) => {
   }, [data, selectedSchoolYearId]);
 
   useEffect(() => {
-    const storedTeacherInfo = localStorage.getItem('teacherInfo');
-    if (storedTeacherInfo) {
-      dispatch(setTeacherInfo(JSON.parse(storedTeacherInfo)));
-    } else {
-      // Get email from JWT token
-      const token = sessionToken;
-      if (token) {
-        const decodedToken: any = jwtDecode(token);
-        const teacherEmail = decodedToken.email;
-        
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${schoolId}/teachers/${teacherEmail}/info`, {
+    if (!teacherInfo && sessionToken) {
+      const decodedToken: any = jwtDecode(sessionToken);
+      const teacherEmail = decodedToken.email;
+      
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/schools/${schoolId}/teachers/${teacherEmail}/info`,
+        {
           headers: {
             Authorization: `Bearer ${sessionToken}`,
           },
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 200) {
-            localStorage.setItem('teacherInfo', JSON.stringify(data.result));
-            dispatch(setTeacherInfo(data.result));
-          }
-        });
-      }
+        }
+      )
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === 200) {
+          dispatch(setTeacherInfo(data.result));
+        }
+      });
     }
-  }, [sessionToken, schoolId]);
+  }, [sessionToken, schoolId, teacherInfo]);
+  
 
   useEffect(() => {
-    const storedTeacherInfo = localStorage.getItem('teacherInfo');
-    if (storedTeacherInfo && !teacherInfo) {
-      dispatch(setTeacherInfo(JSON.parse(storedTeacherInfo)));
-    }
-  }, []);
+    fetchUnreadCount();
+  }, [notifications]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full min-h-[50px] bg-primary-500 flex flex-row justify-between items-center pl-[1.5vw] pr-2">
@@ -206,6 +223,106 @@ const TeacherHeader = ({ children }: { children: ReactNode }) => {
         {children}
       </div>
       <div className="flex flex-row justify-end items-center gap-3">
+        <div className="relative">
+          <IconButton
+            color="primary"
+            onClick={() => setShowNotifications(!showNotifications)}
+          >
+            <div className="relative">
+              <Image
+                src="/images/icons/notification-bell.png"
+                alt="notification-icon"
+                unoptimized={true}
+                width={20}
+                height={20}
+              />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                {unreadCount}
+              </span>
+            </div>
+          </IconButton>
+
+          {showNotifications && (
+            <div
+              ref={notificationRef}
+              className="absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar "
+            >
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h5 className="text-lg font-semibold">Thông báo</h5>
+                </div>
+                <div className="flex justify-between items-center">
+                  <StyledTabs
+                    value={activeTab}
+                    onChange={(_, newValue) => setActiveTab(newValue)}
+                  >
+                    <Tab label="Tất cả" disableRipple />
+                    <Tab label="Chưa đọc" disableRipple />
+                  </StyledTabs>
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-primary-300 hover:text-primary-500 hover:font-semibold flex items-center gap-1 whitespace-nowrap"
+                  >
+                    <Image
+                      src="/images/icons/double-tick.png"
+                      alt="double-tick"
+                      width={16}
+                      height={16}
+                      unoptimized={true}
+                    />
+                    Đánh dấu tất cả
+                  </button>
+                </div>
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
+                        !notification["is-read"] ? "bg-blue-50" : ""
+                      }`}
+                      onClick={() => {
+                        markAsRead(notification["notification-url"]);
+                        if (notification.link) {
+                          window.location.href = notification.link;
+                        }
+                      }}
+                    >
+                      <div className="font-medium">{notification.title}</div>
+                      <div className="text-sm text-gray-600">
+                        {notification.message}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
+                        <span>
+                          {new Date(
+                            notification["create-date"]
+                          ).toLocaleDateString("vi-VN", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                        </span>
+                        <span>
+                          {new Date(
+                            notification["create-date"]
+                          ).toLocaleTimeString("vi-VN", {
+                            hour12: false,
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">
+                    Không có thông báo !
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
         <div className="w-fit h-full flex flex-col justify-between items-end text-white pr-3">
           <div className="text-body-medium font-medium leading-4 pr-1">
             {teacherInfo

@@ -10,12 +10,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import "../styles/teacher_sidenav.css";
 import { useAppContext } from "@/context/app_provider";
-import { ITeacherState } from "@/context/slice_teacher";
-import { useTeacherSelector } from "@/hooks/useReduxStore";
+import { ITeacherInfo, ITeacherState, setTeacherInfo } from "@/context/slice_teacher";
+import { useTeacherDispatch, useTeacherSelector } from "@/hooks/useReduxStore";
 
 const TeacherSidenav = () => {
   const currentPath = usePathname();
   const router = useRouter();
+  const dispatch = useTeacherDispatch();
   const { isMenuOpen }: ITeacherState = useTeacherSelector(
     (state) => state.teacher
   );
@@ -23,7 +24,7 @@ const TeacherSidenav = () => {
   const { logout } = useAppContext();
 
   const handleLogout = async () => {
-    localStorage.removeItem('teacherInfo');
+    dispatch(setTeacherInfo({} as ITeacherInfo));
     await logout();
   };
 

@@ -6,12 +6,17 @@ import { CLASSGROUP_TRANSLATOR } from '@/utils/constants';
 import {
 	Paper,
 	Skeleton,
+	styled,
 	Table,
 	TableBody,
 	TableCell,
 	TableContainer,
 	TableHead,
 	TableRow,
+	Tooltip,
+	tooltipClasses,
+	TooltipProps,
+	Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import useFetchClassGroupInformation from '../_hooks/useFetchClassGroup';
@@ -22,6 +27,18 @@ import {
 	ICurriculumDetailResponse,
 	ICurriculumResponse,
 } from '../_libs/constant';
+import rootShouldForwardProp from '@mui/material/styles/rootShouldForwardProp';
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+	<Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+	[`& .${tooltipClasses.tooltip}`]: {
+		backgroundColor: theme.palette.common.white,
+		color: 'rgba(0, 0, 0, 0.87)',
+		boxShadow: theme.shadows[1],
+		fontSize: 11,
+	},
+}));
 
 const getShortenedSubjects = (subject: string[]): string => {
 	var resStr: string[] = [];
@@ -40,8 +57,8 @@ interface ICurriculumInformationTableData {
 	curriculumName: string;
 	curriculumCode: string;
 	curriculumId: number;
-	specializedSubjects: string[];
-	selectiveSubjects: string[];
+	subjects: string[];
+	classes: string[];
 	grade: string;
 	appliedClassGroups: string[];
 }
@@ -53,7 +70,7 @@ const CurriculumInformationTable = () => {
 		ICurriculumInformationTableData[]
 	>([]);
 
-	const { data: curriculumData, mutate: updateCurriculum } = useFetchCurriculumInformation({
+	const { data: curriculumData } = useFetchCurriculumInformation({
 		pageIndex: 1,
 		pageSize: 1000,
 		schoolId: schoolId,
@@ -71,13 +88,6 @@ const CurriculumInformationTable = () => {
 		schoolYearId: selectedSchoolYearId,
 		sessionToken,
 	});
-	// const { data: curriculumDetailedData, mutate: updateCurriculumDetail } =
-	// 	useFetchCurriculumDetails({
-	// 		schoolId: Number(schoolId),
-	// 		schoolYearId: selectedSchoolYearId,
-	// 		sessionToken,
-	// 		curriculumId: selectedCurriculumId,
-	// 	});
 
 	useEffect(() => {
 		setDetailedCurriculums([]);
@@ -113,21 +123,21 @@ const CurriculumInformationTable = () => {
 			let tmpCurriculumInformationArr: ICurriculumInformationTableData[] = [];
 			detailedCurriculums.forEach((cur: ICurriculumDetailResponse) => {
 				let classGroups: string[] = [];
+				let appliedClasses:string[] = []
 				classGroupData.result.items.map((classGroup: IClassGroupResponse) => {
 					if (classGroup['curriculum-id'] === cur.id && classGroup.classes.length > 0) {
 						classGroups.push(classGroup['group-name']);
+						appliedClasses.push(...classGroup.classes.map((cls) => cls.name))
 					}
 				});
 				let tmpCurriculumInformation: ICurriculumInformationTableData = {
 					curriculumName: cur['curriculum-name'],
 					curriculumCode: cur['curriculum-code'],
 					curriculumId: cur.id,
-					specializedSubjects: useFilterArray(cur['subject-specializedt-views'], [
+					subjects: useFilterArray([...cur['subject-specializedt-views'],...cur['subject-selective-views']], [
 						'subject-id',
 					]).map((sub) => sub['subject-name']),
-					selectiveSubjects: useFilterArray(cur['subject-selective-views'], ['subject-id']).map(
-						(sub) => sub['subject-name']
-					),
+					classes: appliedClasses,
 					grade: cur.grade,
 					appliedClassGroups: classGroups,
 				};
@@ -138,7 +148,7 @@ const CurriculumInformationTable = () => {
 					useFilterArray(
 						tmpCurriculumInformationArr.filter((item) => item.appliedClassGroups.length !== 0),
 						['curriculumId']
-					)
+					).sort((a, b) => a.grade.localeCompare(b.grade))
 				);
 			}
 		}
@@ -153,8 +163,12 @@ const CurriculumInformationTable = () => {
 							<TableRow>
 								<TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
 								<TableCell sx={{ fontWeight: 'bold' }}>KCT</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>Môn chuyên đề</TableCell>
-								<TableCell sx={{ fontWeight: 'bold' }}>Môn tự chọn</TableCell>
+								<TableCell sx={{ fontWeight: 'bold' }}>
+									<LightTooltip title={'Môn tự chọn và môn chuyên đề'}>
+										<Typography sx={{ fontSize: 13, fontWeight: 'bold' }}>Môn TC&CĐ</Typography>
+									</LightTooltip>
+								</TableCell>
+								<TableCell sx={{ fontWeight: 'bold' }}>Lớp áp dụng</TableCell>
 								<TableCell sx={{ fontWeight: 'bold' }}>Khối</TableCell>
 								<TableCell sx={{ fontWeight: 'bold' }}>Nhóm lớp</TableCell>
 								<TableCell></TableCell>
@@ -196,10 +210,12 @@ const CurriculumInformationTable = () => {
 										{index + 1}
 									</TableCell>
 									<TableCell>{row.curriculumName}</TableCell>
-									<TableCell>{getShortenedSubjects(row.specializedSubjects)}</TableCell>
-									<TableCell>{getShortenedSubjects(row.selectiveSubjects)}</TableCell>
+									<TableCell>
+										{getShortenedSubjects([...row.subjects])}
+									</TableCell>
+									<TableCell width={200}>{row.classes.join('-')}</TableCell>
 									<TableCell width={80}>Khối {CLASSGROUP_TRANSLATOR[row.grade]}</TableCell>
-									<TableCell>{row.appliedClassGroups.join(' - ')}</TableCell>
+									<TableCell>{row.appliedClassGroups.join(' | ')}</TableCell>
 									<TableCell width={80}>
 										<a
 											href={`/curiculumn-management/${row.curriculumId}`}

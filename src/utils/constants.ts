@@ -22,6 +22,7 @@ export const publicPaths = ['/landing', '/community', '/contact', '/schools', '/
 export const authPaths = ['/login', '/register', '/forgot-password'];
 export const adminPaths = ['/dashboard'];
 export const teacherPaths = ['/teacher-dashboard'];
+export const teacherDepartmentHeadPaths = ['/teacher-head-dashboard'];
 export const schoolManagerPaths = [
 	'/publish-timetable',
 	'/teacher-management',
@@ -322,11 +323,27 @@ export interface IConfigurationStoreObject {
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];
+	'teacher-assignments-summary': ITeacherAssignmentSummary[];
 	'applied-curriculum-id': number;
 	'required-break-periods': number;
 	'minimum-days-off': number;
 	'days-in-week': number;
 	'max-execution-time-in-seconds': number;
+}
+
+// Interface thêm để lưu trữ tổng số tiết dạy của giáo viên
+export interface ITeacherAssignmentSummary {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abbreviation': string;
+	'total-periods-per-week': ITeacherPeriodsPerWeek[];
+}
+
+export interface ITeacherPeriodsPerWeek {
+	'subject-name': string;
+	'subject-abbreviation': string;
+	'subject-id': number;
+	'period-count': number;
 }
 
 // Interface của record thời khóa biểu
@@ -406,7 +423,6 @@ export interface IClassPeriod {
 	'date-of-week': number;
 	'subject-abbreviation': string;
 	'teacher-abbreviation': string;
-	'teacher-assignment-id': number;
 	'start-at': number;
 	priority: string;
 	id: number;
@@ -423,6 +439,7 @@ export const SCHEDULE_STATUS: { key: string; value: number }[] = [
 	{ key: 'Draft', value: 1 },
 	{ key: 'PublishedInternal', value: 2 },
 	{ key: 'Published', value: 3 },
+	{ key: 'Disabled', value: 5 },
 	{ key: 'Expired', value: 4 },
 ];
 
@@ -430,5 +447,6 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	1: 'Bản nháp',
 	2: 'Nội bộ',
 	3: 'Công bố',
+	5: 'Thu hồi',
 	4: 'Hết hạn',
 };

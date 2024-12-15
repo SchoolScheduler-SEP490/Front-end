@@ -30,7 +30,6 @@ const TimetableCancelConfirmModal = (props: ITimetableCancelConfirmModalProps) =
 			disableEnforceFocus
 			disableAutoFocus
 			disableRestoreFocus
-			keepMounted
 			open={open}
 			onClose={handleClose}
 			aria-labelledby='keep-mounted-modal-title'

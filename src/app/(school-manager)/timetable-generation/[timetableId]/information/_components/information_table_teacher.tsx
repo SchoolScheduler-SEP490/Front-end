@@ -44,6 +44,7 @@ const TeacherInformationTable = () => {
 		pageIndex: 1,
 		pageSize: 100,
 		sessionToken,
+		includeDeleted: false,
 	});
 
 	useEffect(() => {

@@ -5,6 +5,7 @@ import { ITimetableGenerationState } from '@/context/slice_timetable_generation'
 import useFetchTerm from '@/hooks/useFetchTerm';
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
+import { ITeacherAssignmentSummary } from '@/utils/constants';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import TeachingAssignmentFilterableSkeleton from './_components/skeleton_filterable';
@@ -13,6 +14,7 @@ import TeachingAssignmentTableSkeleton from './_components/skeleton_table';
 import TeachingAssignmentFilterable from './_components/teaching_assignment_filterable';
 import TeachingAssignmentAdjustModal from './_components/teaching_assignment_modal_adjust';
 import TeachingAssignmentAutoApplyModal from './_components/teaching_assignment_modal_auto';
+import TeachingAssignmentSummaryModal from './_components/teaching_assignment_modal_summary';
 import TeachingAssignmentSideNav from './_components/teaching_assignment_sidenav';
 import TeachingAssignmentTable from './_components/teaching_assignment_table';
 import useFetchClassData from './_hooks/useFetchClass';
@@ -42,8 +44,8 @@ export default function SMTeachingAssignment() {
 
 	// Selected
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
-	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
+	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 	const [maxPeriodPerWeek, setMaxPeriodPerWeek] = useState<number>(17);
 	const [minPeriodPerWeek, setMinPeriodPerWeek] = useState<number>(10);
@@ -54,11 +56,13 @@ export default function SMTeachingAssignment() {
 	const [termStudyOptions, setTermStudyOptions] = useState<IDropdownOption<number>[]>([]);
 	const [automationResult, setAutomationResult] = useState<IAutoTeacherAssignmentResponse[]>([]);
 	const [editingObjects, setEditingObjects] = useState<ITeacherAssignmentRequest[]>([]);
+	const [assignmentSummary, setAssignmentSummary] = useState<ITeacherAssignmentSummary[]>([]);
 
 	//Modal status
 	const [isFilterable, setIsFilterable] = useState<boolean>(true);
 	const [isModifyingResultModalOpen, setModifyingResultModalOpen] = useState<boolean>(false);
 	const [isAutoApplyModalOpen, setIsAutoApplyModalOpen] = useState<boolean>(false);
+	const [isSummaryModalOpen, setIsSummaryModalOpen] = useState<boolean>(false);
 
 	// Fetch data
 	const {
@@ -99,6 +103,13 @@ export default function SMTeachingAssignment() {
 		schoolYearId: selectedSchoolYearId,
 	});
 
+	// Lấy data summary từ dataStored
+	useEffect(() => {
+		if (dataStored) {
+			setAssignmentSummary(dataStored['teacher-assignments-summary']);
+		}
+	}, [dataStored]);
+
 	// Process data
 	useEffect(() => {
 		if (termData?.status === 200) {
@@ -110,9 +121,7 @@ export default function SMTeachingAssignment() {
 				})
 			);
 			setTermStudyOptions(
-				studyOptions.sort((a, b) =>
-					(a.criteria as string).localeCompare(b.criteria as string)
-				)
+				studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
 			);
 		}
 	}, [termData]);
@@ -124,17 +133,13 @@ export default function SMTeachingAssignment() {
 				(term: ITermResponse) => term['school-year-id'] === selectedSchoolYearId
 			);
 			if (termInYear.length > 0) {
-				const studyOptions: ISortableDropdown<number>[] = termInYear.map(
-					(item: ITermResponse) => ({
-						value: item.id,
-						label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-						criteria: item.name,
-					})
-				);
+				const studyOptions: ISortableDropdown<number>[] = termInYear.map((item: ITermResponse) => ({
+					value: item.id,
+					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
+					criteria: item.name,
+				}));
 				setTermStudyOptions(
-					studyOptions.sort((a, b) =>
-						(a.criteria as string).localeCompare(b.criteria as string)
-					)
+					studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
 				);
 				if (!studyOptions.some((item) => item.value === selectedTermId))
 					setSelectedTermId(studyOptions[0].value);
@@ -178,13 +183,12 @@ export default function SMTeachingAssignment() {
 					);
 				if (existingAssignment !== undefined) {
 					const existingTeacher: ITeacherResponse = teacherData.result.items.find(
-						(teacher: ITeacherResponse) =>
-							teacher.id === existingAssignment['teacher-id']
+						(teacher: ITeacherResponse) => teacher.id === existingAssignment['teacher-id']
 					);
 					return {
 						id: item.id,
 						subjectName: item['subject-name'],
-						teacherName: existingAssignment
+						teacherOption: existingAssignment
 							? {
 									label: `${existingTeacher['first-name']} ${existingTeacher['last-name']} (${existingTeacher.abbreviation})`,
 									value: existingAssignment['teacher-id'],
@@ -200,7 +204,7 @@ export default function SMTeachingAssignment() {
 				return {
 					id: item.id,
 					subjectName: item['subject-name'],
-					teacherName: { label: '- - -', value: 0 },
+					teacherOption: { label: '- - -', value: 0 },
 					totalSlotPerWeek: item['period-count'],
 					subjectKey: item['subject-id'],
 				} as ITeachingAssignmentTableData;
@@ -215,15 +219,14 @@ export default function SMTeachingAssignment() {
 					);
 				if (existingAssignment !== undefined) {
 					const existingTeacher: ITeacherResponse = teacherData.result.items.find(
-						(teacher: ITeacherResponse) =>
-							teacher.id === existingAssignment['teacher-id']
+						(teacher: ITeacherResponse) => teacher.id === existingAssignment['teacher-id']
 					);
 					return {
 						id: item.id,
 						subjectName: item['subject-name'],
-						teacherName: existingAssignment
+						teacherOption: existingAssignment
 							? {
-									label: `${existingTeacher['last-name']} ${existingTeacher['first-name']} (${existingTeacher.abbreviation})`,
+									label: `${existingTeacher['first-name']} ${existingTeacher['last-name']} (${existingTeacher.abbreviation})`,
 									value: existingAssignment['teacher-id'],
 							  }
 							: {
@@ -237,7 +240,7 @@ export default function SMTeachingAssignment() {
 				return {
 					id: item.id,
 					subjectName: item['subject-name'],
-					teacherName: { label: '- - -', value: 0 },
+					teacherOption: { label: '- - -', value: 0 },
 					totalSlotPerWeek: item['period-count'],
 					subjectKey: item['subject-id'],
 				} as ITeachingAssignmentTableData;
@@ -280,6 +283,7 @@ export default function SMTeachingAssignment() {
 								minPeriodPerWeek={minPeriodPerWeek}
 								setMaxPeriodPerWeek={setMaxPeriodPerWeek}
 								setMinPeriodPerWeek={setMinPeriodPerWeek}
+								setIsSummaryModalOpen={setIsSummaryModalOpen}
 							/>
 						) : (
 							<TeachingAssignmentFilterableSkeleton />
@@ -302,7 +306,7 @@ export default function SMTeachingAssignment() {
 				/>
 				<div className='w-[85%] h-full flex justify-center items-start gap-5'>
 					<TeachingAssignmentTable
-						subjectData={tableData}
+						assignmentData={tableData}
 						mutate={updateTeachingAssignment}
 						isFilterable={isFilterable}
 						setIsFilterable={setIsFilterable}
@@ -310,6 +314,7 @@ export default function SMTeachingAssignment() {
 						editingObjects={editingObjects}
 						setEditingObjects={setEditingObjects}
 						selectedGrade={selectedGrade}
+						assignmentSummary={assignmentSummary}
 					/>
 					<TeachingAssignmentFilterable
 						open={isFilterable}
@@ -322,6 +327,7 @@ export default function SMTeachingAssignment() {
 						minPeriodPerWeek={minPeriodPerWeek}
 						setMaxPeriodPerWeek={setMaxPeriodPerWeek}
 						setMinPeriodPerWeek={setMinPeriodPerWeek}
+						setIsSummaryModalOpen={setIsSummaryModalOpen}
 					/>
 					<TeachingAssignmentAutoApplyModal
 						open={isAutoApplyModalOpen}
@@ -341,6 +347,10 @@ export default function SMTeachingAssignment() {
 						updateTeachingAssignment={updateTeachingAssignment}
 						selectedGrade={selectedGrade}
 						setSelectedGrade={setSelectedGrade}
+					/>
+					<TeachingAssignmentSummaryModal
+						isModalOpen={isSummaryModalOpen}
+						setIsModalOpen={setIsSummaryModalOpen}
 					/>
 				</div>
 			</div>

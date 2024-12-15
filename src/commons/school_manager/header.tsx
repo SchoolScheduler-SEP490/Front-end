@@ -9,7 +9,6 @@ import { ISchoolYearResponse } from "@/utils/constants";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   IconButton,
   Menu,
@@ -22,8 +21,9 @@ import {
   TooltipProps,
 } from "@mui/material";
 import Image from "next/image";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useRouter } from "next/navigation";
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -87,11 +87,11 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
     (state: any) => state.schoolManager.isMenuOpen
   );
   const dispatch = useDispatch();
+  const notificationRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  const handleProfileClick = () => {
-    router.push("/profile");
-  };
+	const handleProfileClick = () =>{
+		router.push("/profile");
+	}
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -153,22 +153,21 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
     fetchUnreadCount();
   }, [notifications]);
 
-  const filteredNotifications =
-    activeTab === 0
-      ? notifications.filter(
-          (notification) =>
-            new Date(notification["create-date"]).toDateString() ===
-            new Date().toDateString()
-        )
-      : notifications.filter(
-          (notification) =>
-            new Date(notification["create-date"]).toDateString() !==
-            new Date().toDateString()
-        );
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
+    };
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
-  };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2">
@@ -189,107 +188,108 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
         {children}
       </div>
       <div className="flex flex-row justify-end items-center gap-3">
-        <div className="flex flex-row justify-end items-center ">
-          <IconButton sx={{ color: "white" }} onClick={handleProfileClick}>
-            <AccountCircleIcon width={20} height={20} />
+          <IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
+						<AccountCircleIcon
+							width={20}
+							height={20}
+						/>
+					</IconButton>
+        <div className="relative">
+          <IconButton
+            color="primary"
+            onClick={() => setShowNotifications(!showNotifications)}
+          >
+            <div className="relative">
+              <Image
+                src="/images/icons/notification-bell.png"
+                alt="notification-icon"
+                unoptimized={true}
+                width={20}
+                height={20}
+              />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                {unreadCount}
+              </span>
+            </div>
           </IconButton>
-          <div className="relative">
-            <IconButton
-              color="primary"
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
-              <div className="relative">
-                <Image
-                  src="/images/icons/notification-bell.png"
-                  alt="notification-icon"
-                  unoptimized={true}
-                  width={20}
-                  height={20}
-                />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">
-                  {unreadCount}
-                </span>
-              </div>
-            </IconButton>
 
-            {showNotifications && (
-              <div className="absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar ">
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <h5 className="text-lg font-semibold">Thông báo</h5>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <StyledTabs
-                      value={activeTab}
-                      onChange={(_, newValue) => setActiveTab(newValue)}
-                    >
-                      <Tab label="Tất cả" disableRipple />
-                      <Tab label="Chưa đọc" disableRipple />
-                    </StyledTabs>
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-primary-300 hover:text-primary-500 hover:font-semibold flex items-center gap-1 whitespace-nowrap"
-                    >
-                      <Image
-                        src="/images/icons/double-tick.png"
-                        alt="double-tick"
-                        width={16}
-                        height={16}
-                        unoptimized={true}
-                      />
-                      Đánh dấu tất cả
-                    </button>
-                  </div>
-                  {notifications.length > 0 ? (
-                    notifications.map((notification, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
-                          !notification["is-read"] ? "bg-blue-50" : ""
-                        }`}
-                        onClick={() => {
-                          markAsRead(notification["notification-url"]);
-                          if (notification.link) {
-                            window.location.href = notification.link;
-                          }
-                        }}
-                      >
-                        <div className="font-medium">{notification.title}</div>
-                        <div className="text-sm text-gray-600">
-                          {notification.message}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
-                          <span>
-                            {new Date(
-                              notification["create-date"]
-                            ).toLocaleDateString("vi-VN", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                            })}
-                          </span>
-                          <span>
-                            {new Date(
-                              notification["create-date"]
-                            ).toLocaleTimeString("vi-VN", {
-                              hour12: false,
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              second: "2-digit",
-                            })}
-                          </span>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center text-gray-500 py-4">
-                      Không có thông báo !
-                    </div>
-                  )}
+          {showNotifications && (
+            <div ref={notificationRef} className="absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar ">
+              <div className="p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h5 className="text-lg font-semibold">Thông báo</h5>
                 </div>
+                <div className="flex justify-between items-center">
+                  <StyledTabs
+                    value={activeTab}
+                    onChange={(_, newValue) => setActiveTab(newValue)}
+                  >
+                    <Tab label="Tất cả" disableRipple />
+                    <Tab label="Chưa đọc" disableRipple />
+                  </StyledTabs>
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-primary-300 hover:text-primary-500 hover:font-semibold flex items-center gap-1 whitespace-nowrap"
+                  >
+                    <Image
+                      src="/images/icons/double-tick.png"
+                      alt="double-tick"
+                      width={16}
+                      height={16}
+                      unoptimized={true}
+                    />
+                    Đánh dấu tất cả
+                  </button>
+                </div>
+                {notifications.length > 0 ? (
+                  notifications.map((notification, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
+                        !notification["is-read"] ? "bg-blue-50" : ""
+                      }`}
+                      onClick={() => {
+                        markAsRead(notification["notification-url"]);
+                        if (notification.link) {
+                          window.location.href = notification.link;
+                        }
+                      }}
+                    >
+                      <div className="font-medium">{notification.title}</div>
+                      <div className="text-sm text-gray-600">
+                        {notification.message}
+                      </div>
+                      <div className="text-xs text-gray-400 mt-2 flex justify-between items-center">
+                        <span>
+                          {new Date(
+                            notification["create-date"]
+                          ).toLocaleDateString("vi-VN", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                        </span>
+                        <span>
+                          {new Date(
+                            notification["create-date"]
+                          ).toLocaleTimeString("vi-VN", {
+                            hour12: false,
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500 py-4">
+                    Không có thông báo !
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
         <div className="w-fit h-full flex flex-col justify-between items-end text-white pr-3">
           <h3 className="text-body-medium font-medium leading-4 pr-1">

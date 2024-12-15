@@ -29,6 +29,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { loginSchema } from '../libs/login_schema';
 import LoginRoleSelector from './login_modal_role';
+import { setTeacherHeadInfo } from '@/context/slice_teacher_head';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -142,9 +143,22 @@ export const LoginForm = () => {
 						);
 						const teacherData = await teacherResponse.json();
 						if (teacherData.status === 200) {
-							localStorage.setItem('teacherInfo', JSON.stringify(teacherData.result));
 							dispatch(setTeacherInfo(teacherData.result));
-						}
+						  }
+					}
+					{
+						const teacherHeadResponse = await fetch(
+							`${api}/api/schools/${decodedToken.schoolId}/teachers/${decodedToken.email}/info`,
+							{
+								headers: {
+									Authorization: `Bearer ${loginResponse['jwt-token']}`,
+								},
+							}
+						);
+						const teacherHeadData = await teacherHeadResponse.json();
+						if (teacherHeadData.status === 200) {
+							dispatch(setTeacherHeadInfo(teacherHeadData.result));
+						  }
 					}
 					data = {
 						email: decodedToken?.email ?? '',
