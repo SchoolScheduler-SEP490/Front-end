@@ -22,6 +22,7 @@ export const publicPaths = ['/landing', '/community', '/contact', '/schools', '/
 export const authPaths = ['/login', '/register', '/forgot-password'];
 export const adminPaths = ['/dashboard'];
 export const teacherPaths = ['/teacher-dashboard'];
+export const teacherDepartmentHeadPaths = ['/teacher-head-dashboard'];
 export const schoolManagerPaths = [
 	'/publish-timetable',
 	'/teacher-management',
@@ -438,6 +439,7 @@ export const SCHEDULE_STATUS: { key: string; value: number }[] = [
 	{ key: 'Draft', value: 1 },
 	{ key: 'PublishedInternal', value: 2 },
 	{ key: 'Published', value: 3 },
+	{ key: 'Disabled', value: 5 },
 	{ key: 'Expired', value: 4 },
 ];
 
@@ -445,5 +447,6 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	1: 'Bản nháp',
 	2: 'Nội bộ',
 	3: 'Công bố',
+	5: 'Thu hồi',
 	4: 'Hết hạn',
 };
