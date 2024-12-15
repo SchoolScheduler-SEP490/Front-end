@@ -23,9 +23,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSendApplication } from "./_hooks/useSendApplication";
 import {
   ISendApplication,
-  REQUEST_TYPE,
-  REQUEST_TYPE_TRANSLATOR,
 } from "./_libs/constants";
+import { REQUEST_TYPE, REQUEST_TYPE_TRANSLATOR } from "../_utils/constants";
 
 export default function ApplicationFormPage() {
   const { sessionToken, selectedSchoolYearId } = useAppContext();
@@ -254,12 +253,12 @@ export default function ApplicationFormPage() {
                 onChange={handleFileChange}
                 sx={{ display: "none" }}
                 inputProps={{
-                  accept: ".pdf,.doc,.docx",
+                  accept: ".docx",
                 }}
               />
             </Box>
             <FormHelperText>
-              Định dạng hỗ trợ: pdf, doc, docx (Tối đa 1MB)
+              Định dạng hỗ trợ: docx (Tối đa 1MB)
             </FormHelperText>
           </FormControl>
 
