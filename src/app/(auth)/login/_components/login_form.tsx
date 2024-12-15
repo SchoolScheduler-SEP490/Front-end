@@ -58,6 +58,7 @@ export const LoginForm = () => {
 		setUserRole,
 		setSchoolId,
 		setSchoolName,
+		setAccountId,
 		setSelectedSchoolYearId: setSchoolYear,
 	} = useAppContext();
 	const router = useRouter();
@@ -159,6 +160,7 @@ export const LoginForm = () => {
 					};
 					setSchoolId(decodedToken?.schoolId ?? '');
 					setSchoolName(decodedToken?.schoolName ?? '');
+					setAccountId(decodedToken?.accountId ? parseInt(decodedToken?.accountId) : 0)
 				} else {
 					setIsLoggingIn(false);
 					useNotify({
