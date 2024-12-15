@@ -84,7 +84,6 @@ export default function PublishTimetableTable({
   const { selectedSchoolYearId } = useAppContext();
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
   const [selectedTeacher, setSelectedTeacher] = useState("all");
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {

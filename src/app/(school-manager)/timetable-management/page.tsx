@@ -96,7 +96,7 @@ export default function TimetableManagement() {
         </div>
       </SMHeader>
       <div className="w-full h-fit flex flex-col justify-center items-center px-[8vw] pt-[5vh]">
-        <TimetableTable data={filteredTimetableData} mutate={mutate} />
+        <TimetableTable data={timetableData} mutate={mutate} />
       </div>
       <div className="absolute w-fit h-fit overflow-visible bottom-[3vw] right-[3vw]">
         <LightTooltip title="Tạo Thời khóa biểu" placement="top" arrow>
