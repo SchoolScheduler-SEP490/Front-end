@@ -1,7 +1,11 @@
 'use client';
 
 import SMHeader from '@/commons/school_manager/header';
-import { IConfigurationStoreObject, IScheduleResponse, ITimetableStoreObject } from '@/utils/constants';
+import {
+	IConfigurationStoreObject,
+	IScheduleResponse,
+	ITimetableStoreObject,
+} from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -13,7 +17,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DetailsConfiguration from './_components/details_configurations';
 import DetailsSolution from './_components/details_solution';
-import { ITimetableGenerationState, setDataStored, setGeneratedScheduleStored, setTimetableId, setTimetableStored } from '@/context/slice_timetable_generation';
+import {
+	ITimetableGenerationState,
+	setDataStored,
+	setGeneratedScheduleStored,
+	setTimetableId,
+	setTimetableStored,
+} from '@/context/slice_timetable_generation';
 import { useSMDispatch, useSMSelector } from '@/hooks/useReduxStore';
 import useNotify from '@/hooks/useNotify';
 
@@ -28,7 +38,7 @@ export default function TimetableDetail() {
 	const [activeTab, setActiveTab] = useState(0);
 	const [configTab, setConfigTab] = useState(0);
 	const [notes, setNotes] = useState<string>('');
-  const dispatch = useSMDispatch();
+	const dispatch = useSMDispatch();
 
 	const handleBack = () => {
 		router.push('/timetable-management');
@@ -67,7 +77,7 @@ export default function TimetableDetail() {
 					const docSnap = await getDoc(docRef);
 					const generatedSchedule = docSnap.data() as IScheduleResponse;
 					dispatch(setGeneratedScheduleStored(generatedSchedule));
-          setScheduleData(generatedSchedule);
+					setScheduleData(generatedSchedule);
 				}
 				dispatch(setTimetableStored(timetableStore));
 			}
