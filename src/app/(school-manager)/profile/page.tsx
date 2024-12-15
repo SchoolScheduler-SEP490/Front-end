@@ -1,7 +1,10 @@
 "use client";
 
 import { ACCOUNT_STATUS } from "@/app/(admin)/_utils/constants";
-import { USER_ROLE_TRANSLATOR } from "@/app/(auth)/_utils/constants";
+import {
+  IJWTTokenPayload,
+  USER_ROLE_TRANSLATOR,
+} from "@/app/(auth)/_utils/constants";
 import SMHeader from "@/commons/school_manager/header";
 import { useAppContext } from "@/context/app_provider";
 import {
@@ -16,9 +19,11 @@ import {
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import UpdateProfileModel from "./_componests/update-profile";
+import { jwtDecode } from "jwt-decode";
 
 export default function ProfilePage() {
-  const { sessionToken, accountId } = useAppContext();
+  const { sessionToken, schoolName } = useAppContext();
+  const decodedToken: IJWTTokenPayload = jwtDecode(sessionToken);
   const api = process.env.NEXT_PUBLIC_API_URL;
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const {
@@ -26,13 +31,16 @@ export default function ProfilePage() {
     isLoading,
     mutate,
   } = useSWR(
-    accountId ? ["profile", accountId] : null,
+    decodedToken.accountId ? ["profile", decodedToken.accountId] : null,
     async () => {
-      const response = await fetch(`${api}/api/accounts/${accountId}`, {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-        },
-      });
+      const response = await fetch(
+        `${api}/api/accounts/${decodedToken.accountId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
       const data = await response.json();
       return data.result;
     },
@@ -43,7 +51,7 @@ export default function ProfilePage() {
       revalidateOnMount: true,
     }
   );
-  console.log("id:%d", accountId);
+  console.log("id:%d", decodedToken.accountId);
 
   return (
     <div className="w-[84%] h-screen flex flex-col items-center overflow-y-scroll no-scrollbar">
@@ -58,7 +66,7 @@ export default function ProfilePage() {
           <div className="flex-1 w-full">
             <UpdateProfileModel
               accountData={accountData}
-              accountId={accountId}
+              accountId={decodedToken.accountId}
               mutate={mutate}
               onClose={setOpenUpdateModal}
               open={openUpdateModal}
@@ -70,11 +78,25 @@ export default function ProfilePage() {
                     <Card className="!w-full !shadow-md !border !border-gray-200 !rounded-lg">
                       <CardContent>
                         <div className="flex items-center mb-6 justify-between w-full">
-                          <div className="flex items-center">
-                            <Avatar
-                              alt={`${accountData["first-name"]} ${accountData["last-name"]}`}
-                              className="!w-16 !h-16 !mr-4"
-                            />
+                          <div className="flex items-center gap-3">
+                            <div
+                              style={{
+                                position: "relative",
+                                width: "100px",
+                                height: "100px",
+                                borderRadius: "50%",
+                                border: "1px solid #888",
+                                overflow: "hidden",
+                                cursor: "pointer",
+                              }}
+                            >
+                              <Avatar
+                                alt={`${accountData["first-name"]} ${accountData["last-name"]}`}
+                                src={accountData["avatar-url"] || ""}
+                                className="!w-16 !h-16 !mr-4"
+                              />
+                            </div>
+
                             <div>
                               <Typography
                                 variant="h6"
@@ -87,13 +109,17 @@ export default function ProfilePage() {
                                 variant="body2"
                                 className="!text-gray-500"
                               >
-                                {accountData["account-role"].join(", ")}
+                                {accountData["account-role"]
+                                  .map(
+                                    (r: string) => USER_ROLE_TRANSLATOR[r] ?? r
+                                  )
+                                  .join(", ")}
                               </Typography>
                               <Typography
                                 variant="body2"
                                 className="!text-gray-500"
                               >
-                                Ho Chi Minh City
+                                {schoolName}
                               </Typography>
                             </div>
                           </div>

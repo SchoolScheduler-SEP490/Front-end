@@ -27,7 +27,7 @@ interface UpdateProfileProps {
   onClose: (close: boolean) => void;
   mutate: KeyedMutator<any>;
   accountData: IUpdateAccountRequest;
-  accountId: number;
+  accountId: string;
 }
 
 const UpdateProfileModel = (props: UpdateProfileProps) => {
@@ -58,10 +58,10 @@ const UpdateProfileModel = (props: UpdateProfileProps) => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        // Nếu có ảnh mới, upload lên Firebase
+        
         if (localAvatarFile) {
-          const firebaseURL = await uploadImageToFirebase(localAvatarFile);
-          values["avatar-url"] = firebaseURL; // Cập nhật URL ảnh vào values
+          const firebaseURL = await uploadImageToFirebase(localAvatarFile, "account-avatar-"+accountId);
+          values["avatar-url"] = firebaseURL; 
           console.log(firebaseURL);
         }
 
