@@ -151,7 +151,7 @@ export default function TeacherUnavailability() {
 			var tmpDepartmentOptions: IDropdownOption<number>[] = [];
 			teacherData.result.items.map((teacher: ITeacherResponse) => {
 				tmpTeacherOptions.push({
-					label: `${teacher['last-name']} ${teacher['first-name']} (${teacher.abbreviation})`,
+					label: `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`,
 					value: teacher.id,
 					filterableId: teacher['department-id'],
 				} as IFilterableDropdownOption<number>);

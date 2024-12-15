@@ -11,8 +11,8 @@ import {
 	TableRow,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import useFetchTeachers from '../_hooks/useFetchTeachers';
-import { ITeachableSubject, ITeacherResponse } from '../_libs/constant';
+import useFetchTeachers from '../../../_hooks/useFetchTeachers';
+import { ITeachableSubject, ITeacherResponse } from '../../../_libs/constants';
 
 const getTeacherFullName = (teacher: ITeacherResponse): string => {
 	return `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`;
@@ -31,7 +31,7 @@ const getShortenedTeachableSubjects = (subject: ITeachableSubject[]): string => 
 	return resStr.join(' - ');
 };
 
-const TeacherInformationTable = () => {
+const DetailsTeacherTable = () => {
 	const { schoolId, sessionToken } = useAppContext();
 	const [teacherData, setTeacherData] = useState<ITeacherResponse[]>([]);
 
@@ -59,7 +59,7 @@ const TeacherInformationTable = () => {
 	}, [teacherResponse]);
 
 	return (
-		<div className='w-full h-[90vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
+		<div className='w-full h-[85vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
 			<Paper sx={{ mb: 2 }}>
 				<TableContainer component={Paper}>
 					<Table aria-label='teacher table' size='small'>
@@ -174,4 +174,4 @@ const TeacherInformationTable = () => {
 	);
 };
 
-export default TeacherInformationTable;
+export default DetailsTeacherTable;

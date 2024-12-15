@@ -1,15 +1,14 @@
 'use client';
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSMSelector } from '@/hooks/useReduxStore';
 import CloseIcon from '@mui/icons-material/Close';
 import {
 	Button,
-	FormControl,
+	Collapse,
 	IconButton,
-	InputLabel,
-	MenuItem,
 	Paper,
-	Select,
 	SelectChangeEvent,
 	TextField,
 	Typography,
@@ -29,6 +28,7 @@ interface ITeachingAssignmentFilterableProps {
 	setMaxPeriodPerWeek: React.Dispatch<React.SetStateAction<number>>;
 	minPeriodPerWeek: number;
 	setMinPeriodPerWeek: React.Dispatch<React.SetStateAction<number>>;
+	setIsSummaryModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface Errors {
@@ -49,7 +49,12 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 		minPeriodPerWeek,
 		setMaxPeriodPerWeek,
 		setMinPeriodPerWeek,
+		setIsSummaryModalOpen
 	} = props;
+	const { dataStored }: ITimetableGenerationState = useSMSelector(
+		(state) => state.timetableGeneration
+	);
+
 	const [errors, setErrors] = useState<Errors>({
 		field1: false,
 		field2: false,
@@ -118,6 +123,22 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 			>
 				Phân công tự động
 			</Button>
+			<Collapse
+				in={dataStored && dataStored['teacher-assignments-summary'].length > 0}
+				sx={{ width: '100%' }}
+				timeout={300}
+				orientation='vertical'
+			>
+				<Button
+					variant='contained'
+					fullWidth
+					onClick={() => setIsSummaryModalOpen(true)}
+					color='success'
+					sx={{ color: 'white', borderRadius: 0 }}
+				>
+					Xem tiết giáo viên
+				</Button>
+			</Collapse>
 
 			<Paper className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 				<div className='w-full flex flex-row justify-between items-center pt-1'>

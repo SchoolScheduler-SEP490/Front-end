@@ -57,7 +57,7 @@ export interface ISchoolYearResponse {
 export interface ITeachingAssignmentTableData {
 	id: number;
 	subjectName: string;
-	teacherName: IDropdownOption<number>;
+	teacherOption: IDropdownOption<number>;
 	totalSlotPerWeek: number;
 	subjectKey: number;
 }
@@ -153,19 +153,26 @@ export interface IAssignmentResponse {
 	'is-deleted': boolean;
 }
 
-export interface ITeachingPeriodCountResponse {
-	'teacher-id': number;
-	'teacher-name': string;
-	'teacher-abbreviation': string;
-	'total-periods-per-week': number;
-}
-
 export interface IAutoTeacherAssignmentResponse {
 	'assignment-minimal-data': ITeachingAssignmentObject[];
 	assignments: IAssignmentResponse[];
 	'teacher-periods-count': ITeachingPeriodCountResponse[];
 	'term-id': number;
 	'term-name': string;
+}
+
+export interface ITeachingPeriodCountResponse {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abbreviation': string;
+	'total-periods-per-week': ITotalPeriodsPerWeek[];
+}
+
+export interface ITotalPeriodsPerWeek {
+	'subject-name': string;
+	'subject-abbreviation': string;
+	'subject-id': number;
+	'period-count': number;
 }
 
 export interface IAutoTeacherAssingmentRequest {

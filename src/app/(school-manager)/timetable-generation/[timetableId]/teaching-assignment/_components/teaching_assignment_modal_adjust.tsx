@@ -6,7 +6,12 @@ import { ITimetableGenerationState, updateDataStored } from '@/context/slice_tim
 import useFilterArray from '@/hooks/useFilterArray';
 import useNotify from '@/hooks/useNotify';
 import { useSMDispatch } from '@/hooks/useReduxStore';
-import { ITeachingAssignmentObject } from '@/utils/constants';
+import {
+	IConfigurationStoreObject,
+	ITeacherAssignmentSummary,
+	ITeacherPeriodsPerWeek,
+	ITeachingAssignmentObject,
+} from '@/utils/constants';
 import { firestore } from '@/utils/firebaseConfig';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,6 +31,31 @@ import {
 	ITeachingAssignmentSidenavData,
 } from '../_libs/constants';
 import TeachingAssignmentSideNav from './teaching_assignment_sidenav';
+import TeachingAssignmentCancelConfirmModal from './teaching_assignment_modal_close_confirm';
+
+function groupSubjectsByPeriod(data: ITeacherAssignmentSummary): ITeacherAssignmentSummary {
+	const groupedSubjects: Record<number, ITeacherPeriodsPerWeek> = {};
+
+	data['total-periods-per-week'].forEach((subject) => {
+		const subjectId = subject['subject-id'];
+		if (!groupedSubjects[subjectId]) {
+			// Nếu chưa có môn học này, thêm vào
+			groupedSubjects[subjectId] = { ...subject };
+		} else {
+			// Nếu đã có, cộng dồn số tiết
+			groupedSubjects[subjectId]['period-count'] += subject['period-count'];
+		}
+	});
+
+	// Chuyển từ dictionary thành array
+	const groupedPeriods = Object.values(groupedSubjects);
+
+	// Cập nhật lại dữ liệu và trả về
+	return {
+		...data,
+		'total-periods-per-week': groupedPeriods,
+	};
+}
 
 const Accordion = styled((props: AccordionProps) => (
 	<MuiAccordion disableGutters elevation={0} square {...props} />
@@ -78,7 +108,7 @@ interface IExtendedTeachingAssignment extends ITeachingAssignmentObject {
 
 const renderTeacherOption = (assignment: IAssignmentResponse): IDropdownOption<number> => {
 	return {
-		label: `${assignment['teacher-last-name']} ${assignment['teacher-first-name']} (${assignment['teacher-abbreviation']})`,
+		label: `${assignment['teacher-first-name']} ${assignment['teacher-last-name']} (${assignment['teacher-abbreviation']})`,
 		value: assignment['teacher-id'],
 	} as IDropdownOption<number>;
 };
@@ -116,14 +146,17 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 	);
 	const dispatch = useSMDispatch();
 
-	const [editingObjects] = useState<IExtendedTeachingAssignment[]>([]);
+	const [editingObjects, setEditingObject] = useState<IExtendedTeachingAssignment[]>([]);
+	const [assignmentSummary, setAssignmentSummary] = useState<ITeacherAssignmentSummary[]>([]);
 	const [selectedAssignments, setSelectedAssignments] = useState<IAssignmentResponse[]>([]);
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
 
 	const [selectedClassId, setSelectedClassId] = useState<number>(0);
 	const [selectedCurriculumName, setSelectedCurriculumName] = useState<string>('');
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(0);
+	const [isCancelModalOpen, setIsCancelModalOpen] = useState<boolean>(false);
 
+	// Get data giáo viên trong dropdown
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
 		subjectId: selectedSubjectId,
@@ -131,9 +164,64 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		grade: selectedGrade,
 	});
 
+	const updateAssignmentSummary = () => {
+		const currentTermAssignments: IAutoTeacherAssignmentResponse | undefined =
+			automationResult.find((item) => item['term-id'] === timetableStored['term-id']);
+		if (currentTermAssignments) {
+			editingObjects.forEach((obj) => {
+				// Lấy ra assignment cũ
+				const existingAssignment = currentTermAssignments.assignments.find(
+					(item) => item.id === obj['assignment-id']
+				);
+
+				// Nếu giáo viên đã thay đổi
+				if (existingAssignment?.['teacher-id'] !== obj['teacher-id']) {
+					const oldTeacherPosition = assignmentSummary.findIndex(
+						(item) => item['teacher-id'] === existingAssignment?.['teacher-id']
+					);
+					const newTeacherPosition = assignmentSummary.findIndex(
+						(item) => item['teacher-id'] === obj['teacher-id']
+					);
+
+					if (oldTeacherPosition !== -1 && newTeacherPosition !== -1) {
+						assignmentSummary[oldTeacherPosition] = {
+							...assignmentSummary[oldTeacherPosition],
+							'total-periods-per-week': assignmentSummary[oldTeacherPosition][
+								'total-periods-per-week'
+							].map((subject) => {
+								if (subject['subject-id'] === existingAssignment?.['subject-id']) {
+									return {
+										...subject,
+										'period-count': (subject['period-count'] -= 1),
+									};
+								}
+								return subject;
+							}),
+						};
+						assignmentSummary[newTeacherPosition] = {
+							...assignmentSummary[newTeacherPosition],
+							'total-periods-per-week': assignmentSummary[newTeacherPosition][
+								'total-periods-per-week'
+							].map((subject) => {
+								if (subject['subject-id'] === existingAssignment?.['subject-id']) {
+									return {
+										...subject,
+										'period-count': (subject['period-count'] += 1),
+									};
+								}
+								return subject;
+							}),
+						};
+					}
+				}
+			});
+		}
+	};
+
 	const handleSaveUpdates = async () => {
 		// Save data to Firebase
 		const originAutoResult: ITeachingAssignmentObject[] = [];
+		// Lấy assignments của term hiện tại
 		automationResult.map((item) => {
 			if (item['term-id'] === timetableStored['term-id']) {
 				item.assignments.map((assignment) => {
@@ -145,6 +233,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 			}
 		});
 		if (dataStored && dataFirestoreName && dataStored.id && automationResult.length > 0) {
+			// Lọc đi những giá trị đầu và dùng những giá trị mới
 			const finalResult: ITeachingAssignmentObject[] = useFilterArray(
 				[
 					...originAutoResult,
@@ -158,16 +247,24 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 				],
 				['assignment-id']
 			);
+
+			// Cập nhật lại dữ liệu summary assignment
+			updateAssignmentSummary();
+
 			const docRef = doc(firestore, dataFirestoreName, dataStored.id);
 			await setDoc(
 				docRef,
 				{
 					...dataStored,
 					'teacher-assignments': finalResult,
-				},
+					'teacher-assignments-summary': assignmentSummary,
+				} as IConfigurationStoreObject,
 				{ merge: true }
 			);
-			dispatch(updateDataStored({ target: 'teacher-assignments', value: finalResult }));
+			dispatch(
+				updateDataStored({ target: 'teacher-assignments', value: finalResult }),
+				updateDataStored({ target: 'teacher-assignments-summary', value: assignmentSummary })
+			);
 			useNotify({ message: 'Phân công giáo viên thành công', type: 'success' });
 			updateTeachingAssignment();
 			handleClose();
@@ -182,16 +279,24 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 		}
 	}, [automationResult]);
 
-	// Lấy dữ liệu phân công giáo viên theo lớp đã chọn
+	// Lấy dữ liệu phân công giáo viên theo lớp đã chọn trong kỳ học dựa theo kỳ học của thời khóa biểu đã chọn
 	useEffect(() => {
 		if (open && automationResult.length > 0) {
-			const currentTermAssignments: IAssignmentResponse[] | undefined = automationResult.find(
-				(item) => item['term-id'] === timetableStored['term-id']
-			)?.assignments;
-			if (currentTermAssignments && currentTermAssignments.length > 0) {
-				const currentClassAssignment: IAssignmentResponse[] = currentTermAssignments.filter(
-					(item) => item['student-class-id'] === selectedClassId
-				);
+			const currentTermAssignments: IAutoTeacherAssignmentResponse | undefined =
+				automationResult.find((item) => item['term-id'] === timetableStored['term-id']);
+			if (currentTermAssignments && currentTermAssignments.assignments.length > 0) {
+				// Pre-define trước tổng số tiết dạy của giáo viên cho từng môn học
+				if (assignmentSummary.length === 0) {
+					assignmentSummary.push(
+						...currentTermAssignments['teacher-periods-count'].map((item) =>
+							groupSubjectsByPeriod({ ...item })
+						)
+					);
+				}
+				const currentClassAssignment: IAssignmentResponse[] =
+					currentTermAssignments.assignments.filter(
+						(item) => item['student-class-id'] === selectedClassId
+					);
 				if (currentClassAssignment.length > 0) {
 					setSelectedAssignments(currentClassAssignment);
 				}
@@ -214,6 +319,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 	}, [teachableData, selectedSubjectId]);
 
 	const handleUpdateTeacher = (assignmentId: number, teacherId: number, teacherName: string) => {
+		// Thêm  hoặc cập nhật các giá trị assign giáo viên update của người dùng
 		const editIndex = editingObjects.findIndex((obj) => obj['assignment-id'] === assignmentId);
 		if (editIndex !== -1) {
 			editingObjects[editIndex] = {
@@ -232,6 +338,10 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 
 	const handleClose = () => {
 		setOpen(false);
+		setIsCancelModalOpen(false);
+		setSelectedClassId(0);
+		setEditingObject([]);
+		setAssignmentSummary([]);
 	};
 
 	const handleSelectSubject = (subjectId: number) => {
@@ -245,7 +355,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 			disableAutoFocus
 			disableRestoreFocus
 			open={open}
-			onClose={handleClose}
+			onClose={() => setIsCancelModalOpen(true)}
 			aria-labelledby='keep-mounted-modal-title'
 			aria-describedby='keep-mounted-modal-description'
 		>
@@ -261,7 +371,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 					>
 						Kết quả phân công
 					</Typography>
-					<IconButton onClick={handleClose}>
+					<IconButton onClick={() => setIsCancelModalOpen(true)}>
 						<CloseIcon />
 					</IconButton>
 				</div>
@@ -324,7 +434,7 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 				>
 					<ContainedButton
 						title='Huỷ'
-						onClick={handleClose}
+						onClick={() => setIsCancelModalOpen(true)}
 						disableRipple
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
@@ -336,6 +446,11 @@ const TeachingAssignmentAdjustModal = (props: IApplyModalProps) => {
 						onClick={handleSaveUpdates}
 					/>
 				</div>
+				<TeachingAssignmentCancelConfirmModal
+					open={isCancelModalOpen}
+					setOpen={setIsCancelModalOpen}
+					handleApprove={handleClose}
+				/>
 			</Box>
 		</Modal>
 	);

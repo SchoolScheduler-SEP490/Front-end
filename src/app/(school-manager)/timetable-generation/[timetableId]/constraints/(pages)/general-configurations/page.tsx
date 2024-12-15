@@ -10,11 +10,17 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useFormik } from 'formik';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
+import useFetchCurriculumInformation from './_hooks/useFetchCurriculum';
+import { useAppContext } from '@/context/app_provider';
+import { ICurriculumDetailResponse, ICurriculumResponse, ISubjectInGroup } from './_libs/constant';
+import { getFetchCurriculumDetailApi } from './_libs/apis';
+import useFilterArray from '@/hooks/useFilterArray';
 
-export default function Home() {
+export default function GeneralConfiguration() {
+	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
@@ -23,6 +29,68 @@ export default function Home() {
 	const pathName = usePathname();
 
 	const [isCompleted, setIsCompleted] = useState<boolean>(false);
+	const [detailedCurriculums, setDetailedCurriculums] = useState<ICurriculumDetailResponse[]>([]);
+
+	const { data: curriculumData, mutate: updateCurriculum } = useFetchCurriculumInformation({
+		pageIndex: 1,
+		pageSize: 1000,
+		schoolId: schoolId,
+		schoolYearId: selectedSchoolYearId,
+		sessionToken,
+	});
+
+	useEffect(() => {
+		const fetchCurriculumDetails = async () => {
+			if (curriculumData?.status === 200) {
+				setDetailedCurriculums([]);
+				curriculumData.result.items.forEach(async (cur: ICurriculumResponse) => {
+					const endpoint: string = getFetchCurriculumDetailApi({
+						subjectGroupId: cur.id,
+						schoolId: Number(schoolId),
+						schoolYearId: selectedSchoolYearId,
+					});
+					const res = await fetch(endpoint, {
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${sessionToken}`,
+						},
+					});
+					if (res.ok) {
+						const data = await res.json();
+						if ((data.result as ICurriculumDetailResponse)['student-class-group-view-names'].length > 0) {
+							setDetailedCurriculums((prev) => [...prev, data.result]);
+						}
+					}
+				});
+			}
+		};
+
+		fetchCurriculumDetails();
+	}, [curriculumData]);
+
+	const minDaysOff:number =  useMemo(():number => {
+		let tmpMaxMainSlotPerWeek = 0;
+		if (detailedCurriculums.length > 0) {
+			detailedCurriculums.forEach((cur) => {
+				const subjectList: ISubjectInGroup[] = useFilterArray(
+					[
+						...cur['subject-required-views'],
+						...cur['subject-selective-views'],
+						...cur['subject-specializedt-views'],
+					],
+					['subject-id']
+				);
+				// lấy ra tổng số lượng tiết của buổi chính khóa/tuần
+				let totalMainSlotPerWeek = 0;
+				subjectList.forEach((subject) => (totalMainSlotPerWeek += subject['main-slot-per-week']));
+				const tmpDayOff = totalMainSlotPerWeek % 5 > 0 ? Math.floor(totalMainSlotPerWeek / 5) + 1 :Math.floor(totalMainSlotPerWeek / 5)
+				if (tmpDayOff > tmpMaxMainSlotPerWeek) {
+					tmpMaxMainSlotPerWeek = tmpDayOff;
+				}
+			});
+		}
+		return tmpMaxMainSlotPerWeek;
+	}, [detailedCurriculums]);
 
 	useEffect(() => {
 		if (dataStored) {
@@ -48,7 +116,7 @@ export default function Home() {
 			'days-in-week': yup
 				.number()
 				.required('Vui lòng nhập số ngày học trong tuần')
-				.min(4, 'Phải học ít nhất 4 ngày/tuần')
+				.min(minDaysOff, `Phải học ít nhất ${minDaysOff} ngày/tuần`)
 				.max(6, 'Không thể học quá 6 ngày/tuần'),
 			'required-break-periods': yup
 				.number()
@@ -151,8 +219,7 @@ export default function Home() {
 						Boolean(formik.errors['required-break-periods'])
 					}
 					helperText={
-						formik.touched['required-break-periods'] &&
-						formik.errors['required-break-periods']
+						formik.touched['required-break-periods'] && formik.errors['required-break-periods']
 					}
 					slotProps={{
 						input: {
@@ -179,10 +246,7 @@ export default function Home() {
 					value={formik.values['minimum-days-off']}
 					onChange={formik.handleChange('minimum-days-off')}
 					onBlur={formik.handleBlur}
-					error={
-						formik.touched['minimum-days-off'] &&
-						Boolean(formik.errors['minimum-days-off'])
-					}
+					error={formik.touched['minimum-days-off'] && Boolean(formik.errors['minimum-days-off'])}
 					helperText={
 						formik.touched['minimum-days-off'] && formik.errors['minimum-days-off']
 							? formik.errors['minimum-days-off']

@@ -4,7 +4,7 @@ import { Box, IconButton, Modal, Typography } from '@mui/material';
 
 const style = {
 	position: 'absolute',
-	top: '40%',
+	top: '50%',
 	left: '50%',
 	transform: 'translate(-50%, -50%)',
 	width: '40vw',
@@ -12,13 +12,13 @@ const style = {
 	bgcolor: 'background.paper',
 };
 
-interface ITimetableCancelConfirmModalProps {
+interface ITeachingAssignmentCancelConfirmModalProps {
 	open: boolean;
 	setOpen: (status: boolean) => void;
 	handleApprove: () => void;
 }
 
-const TimetableCancelConfirmModal = (props: ITimetableCancelConfirmModalProps) => {
+const TeachingAssignmentCancelConfirmModal = (props: ITeachingAssignmentCancelConfirmModalProps) => {
 	const { open, setOpen, handleApprove } = props;
 
 	const handleClose = () => {
@@ -78,4 +78,4 @@ const TimetableCancelConfirmModal = (props: ITimetableCancelConfirmModalProps) =
 	);
 };
 
-export default TimetableCancelConfirmModal;
+export default TeachingAssignmentCancelConfirmModal;

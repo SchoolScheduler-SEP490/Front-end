@@ -27,3 +27,27 @@ export async function POST(request: Request) {
 		},
 	});
 }
+
+export async function PUT({userRole}: {userRole: string}) {
+	if (!userRole) {
+		return Response.json(
+			{ message: 'Không nhận được user role' },
+			{
+				status: 400,
+			}
+		);
+	} else {
+		return Response.json(
+			{ message: 'Cập nhật user role thành công' },
+			
+			{
+				status: 200,
+				headers: {
+					'Set-Cookie': [
+						`userRole=${userRole}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
+					].join(','),
+				}
+			}
+		);
+	}
+}
