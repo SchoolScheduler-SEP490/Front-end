@@ -2,7 +2,14 @@
 
 import { IDropdownOption } from '@/app/(school-manager)/_utils/contants';
 import { useAppContext } from '@/context/app_provider';
+import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
 import useFilterArray from '@/hooks/useFilterArray';
+import {
+	IConfigurationStoreObject,
+	ITeacherAssignmentSummary,
+	ITeachingAssignmentObject,
+} from '@/utils/constants';
+import { firestore } from '@/utils/firebaseConfig';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -16,9 +23,10 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { KeyedMutator } from 'swr';
-import useAssignTeacher from '../_hooks/useAssignTeacher';
 import useFetchTeachableTeacher from '../_hooks/useFetchTeachableTeacher';
 import {
 	ITeachableResponse,
@@ -26,11 +34,6 @@ import {
 	ITeachingAssignmentTableData,
 } from '../_libs/constants';
 import CancelAssignTeacherModal from './teaching_assignment_modal_cancel';
-import { ITimetableGenerationState, updateDataStored } from '@/context/slice_timetable_generation';
-import { useDispatch, useSelector } from 'react-redux';
-import { doc, setDoc } from 'firebase/firestore';
-import { firestore } from '@/utils/firebaseConfig';
-import { IConfigurationStoreObject, ITeachingAssignmentObject } from '@/utils/constants';
 
 interface HeadCell {
 	disablePadding: boolean;
@@ -73,10 +76,7 @@ function EnhancedTableHead() {
 						key={headCell.id}
 						align={headCell.centered ? 'center' : 'left'}
 						padding={headCell.disablePadding ? 'none' : 'normal'}
-						sx={[
-							{ fontWeight: 'bold' },
-							headCell.centered ? { paddingLeft: '3%' } : {},
-						]}
+						sx={[{ fontWeight: 'bold' }, headCell.centered ? { paddingLeft: '3%' } : {}]}
 					>
 						{headCell.label}
 					</TableCell>
@@ -87,7 +87,7 @@ function EnhancedTableHead() {
 }
 
 interface ITeachingAssignmentTableProps {
-	subjectData: ITeachingAssignmentTableData[];
+	assignmentData: ITeachingAssignmentTableData[];
 	mutate: KeyedMutator<any>;
 	isFilterable: boolean;
 	setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
@@ -95,11 +95,12 @@ interface ITeachingAssignmentTableProps {
 	editingObjects: ITeacherAssignmentRequest[];
 	setEditingObjects: React.Dispatch<React.SetStateAction<ITeacherAssignmentRequest[]>>;
 	selectedGrade: string;
+	assignmentSummary: ITeacherAssignmentSummary[]
 }
 
 const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 	const {
-		subjectData,
+		assignmentData,
 		mutate,
 		isFilterable,
 		setIsFilterable,
@@ -108,18 +109,20 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		setEditingObjects,
 		selectedGrade,
 	} = props;
-	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
+	const { sessionToken, schoolId } = useAppContext();
 	const { dataStored, dataFirestoreName }: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 	const dispatch = useDispatch();
 
 	const [isEditing, setIsEditing] = useState<boolean>(false);
+	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
+
 	const [teachableDropdown, setTeachableDropdown] = useState<IDropdownOption<number>[]>([]);
 	const [selectedSubjectId, setSelectedSubjectId] = useState<number>(
-		subjectData[0]?.subjectKey ?? 0
+		assignmentData[0]?.subjectKey ?? 0
 	);
-	const [isCancelUpdateModalOpen, setIsCancelUpdateModalOpen] = useState<boolean>(false);
+
 	const { data: teachableData, mutate: getTeachableData } = useFetchTeachableTeacher({
 		schoolId: Number(schoolId),
 		subjectId: selectedSubjectId,
@@ -127,6 +130,10 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 		grade: selectedGrade,
 	});
 
+	const handleUpdateAssignmentSummary = () => {
+
+	}
+	
 	useEffect(() => {
 		if (teachableData?.status === 200) {
 			const dropdownOptions: IDropdownOption<number>[] = teachableData.result.map(
@@ -230,34 +237,17 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 								isEditing && (
 									<>
 										<Tooltip title='Lưu thay đổi'>
-											<IconButton
-												color='success'
-												onClick={handleConfirmUpdate}
-											>
+											<IconButton color='success' onClick={handleConfirmUpdate}>
 												<AddTaskIcon />
 											</IconButton>
 										</Tooltip>
 										<Tooltip title='Hủy bỏ'>
-											<IconButton
-												onClick={handleConfirmCancelUpdate}
-												color='error'
-											>
+											<IconButton onClick={handleConfirmCancelUpdate} color='error'>
 												<HighlightOffIcon />
 											</IconButton>
 										</Tooltip>
 									</>
 								)
-								// <Tooltip title='Phân công tự động'>
-								// 	<IconButton
-								// 		id='filter-btn'
-								// 		aria-controls={isFilterable ? 'basic-menu' : undefined}
-								// 		aria-haspopup='true'
-								// 		aria-expanded={isFilterable ? 'true' : undefined}
-								// 		onClick={handleAutoAssign}
-								// 	>
-								// 		<LayersIcon fontSize='medium' />
-								// 	</IconButton>
-								// </Tooltip>
 							}
 							<Tooltip title='Lọc danh sách'>
 								<IconButton
@@ -276,7 +266,7 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 						<Table aria-labelledby='tableTitle' size='small'>
 							<EnhancedTableHead />
 							<TableBody>
-								{subjectData.length === 0 && (
+								{assignmentData.length === 0 && (
 									<TableRow>
 										<TableCell colSpan={4} align='center'>
 											<h1 className='text-body-large-strong italic text-basic-gray'>
@@ -285,12 +275,10 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 										</TableCell>
 									</TableRow>
 								)}
-								{subjectData.map((row, index) => {
+								{assignmentData.map((row, index) => {
 									const labelId = `enhanced-table-checkbox-${index}`;
 									const editedObject: ITeacherAssignmentRequest | undefined =
-										editingObjects.find(
-											(item) => item['assignment-id'] === row.id
-										) ?? undefined;
+										editingObjects.find((item) => item['assignment-id'] === row.id) ?? undefined;
 
 									return (
 										<TableRow
@@ -337,37 +325,25 @@ const TeachingAssignmentTable = (props: ITeachingAssignmentTableProps) => {
 											>
 												<Autocomplete
 													options={teachableDropdown}
-													getOptionLabel={(
-														option: IDropdownOption<number>
-													) => option.label}
-													getOptionKey={(
-														option: IDropdownOption<number>
-													) => option.value}
+													getOptionLabel={(option: IDropdownOption<number>) => option.label}
+													getOptionKey={(option: IDropdownOption<number>) => option.value}
 													fullWidth
 													noOptionsText='Không có giáo viên phù hợp'
 													disableClearable
-													defaultValue={row.teacherName}
+													defaultValue={row.teacherOption}
 													onOpen={() => {
 														handleSelectSubject(row.subjectKey);
 													}}
 													onBlur={() => {
 														setTeachableDropdown([]);
 													}}
-													onChange={(
-														event: any,
-														newValue: IDropdownOption<number> | null
-													) => {
+													onChange={(event: any, newValue: IDropdownOption<number> | null) => {
 														if (newValue !== null) {
-															handleAssignTeacher(
-																row.id,
-																newValue.value
-															);
+															handleAssignTeacher(row.id, newValue.value);
 														}
 													}}
 													blurOnSelect
-													renderInput={(params) => (
-														<TextField {...params} variant='standard' />
-													)}
+													renderInput={(params) => <TextField {...params} variant='standard' />}
 												/>
 											</TableCell>
 											<TableCell

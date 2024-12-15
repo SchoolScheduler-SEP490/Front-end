@@ -322,11 +322,27 @@ export interface IConfigurationStoreObject {
 	'no-assign-periods-para': INoAssignPeriodObject[];
 	'free-timetable-periods-para': IFreePeriodObject[];
 	'teacher-assignments': ITeachingAssignmentObject[];
+	'teacher-assignments-summary': ITeacherAssignmentSummary[];
 	'applied-curriculum-id': number;
 	'required-break-periods': number;
 	'minimum-days-off': number;
 	'days-in-week': number;
 	'max-execution-time-in-seconds': number;
+}
+
+// Interface thêm để lưu trữ tổng số tiết dạy của giáo viên
+export interface ITeacherAssignmentSummary {
+	'teacher-id': number;
+	'teacher-name': string;
+	'teacher-abbreviation': string;
+	'total-periods-per-week': ITeacherPeriodsPerWeek[];
+}
+
+export interface ITeacherPeriodsPerWeek {
+	'subject-name': string;
+	'subject-abbreviation': string;
+	'subject-id': number;
+	'period-count': number;
 }
 
 // Interface của record thời khóa biểu
@@ -406,7 +422,6 @@ export interface IClassPeriod {
 	'date-of-week': number;
 	'subject-abbreviation': string;
 	'teacher-abbreviation': string;
-	'teacher-assignment-id': number;
 	'start-at': number;
 	priority: string;
 	id: number;

@@ -64,7 +64,6 @@ export default function Home() {
 	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const {
 		data: termData,
-		error: termFetchError,
 		mutate: updateTerm,
 	} = useFetchTerm({
 		pageIndex: 1,
@@ -151,6 +150,7 @@ export default function Home() {
 			'fixed-periods-para': [],
 			'no-assign-periods-para': [],
 			'free-timetable-periods-para': [],
+			"teacher-assignments-summary": [],
 			'applied-curriculum-id': 0,
 			'days-in-week': 6,
 			'minimum-days-off': 0,

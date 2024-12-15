@@ -11,7 +11,7 @@ export interface ISMNavigation extends INavigation {
 
 export const SM_SIDENAV: ISMSidenav[] = [
 	{
-		category: 'Thời khóa biểu chính thức',
+		category: 'TKB chính thức',
 		items: [
 			{
 				name: 'Thời khóa biểu',

@@ -19,15 +19,14 @@ import {
 	Typography,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import useFetchClassGroupInformation from '../_hooks/useFetchClassGroup';
-import useFetchCurriculumInformation from '../_hooks/useFetchCurriculum';
-import { getFetchCurriculumDetailApi } from '../_libs/apis';
+import useFetchClassGroupInformation from '../../../_hooks/useFetchClassGroup';
+import useFetchCurriculumInformation from '../../../_hooks/useFetchCurriculum';
+import { getFetchCurriculumDetailApi } from '../../../_libs/apis';
 import {
 	IClassGroupResponse,
 	ICurriculumDetailResponse,
 	ICurriculumResponse,
-} from '../_libs/constant';
-import rootShouldForwardProp from '@mui/material/styles/rootShouldForwardProp';
+} from '../../../_libs/constants';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -63,7 +62,7 @@ interface ICurriculumInformationTableData {
 	appliedClassGroups: string[];
 }
 
-const CurriculumInformationTable = () => {
+const DetailsCurriculumTable = () => {
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 	const [detailedCurriculums, setDetailedCurriculums] = useState<ICurriculumDetailResponse[]>([]);
 	const [curriculumInformation, setCurriculumInformation] = useState<
@@ -155,7 +154,7 @@ const CurriculumInformationTable = () => {
 	}, [classGroupData, detailedCurriculums]);
 
 	return (
-		<div className='w-full h-[90vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
+		<div className='w-full h-[85vh] flex flex-col justify-start items-center px-[2vw] pt-[5vh] pb-[5vh] overflow-y-scroll no-scrollbar'>
 			<Paper sx={{ mb: 2 }}>
 				<TableContainer component={Paper}>
 					<Table aria-label='curriculum table' size='small'>
@@ -236,4 +235,4 @@ const CurriculumInformationTable = () => {
 	);
 };
 
-export default CurriculumInformationTable;
+export default DetailsCurriculumTable;

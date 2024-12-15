@@ -11,7 +11,7 @@ import { firestore } from '@/utils/firebaseConfig';
 import { IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import TimetableTabs from '../_components/timetable-tabs';
@@ -22,7 +22,6 @@ import {
 	IScheduleResponse,
 	ITimetableStoreObject,
 } from '@/utils/constants';
-import IframeLayout from '@/app/(iframe)/layout';
 
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -63,8 +62,6 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 	const pathName = usePathname();
 	const router = useRouter();
 	const dispatch = useDispatch();
-	const searchParams = useSearchParams();
-	const isIframe = searchParams.get('iframe') === 'true';
 
 	const isMenuOpen: boolean = useSelector((state: any) => state.schoolManager.isMenuOpen);
 	const [value, setValue] = useState<number>(0);
@@ -93,6 +90,8 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 					dispatch(setGeneratedScheduleStored(generatedSchedule));
 				}
 				dispatch(setTimetableStored(timetableStore));
+			} else {
+				notFound();
 			}
 		};
 		fetchStoreTimetable();
@@ -122,6 +121,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 					type: 'error',
 					message: 'Không tìm thấy dữ liệu cấu hình của TKB',
 				});
+				notFound();
 			}
 		};
 		fetchStoredData();
@@ -141,9 +141,6 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 		}
 	}, [pathName]);
 	
-	if (isIframe) {
-		return <IframeLayout>{children}</IframeLayout>;
-	  }
 
 	return (
 		<section
@@ -153,7 +150,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 		>
 			<SMHeader>
 				<div className='flex flex-row justify-start items-baseline gap-2'>
-					<IconButton color='info' onClick={() => router.replace('/timetable-management')}>
+					<IconButton color='info' onClick={() => router.replace(`/timetable-management/${timetableId}`)}>
 						<Image
 							src='/images/icons/arrow.png'
 							alt='Trở lại'
