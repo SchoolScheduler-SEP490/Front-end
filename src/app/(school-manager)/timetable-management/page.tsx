@@ -58,6 +58,10 @@ export default function TimetableManagement() {
             yearName: data['year-name'],
             generatedScheduleId: data['generated-schedule-id'],
             generatedDate: data['generated-date'],
+            "applied-week": data['applied-week'],
+            "ended-week": data['ended-week'],
+            "term-id": data['term-id'],
+            "term-name": data['term-name'],
           };
         });
         setTimetableData(timetables);
