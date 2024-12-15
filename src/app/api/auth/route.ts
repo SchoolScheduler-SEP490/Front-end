@@ -28,8 +28,11 @@ export async function POST(request: Request) {
 	});
 }
 
-export async function PUT({userRole}: {userRole: string}) {
-	if (!userRole) {
+export async function PUT(request: Request) {
+	const req = await request.json();
+	const requestBody: { userRole: string } = { ...req };
+
+	if (!requestBody.userRole) {
 		return Response.json(
 			{ message: 'Không nhận được user role' },
 			{
@@ -44,7 +47,7 @@ export async function PUT({userRole}: {userRole: string}) {
 				status: 200,
 				headers: {
 					'Set-Cookie': [
-						`userRole=${userRole}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
+						`userRole=${requestBody.userRole}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=2592000`,
 					].join(','),
 				}
 			}
