@@ -23,6 +23,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import useTimetableData from "../_hooks/useTimetableData";
 import { getTerms } from "../_libs/apiTimetableTeacher";
+import { useTeacherSelector } from "@/hooks/useReduxStore";
 
 interface TeacherTimetableTableProps {
   schoolId: string;
@@ -81,6 +82,7 @@ export default function TeacherTimetableTable({
   const [terms, setTerms] = useState<ITermResponse[]>([]);
   const { selectedSchoolYearId } = useAppContext();
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+  const { teacherInfo } = useTeacherSelector((state) => state.teacher);
 
   useEffect(() => {
     const fetchTerm = async () => {
@@ -127,6 +129,18 @@ export default function TeacherTimetableTable({
     return Array.from(new Set(names)) as string[];
   }, [scheduleData, selectedGrade]);
 
+  const teacherSchedules = useMemo(() => {
+    if (!scheduleData?.["class-schedules"] || !teacherInfo?.id) return [];
+
+    return scheduleData["class-schedules"].filter((schedule: IClassSchedule) =>
+      schedule["class-periods"].some(
+        (period: IClassPeriod) => 
+          period["teacher-id"] === teacherInfo.id && 
+          !period["is-deleted"]
+      )
+    );
+  }, [scheduleData, teacherInfo]);
+
   return (
     <div className="w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]">
       <div className="w-full mb-6 flex justify-between items-center gap-4">
@@ -151,7 +165,7 @@ export default function TeacherTimetableTable({
             format="DD/MM/YYYY"
             slotProps={{ textField: { variant: "standard" } }}
           />
-          <FormControl sx={{ minWidth: 170 }}>
+          {/* <FormControl sx={{ minWidth: 170 }}>
             <Select
               value={selectedGrade}
               onChange={(e) => setSelectedGrade(e.target.value)}
@@ -164,8 +178,8 @@ export default function TeacherTimetableTable({
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
-          <FormControl sx={{ minWidth: 170 }}>
+          </FormControl> */}
+          {/* <FormControl sx={{ minWidth: 170 }}>
             <Select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
@@ -179,7 +193,7 @@ export default function TeacherTimetableTable({
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl> */}
         </div>
       </div>
 
@@ -208,58 +222,60 @@ export default function TeacherTimetableTable({
           </TableHead>
 
           <TableBody>
-            {TIMETABLE_SLOTS.map((session, sessionIndex) =>
-              session.slots.map((slot, slotIndex) => (
-                <TableRow key={`${session.period}-${slotIndex}`}>
-                  <TableCell sx={{ ...cellStyle }}>
-                    {sessionIndex * 5 + slotIndex + 1}
+        {TIMETABLE_SLOTS.map((session, sessionIndex) =>
+          session.slots.map((slot, slotIndex) => (
+            <TableRow key={`${session.period}-${slotIndex}`}>
+              <TableCell sx={{ ...cellStyle }}>
+                {sessionIndex * 5 + slotIndex + 1}
+              </TableCell>
+
+              {WEEK_DAYS_FULL.map((day, dayIndex) => {
+                const currentSlotIndex =
+                  dayIndex * 10 + sessionIndex * 5 + slotIndex + 1;
+                
+                const schedule = teacherSchedules.find((s: IClassSchedule) =>
+                  s["class-periods"].some(
+                    (p: IClassPeriod) =>
+                      p["start-at"] === currentSlotIndex && 
+                      !p["is-deleted"] &&
+                      p["teacher-id"] === teacherInfo?.id
+                  )
+                );
+
+                const period = schedule?.["class-periods"].find(
+                  (p: IClassPeriod) =>
+                    p["start-at"] === currentSlotIndex && 
+                    !p["is-deleted"] &&
+                    p["teacher-id"] === teacherInfo?.id
+                );
+
+                return (
+                  <TableCell
+                    key={`${day}-${currentSlotIndex}`}
+                    sx={periodCellStyle(Boolean(period))}
+                  >
+                    {period && (
+                      <div className="flex flex-col justify-center items-center h-full p-1 gap-1">
+                        <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
+                          {period["subject-abbreviation"]}
+                        </strong>
+                        <div className="flex justify-between w-full">
+                          <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                            {schedule["student-class-name"]}
+                          </p>
+                          <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                            {period["room-code"]}
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </TableCell>
-
-                  {WEEK_DAYS_FULL.map((day, dayIndex) => {
-                    const currentSlotIndex =
-                      dayIndex * 10 + sessionIndex * 5 + slotIndex + 1;
-                    const period = scheduleData?.["class-schedules"]
-                      .filter((s: IClassSchedule) =>
-                        s["student-class-name"].startsWith(
-                          String(CLASSGROUP_TRANSLATOR[selectedGrade])
-                        )
-                      )
-                      .find(
-                        (s: IClassSchedule) =>
-                          s["student-class-name"] === selectedClass
-                      )
-                      ?.["class-periods"].find(
-                        (p: IClassPeriod) =>
-                          p["start-at"] === currentSlotIndex && !p["is-deleted"]
-                      );
-
-                    return (
-                      <TableCell
-                        key={`${day}-${currentSlotIndex}`}
-                        sx={periodCellStyle(Boolean(period))}
-                      >
-                        {period && (
-                          <div className="flex flex-col justify-center items-center h-full p-1 gap-1">
-                            <strong className="tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold">
-                              {period["subject-abbreviation"]}
-                            </strong>
-                            <div className="flex justify-between w-full">
-                              <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
-                                {period["room-code"]}
-                              </p>
-                              <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
-                                {period["teacher-abbreviation"]}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
+                );
+              })}
+            </TableRow>
+          ))
+        )}
+      </TableBody>
         </Table>
       </TableContainer>
     </div>
