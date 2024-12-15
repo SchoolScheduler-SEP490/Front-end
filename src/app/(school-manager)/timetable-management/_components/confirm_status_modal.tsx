@@ -1,7 +1,22 @@
 import React from "react";
-import { Box, IconButton, Modal, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Modal,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  keyframes,
+  Menu,
+} from "@mui/material";
 import ContainedButton from "@/commons/button-contained";
 import CloseIcon from "@mui/icons-material/Close";
+import { ITerm, IWeekDate } from "../_libs/constants";
+import { getTerms, getWeekDate } from "../_libs/apiTimetable";
+import { useState, useEffect } from "react";
+import { useAppContext } from "@/context/app_provider";
 
 const style = {
   position: "absolute",
@@ -13,14 +28,26 @@ const style = {
   bgcolor: "background.paper",
 };
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 300,
+      scrollbars: "none",
+    },
+  },
+};
+
 interface ConfirmStatusModalProps {
   open: boolean;
   onClose: (close: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: (termId?: number, startWeek?: number, endWeek?: number) => void;
   status: number;
   timetableCode: string;
   timetableName: string;
-  termName: string;
+  termId: number;
   appliedWeek: string | null;
   endedWeek: string | null;
 }
@@ -33,10 +60,60 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
     status,
     timetableCode,
     timetableName,
-    termName,
+    termId,
     appliedWeek,
     endedWeek,
   } = props;
+
+  const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
+  const [terms, setTerms] = useState<ITerm[]>([]);
+  const [selectedTermId, setSelectedTermId] = useState<number>(termId);
+  const [weeks, setWeeks] = useState<IWeekDate[]>([]);
+  const [selectedStartWeek, setSelectedStartWeek] = useState<number>(
+    Number(appliedWeek) || 0
+  );
+  const [selectedEndWeek, setSelectedEndWeek] = useState<number>(
+    Number(endedWeek) || 0
+  );
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      if (open) {
+        const termsData = await getTerms(sessionToken, selectedSchoolYearId);
+        setTerms(termsData.result.items);
+        setSelectedTermId(termId);
+      }
+    };
+    loadInitialData();
+  }, [open, termId]);
+
+  useEffect(() => {
+    const loadWeeks = async () => {
+      if (selectedTermId && status === 3) {
+        const data = await getWeekDate(
+          schoolId,
+          selectedSchoolYearId,
+          selectedTermId,
+          sessionToken
+        );
+        setWeeks(data.result);
+        setSelectedStartWeek(Number(appliedWeek) || 0);
+        setSelectedEndWeek(Number(endedWeek) || 0);
+      }
+    };
+    loadWeeks();
+  }, [selectedTermId, status]);
+
+  const getCurrentWeekNumber = () => {
+    const currentDate = new Date();
+    return (
+      weeks.find((week) => {
+        const startDate = new Date(week["start-date"]);
+        const endDate = new Date(week["end-date"]);
+        return currentDate >= startDate && currentDate <= endDate;
+      })?.["week-number"] || 0
+    );
+  };
 
   const getStatusMessage = () => {
     switch (status) {
@@ -50,39 +127,118 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
 
       case 3:
         return (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <span>
               Bạn có chắc chắn muốn công bố thời khóa biểu{" "}
               <strong>"{timetableCode}"</strong>?
             </span>
-            <div className="mt-4 p-4 bg-gray-50 rounded">
-              <div className="grid grid-cols-2 gap-2">
-                <span className="text-gray-600 font-semibold">
-                  Mã thời khóa biểu:
-                </span>
-                <span className="font-normal text-sm">{timetableCode}</span>
+            <div className="bg-gray-50 p-4 rounded">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Mã thời khóa biểu:
+                  </span>
+                  <span>{timetableCode}</span>
+                </div>
 
-                <span className="text-gray-600 font-semibold">
-                  Tên thời khóa biểu:
-                </span>
-                <span className="font-normal text-sm">{timetableName}</span>
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tên thời khóa biểu:
+                  </span>
+                  <span>{timetableName}</span>
+                </div>
 
-                <span className="text-gray-600 font-semibold">Học kỳ:</span>
-                <span className="font-normal text-sm">{termName}</span>
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">Học kỳ:</span>
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    sx={{ maxWidth: 200 }}
+                  >
+                    <Select
+                      value={selectedTermId}
+                      onChange={(e) =>
+                        setSelectedTermId(Number(e.target.value))
+                      }
+                    >
+                      {terms.map((term) => (
+                        <MenuItem key={term.id} value={term.id}>
+                          {term.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
 
-                <span className="text-gray-600 font-semibold">
-                  Tuần áp dụng:
-                </span>
-                <span className="ffont-normal text-sm">
-                  {appliedWeek || "Chưa xác định"}
-                </span>
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tuần áp dụng:
+                  </span>
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    sx={{ maxWidth: 200 }}
+                  >
+                    <Select
+                      value={selectedStartWeek}
+                      onChange={(e) =>
+                        setSelectedStartWeek(Number(e.target.value))
+                      }
+                      disabled={!selectedTermId}
+                    >
+                      {Array.isArray(weeks) &&
+                        weeks
+                          .filter(
+                            (week) =>
+                              week["week-number"] > getCurrentWeekNumber()
+                          )
+                          .map((week) => (
+                            <MenuItem
+                              key={week["week-number"]}
+                              value={week["week-number"]}
+                            >
+                              Tuần {week["week-number"]} ({week["start-date"]} -{" "}
+                              {week["end-date"]})
+                            </MenuItem>
+                          ))}
+                    </Select>
+                  </FormControl>
+                </div>
 
-                <span className="text-gray-600 font-semibold">
-                  Tuần kết thúc:
-                </span>
-                <span className="font-normal text-sm">
-                  {endedWeek || "Chưa xác định"}
-                </span>
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tuần kết thúc:
+                  </span>
+                  <FormControl
+                    variant="standard"
+                    fullWidth
+                    sx={{ maxWidth: 200 }}
+                  >
+                    <Select
+                      value={selectedEndWeek}
+                      onChange={(e) =>
+                        setSelectedEndWeek(Number(e.target.value))
+                      }
+                      disabled={!selectedStartWeek}
+                      MenuProps={MenuProps}
+                    >
+                      {Array.isArray(weeks) &&
+                        weeks
+                          .filter(
+                            (week) => week["week-number"] >= selectedStartWeek
+                          )
+                          .map((week) => (
+                            <MenuItem
+                              key={week["week-number"]}
+                              value={week["week-number"]}
+                            >
+                              Tuần {week["week-number"]} ({week["start-date"]} -{" "}
+                              {week["end-date"]})
+                            </MenuItem>
+                          ))}
+                    </Select>
+                  </FormControl>
+                </div>
               </div>
             </div>
           </div>
@@ -92,6 +248,13 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
         return (
           <span>
             Bạn có chắc chắn muốn đánh dấu hết hạn thời khóa biểu{" "}
+            <strong>{timetableCode}</strong>?
+          </span>
+        );
+      case 5:
+        return (
+          <span>
+            Bạn có chắc chắn muốn thu hồi thời khóa biểu{" "}
             <strong>{timetableCode}</strong>?
           </span>
         );
@@ -106,6 +269,9 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
   };
 
   const handleClose = () => {
+    // setSelectedTermId(null);
+    // setSelectedStartWeek(null);
+    // setSelectedEndWeek(null);
     onClose(false);
   };
 
@@ -151,7 +317,7 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
           <ContainedButton
             title="Xác nhận"
             disableRipple
-            onClick={onConfirm}
+            onClick={() => onConfirm(selectedTermId, selectedStartWeek, selectedEndWeek)}
             styles="!bg-primary-300 text-white !py-1 px-4"
           />
         </div>
