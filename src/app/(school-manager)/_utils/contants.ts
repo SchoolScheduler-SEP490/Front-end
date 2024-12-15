@@ -114,8 +114,8 @@ export const SM_SIDENAV: ISMSidenav[] = [
 		category: 'Báo cáo',
 		items: [
 			{
-				name: 'Đơn xin nghỉ',
-				url: '/application-form',
+				name: 'Đơn yêu cầu',
+				url: '/request-management',
 				icon: '/images/icons/Import.png',
 			},
 		],

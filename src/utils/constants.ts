@@ -156,11 +156,11 @@ export const TEACHER_STATUS_TRANSLATOR: { [key: number]: string } = {
 };
 
 export const TEACHER_STATUS_TRANSLATOR_REVERSED: { [key: string]: number } = {
-	'hoạt động':1,
-	'công tác':2,
-	'hậu sản':3,
-	'định chỉ':4,
-	'ngừng hoạt động':5,
+	'hoạt động': 1,
+	'công tác': 2,
+	'hậu sản': 3,
+	'định chỉ': 4,
+	'ngừng hoạt động': 5,
 };
 
 export const TEACHER_ROLE: { key: string; value: number }[] = [
@@ -168,10 +168,10 @@ export const TEACHER_ROLE: { key: string; value: number }[] = [
 	{ key: 'TEACHER_DEPARTMENT_HEAD', value: 2 },
 ];
 
-export const TEACHER_ROLE_REVERSED:  { [key: number]: string } = {
+export const TEACHER_ROLE_REVERSED: { [key: number]: string } = {
 	1: 'TEACHER',
 	2: 'TEACHER_DEPARTMENT_HEAD',
-}
+};
 
 export const TEACHER_ROLE_TRANSLATOR: { [key: number]: string } = {
 	1: 'Giáo viên',
@@ -179,8 +179,8 @@ export const TEACHER_ROLE_TRANSLATOR: { [key: number]: string } = {
 };
 
 export const TEACHER_ROLE_TRANSLATOR_REVERSED: { [key: string]: number } = {
-	 'giáo viên':1,
-	'trưởng bộ môn':2,
+	'giáo viên': 1,
+	'trưởng bộ môn': 2,
 };
 
 export const SUBJECT_ABBREVIATION: { [key: string]: string } = {
@@ -211,10 +211,10 @@ export const TEACHER_GENDER: { key: string; value: number }[] = [
 	{ key: 'Female', value: 2 },
 ];
 
-export const TEACHER_GENDER_REVERSED: { [key: number]: string  } = {
+export const TEACHER_GENDER_REVERSED: { [key: number]: string } = {
 	1: 'Male',
 	2: 'Female',
-}
+};
 
 export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 	1: 'Nam',
@@ -222,8 +222,8 @@ export const TEACHER_GENDER_TRANSLATOR: { [key: number]: string } = {
 };
 
 export const TEACHER_GENDER_TRANSLATOR_REVERSED: { [key: string]: number } = {
-	'nam':1,
-	'nữ':2,
+	nam: 1,
+	nữ: 2,
 };
 
 export const ROOM_SUBJECT_MODEL: { key: string; value: number }[] = [
@@ -446,4 +446,11 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 	2: 'Nội bộ',
 	3: 'Công bố',
 	4: 'Hết hạn',
+};
+
+export const REQUEST_TYPE_TRANSLATOR: { [key: string]: string } = {
+	All: 'Tất cả',
+	Other: 'Đơn Khác',
+	RequestAbsenntSchedule: 'Xin nghỉ phép',
+	RequestChangeSlot: 'Xin đổi tiết',
 };
