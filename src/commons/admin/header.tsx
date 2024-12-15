@@ -19,7 +19,9 @@ import {
 	tooltipClasses,
 	TooltipProps,
 } from '@mui/material';
+import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from 'react';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -73,6 +75,11 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 	// const [showNotifications, setShowNotifications] = useState(false);
 	const { isMenuOpen }: IAdminState = useAdminSelector((state) => state.admin);
 	const dispatch = useAdminDispatch();
+
+	const router = useRouter();
+	const handleProfileClick = () =>{
+		router.push("/admin-profile");
+	}
 
 	const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
 		setAnchorEl(event.currentTarget);
@@ -161,7 +168,7 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 				</LightTooltip>
 				{children}
 			</div>
-			<div className='flex flex-row justify-end items-center gap-3'>
+			<div className='flex flex-row justify-end items-center'>
 				{/* <div className='relative'>
 					<IconButton color='primary' onClick={() => setShowNotifications(!showNotifications)}>
 						<div className='relative'>
@@ -266,6 +273,12 @@ const AdminHeader = ({ children }: { children: ReactNode }) => {
 						))}
 					</Menu>
 				</div>
+				<IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
+					<AccountCircleIcon
+						width={20}
+						height={20}
+					/>
+				</IconButton>
 			</div>
 		</div>
 	);
