@@ -42,6 +42,7 @@ export default function SMDepartment() {
 	useEffect(() => {
 		updateDepartment();
 		setDepartmentTableData([]);
+		setIsDepartmentDetailsOpen(false);
 		if (departmentData?.status === 200) {
 			const tmpDepartmentData: IDepartmentTableData[] = departmentData.result.items.map(
 				(item: IDepartmentResponse) =>

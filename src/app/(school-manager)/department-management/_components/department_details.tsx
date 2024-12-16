@@ -31,6 +31,7 @@ const DepartmentDetails = (props: IDepartmentDetailsProps) => {
 	});
 
 	useEffect(() => {
+		setExistingTeachers([])
 		if (open && departmentData) {
 			updateTeacher();
 			if (teacherData?.status === 200) {

@@ -190,13 +190,9 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 								onChange={formik.handleChange('department-code')}
 								onBlur={formik.handleBlur}
 								error={
-									formik.touched['department-code'] &&
-									Boolean(formik.errors['department-code'])
+									formik.touched['department-code'] && Boolean(formik.errors['department-code'])
 								}
-								helperText={
-									formik.touched['department-code'] &&
-									formik.errors['department-code']
-								}
+								helperText={formik.touched['department-code'] && formik.errors['department-code']}
 								slotProps={{
 									input: {
 										endAdornment: (
@@ -224,9 +220,7 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 								value={formik.values.description}
 								onChange={formik.handleChange('description')}
 								onBlur={formik.handleBlur}
-								error={
-									formik.touched.description && Boolean(formik.errors.description)
-								}
+								error={formik.touched.description && Boolean(formik.errors.description)}
 								helperText={formik.touched.description && formik.errors.description}
 								slotProps={{
 									input: {
@@ -254,14 +248,9 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 									id='elective'
 									variant='standard'
 									value={formik.values['meeting-day']}
-									onChange={(event) =>
-										formik.setFieldValue('meeting-day', event.target.value)
-									}
+									onChange={(event) => formik.setFieldValue('meeting-day', event.target.value)}
 									onBlur={formik.handleBlur('meeting-day')}
-									error={
-										formik.touched['meeting-day'] &&
-										Boolean(formik.errors['meeting-day'])
-									}
+									error={formik.touched['meeting-day'] && Boolean(formik.errors['meeting-day'])}
 									MenuProps={MenuProps}
 									sx={{ width: '100%' }}
 									// renderValue={(selected) => selected.label}
@@ -292,17 +281,17 @@ const UpdateDepartment = (props: ICreateDepartmentProps) => {
 
 					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
 						<ContainedButton
+							title='Huỷ'
+							onClick={handleClose}
+							disableRipple
+							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+						/>
+						<ContainedButton
 							title='Cập nhật TBM'
 							disableRipple
 							type='submit'
 							disabled={!formik.isValid}
 							styles='bg-primary-300 text-white !py-1 px-4'
-						/>
-						<ContainedButton
-							title='Huỷ'
-							onClick={handleClose}
-							disableRipple
-							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 						/>
 					</div>
 				</form>

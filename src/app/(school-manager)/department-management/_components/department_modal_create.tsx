@@ -1,6 +1,8 @@
 import ContainedButton from '@/commons/button-contained';
 import { useAppContext } from '@/context/app_provider';
+import useNotify from '@/hooks/useNotify';
 import { SUBJECT_ABBREVIATION } from '@/utils/constants';
+import { TRANSLATOR } from '@/utils/dictionary';
 import CloseIcon from '@mui/icons-material/Close';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
@@ -34,8 +36,8 @@ import { ChangeEvent, Dispatch, useEffect, useRef, useState } from 'react';
 import { TransitionGroup } from 'react-transition-group';
 import { KeyedMutator } from 'swr';
 import { IDropdownOption } from '../../_utils/contants';
-import useCreateDepartment from '../_hooks/useCreateDepartment';
 import useFetchSubjects from '../_hooks/useFetchSubject';
+import { getCreateDepartmentApi } from '../_libs/apis';
 import {
 	ICreateDepartmentRequest,
 	IErrorDepartmentResonse,
@@ -318,7 +320,6 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 				...tmpEditingDepartment,
 			]);
 		}
-		handleClose();
 	};
 
 	const handleUpdateDepartment = (
@@ -345,20 +346,28 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 	};
 
 	const handleFormSubmit = async () => {
-		const { response } = await useCreateDepartment({
-			formData: editingDepartment,
-			schoolId: Number(schoolId),
-			sessionToken,
+		const endpoint = getCreateDepartmentApi({ schoolId: Number(schoolId) });
+		const response = await fetch(endpoint, {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${sessionToken}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(editingDepartment),
 		});
-		if (response?.status === 200) {
+		const data = await response.json();
+		if (response.ok) {
+			useNotify({
+				message: TRANSLATOR[data?.message || ''] ?? 'Có lỗi xảy ra',
+				type: 'success',
+			});
 			updateDepartment();
 			handleClose();
 		} else if (
-			response?.status === 400 &&
-			response?.message === 'Department name or code does existed.'
+			data?.status === 400 &&
+			data?.message === 'Department name or code does existed.'
 		) {
-			alert(JSON.stringify(response));
-			const tmpErrorObjects: IErrorDepartmentResonse[] = response?.result?.map(
+			const tmpErrorObjects: IErrorDepartmentResonse[] = data?.result?.map(
 				(item: IErrorDepartmentResonse) => ({
 					...item,
 				})
