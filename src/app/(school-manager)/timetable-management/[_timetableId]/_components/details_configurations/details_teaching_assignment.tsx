@@ -39,6 +39,7 @@ const DetailsTeachingAssignment = () => {
 					{/* Header */}
 					<TableHead>
 						<TableRow>
+							<TableCell sx={{ fontWeight: 'bold' }}>STT</TableCell>
 							<TableCell width={50} />
 							<TableCell sx={{ fontWeight: 'bold' }}>Tên Giáo Viên</TableCell>
 							<TableCell sx={{ fontWeight: 'bold' }}>Viết Tắt</TableCell>
@@ -52,13 +53,16 @@ const DetailsTeachingAssignment = () => {
 					<TableBody>
 						{dataStored &&
 							dataStored['teacher-assignments-summary'].map(
-								(teacher: ITeacherAssignmentSummary) => (
-									<React.Fragment key={teacher['teacher-id']}>
+								(teacher: ITeacherAssignmentSummary, index: number) => (
+									<React.Fragment key={index}>
 										{/* Hàng chính (giáo viên) */}
 										<TableRow
 											sx={{ bgcolor: '#f5f5f5', cursor: 'pointer' }}
 											onClick={() => toggleRow(teacher['teacher-id'])}
 										>
+											<TableCell width={50} align='center'>
+												{index + 1}
+											</TableCell>
 											<TableCell width={50}>
 												<IconButton size='small' onClick={() => toggleRow(teacher['teacher-id'])}>
 													{openRows[teacher['teacher-id']] ? (
@@ -77,11 +81,12 @@ const DetailsTeachingAssignment = () => {
 
 										{/* Hàng mở rộng (danh sách môn học) */}
 										<TableRow>
-											<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
+											<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>
 												<Collapse in={openRows[teacher['teacher-id']]} timeout='auto' unmountOnExit>
 													<Table size='small'>
 														<TableHead>
 															<TableRow>
+																<TableCell sx={{ fontWeight: 'bold' }}></TableCell>
 																<TableCell width={50} />
 																<TableCell sx={{ fontWeight: 'bold' }}>Môn Học</TableCell>
 																<TableCell sx={{ fontWeight: 'bold' }}>Viết Tắt</TableCell>
@@ -94,6 +99,7 @@ const DetailsTeachingAssignment = () => {
 															{teacher['total-periods-per-week'].map(
 																(subject: ITeacherPeriodsPerWeek) => (
 																	<TableRow key={subject['subject-id']}>
+																		<TableCell width={60} align='center'></TableCell>
 																		<TableCell width={50} />
 																		<TableCell width={300}>{subject['subject-name']}</TableCell>
 																		<TableCell width={200}>

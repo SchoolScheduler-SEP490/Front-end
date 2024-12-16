@@ -35,8 +35,7 @@ export default function TimetableDetail() {
 	const [scheduleData, setScheduleData] = useState<IScheduleResponse | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const isMenuOpen = useSelector((state: any) => state.schoolManager.isMenuOpen);
-	const [activeTab, setActiveTab] = useState(0);
-	const [configTab, setConfigTab] = useState(0);
+	const [activeTab, setActiveTab] = useState(1);
 	const [notes, setNotes] = useState<string>('');
 	const dispatch = useSMDispatch();
 

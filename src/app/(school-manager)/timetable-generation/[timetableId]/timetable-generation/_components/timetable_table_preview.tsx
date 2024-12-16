@@ -482,7 +482,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 																<TableCell
 																	sx={{
 																		border: '1px solid #ddd',
-																		maxWidth: 50,
+																		maxWidth: 150,
 																		maxHeight: 100,
 																		backgroundColor: '#f5f5f5',
 																		overflow: 'hidden',
@@ -491,7 +491,7 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 																	}}
 																>
 																	{!isCombination ? (
-																		<div className='flex flex-col justify-center items-center opacity-80 '>
+																		<div className='flex flex-col justify-center items-center opacity-80  px-1'>
 																			<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
 																				{period.subjectAbbreviation}
 																			</strong>
@@ -501,11 +501,11 @@ const PreviewScheduleTable = (props: IPreviewScheduleProps) => {
 																		</div>
 																	) : (
 																		<LightTooltip title='Tiết học lớp gộp'>
-																			<div className='relative flex flex-col justify-center items-center opacity-80 overflow-hidden'>
+																			<div className='relative flex flex-col justify-center items-center opacity-80 overflow-hidden px-1'>
 																				<strong className='tracking-widertext-ellipsis text-nowrap overflow-hidden text-primary-400'>
 																					{period.subjectAbbreviation}
 																				</strong>
-																				<p className='text-ellipsis text-nowrap overflow-hidden'>
+																				<p className='text-ellipsis text-nowrap overflow-hidden '>
 																					{period.teacherName}
 																				</p>
 																				<div className='absolute top-0 right-0 -translate-y-[50%] translate-x-[10%] bg-tertiary-normal w-[20%] h-[130%] flex flex-row justify-center items-center -rotate-[50deg]'></div>

@@ -124,7 +124,7 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 				Phân công tự động
 			</Button>
 			<Collapse
-				in={dataStored && dataStored['teacher-assignments-summary'].length > 0}
+				in={dataStored && dataStored['teacher-assignments-summary']?.length > 0}
 				sx={{ width: '100%' }}
 				timeout={300}
 				orientation='vertical'

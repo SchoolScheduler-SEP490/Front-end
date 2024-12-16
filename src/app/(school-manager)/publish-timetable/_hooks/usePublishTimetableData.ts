@@ -1,47 +1,48 @@
+import { ICommonResponse, IScheduleResponse } from '@/utils/constants';
 import useSWR from 'swr';
 
 interface IPublishTimetableDataProps {
-  schoolId: string;
-  schoolYearId: number;
-  termId: number;
-  sessionToken: string;
-  date:  Date;
+	schoolId: string;
+	schoolYearId: number;
+	termId: number;
+	sessionToken: string;
+	date: Date;
 }
 
 const api = process.env.NEXT_PUBLIC_API_URL;
 
 const usePublishTimetableData = ({
-  schoolId,
-  schoolYearId,
-  termId,
-  sessionToken,
-  date
+	schoolId,
+	schoolYearId,
+	termId,
+	sessionToken,
+	date,
 }: IPublishTimetableDataProps) => {
-  const formattedDate = date.toISOString().split("T")[0];
-  const endpoint = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/timetables/${formattedDate}?termId=${termId}`;
+	const formattedDate = date.toISOString().split('T')[0];
+	const endpoint = `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/timetables/${formattedDate}?termId=${termId}`;
 
-  const { data, error, isValidating } = useSWR(
-    sessionToken ? endpoint : null,
-    async (url) => {
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${sessionToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const responseData = await response.json();
-      if (!response.ok) {
-        throw new Error(responseData.message);
-      }
-      return responseData;
-    },
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
+	async function fetcher(url: string) {
+		const response = await fetch(url, {
+			headers: {
+				Authorization: `Bearer ${sessionToken}`,
+			},
+		});
+		const data = await response.json();
+		if (!response.ok) {
+			throw new Error(data.message);
+		}
+		return data;
+	}
 
-  return { data: data?.result, error, isValidating };
+	const { data, error, isLoading, isValidating, mutate } = useSWR(endpoint, fetcher, {
+		revalidateIfStale: false,
+		revalidateOnFocus: false,
+		revalidateOnReconnect: false,
+		revalidateOnMount: false,
+		shouldRetryOnError: false,
+	});
+
+	return { data, error, isLoading, isValidating, mutate };
 };
 
 export default usePublishTimetableData;
