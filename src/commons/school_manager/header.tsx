@@ -90,7 +90,7 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
   const notificationRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 	const handleProfileClick = () =>{
-		router.push("/profile");
+		router.push("/school-manager-profile");
 	}
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {

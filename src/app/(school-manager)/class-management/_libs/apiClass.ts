@@ -17,10 +17,11 @@ export const fetchSchoolYear = async (sessionToken: string) => {
 
 export const getTeacherName = async (
   sessionToken: string,
-  schoolId: string
+  schoolId: string,
+  teacherStatus: string
 ) => {
   const initialResponse = await fetch(
-    `${api}/api/schools/${schoolId}/teachers?includeDeleted=false&pageSize=20&pageIndex=1`,
+    `${api}/api/schools/${schoolId}/teachers?teacherStatus=${teacherStatus}&includeDeleted=false&pageSize=20&pageIndex=1`,
     {
       method: "GET",
       headers: {

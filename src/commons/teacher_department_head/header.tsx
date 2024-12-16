@@ -30,6 +30,8 @@ import {
 import { jwtDecode } from "jwt-decode";
 import Image from "next/image";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -101,6 +103,11 @@ const TeacherHeadHeader = ({ children }: { children: ReactNode }) => {
   const { teacherHeadInfo }: ITeacherHeadState = useTeacherHeadSelector(
     (state) => state.teacherDepartmentHead
   );
+
+  const router = useRouter();
+	const handleProfileClick = () =>{
+		router.push("/teacher-department-head-profile");
+	}
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -223,8 +230,8 @@ const TeacherHeadHeader = ({ children }: { children: ReactNode }) => {
             </LightTooltip>
             {children}
           </div>
-          <div className="flex flex-row justify-end items-center gap-3">
-            <div className="relative">
+          <div className="flex flex-row justify-end items-center">
+            <div className="relative mr-3">
               <IconButton
                 color="primary"
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -366,6 +373,12 @@ const TeacherHeadHeader = ({ children }: { children: ReactNode }) => {
                 </MenuItem>
               ))}
             </Menu>
+            <IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
+              <AccountCircleIcon
+                width={20}
+                height={20}
+              />
+            </IconButton>
           </div>
         </div>
       );    

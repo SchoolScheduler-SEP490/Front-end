@@ -131,7 +131,7 @@ export default function ClassDetails() {
 									<strong>Khối:</strong> {CLASSGROUP_TRANSLATOR[classData.grade]}
 								</p>
 								<p>
-									<strong>Số tiết học:</strong> {classData['period-count']}
+									<strong>Số tiết học/tuần:</strong> {classData['period-count']}
 								</p>
 							</div>
 							<div className='text-gray-700'>
@@ -154,7 +154,7 @@ export default function ClassDetails() {
 						<div className='grid grid-cols-2 gap-6 mb-8 leading-loose'>
 							<div className='text-gray-700'>
 								<p>
-									<strong>Tổ bộ môn:</strong> {classData['subject-group-name']}
+									<strong>Khung chương trình:</strong> {classData['curriculum-name']}
 								</p>
 								<p>
 									<strong>Học cả ngày:</strong> {classData['is-full-day'] ? 'Có' : 'Không'}
@@ -162,6 +162,17 @@ export default function ClassDetails() {
 								<p>
 									<strong>Năm học:</strong>{' '}
 									{schoolYear ? `${schoolYear['start-year']} - ${schoolYear['end-year']}` : ''}
+								</p>
+							</div>
+							<div className='text-gray-700'>
+								<p>
+									<strong>Mã khung chương trình:</strong> {classData['curriculum-code']}
+								</p>
+								<p>
+									<strong>Tên nhóm lớp:</strong> {classData['student-class-group-name']}
+								</p>
+								<p>
+									<strong>Mã nhóm lớp:</strong> {classData['student-class-group-code']}
 								</p>
 							</div>
 						</div>
@@ -240,28 +251,34 @@ export default function ClassDetails() {
 												let currentTeacherRowSpan = 0;
 
 												return teacherAssignments.map((assignment, index) => {
-													const teacherName = `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
-													let teacherCell = null;
-													const rowId = `${subject['subject-id']}-${index}`;
-
-													if (teacherName !== currentTeacher) {
-														currentTeacher = teacherName;
-														currentTeacherRowSpan = teacherAssignments.filter(
-															(a) =>
-																`${a['teacher-last-name']} ${a['teacher-first-name']}` ===
-																teacherName
-														).length;
-														teacherCell = (
-															<TableCell
-																rowSpan={currentTeacherRowSpan}
-																sx={{
-																	borderRight: '1px solid rgba(224, 224, 224, 1)',
-																}}
-															>
-																{teacherName}
-															</TableCell>
-														);
-													}
+													const teacherName = assignment['teacher-last-name'] === null || assignment['teacher-first-name'] === null
+													? 'N/A'
+													: `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
+											
+												let teacherCell = null;
+												const rowId = `${subject['subject-id']}-${index}`;
+											
+												if (teacherName !== currentTeacher) {
+													currentTeacher = teacherName;
+													currentTeacherRowSpan = teacherAssignments.filter(
+														(a) => {
+															const name = a['teacher-last-name'] === null || a['teacher-first-name'] === null
+																? 'N/A'
+																: `${a['teacher-last-name']} ${a['teacher-first-name']}`;
+															return name === teacherName;
+														}
+													).length;
+													teacherCell = (
+														<TableCell
+															rowSpan={currentTeacherRowSpan}
+															sx={{
+																borderRight: '1px solid rgba(224, 224, 224, 1)',
+															}}
+														>
+															{teacherName}
+														</TableCell>
+													);
+												}
 
 													return (
 														<TableRow key={rowId}>
@@ -308,7 +325,9 @@ export default function ClassDetails() {
 															>
 																{assignment['end-week']}
 															</TableCell>
+															{index === 0 && (
 															<TableCell
+																rowSpan={teacherAssignments.length}
 																className='text-center'
 																sx={{
 																	borderRight: '1px solid rgba(224, 224, 224, 1)',
@@ -316,6 +335,7 @@ export default function ClassDetails() {
 															>
 																{subject['total-slot-in-year']}
 															</TableCell>
+														)}
 														</TableRow>
 													);
 												});

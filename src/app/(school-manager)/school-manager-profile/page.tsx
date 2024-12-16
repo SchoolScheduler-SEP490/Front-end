@@ -82,8 +82,8 @@ export default function ProfilePage() {
                             <div
                               style={{
                                 position: "relative",
-                                width: "100px",
-                                height: "100px",
+                                width: "64px",
+                                height: "64px",
                                 borderRadius: "50%",
                                 border: "1px solid #888",
                                 overflow: "hidden",
@@ -91,7 +91,7 @@ export default function ProfilePage() {
                               }}
                             >
                               <Avatar
-                                alt={`${accountData["first-name"]} ${accountData["last-name"]}`}
+                                
                                 src={accountData["avatar-url"] || ""}
                                 className="!w-16 !h-16 !mr-4"
                               />
