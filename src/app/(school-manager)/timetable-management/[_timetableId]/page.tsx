@@ -35,8 +35,7 @@ export default function TimetableDetail() {
 	const [scheduleData, setScheduleData] = useState<IScheduleResponse | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const isMenuOpen = useSelector((state: any) => state.schoolManager.isMenuOpen);
-	const [activeTab, setActiveTab] = useState(0);
-	const [configTab, setConfigTab] = useState(0);
+	const [activeTab, setActiveTab] = useState(1);
 	const [notes, setNotes] = useState<string>('');
 	const dispatch = useSMDispatch();
 
@@ -188,9 +187,7 @@ export default function TimetableDetail() {
 							<Button
 								variant='contained'
 								size='medium'
-								className='!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s 
-       transform transition-all duration-300 hover:scale-105 hover:shadow-lg
-       flex items-center gap-2'
+								className='!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s transform transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2'
 								onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
 							>
 								<AddIcon />

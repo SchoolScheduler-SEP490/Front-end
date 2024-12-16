@@ -178,7 +178,7 @@ export default function SMTeachingAssignment() {
 			].map((item: ITeachingAssignmentResponse) => {
 				const existingAssignment =
 					editingObjects.find((assignment) => assignment['assignment-id'] === item.id) ??
-					dataStored['teacher-assignments'].find(
+					dataStored['teacher-assignments']?.find(
 						(assignment) => assignment['assignment-id'] === item.id
 					);
 				if (existingAssignment !== undefined) {
@@ -214,7 +214,7 @@ export default function SMTeachingAssignment() {
 			].map((item: ITeachingAssignmentResponse) => {
 				const existingAssignment =
 					editingObjects.find((assignment) => assignment['assignment-id'] === item.id) ??
-					dataStored['teacher-assignments'].find(
+					dataStored['teacher-assignments']?.find(
 						(assignment) => assignment['assignment-id'] === item.id
 					);
 				if (existingAssignment !== undefined) {

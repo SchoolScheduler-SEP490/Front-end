@@ -155,19 +155,21 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 			setIsErrorShown(true);
 		}
 		if (requiredSubjectsData?.status === 200) {
-			const requiredSubjects: IDropdownOption<number>[] =
-				requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+			const requiredSubjects: IDropdownOption<number>[] = requiredSubjectsData.result.items.map(
+				(subject: ISubjectOptionResponse) => ({
 					label: subject['subject-name'],
 					value: subject.id,
-				}));
+				})
+			);
 			setSpecialisedSubjects(requiredSubjects);
 		}
 		if (optionalSubjectsData?.status === 200) {
-			const optionalSubjects: IDropdownOption<number>[] =
-				optionalSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+			const optionalSubjects: IDropdownOption<number>[] = optionalSubjectsData.result.items.map(
+				(subject: ISubjectOptionResponse) => ({
 					label: subject['subject-name'],
 					value: subject.id,
-				}));
+				})
+			);
 			setOptionalSubjects(optionalSubjects);
 		}
 		if (subjectGroupDetailData?.status === 200) {
@@ -182,11 +184,12 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 				formik.values['elective-subject-ids'].includes(subject.value)
 			);
 			if (requiredSubjectsData?.result.items ?? false) {
-				const initialData: IDropdownOption<number>[] =
-					requiredSubjectsData.result.items.map((subject: ISubjectOptionResponse) => ({
+				const initialData: IDropdownOption<number>[] = requiredSubjectsData.result.items.map(
+					(subject: ISubjectOptionResponse) => ({
 						label: subject['subject-name'],
 						value: subject.id,
-					}));
+					})
+				);
 				setSpecialisedSubjects([...initialData, ...selectedSubjects]);
 			}
 		}
@@ -198,8 +201,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 			const specialisedSubjectIds: Set<number> = new Set<number>();
 			oldData['subject-selective-views']?.map((item) => {
 				const selectedId =
-					optionalSubjects.find((subject) => subject.label === item['subject-name'])
-						?.value ?? 0;
+					optionalSubjects.find((subject) => subject.label === item['subject-name'])?.value ?? 0;
 				if (selectedId !== 0) electiveSubjectIds.add(selectedId);
 			});
 			oldData['subject-specializedt-views']?.map((item) => {
@@ -268,9 +270,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 				>
 					<div className='w-full p-3 flex flex-col justify-start items-center gap-3'>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Tên Khung chương trình
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Tên Khung chương trình</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
@@ -281,13 +281,9 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 								onChange={formik.handleChange('curriculum-name')}
 								onBlur={formik.handleBlur}
 								error={
-									formik.touched['curriculum-name'] &&
-									Boolean(formik.errors['curriculum-name'])
+									formik.touched['curriculum-name'] && Boolean(formik.errors['curriculum-name'])
 								}
-								helperText={
-									formik.touched['curriculum-name'] &&
-									formik.errors['curriculum-name']
-								}
+								helperText={formik.touched['curriculum-name'] && formik.errors['curriculum-name']}
 								slotProps={{
 									input: {
 										endAdornment: (
@@ -304,9 +300,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 							/>
 						</div>
 						<div className='w-full h-fit flex flex-row justify-between items-center'>
-							<h3 className=' h-full flex justify-start pt-4'>
-								Mã Khung chương trình
-							</h3>
+							<h3 className=' h-full flex justify-start pt-4'>Mã Khung chương trình</h3>
 							<TextField
 								className='w-[70%]'
 								variant='standard'
@@ -317,13 +311,9 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 								onChange={formik.handleChange('curriculum-code')}
 								onBlur={formik.handleBlur}
 								error={
-									formik.touched['curriculum-code'] &&
-									Boolean(formik.errors['curriculum-code'])
+									formik.touched['curriculum-code'] && Boolean(formik.errors['curriculum-code'])
 								}
-								helperText={
-									formik.touched['curriculum-code'] &&
-									formik.errors['curriculum-code']
-								}
+								helperText={formik.touched['curriculum-code'] && formik.errors['curriculum-code']}
 								slotProps={{
 									input: {
 										endAdornment: (
@@ -351,12 +341,10 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 									multiple
 									variant='standard'
 									value={formik.values['elective-subject-ids']}
-									onChange={(event) =>
-										formik.setFieldValue(
-											'elective-subject-ids',
-											event.target.value
-										)
-									}
+									onChange={(event) => {
+										formik.setFieldValue('specialized-subject-ids', []);
+										formik.setFieldValue('elective-subject-ids', event.target.value);
+									}}
 									onBlur={formik.handleBlur('elective-subject-ids')}
 									error={
 										formik.touched['elective-subject-ids'] &&
@@ -378,11 +366,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
-												checked={
-													formik.values['elective-subject-ids'].indexOf(
-														item.value
-													) > -1
-												}
+												checked={formik.values['elective-subject-ids'].indexOf(item.value) > -1}
 											/>
 											<ListItemText primary={item.label} />
 										</MenuItem>
@@ -409,10 +393,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 									variant='standard'
 									value={formik.values['specialized-subject-ids']}
 									onChange={(event) =>
-										formik.setFieldValue(
-											'specialized-subject-ids',
-											event.target.value
-										)
+										formik.setFieldValue('specialized-subject-ids', event.target.value)
 									}
 									onBlur={formik.handleBlur('specialized-subject-ids')}
 									error={
@@ -435,11 +416,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 											style={getStyles(item, optionalSubjects, theme)}
 										>
 											<Checkbox
-												checked={
-													formik.values[
-														'specialized-subject-ids'
-													].indexOf(item.value) > -1
-												}
+												checked={formik.values['specialized-subject-ids'].indexOf(item.value) > -1}
 											/>
 											<ListItemText primary={item.label} />
 										</MenuItem>
@@ -464,9 +441,7 @@ const UpdateCurriculumModal = (props: IAddSubjectModalProps) => {
 									id='grade'
 									variant='standard'
 									value={formik.values.grade}
-									onChange={(event) =>
-										formik.setFieldValue('grade', event.target.value)
-									}
+									onChange={(event) => formik.setFieldValue('grade', event.target.value)}
 									onBlur={formik.handleBlur('grade')}
 									error={formik.touched.grade && Boolean(formik.errors.grade)}
 									MenuProps={MenuProps}

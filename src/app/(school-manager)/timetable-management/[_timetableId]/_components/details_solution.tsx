@@ -1,5 +1,7 @@
 'use client';
 
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSMSelector } from '@/hooks/useReduxStore';
 import { IScheduleResponse, TIMETABLE_SLOTS, WEEK_DAYS_FULL } from '@/utils/constants';
 import TuneIcon from '@mui/icons-material/Tune';
 import {
@@ -35,22 +37,22 @@ interface IDetailsSolutionProps {
 
 const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 	const { selectedTeacher, setSelectedTeacher, teacherNames, timetableId, scheduleData } = props;
+	const { timetableStored }: ITimetableGenerationState = useSMSelector(
+		(state) => state.timetableGeneration
+	);
+
 	const router = useRouter();
-	const [openExportModel, setOpenExportModel] = useState(false)
+	const [openExportModel, setOpenExportModel] = useState(false);
 	const { selectedSchoolYearId, sessionToken } = useAppContext();
-	const [subjectLoadedData, setsubjectLoadedData] = useState<ISubjectResponse[]>([])
-	const [teacherLoadedData, setteacherLoadedData] = useState<ITeacherResponse[]>([])
-	const {
-		data: subjectData,
-	} = useFetchData({
+	const [subjectLoadedData, setsubjectLoadedData] = useState<ISubjectResponse[]>([]);
+	const [teacherLoadedData, setteacherLoadedData] = useState<ITeacherResponse[]>([]);
+	const { data: subjectData } = useFetchData({
 		sessionToken: sessionToken,
 		schoolYearId: selectedSchoolYearId,
 		pageSize: 100,
 		pageIndex: 1,
 	});
-	const {
-		data: teacherData,
-	} = useFetchData({
+	const { data: teacherData } = useFetchData({
 		sessionToken: sessionToken,
 		schoolYearId: selectedSchoolYearId,
 		pageSize: 200,
@@ -61,15 +63,13 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 		if (subjectData?.status === 200) {
 			setsubjectLoadedData(subjectData.result.items);
 		}
-
-	},[subjectData, selectedSchoolYearId])
+	}, [subjectData, selectedSchoolYearId]);
 
 	useEffect(() => {
 		if (teacherData?.status === 200) {
 			setteacherLoadedData(teacherData.result.items);
 		}
-
-	},[teacherData, selectedSchoolYearId])
+	}, [teacherData, selectedSchoolYearId]);
 
 	return (
 		<div className='w-full h-fit flex flex-col justify-center items-center px-[2vw] pt-[3vh]'>
@@ -103,16 +103,19 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 							onClick={() => setOpenExportModel(true)}
 							disabled={subjectLoadedData.length == 0 || teacherLoadedData.length == 0}
 						>
-							<DownloadIcon/>
+							<DownloadIcon />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title='Cấu hình'>
-						<IconButton
-							onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
-						>
-							<TuneIcon />
-						</IconButton>
-					</Tooltip>	
+					{timetableStored &&
+						['Published', 'PublishedInternal'].includes(timetableStored.status) && (
+							<Tooltip title='Cấu hình'>
+								<IconButton
+									onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
+								>
+									<TuneIcon />
+								</IconButton>
+							</Tooltip>
+						)}
 				</div>
 			</div>
 
@@ -252,10 +255,10 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						</TableBody>
 					</Table>
 				</TableContainer>
-				
+
 				<ExportDialog
 					open={openExportModel}
-					onClose={() =>setOpenExportModel(false)}
+					onClose={() => setOpenExportModel(false)}
 					scheduleData={scheduleData}
 					subjectData={subjectLoadedData}
 					teacherData={teacherLoadedData}

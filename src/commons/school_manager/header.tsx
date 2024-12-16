@@ -188,12 +188,6 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
         {children}
       </div>
       <div className="flex flex-row justify-end items-center gap-3">
-          <IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
-						<AccountCircleIcon
-							width={20}
-							height={20}
-						/>
-					</IconButton>
         <div className="relative">
           <IconButton
             color="primary"
@@ -330,6 +324,12 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
             ))}
           </Menu>
         </div>
+        <IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
+						<AccountCircleIcon
+							width={20}
+							height={20}
+						/>
+					</IconButton>
       </div>
     </div>
   );
