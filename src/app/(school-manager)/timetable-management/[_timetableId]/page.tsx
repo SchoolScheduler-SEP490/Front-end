@@ -187,9 +187,7 @@ export default function TimetableDetail() {
 							<Button
 								variant='contained'
 								size='medium'
-								className='!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s 
-       transform transition-all duration-300 hover:scale-105 hover:shadow-lg
-       flex items-center gap-2'
+								className='!bg-primary-500 !hover:bg-primary-600 text-white px-8 py-3 rounded-s transform transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2'
 								onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
 							>
 								<AddIcon />

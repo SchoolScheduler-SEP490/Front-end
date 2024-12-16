@@ -65,6 +65,7 @@ export default function CurriculumDetailsPage() {
 	};
 
 	useEffect(() => {
+		mutate();
 		if (data?.status === 200) {
 			setCurriculumDetails(data?.result);
 		}

@@ -21,6 +21,8 @@ import PublishTimetableCancelConfirmModal from './publish_timetable_modal_close_
 import { getUpdateTimetableApi } from '../_libs/apiPublish';
 import { useAppContext } from '@/context/app_provider';
 import { KeyedMutator } from 'swr';
+import { DatePicker } from '@mui/x-date-pickers';
+import PublishTimetableConfirmModal from './publish_timetable_modal_confirm';
 
 const style = {
 	position: 'absolute',
@@ -39,11 +41,11 @@ interface IPublishTimetableEditModalProps {
 	weekdayOptions: IExtendedDropdownOption<string>[];
 	selectedDate: Dayjs;
 	setSelectedDate: Dispatch<SetStateAction<Dayjs>>;
-	updateData:KeyedMutator<any>;
+	updateData: KeyedMutator<any>;
 }
 
 const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
-	const { open, setOpen, data, selectedDate, setSelectedDate, weekdayOptions,updateData } = props;
+	const { open, setOpen, data, selectedDate, setSelectedDate, weekdayOptions, updateData } = props;
 	const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
 
 	const [selectedSession, setSelectedSession] = useState<number>(0);
@@ -64,6 +66,8 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 	const [sessionOptions, setSessionOptions] = useState<IDropdownOption<number>[]>([]);
 	const [mainSession, setMainSession] = useState<number>(0);
 	const [savedChangeObjects, setSavedChangeObjects] = useState<IUpdateTimetableRequest[]>([]);
+
+	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
 	useEffect(() => {
 		if (data.length > 0) {
@@ -104,7 +108,6 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 					setSelectedClassId(tmpClassData.classId);
 					setMainSession(tmpClassData.mainSessionId);
 					generateSessionOptions(tmpClassData.mainSessionId);
-					setSelectedDate(dayjs(weekdayOptions[0].value));
 				}
 				setSelectedClassData(tmpClassData.periods);
 			}
@@ -136,6 +139,7 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 		setClassOptions([]);
 		setSessionOptions([]);
 		setSavedChangeObjects([]);
+		setIsConfirmModalOpen(false);
 	};
 
 	const handleClose = () => {
@@ -209,7 +213,7 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 		}
 	};
 
-	const handleApplyChanges = async () => {
+	const handleApplyChanges = async (isPermanent: boolean) => {
 		const endpoint = getUpdateTimetableApi({
 			schoolId: Number(schoolId),
 			yearId: selectedSchoolYearId,
@@ -220,8 +224,10 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${sessionToken}`,
 			},
-			body: JSON.stringify(savedChangeObjects)
-		})
+			body: JSON.stringify(
+				savedChangeObjects.map((item) => ({ ...item, 'is-change-forever': isPermanent }))
+			),
+		});
 		if (response.ok) {
 			const data = await response.json();
 			useNotify({
@@ -267,27 +273,23 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 				</div>
 				<div className='w-full h-fit max-h-[85vh] flex flex-col justify-start items-center p-3'>
 					<div className='relative w-full h-fit flex flex-row justify-center items-center gap-5'>
-						<TextField
-							select
-							label='Chọn tuần áp dụng'
-							value={selectedDate.format('YYYY-MM-DD') ?? ''}
-							defaultValue={selectedDate.format('YYYY-MM-DD') ?? ''}
-							variant='outlined'
-							onChange={(event) => setSelectedDate(dayjs(event.target.value))}
-							sx={{ width: '20%' }}
-							InputProps={{
-								sx: {
-									height: 45,
-									paddingTop: '2px',
+						<DatePicker
+							label='Chọn ngày'
+							value={selectedDate}
+							onChange={(newValue) => setSelectedDate(newValue || dayjs())}
+							format='DD/MM/YYYY'
+							minDate={dayjs()}
+							slotProps={{
+								textField: {
+									variant: 'outlined',
+									sx: {
+										'& .MuiOutlinedInput-root': {
+											height: 45,
+										},
+									},
 								},
 							}}
-						>
-							{weekdayOptions.map((option: IDropdownOption<string>, index: number) => (
-								<MenuItem value={option.value} key={index}>
-									{option.label}
-								</MenuItem>
-							))}
-						</TextField>
+						/>
 						<TextField
 							select
 							label='Chọn lớp'
@@ -432,13 +434,18 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 						disableRipple
 						type='button'
 						styles='bg-primary-300 text-white !py-1 px-4'
-						onClick={handleApplyChanges}
+						onClick={() => setIsConfirmModalOpen(true)}
 					/>
 				</div>
 				<PublishTimetableCancelConfirmModal
 					open={isCloseConfirmModalOpen}
 					setOpen={setIsCloseConfirmModalOpen}
 					handleApprove={handleClose}
+				/>
+				<PublishTimetableConfirmModal
+					open={isConfirmModalOpen}
+					setOpen={setIsConfirmModalOpen}
+					handleApprove={handleApplyChanges}
 				/>
 			</Box>
 		</Modal>

@@ -1,10 +1,10 @@
 import { useAppContext } from '@/context/app_provider';
+import useFilterArray from '@/hooks/useFilterArray';
 import {
 	IClassCombinationScheduleObject,
 	IClassPeriod,
 	IClassSchedule,
 	ITermResponse,
-	TIMETABLE_SLOTS,
 	WEEK_DAYS_FULL,
 } from '@/utils/constants';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -31,8 +31,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { IDropdownOption } from '../../_utils/contants';
-import useFetchWeekDays from '../_hooks/useFetchWeekDays';
+import useFetchWeekDays from '../_hooks/useFetchWeekdays';
 import usePublishTimetableData from '../_hooks/usePublishTimetableData';
 import { getTerms } from '../_libs/apiPublish';
 import {
@@ -42,7 +41,7 @@ import {
 	IWeekdayResponse,
 } from '../_libs/constants';
 import PublishTimetableEditModal from './publish-timetable_modal_edit';
-import useFilterArray from '@/hooks/useFilterArray';
+import PublishTimetableDetailsModal from './publish_timetable_modal_details';
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
 	<Tooltip {...props} classes={{ popper: className }} />
@@ -111,9 +110,12 @@ export default function PublishTimetableTable({
 	const { selectedSchoolYearId } = useAppContext();
 	const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
 	const [selectedTeacher, setSelectedTeacher] = useState('all');
+	const [selectedPeriod, setSelectedPeriod] = useState<IPeriodProcessData | null>(null);
 	const router = useRouter();
 
 	const [isTimetableEditModalOpen, openTimetableEditModal] = useState<boolean>(false);
+	const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
+
 	const [weekdayOptions, setWeekdayOptions] = useState<IExtendedDropdownOption<string>[]>([]);
 	const [processData, setProcessData] = useState<ITimetableProcessData[]>([]);
 	const [existingCombination, setExistingCombination] = useState<IClassCombinationScheduleObject[]>(
@@ -163,8 +165,8 @@ export default function PublishTimetableTable({
 
 	useEffect(() => {
 		mutate();
+		setProcessData([]);
 		if (scheduleData?.status === 200) {
-			setProcessData([]);
 			const tmpProcessData: ITimetableProcessData[] = scheduleData.result['class-schedules'].map(
 				(classSchedule: IClassSchedule) =>
 					({
@@ -192,6 +194,8 @@ export default function PublishTimetableTable({
 			if (tmpProcessData.length > 0) {
 				setProcessData(tmpProcessData);
 				setExistingCombination(scheduleData.result['class-combinations']);
+			} else {
+				setProcessData([]);
 			}
 		}
 	}, [scheduleData, selectedDate]);
@@ -212,7 +216,7 @@ export default function PublishTimetableTable({
 			}
 		};
 		fetchTerm();
-	}, [sessionToken, selectedSchoolYearId]);
+	}, [ selectedSchoolYearId]);
 
 	const handleEditTimetable = () => {
 		openTimetableEditModal(true);
@@ -252,10 +256,15 @@ export default function PublishTimetableTable({
 		return Array.from(teachers) as string[];
 	}, [scheduleData]);
 
+	const handleSelectPeriod = (period: IPeriodProcessData) => {
+		setSelectedPeriod(period);
+		setIsDetailsModalOpen(true);
+	};
+
 	return (
-		<div className='w-full flex flex-col gap-4'>
-			<div className='w-full mb-6 flex justify-between items-center gap-4'>
-				<div className='flex gap-4'>
+		<div className='w-full h-full flex flex-col justify-between gap-4'>
+			<div className='w-full flex justify-between items-center gap-4'>
+				<div className='flex gap-4 px-[2vw]'>
 					<FormControl sx={{ minWidth: 170 }}>
 						<Select
 							value={selectedTerm}
@@ -274,6 +283,7 @@ export default function PublishTimetableTable({
 						value={selectedDate}
 						onChange={(newValue) => setSelectedDate(newValue || dayjs())}
 						format='DD/MM/YYYY'
+						minDate={dayjs()}
 						slotProps={{ textField: { variant: 'standard' } }}
 					/>
 
@@ -293,9 +303,13 @@ export default function PublishTimetableTable({
 						</Select>
 					</FormControl>
 				</div>
-				<div>
+				<div className='flex flex-row justify-end items-center pr-[2vw]'>
 					<LightTooltip title='Chỉnh sửa TKB' arrow>
-						<IconButton color='primary' onClick={handleEditTimetable}>
+						<IconButton
+							color='primary'
+							onClick={handleEditTimetable}
+							disabled={(!scheduleData && !isValidating) || isValidating}
+						>
 							<DriveFileRenameOutlineIcon />
 						</IconButton>
 					</LightTooltip>
@@ -408,7 +422,7 @@ export default function PublishTimetableTable({
 														);
 														const isCombination =
 															existingCombination?.length > 0 &&
-															existingCombination?.some(
+															existingCombination.some(
 																(combination) =>
 																	combination.classes.some(
 																		(clazz) => clazz.id === period?.classId
@@ -429,7 +443,10 @@ export default function PublishTimetableTable({
 																	}}
 																>
 																	{!isCombination ? (
-																		<div className='flex flex-col justify-center items-center h-full p-1 gap-1 relative'>
+																		<div
+																			className='flex flex-col justify-center items-center h-full p-1 gap-1 relative cursor-pointer'
+																			onClick={() => handleSelectPeriod(period)}
+																		>
 																			<strong className='tracking-wider text-ellipsis text-nowrap overflow-hidden text-primary-500 text-sm font-semibold'>
 																				{period.subjectAbbreviation}
 																			</strong>
@@ -490,6 +507,14 @@ export default function PublishTimetableTable({
 						weekdayOptions={weekdayOptions}
 						selectedDate={selectedDate}
 						setSelectedDate={setSelectedDate}
+						updateData={mutate}
+					/>
+					<PublishTimetableDetailsModal
+						open={isDetailsModalOpen}
+						setOpen={setIsDetailsModalOpen}
+						selectedDate={selectedDate.toISOString()}
+						selectedSlot={selectedPeriod}
+						selectedTermId={selectedTerm}
 						updateData={mutate}
 					/>
 				</div>

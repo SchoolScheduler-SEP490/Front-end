@@ -1,3 +1,5 @@
+import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
+import { useSMSelector } from '@/hooks/useReduxStore';
 import { IScheduleResponse, TIMETABLE_SLOTS, WEEK_DAYS_FULL } from '@/utils/constants';
 import TuneIcon from '@mui/icons-material/Tune';
 import {
@@ -27,6 +29,10 @@ interface IDetailsSolutionProps {
 
 const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 	const { selectedTeacher, setSelectedTeacher, teacherNames, timetableId, scheduleData } = props;
+	const { timetableStored }: ITimetableGenerationState = useSMSelector(
+		(state) => state.timetableGeneration
+	);
+
 	const router = useRouter();
 
 	return (
@@ -55,13 +61,15 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						))}
 					</Select>
 				</FormControl>
-				<Tooltip title='Cấu hình'>
-					<IconButton
-						onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
-					>
-						<TuneIcon />
-					</IconButton>
-				</Tooltip>
+				{timetableStored && !['Published', 'PublishedInternal'].includes(timetableStored.status) && (
+					<Tooltip title='Cấu hình'>
+						<IconButton
+							onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
+						>
+							<TuneIcon />
+						</IconButton>
+					</Tooltip>
+				)}
 			</div>
 
 			<div className='w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]'>

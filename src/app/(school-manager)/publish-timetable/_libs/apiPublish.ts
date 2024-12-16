@@ -54,3 +54,40 @@ export const getUpdateTimetableApi = ({
 }) => {
 	return `${api}/api/schools/${schoolId}/academic-years/${yearId}/timetables/student-class-period-change`;
 };
+
+export const getFetchAvailableTeacherApi = ({
+	classPeriodId,
+	day,
+	schoolId,
+	slot,
+	termId,
+	yearId,
+}: {
+	schoolId: number;
+	yearId: number;
+	termId: number;
+	classPeriodId: number;
+	day: string;
+	slot: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${yearId}/timetables/available-teachers?TermId=${termId}&ClassPeriodId=${classPeriodId}&Day=${day}&StartAt=${slot}`;
+};
+
+export const getFetchAvailableRoomApi = ({
+	classPeriodId,
+	day,
+	schoolId,
+	slot,
+	termId,
+	yearId,
+}: {
+	schoolId: number;
+	yearId: number;
+	termId: number;
+	classPeriodId: number;
+	day: string;
+	slot: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${yearId}/timetables/available-rooms?TermId=${termId}&ClassPeriodId=${classPeriodId}&Day=${day}&StartAt=${slot}`;
+};
+

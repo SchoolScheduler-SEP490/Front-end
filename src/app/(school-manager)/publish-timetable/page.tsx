@@ -14,13 +14,13 @@ export default function PublishTimetablePage() {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div className={`w-[${!isMenuOpen ? '84' : '100'}%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar`}>
+      <div className={`w-[${!isMenuOpen ? '84' : '100'}%] h-screen flex flex-col justify-start items-start `}>
         <SMHeader>
           <h3 className="text-title-small text-white font-semibold tracking-wider">
             Thời khóa biểu đã công bố
           </h3>
         </SMHeader>
-        <div className="w-full h-fit flex flex-col justify-center items-center px-[2vw] pt-[5vh]">
+        <div className="w-full h-fit flex flex-col justify-center items-center pt-[5vh]">
           <PublishTimetableTable 
             schoolId={schoolId}
             schoolYearId={selectedSchoolYearId}

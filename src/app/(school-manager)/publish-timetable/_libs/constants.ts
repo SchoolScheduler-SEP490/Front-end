@@ -1,4 +1,4 @@
-import { IDropdownOption } from "../../_utils/contants";
+import { IDropdownOption } from '../../_utils/contants';
 
 export interface ITermResponse {
 	id: number;
@@ -21,7 +21,7 @@ export interface ITimetableProcessData {
 }
 
 export interface IPeriodProcessData {
-  periodId:number
+	periodId: number;
 	teacherId: number;
 	teacherName: string;
 	subjectId: number;
@@ -50,8 +50,30 @@ export interface IUpdateTimetableRequest {
 	week: number;
 	'teacher-id'?: number;
 	'room-id'?: number;
+	'is-change-forever': boolean;
 }
 
 export interface IExtendedDropdownOption<T> extends IDropdownOption<T> {
-  extra: any;
+	extra: any;
+}
+
+export interface IAvailableTeacherResponse {
+	'teacher-id': number;
+	'first-name': string;
+	'last-name': string;
+	'subject-id': number;
+	'subject-name': string;
+	abbreviation: string;
+	'list-approriate-level-by-grades': {
+		id: number;
+		'is-main': boolean;
+		'appropriate-level': string;
+		grade: string;
+	}[];
+}
+
+export interface IAvailableRoomResponse {
+	'room-id': number;
+	'room-code': string;
+	'room-name': string;
 }

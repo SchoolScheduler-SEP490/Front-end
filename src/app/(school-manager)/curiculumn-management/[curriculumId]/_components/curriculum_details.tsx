@@ -124,7 +124,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 						<h4 className='text-body-small text-basic-gray'>Nhóm lớp áp dụng</h4>
 						{subjectGroupDetails?.['student-class-group-view-names'] ? (
 							<ul className='list-disc pl-6 w-full'>
-								{subjectGroupDetails?.['student-class-group-view-names'].map((item, index) => (
+								{subjectGroupDetails?.['student-class-group-view-names'].sort((a,b) => a.localeCompare(b)).map((item, index) => (
 									<li className='w-full h-fit' key={index}>
 										<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 											<p className='max-w-[90%]'>{item}</p>
@@ -161,7 +161,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 							<ul className='list-disc pl-6 w-full'>
 								{useFilterArray(subjectGroupDetails?.['subject-selective-views'], [
 									'subject-name',
-								]).map((item, index) => (
+								]).sort((a,b) => a['subject-name'].localeCompare(b['subject-name'])).map((item, index) => (
 									<li className='w-full h-fit' key={item.abbreviation + index}>
 										<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 											<p className='max-w-[90%]'>{item['subject-name']}</p>
@@ -196,7 +196,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 							<ul className='list-disc pl-6 w-full'>
 								{useFilterArray(subjectGroupDetails?.['subject-specializedt-views'], [
 									'subject-name',
-								]).map((item, index) => (
+								]).sort((a,b) => a['subject-name'].localeCompare(b['subject-name'])).map((item, index) => (
 									<li className='w-full h-fit' key={item.abbreviation + index}>
 										<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 											<p className='max-w-[90%]'>{item['subject-name']}</p>
@@ -232,7 +232,7 @@ const CurriculumDetails = (props: ICurriculumDetailsProps) => {
 						<ul className='list-disc pl-6 w-full'>
 							{useFilterArray(subjectGroupDetails?.['subject-required-views'], [
 								'subject-name',
-							]).map((item, index) => (
+							]).sort((a,b) => a['subject-name'].localeCompare(b['subject-name'])).map((item, index) => (
 								<li className='w-full h-fit' key={item.abbreviation + index}>
 									<div className='w-[90%] h-fit flex flex-row justify-between items-baseline'>
 										<p className='max-w-[90%]'>{item['subject-name']}</p>
