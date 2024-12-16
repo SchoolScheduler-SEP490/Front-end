@@ -82,6 +82,10 @@ export interface IClassDetail {
   "update-date": string;
   "is-deleted": boolean;
   "school-year": ISchoolYear;
+  "curriculum-name": string;
+  "curriculum-code": string;
+  "student-class-group-name": string;
+  "student-class-group-code": string;
 }
 
 export interface ISchoolYear {

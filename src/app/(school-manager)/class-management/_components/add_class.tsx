@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -69,7 +69,7 @@ const AddClassModal = (props: AddClassFormProps) => {
 
   React.useEffect(() => {
     const loadTeachers = async () => {
-      const data = await getTeacherName(sessionToken, schoolId);
+      const data = await getTeacherName(sessionToken, schoolId, "HoatDong");
       if (data.result?.items) {
         setTeachers(data.result.items);
       }

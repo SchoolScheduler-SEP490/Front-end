@@ -192,7 +192,7 @@ const UpdateClassModal = (props: UpdateClassFormProps) => {
     };
 
     const loadTeacherName = async () => {
-      const response = await getTeacherName(sessionToken, schoolId);
+      const response = await getTeacherName(sessionToken, schoolId, "HoatDong");
       if (response.status === 200) {
         setTeachers(response.result.items);
       }
