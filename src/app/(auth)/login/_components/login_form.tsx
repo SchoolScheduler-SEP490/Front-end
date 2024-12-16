@@ -144,9 +144,9 @@ export const LoginForm = () => {
 						const teacherData = await teacherResponse.json();
 						if (teacherData.status === 200) {
 							dispatch(setTeacherInfo(teacherData.result));
-						  }
+						}
 					}
-					{
+					if ((decodedToken?.role as string[]).includes('TeacherDepartmentHead')) {
 						const teacherHeadResponse = await fetch(
 							`${api}/api/schools/${decodedToken.schoolId}/teachers/${decodedToken.email}/info`,
 							{
@@ -158,7 +158,7 @@ export const LoginForm = () => {
 						const teacherHeadData = await teacherHeadResponse.json();
 						if (teacherHeadData.status === 200) {
 							dispatch(setTeacherHeadInfo(teacherHeadData.result));
-						  }
+						}
 					}
 					data = {
 						email: decodedToken?.email ?? '',
@@ -174,7 +174,7 @@ export const LoginForm = () => {
 					};
 					setSchoolId(decodedToken?.schoolId ?? '');
 					setSchoolName(decodedToken?.schoolName ?? '');
-					setAccountId(decodedToken?.accountId ? parseInt(decodedToken?.accountId) : 0)
+					setAccountId(decodedToken?.accountId ? parseInt(decodedToken?.accountId) : 0);
 				} else {
 					setIsLoggingIn(false);
 					useNotify({
@@ -186,7 +186,7 @@ export const LoginForm = () => {
 				}
 				return data;
 			});
-			
+
 			setLoginResult(result);
 			setIsLoggingIn(false);
 		} catch (error: any) {
@@ -194,7 +194,7 @@ export const LoginForm = () => {
 		}
 	};
 
-	const saveClientLoginData = async (userData:IUser) => {
+	const saveClientLoginData = async (userData: IUser) => {
 		const resultFromNextServer = await fetch('/api/auth', {
 			method: 'POST',
 			body: JSON.stringify({ ...userData, selectedSchoolYearId }),
@@ -224,7 +224,7 @@ export const LoginForm = () => {
 	useEffect(() => {
 		if (loginResult !== undefined) {
 			if (isMultiRole && selectedRole.length > 0) {
-				saveClientLoginData({...loginResult, role: selectedRole});
+				saveClientLoginData({ ...loginResult, role: selectedRole });
 			} else if (!isMultiRole) {
 				saveClientLoginData(loginResult);
 			}
