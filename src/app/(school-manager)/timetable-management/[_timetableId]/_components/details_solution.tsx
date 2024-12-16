@@ -1,3 +1,5 @@
+'use client';
+
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 import { useSMSelector } from '@/hooks/useReduxStore';
 import { IScheduleResponse, TIMETABLE_SLOTS, WEEK_DAYS_FULL } from '@/utils/constants';
@@ -17,7 +19,13 @@ import {
 	Tooltip,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import DownloadIcon from '@mui/icons-material/Download';
+import ExportDialog from './details_configurations/export_timetable';
+import useFetchData from '@/app/(admin)/subjects/_hooks/useFetchData';
+import { useAppContext } from '@/context/app_provider';
+import { ISubjectResponse } from '@/app/(school-manager)/department-management/_libs/constants';
+import { ITeacherResponse } from '../_libs/constants';
 
 interface IDetailsSolutionProps {
 	selectedTeacher: string;
@@ -34,6 +42,34 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 	);
 
 	const router = useRouter();
+	const [openExportModel, setOpenExportModel] = useState(false);
+	const { selectedSchoolYearId, sessionToken } = useAppContext();
+	const [subjectLoadedData, setsubjectLoadedData] = useState<ISubjectResponse[]>([]);
+	const [teacherLoadedData, setteacherLoadedData] = useState<ITeacherResponse[]>([]);
+	const { data: subjectData } = useFetchData({
+		sessionToken: sessionToken,
+		schoolYearId: selectedSchoolYearId,
+		pageSize: 100,
+		pageIndex: 1,
+	});
+	const { data: teacherData } = useFetchData({
+		sessionToken: sessionToken,
+		schoolYearId: selectedSchoolYearId,
+		pageSize: 200,
+		pageIndex: 1,
+	});
+
+	useEffect(() => {
+		if (subjectData?.status === 200) {
+			setsubjectLoadedData(subjectData.result.items);
+		}
+	}, [subjectData, selectedSchoolYearId]);
+
+	useEffect(() => {
+		if (teacherData?.status === 200) {
+			setteacherLoadedData(teacherData.result.items);
+		}
+	}, [teacherData, selectedSchoolYearId]);
 
 	return (
 		<div className='w-full h-fit flex flex-col justify-center items-center px-[2vw] pt-[3vh]'>
@@ -61,15 +97,26 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						))}
 					</Select>
 				</FormControl>
-				{timetableStored && !['Published', 'PublishedInternal'].includes(timetableStored.status) && (
-					<Tooltip title='Cấu hình'>
+				<div className='flex items-center gap-3'>
+					<Tooltip title='Xuất TKB'>
 						<IconButton
-							onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
+							onClick={() => setOpenExportModel(true)}
+							disabled={subjectLoadedData.length == 0 || teacherLoadedData.length == 0}
 						>
-							<TuneIcon />
+							<DownloadIcon />
 						</IconButton>
 					</Tooltip>
-				)}
+					{timetableStored &&
+						['Published', 'PublishedInternal'].includes(timetableStored.status) && (
+							<Tooltip title='Cấu hình'>
+								<IconButton
+									onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
+								>
+									<TuneIcon />
+								</IconButton>
+							</Tooltip>
+						)}
+				</div>
 			</div>
 
 			<div className='w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]'>
@@ -208,6 +255,14 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						</TableBody>
 					</Table>
 				</TableContainer>
+
+				<ExportDialog
+					open={openExportModel}
+					onClose={() => setOpenExportModel(false)}
+					scheduleData={scheduleData}
+					subjectData={subjectLoadedData}
+					teacherData={teacherLoadedData}
+				/>
 			</div>
 		</div>
 	);
