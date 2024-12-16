@@ -220,10 +220,9 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 			? rowsPerPage - curriculumTableData.length
 			: 0;
 
-	const visibleRows = React.useMemo(
-		() => [...curriculumTableData].sort(getComparator(order, orderBy)),
-		[order, orderBy, page, rowsPerPage]
-	);
+	const visibleRows: ICurriculumTableData[] = React.useMemo((): ICurriculumTableData[] => {
+		return curriculumTableData ? [...curriculumTableData].sort(getComparator(order, orderBy)) : [];
+	}, [order, orderBy, page, rowsPerPage]);
 	return (
 		<div className='w-full h-fit flex flex-row justify-center items-center gap-6 px-1 pt-[2vh]'>
 			<Box sx={{ width: '100%' }}>
@@ -313,7 +312,7 @@ const CurriculumTable = (props: ICurriculumTableProps) => {
 												}}
 												onClick={() => handleViewDetails(row)}
 											>
-												{row.curriculumCode.length > 0 ? row.curriculumCode : '- - -'}
+												{row.curriculumCode?.length > 0 ? row.curriculumCode : '- - -'}
 											</TableCell>
 											<TableCell
 												align='left'
