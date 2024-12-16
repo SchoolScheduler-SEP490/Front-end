@@ -154,9 +154,8 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 				'class-period-id': selectedSlot?.periodId ?? 0,
 				'start-at': selectedTarget?.slot ?? 0,
 				week:
-					weekdayOptions.find(
-						(item) => dayjs(item.value).format('YYYY-MM-DD') === selectedDate.format('YYYY-MM-DD')
-					)?.extra ?? 0,
+					weekdayOptions.find((option) => dayjs(selectedDate).isBefore(dayjs(option.max)))?.extra ??
+					0,
 			} as IUpdateTimetableRequest;
 			if (tmpSavedChangeObject.week !== 0) {
 				savedChangeObjects.push(tmpSavedChangeObject);
@@ -430,7 +429,7 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton
-						title='áp dụng'
+						title='lưu thay đổi'
 						disableRipple
 						type='button'
 						styles='bg-primary-300 text-white !py-1 px-4'
