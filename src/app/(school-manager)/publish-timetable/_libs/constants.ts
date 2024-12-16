@@ -55,6 +55,7 @@ export interface IUpdateTimetableRequest {
 
 export interface IExtendedDropdownOption<T> extends IDropdownOption<T> {
 	extra: any;
+	max:string;
 }
 
 export interface IAvailableTeacherResponse {

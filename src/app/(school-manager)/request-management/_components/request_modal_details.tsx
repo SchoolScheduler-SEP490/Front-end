@@ -200,7 +200,7 @@ const RequestDetailsModal = (props: IRequestDetailsModalprops) => {
 						{/* Nội dung */}
 						<Box mb={2}>
 							<Typography variant='body1' fontWeight='bold'>
-								Nội dung:
+								Lý do:
 							</Typography>
 							<Typography
 								variant='body2'

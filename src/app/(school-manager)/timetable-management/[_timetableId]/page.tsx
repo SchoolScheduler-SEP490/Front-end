@@ -2,6 +2,15 @@
 
 import SMHeader from '@/commons/school_manager/header';
 import {
+	ITimetableGenerationState,
+	setDataStored,
+	setGeneratedScheduleStored,
+	setTimetableId,
+	setTimetableStored,
+} from '@/context/slice_timetable_generation';
+import useNotify from '@/hooks/useNotify';
+import { useSMDispatch, useSMSelector } from '@/hooks/useReduxStore';
+import {
 	IConfigurationStoreObject,
 	IScheduleResponse,
 	ITimetableStoreObject,
@@ -12,20 +21,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, IconButton, Tab, Tabs, TextField, Typography } from '@mui/material';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import Image from 'next/image';
-import { notFound, useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import DetailsConfiguration from './_components/details_configurations';
 import DetailsSolution from './_components/details_solution';
-import {
-	ITimetableGenerationState,
-	setDataStored,
-	setGeneratedScheduleStored,
-	setTimetableId,
-	setTimetableStored,
-} from '@/context/slice_timetable_generation';
-import { useSMDispatch, useSMSelector } from '@/hooks/useReduxStore';
-import useNotify from '@/hooks/useNotify';
 
 export default function TimetableDetail() {
 	const params = useParams();
@@ -108,7 +108,6 @@ export default function TimetableDetail() {
 					type: 'error',
 					message: 'Không tìm thấy dữ liệu cấu hình của TKB',
 				});
-				notFound();
 			}
 		};
 		fetchStoredData();

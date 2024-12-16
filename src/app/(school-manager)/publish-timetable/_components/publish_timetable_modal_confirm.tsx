@@ -64,7 +64,7 @@ const PublishTimetableConfirmModal = (props: IPublishTimetableConfirmModalProps)
 						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
 					/>
 					<ContainedButton
-						title='Áp dụng một lần'
+						title='Áp dụng trong tuần'
 						disableRipple
 						onClick={() => handleApprove(false)}
 						styles='bg-primary-400 text-white text-normal !py-1 px-4'

@@ -31,7 +31,7 @@ interface IAccountRequestModalProps {
 	selectedAccount: IAccountResponse;
 	open: boolean;
 	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	handleProcess: (newStatus: string) => void;
+	handleProcess: (newStatus: 'Active' | 'Pending' | 'Inactive') => void;
 }
 
 const AccountRequestModal = (props: IAccountRequestModalProps) => {

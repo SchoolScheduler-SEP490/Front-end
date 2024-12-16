@@ -74,20 +74,6 @@ const cellStyle = {
 	fontWeight: 'bold',
 };
 
-const periodCellStyle = (hasPeriod: boolean) => ({
-	border: '1px solid #e5e7eb',
-	maxWidth: 110,
-	height: '70px',
-	backgroundColor: hasPeriod ? '#f8faff' : 'white',
-	overflow: 'hidden',
-	cursor: 'pointer',
-	transition: 'all 0.2s ease-in-out',
-	'&:hover': {
-		backgroundColor: '#e5e7eb',
-		boxShadow: 'inset 0 0 0 1px #fafafa',
-	},
-});
-
 const ITEM_HEIGHT = 40;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -130,7 +116,6 @@ export default function PublishTimetableTable({
 	});
 	const {
 		data: scheduleData,
-		error,
 		isValidating,
 		mutate,
 	} = usePublishTimetableData({
@@ -153,6 +138,7 @@ export default function PublishTimetableTable({
 						)} - ${dayjs(weekday['end-date']).format('DD/MM/YYYY')})`,
 						value: `${weekday['start-date']}`,
 						extra: weekday['week-number'],
+						max: weekday['end-date'],
 					} as IExtendedDropdownOption<string>)
 			);
 			if (tmpWeekdayOptions.length > 0) {
@@ -216,7 +202,7 @@ export default function PublishTimetableTable({
 			}
 		};
 		fetchTerm();
-	}, [ selectedSchoolYearId]);
+	}, [selectedSchoolYearId]);
 
 	const handleEditTimetable = () => {
 		openTimetableEditModal(true);
@@ -239,7 +225,7 @@ export default function PublishTimetableTable({
 			return 0; // Không thay đổi nếu độ dài khác nhau (đã được xử lý ở bước 1)
 		});
 		return tmpDisplayData;
-	}, [processData]);
+	}, [processData, selectedTeacher]);
 
 	const teacherNames = useMemo(() => {
 		if (!scheduleData) return [];
@@ -283,7 +269,6 @@ export default function PublishTimetableTable({
 						value={selectedDate}
 						onChange={(newValue) => setSelectedDate(newValue || dayjs())}
 						format='DD/MM/YYYY'
-						minDate={dayjs()}
 						slotProps={{ textField: { variant: 'standard' } }}
 					/>
 
@@ -417,9 +402,14 @@ export default function PublishTimetableTable({
 												</TableCell>
 												{filteredData &&
 													filteredData.map((clazz: ITimetableProcessData) => {
-														const period = clazz.periods.find(
-															(item) => item.slot === slot + weekdayIndex * 10
-														);
+														const period =
+															selectedTeacher === 'all'
+																? clazz.periods.find(
+																		(item) => item.slot === slot + weekdayIndex * 10
+																  )
+																: clazz.periods
+																		.filter((item) => item.teacherName === selectedTeacher)
+																		.find((item) => item.slot === slot + weekdayIndex * 10);
 														const isCombination =
 															existingCombination?.length > 0 &&
 															existingCombination.some(
@@ -516,6 +506,7 @@ export default function PublishTimetableTable({
 						selectedSlot={selectedPeriod}
 						selectedTermId={selectedTerm}
 						updateData={mutate}
+						weekdayOptions={weekdayOptions}
 					/>
 				</div>
 			)}

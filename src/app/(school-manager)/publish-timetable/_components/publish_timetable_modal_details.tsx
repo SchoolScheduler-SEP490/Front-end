@@ -18,6 +18,7 @@ import useFetchAvailableTeachers from '../_hooks/useFetchAvailableTeacher';
 import {
 	IAvailableRoomResponse,
 	IAvailableTeacherResponse,
+	IExtendedDropdownOption,
 	IPeriodProcessData,
 	IUpdateTimetableRequest,
 } from '../_libs/constants';
@@ -26,6 +27,8 @@ import { getUpdateTimetableApi } from '../_libs/apiPublish';
 import useNotify from '@/hooks/useNotify';
 import { KeyedMutator } from 'swr';
 import PublishTimetableConfirmModal from './publish_timetable_modal_confirm';
+import dayjs from 'dayjs';
+import useFetchWeekDays from '../_hooks/useFetchWeekdays';
 
 const style = {
 	position: 'absolute',
@@ -44,6 +47,7 @@ interface IPublishTimetableDetailsModalProps {
 	selectedDate: string;
 	selectedTermId: number;
 	updateData: KeyedMutator<any>;
+	weekdayOptions: IExtendedDropdownOption<string>[];
 }
 
 const TRANSLATOR = {
@@ -56,7 +60,8 @@ const TRANSLATOR = {
 };
 
 const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps) => {
-	const { open, setOpen, selectedSlot, selectedDate, selectedTermId, updateData } = props;
+	const { open, setOpen, selectedSlot, selectedDate, selectedTermId, updateData, weekdayOptions } =
+		props;
 	const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
 
 	const [teacherOptions, setTeacherOptions] = useState<IDropdownOption<number>[]>([]);
@@ -65,6 +70,13 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 	const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null);
 
 	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+
+	const { data: weekdayData, mutate: updateWeekdayData } = useFetchWeekDays({
+		schoolId: Number(schoolId),
+		sessionToken,
+		termId: selectedTermId,
+		yearId: selectedSchoolYearId,
+	});
 
 	const { data: availableTeachers, mutate: updateAvailableTeachers } = useFetchAvailableTeachers({
 		schoolId: Number(schoolId),
@@ -98,13 +110,16 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 						value: room['room-id'],
 					} as IDropdownOption<number>)
 			);
-			setRoomOptions([
-				...tmpRoomOptions,
-				{ label: selectedSlot?.roomName ?? '', value: selectedSlot?.roomId ?? 0 },
-			].sort((a, b) => a.label.localeCompare(b.label)));
+			if (!tmpRoomOptions.some((option) => option.value === selectedSlot?.roomId)) {
+				tmpRoomOptions.push({
+					label: selectedSlot?.roomName ?? '',
+					value: selectedSlot?.roomId ?? 0,
+				});
+			}
+			setRoomOptions(tmpRoomOptions.sort((a, b) => a.label.localeCompare(b.label)));
 			setSelectedRoom(selectedSlot?.roomId ?? null);
 		}
-	}, [availableRooms]);
+	}, [availableRooms, open]);
 
 	useEffect(() => {
 		updateAvailableTeachers();
@@ -114,17 +129,20 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 			].map(
 				(teacher: IAvailableTeacherResponse) =>
 					({
-						label: `${teacher['first-name']} ${teacher['last-name']} (${teacher.abbreviation})`,
+						label: `${teacher['first-name']} ${teacher['last-name']}`,
 						value: teacher['teacher-id'],
 					} as IDropdownOption<number>)
 			);
-			setTeacherOptions([
-				...tmpTeacherOptions,
-				{ label: selectedSlot?.teacherName ?? '', value: selectedSlot?.teacherId ?? 0 },
-			].sort((a, b) => a.label.localeCompare(b.label)));
+			if (!tmpTeacherOptions.some((option) => option.value === selectedSlot?.teacherId)) {
+				tmpTeacherOptions.push({
+					label: selectedSlot?.teacherName ?? '',
+					value: selectedSlot?.teacherId ?? 0,
+				});
+			}
+			setTeacherOptions(tmpTeacherOptions.sort((a, b) => a.label.localeCompare(b.label)));
 			setSelectedTeacher(selectedSlot?.teacherId ?? null);
 		}
-	}, [availableTeachers]);
+	}, [availableTeachers, open]);
 
 	const handleClose = () => {
 		setOpen(false);
@@ -148,10 +166,14 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 			},
 			body: JSON.stringify([
 				{
-					"class-period-id": selectedSlot?.periodId,
-					"start-at": selectedSlot?.slot,
+					'class-period-id': selectedSlot?.periodId,
+					'start-at': selectedSlot?.slot,
 					'room-id': selectedRoom,
 					'teacher-id': selectedTeacher,
+					'is-change-forever': isPermanent,
+					week:
+						weekdayOptions.find((option) => dayjs(selectedDate).isBefore(dayjs(option.max)))
+							?.extra ?? 0,
 				} as IUpdateTimetableRequest,
 			]),
 		});
@@ -171,6 +193,7 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 			});
 		}
 	};
+
 	return (
 		<Modal
 			disableEnforceFocus
@@ -225,6 +248,11 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 						</div>
 					)}
 
+					{selectedSlot?.priority === 'Double' && (
+						<p className='text-body-small italic opacity-80 text-basic-negative pt-2'>
+							(*) Đối với tiết đôi nên cập nhật cả 2 tiết để tránh gây sai sót
+						</p>
+					)}
 					{/* Dropdown chọn Room */}
 					<Box mt={3}>
 						<FormControl fullWidth>
@@ -233,12 +261,12 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 								value={selectedRoom ?? ''}
 								onChange={(e) => setSelectedRoom(Number(e.target.value))}
 								displayEmpty
+								disabled={!dayjs().isAfter(dayjs(selectedDate))}
 								variant='outlined'
 								renderValue={(selected) =>
 									roomOptions.find((item) => item.value === selected)?.label ?? ''
 								}
 							>
-								<MenuItem value=''>Chọn phòng</MenuItem>
 								{roomOptions.map((room) => (
 									<MenuItem key={room.value} value={room.value}>
 										{room.label}
@@ -256,12 +284,12 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 								value={selectedTeacher ?? ''}
 								onChange={(e) => setSelectedTeacher(Number(e.target.value))}
 								displayEmpty
+								disabled={!dayjs().isAfter(dayjs(selectedDate))}
 								variant='outlined'
 								renderValue={(selected) =>
 									teacherOptions.find((item) => item.value === selected)?.label ?? ''
 								}
 							>
-								<MenuItem value=''>Chọn giáo viên</MenuItem>
 								{teacherOptions.map((teacher) => (
 									<MenuItem key={teacher.value} value={teacher.value}>
 										{teacher.label}
@@ -271,21 +299,22 @@ const PublishTimetableDetailsModal = (props: IPublishTimetableDetailsModalProps)
 						</FormControl>
 					</Box>
 				</div>
-				<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
-					
-					<ContainedButton
-						title='Huỷ'
-						onClick={handleClose}
-						disableRipple
-						styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
-					/>
-					<ContainedButton
-						title='cập nhật'
-						disableRipple
-						onClick={() => setIsConfirmModalOpen(true)}
-						styles='bg-primary-400 text-white text-normal !py-1 px-4'
-					/>
-				</div>
+				{dayjs().isAfter(dayjs(selectedDate)) && (
+					<div className='w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3'>
+						<ContainedButton
+							title='Huỷ'
+							onClick={handleClose}
+							disableRipple
+							styles='!bg-basic-gray-active !text-basic-gray !py-1 px-4'
+						/>
+						<ContainedButton
+							title='cập nhật'
+							disableRipple
+							onClick={() => setIsConfirmModalOpen(true)}
+							styles='bg-primary-400 text-white text-normal !py-1 px-4'
+						/>
+					</div>
+				)}
 				<PublishTimetableConfirmModal
 					open={isConfirmModalOpen}
 					setOpen={setIsConfirmModalOpen}
