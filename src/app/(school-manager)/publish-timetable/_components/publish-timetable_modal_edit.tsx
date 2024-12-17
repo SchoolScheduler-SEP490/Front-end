@@ -150,15 +150,25 @@ const PublishTimetableEditModal = (props: IPublishTimetableEditModalProps) => {
 	const handleUpdateData = () => {
 		if (editingData.length > 0) {
 			// Lưu lại data đã được update
-			const tmpSavedChangeObject: IUpdateTimetableRequest = {
+			const tmpSavedChangeObject: IUpdateTimetableRequest[] = [{
 				'class-period-id': selectedSlot?.periodId ?? 0,
 				'start-at': selectedTarget?.slot ?? 0,
 				week:
 					weekdayOptions.find((option) => dayjs(selectedDate).isBefore(dayjs(option.max)))?.extra ??
 					0,
-			} as IUpdateTimetableRequest;
-			if (tmpSavedChangeObject.week !== 0) {
-				savedChangeObjects.push(tmpSavedChangeObject);
+			} as IUpdateTimetableRequest]
+			if (selectedTarget?.subjectId !== 0) {
+				tmpSavedChangeObject.push({
+					'class-period-id': selectedTarget?.periodId ?? 0,
+					'start-at': selectedSlot?.slot ?? 0,
+					week:
+						weekdayOptions.find((option) => dayjs(selectedDate).isBefore(dayjs(option.max)))?.extra ??
+						0,
+				} as IUpdateTimetableRequest)
+			}
+
+			if (tmpSavedChangeObject.length > 0) {
+				savedChangeObjects.push(...tmpSavedChangeObject);
 				// Update data trên giao diện
 				const updatedData: ITimetableProcessData[] = editingData.map(
 					(item: ITimetableProcessData) => {
