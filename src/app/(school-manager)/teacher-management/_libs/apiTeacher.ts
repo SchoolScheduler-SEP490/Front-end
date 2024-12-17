@@ -313,3 +313,15 @@ export const deleteTeachableSubject = async (
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 };
+
+export const getFetchTeacherAccountsApi = (schoolId:number) => {
+  return `${api}/api/schools/${schoolId}/teachers/teacher-account?pageIndex=0&pageSize=100`
+}
+
+export const getGenerateTeacherAccountsApi = (schoolId:number) => {
+  return `${api}/api/schools/${schoolId}/teachers/generate-account`
+}
+
+export const getUpdateStatusSchoolApi = () => {
+  return `${api}/api/users/status`;
+};

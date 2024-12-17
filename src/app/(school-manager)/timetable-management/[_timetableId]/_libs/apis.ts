@@ -126,3 +126,19 @@ export const getFetchClassApi = ({
 	}).toString();
 	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/classes?${queryString}`;
 };
+
+export const getFetchWeekDaysApi = ({
+	schoolId,
+	termId,
+	weekNumber,
+	yearId,
+}: {
+	termId: number;
+	weekNumber?: number;
+	schoolId: number;
+	yearId: number;
+}) => {
+	return `${api}/api/schools/${schoolId}/academic-years/${yearId}/timetables/get-week-dates?termId=${termId}${
+		weekNumber ? `&weekNumber=${weekNumber}` : ''
+	}`;
+};

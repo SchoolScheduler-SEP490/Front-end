@@ -156,3 +156,31 @@ export interface ITeachableSubjectResponse {
   "period-count": number;
   "teachable-subjects": ITeachableSubject[];
 }
+
+export interface ITeacherAccountResponse {
+  id: number;
+  "first-name": string;
+  "last-name": string;
+  abbreviation: string;
+  email: string;
+  gender: string;
+  "department-id": number;
+  "department-name": string;
+  "teacher-role": string;
+  "is-teacher-head-department": boolean;
+  "teacher-status": string;
+  "is-deleted": boolean;
+  "is-have-account": boolean;
+  "account-status": string | null;
+  "account-id": number | null;
+}
+
+export interface IGenerateAccountRequest {
+  "school-id": number,
+  "teacher-id": number
+}
+
+export interface IUpdateAccountRequest {
+	'account-id': number;
+	'account-status': string;
+}

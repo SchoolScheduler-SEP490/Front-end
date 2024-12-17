@@ -121,3 +121,10 @@ export interface IClassResponse {
 	'update-date': string;
 	'is-deleted': boolean;
 }
+
+export interface IWeekdayResponse {
+	'week-number': number;
+	'start-date': string;
+	'end-date': string;
+}
+

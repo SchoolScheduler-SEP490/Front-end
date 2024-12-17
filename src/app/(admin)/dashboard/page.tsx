@@ -171,7 +171,7 @@ export default function AdminHome() {
 				>
 					<div className='w-full h-fit flex flex-col justify-start items-center pl-2 mb-[4vh] mt-[2vh]'>
 						<DashboardNumbers data={numberSummaryData} />
-						<DashboardGraph />
+						{/* <DashboardGraph /> */}
 						<DashboardSchools data={topSchoolData} />
 					</div>
 				</div>
