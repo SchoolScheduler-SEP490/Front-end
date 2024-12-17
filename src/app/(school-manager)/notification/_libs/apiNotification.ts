@@ -102,22 +102,29 @@ export const markAllNotificationsAsRead = async (
 
 export const markNotificationAsRead = async (
   sessionToken: string,
-  accountId: number
+  notificationId: number
 ) => {
-  const response = await fetch(
-    `${api}/api/notifications/${accountId}/mark-isread`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${sessionToken}`,
-        "Content-Type": "application/json",
-      },
+  try {
+    const response = await fetch(
+      `${api}/api/notifications/${notificationId}/mark-isread`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${sessionToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error("Error marking notification as read:", data.message);
+      return null;
     }
-  );
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
+    
+    return data;
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    return null;
   }
-  return data;
 };
