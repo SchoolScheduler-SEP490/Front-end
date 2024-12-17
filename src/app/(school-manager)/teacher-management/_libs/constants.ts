@@ -108,6 +108,7 @@ export interface ITeacherDetail {
   "teacher-role": string;
   status: number;
   "is-deleted": boolean;
+  "is-have-account": boolean;
   phone: string;
   "teachable-subjects": ITeachableSubject[];
 }

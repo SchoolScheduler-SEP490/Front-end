@@ -329,7 +329,17 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
                     onChange={formik.handleChange("email")}
                     onBlur={formik.handleBlur}
                     error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
+                    helperText={
+                      teacherData?.["is-have-account"] 
+                        ? "Email không thể chỉnh sửa do giáo viên đã có tài khoản"
+                        : formik.touched.email && formik.errors.email
+                    }
+                    disabled={teacherData?.["is-have-account"]}
+                    sx={{
+                      "& .Mui-disabled": {
+                        WebkitTextFillColor: "#00000061",
+                      }
+                    }}
                   />
                 </Grid>
               </Grid>

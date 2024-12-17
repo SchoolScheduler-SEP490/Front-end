@@ -610,7 +610,9 @@ const TimetableTable = (props: TimetableTableProps) => {
                                   status.value === 4)) ||
                               (hasPublishedTimetable &&
                                 status.value === 3 &&
-                                row.status !== 3)
+                                row.status !== 3) ||
+                              (status.value === 2 && row.status === 2) ||
+                              (status.value === 3 && row.status === 3)
                             }
                           >
                             <Chip

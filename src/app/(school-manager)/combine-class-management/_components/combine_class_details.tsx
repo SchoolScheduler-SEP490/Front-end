@@ -13,6 +13,7 @@ import {
 } from "../_libs/apiCombineClass";
 import { Divider, IconButton, Skeleton, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { MAIN_SESSION, MAIN_SESSION_TRANSLATOR } from "@/utils/constants";
 
 interface ICombineClassDetailsProps {
   open: boolean;
@@ -154,7 +155,13 @@ const CombineClassDetails = (props: ICombineClassDetailsProps) => {
           <h4 className="text-body-small text-basic-gray">Buổi học</h4>
           {combineClassDetails?.session ? (
             <h2 className="text-body-large-strong">
-              {combineClassDetails.session}
+              {
+                MAIN_SESSION_TRANSLATOR[
+                  MAIN_SESSION.find(
+                    (s) => s.key === combineClassDetails.session
+                  )?.value || 0
+                ]
+              }
             </h2>
           ) : (
             <Skeleton
@@ -208,9 +215,8 @@ const CombineClassDetails = (props: ICombineClassDetailsProps) => {
           <h4 className="text-body-small text-basic-gray">Phòng học</h4>
           {combineClassDetails ? (
             <h2 className="text-body-large-strong">
-              {roomName.find(
-                (r) => r.id === combineClassDetails["room-id"]
-              )?.name || "Chưa có dữ liệu"}
+              {roomName.find((r) => r.id === combineClassDetails["room-id"])
+                ?.name || "Chưa có dữ liệu"}
             </h2>
           ) : (
             <Skeleton
