@@ -121,6 +121,7 @@ export const TRANSLATOR: { [key: string]: string } = {
 
 	'Quick assign success!': 'Xếp tiết thành công',
 	'Account status change success.': 'Cập nhật trạng thái thành công',
+	'Generate teacher account success.': 'Tạo tài khoản giáo viên thành công'
 };
 
 export const STATUS_TRANSLATOR: { [key: string]: string } = {};

@@ -1,9 +1,11 @@
-import * as React from "react";
+import { TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
+import AddIcon from "@mui/icons-material/Add";
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import {
   Box,
   IconButton,
-  Menu,
-  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -14,22 +16,19 @@ import {
   TableRow,
   TableSortLabel,
   Toolbar,
-  Tooltip,
+  Tooltip
 } from "@mui/material";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import { IDepartment, ITeacherTableData } from "../_libs/constants";
-import DeleteConfirmationModal from "./delete_teacher";
 import Image from "next/image";
-import AddIcon from "@mui/icons-material/Add";
-import { ICommonOption, TEACHER_STATUS_TRANSLATOR } from "@/utils/constants";
-import UpdateTeacherModal from "./update_teacher";
-import { KeyedMutator } from "swr";
-import AddTeacherModal from "./add_teacher";
 import { useRouter } from "next/navigation";
-import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import * as React from "react";
+import { KeyedMutator } from "swr";
+import { ITeacherTableData } from "../_libs/constants";
+import AddTeacherModal from "./add_teacher";
+import DeleteConfirmationModal from "./delete_teacher";
 import ImportTeacherSelectModal from "./import_teachers";
-
+import TeacherAccountModal from "./teacher_modal_accounts";
+import UpdateTeacherModal from "./update_teacher";
 //Teacher's data table
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
@@ -199,6 +198,7 @@ const TeacherTable = (props: ITeacherTableProps) => {
   >();
   const open = Boolean(anchorEl);
   const router = useRouter();
+  const [isAccountModalOpen, setOpenAccountModal] = React.useState<boolean>(false);
 
   const handleRowClick = (teacherId: number) => {
     router.push(`/teacher-management/detail?id=${teacherId}`);
@@ -299,6 +299,11 @@ const TeacherTable = (props: ITeacherTableProps) => {
           <h2 className="text-title-medium-strong font-semibold w-full text-left">
             Danh sách giáo viên
           </h2>
+          <Tooltip title="Trạng thái tài khoản">
+            <IconButton onClick={() => setOpenAccountModal(true)}>
+              <ManageAccountsIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="Thêm giáo viên">
             <IconButton onClick={handleOpenAddForm}>
               <AddIcon />
@@ -444,6 +449,10 @@ const TeacherTable = (props: ITeacherTableProps) => {
         onClose={setOpenUpdateModal}
         teacherId={selectedRow?.id ?? 0}
         mutate={mutate}
+      />
+      <TeacherAccountModal
+        open={isAccountModalOpen}
+        setOpen={setOpenAccountModal}
       />
     </Box>
   );
