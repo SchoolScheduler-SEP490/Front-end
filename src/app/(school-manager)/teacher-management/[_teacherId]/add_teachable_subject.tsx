@@ -83,6 +83,10 @@ type FormErrors = {
   }[];
 };
 
+interface GradesMap {
+  [key: string]: string[];
+}
+
 const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   const { open, onClose, teacherId, mutate } = props;
   const { schoolId, sessionToken, selectedSchoolYearId } = useAppContext();
@@ -90,11 +94,14 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   const [gradeFields, setGradeFields] = React.useState([{ id: 0 }]);
   const [expandedAccordion, setExpandedAccordion] = React.useState<number>(0);
   const [expandedAccordions, setExpandedAccordions] = useState<number[]>([0]);
-  const [existingSubjectDetails, setExistingSubjectDetails] =
-    useState<ITeachableSubject | null>(null);
-  const [hasMainSubject, setHasMainSubject] = useState(false);
-  const [hasOtherMainSubject, setHasOtherMainSubject] = useState(false);
-  const [assignedGrades, setAssignedGrades] = useState<string[]>([]);
+  const [existingSubjectDetails, setExistingSubjectDetails] = useState<{
+    [key: string]: ITeachableSubject | null;
+  }>({});
+  const [hasOtherMainSubject, setHasOtherMainSubject] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [assignedGrades, setAssignedGrades] = useState<GradesMap>({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   React.useEffect(() => {
     const loadSubjects = async () => {
@@ -107,44 +114,37 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   }, [sessionToken, selectedSchoolYearId]);
 
   const handleClose = () => {
+    setIsModalOpen(false);
     formik.resetForm();
     setGradeFields([{ id: 0 }]);
+    setExpandedAccordions([0]);
+    setExistingSubjectDetails({});
+    setHasOtherMainSubject({});
     onClose(false);
   };
 
   const handleFormSubmit = async (values: FormValues) => {
     if (teacherId) {
-      const teachableSubject: ITeachableSubjectRequest[] = [
-        {
-          "subject-abreviation": values.subjects[0]["subject-abreviation"],
-          "list-approriate-level-by-grades": values.subjects[0][
-            "list-approriate-level-by-grades"
-          ].map((grade) => ({
-            id: 0,
-            grade: grade.grade,
-            "appropriate-level": grade["appropriate-level"],
-            "is-main": grade["is-main"],
-          })),
-        },
-      ];
-
+      const teachableSubjects = values.subjects.map(subject => ({
+        "subject-abreviation": subject["subject-abreviation"],
+        "list-approriate-level-by-grades": subject["list-approriate-level-by-grades"]
+      }));
+  
       const { handleAddTeachableSubject } = useAddTeachableSubject({
         schoolId,
         teacherId: Number(teacherId),
-        teachableData: teachableSubject,
-        sessionToken,
+        teachableData: teachableSubjects,
+        sessionToken
       });
-
+  
       const success = await handleAddTeachableSubject();
       if (success) {
         await mutate();
-        formik.resetForm();
-        setGradeFields([{ id: 0 }]);
         handleClose();
       }
     }
   };
-
+    
   const formik = useFormik<FormValues>({
     initialValues: {
       subjects: [
@@ -215,17 +215,17 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
   };
 
   const handleAccordionChange = (index: number) => {
-    setExpandedAccordions((prev: number[]) => {
+    setExpandedAccordions((prev) => {
       if (prev.includes(index)) {
         return prev.filter((i) => i !== index);
-      } else {
-        return [...prev, index];
       }
+      return [...prev, index];
     });
   };
 
   React.useEffect(() => {
     const checkSubjectStatus = async () => {
+      // Only check subject status if a subject is selected
       if (teacherId && formik.values.subjects[0]["subject-abreviation"]) {
         const response = await getTeacherSubject(
           schoolId,
@@ -233,55 +233,66 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
           sessionToken
         );
         if (response.status === 200) {
-          const existingSubject = response.result["teachable-subjects"].find(
-            (subject: ITeachableSubject) =>
-              subject.abbreviation ===
-              formik.values.subjects[0]["subject-abreviation"]
-          );
-          setExistingSubjectDetails(existingSubject || null);
+          const subjectDetailsMap: { [key: string]: ITeachableSubject | null } =
+            {};
+          const mainSubjectMap: { [key: string]: boolean } = {};
 
-          const hasMain = response.result["teachable-subjects"].some(
-            (subject: ITeachableSubject) =>
-              subject.abbreviation !==
-                formik.values.subjects[0]["subject-abreviation"] &&
-              subject["list-approriate-level-by-grades"].some(
-                (grade) => grade["is-main"]
-              )
-          );
-          setHasOtherMainSubject(hasMain);
+          formik.values.subjects.forEach((subject, idx) => {
+            // Only check status if user selected to add more accordion
+            if (subject["subject-abreviation"]) {
+              const currentSubject = response.result["teachable-subjects"].find(
+                (s: ITeachableSubject) =>
+                  s.abbreviation === subject["subject-abreviation"]
+              );
+              subjectDetailsMap[idx] = currentSubject || null;
+              mainSubjectMap[idx] = response.result["teachable-subjects"].some(
+                (s: ITeachableSubject) =>
+                  s.abbreviation !== subject["subject-abreviation"] &&
+                  s["list-approriate-level-by-grades"].some(
+                    (grade: IAppropriateLevel) => grade["is-main"]
+                  )
+              );
+            } else {
+              subjectDetailsMap[idx] = null;
+              mainSubjectMap[idx] = false;
+            }
+          });
+
+          setExistingSubjectDetails(subjectDetailsMap);
+          setHasOtherMainSubject(mainSubjectMap);
         }
+      } else {
+        // Clear states when no subject is selected
+        setExistingSubjectDetails({});
+        setHasOtherMainSubject({});
       }
     };
     checkSubjectStatus();
-  }, [formik.values.subjects[0]["subject-abreviation"]]);
+  }, [teacherId, formik.values.subjects]);
 
   React.useEffect(() => {
     const checkAssignedGrades = async () => {
-      if (teacherId && formik.values.subjects[0]["subject-abreviation"]) {
+      if (teacherId) {
         const response = await getTeacherSubject(
           schoolId,
           Number(teacherId),
           sessionToken
         );
         if (response.status === 200) {
-          const existingSubject = response.result["teachable-subjects"].find(
-            (subject: ITeachableSubject) =>
-              subject.abbreviation ===
-              formik.values.subjects[0]["subject-abreviation"]
+          const gradesMap: GradesMap = {};
+          response.result["teachable-subjects"].forEach(
+            (subject: ITeachableSubject) => {
+              gradesMap[subject.abbreviation] = subject[
+                "list-approriate-level-by-grades"
+              ].map((grade) => grade.grade);
+            }
           );
-          if (existingSubject) {
-            const grades = existingSubject[
-              "list-approriate-level-by-grades"
-            ].map((grade: IAppropriateLevel) => grade.grade);
-            setAssignedGrades(grades);
-          } else {
-            setAssignedGrades([]);
-          }
+          setAssignedGrades(gradesMap);
         }
       }
     };
     checkAssignedGrades();
-  }, [formik.values.subjects[0]["subject-abreviation"]]);
+  }, [teacherId]);
 
   return (
     <Dialog
@@ -322,10 +333,10 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                className="bg-gray-50"
+                className="!bg-gray-50"
               >
-                <div className="flex justify-between items-center w-full">
-                  <Typography variant="subtitle1" className="font-semibold">
+                <div className="!flex justify-between items-center w-full">
+                  <Typography variant="subtitle1" className="!font-semibold">
                     Chuyên môn {index + 1}
                   </Typography>
                   {index > 0 && (
@@ -448,9 +459,11 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                                         <MenuItem
                                           key={grade}
                                           value={grade}
-                                          disabled={assignedGrades.includes(
-                                            grade
-                                          )}
+                                          disabled={assignedGrades[
+                                            formik.values.subjects[index][
+                                              "subject-abreviation"
+                                            ]
+                                          ]?.includes(grade)}
                                         >
                                           Khối {value}
                                         </MenuItem>
@@ -594,15 +607,15 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
                               value="true"
                               control={<Radio />}
                               label="Môn chính"
-                              disabled={hasOtherMainSubject}
+                              disabled={hasOtherMainSubject[index]}
                             />
                             <FormControlLabel
                               value="false"
                               control={<Radio />}
                               label="Môn phụ"
-                              disabled={existingSubjectDetails?.[
+                              disabled={existingSubjectDetails[index]?.[
                                 "list-approriate-level-by-grades"
-                              ].some((grade) => grade["is-main"])}
+                              ]?.some((grade) => grade["is-main"])}
                             />
                           </RadioGroup>
                         </FormControl>

@@ -27,11 +27,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import { visuallyHidden } from "@mui/utils";
 import dayjs from "dayjs";
-import {
-  doc,
-  getDoc,
-  updateDoc
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import * as React from "react";
@@ -45,6 +41,7 @@ import {
   ITerm,
   ITimetableTableData,
   IUpdateTimetableStatus,
+  IWeekDate,
 } from "../_libs/constants";
 import ConfirmStatusModal from "./confirm_status_modal";
 
@@ -208,29 +205,9 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
         },
       ]}
     >
-      {numSelected > 0 ? (
-        <h2 className="text-title-medium-strong font-semibold w-full text-left flex justify-start items-center gap-1">
-          Thời khóa biểu{" "}
-          <p className="text-body-medium pt-[2px]">(đã chọn {numSelected})</p>
-        </h2>
-      ) : (
         <h2 className="text-title-medium-strong font-semibold w-full text-left">
-          Thời khóa biểu
+          Bản thảo thời khóa biểu
         </h2>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Xóa">
-          <IconButton color="error">
-            <DeleteIcon color="error" />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Lọc">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
     </Toolbar>
   );
 }
@@ -256,10 +233,13 @@ const TimetableTable = (props: TimetableTableProps) => {
   const [selectedStatus, setSelectedStatus] = React.useState<number | null>(
     null
   );
+  const hasPublishedTimetable = data.some((row) => row.status === 3);
 
   const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+    data.length < rowsPerPage && rowsPerPage < 10
+      ? rowsPerPage - data.length + 1
+      : 0;
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -290,13 +270,25 @@ const TimetableTable = (props: TimetableTableProps) => {
     setPage(0);
   };
 
-  const visibleRows = React.useMemo(
-    () =>
-      [...data]
-        // .sort(getComparator(order, orderBy))
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, data]
-  );
+  // timetable_table.tsx
+  const visibleRows = React.useMemo(() => {
+    const sortedData = [...data].sort((a, b) => {
+      // Sort by status (published first)
+      if (a.status === 3 && b.status !== 3) return -1;
+      if (a.status !== 3 && b.status === 3) return 1;
+
+      // Then sort by date
+      return (
+        new Date(b.generatedDate).getTime() -
+        new Date(a.generatedDate).getTime()
+      );
+    });
+
+    return sortedData.slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage
+    );
+  }, [order, orderBy, page, rowsPerPage, data]);
 
   const handleRowClick = (row: ITimetableTableData) => {
     router.push(`/timetable-management/${row.id}`);
@@ -330,109 +322,166 @@ const TimetableTable = (props: TimetableTableProps) => {
     setConfirmModal(true);
   };
 
-  const handleConfirmStatus = async (termId?: number, startWeek?: number, endWeek?: number) => {
+
+  const handleConfirmStatus = async (
+    termId?: number,
+    startWeek?: number,
+    endWeek?: number,
+    weekData?: IWeekDate[]
+  ) => {
     if (!selectedRow || selectedStatus === null) return;
-  
+
     try {
-      // For non-publish status updates
-      if (selectedStatus !== 3) {
+      // For status 2 (Ready)
+      if (selectedStatus === 2) { 
         const statusData: IUpdateTimetableStatus = {
-          "term-id": selectedRow.termId,
-          "start-week": Number(selectedRow.appliedWeek),
-          "end-week": Number(selectedRow.endedWeek),
-          "schedule-status": SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || ""
+          "term-id": termId || selectedRow.termId,
+          "start-week": startWeek || Number(selectedRow.appliedWeek),
+          "end-week": endWeek || Number(selectedRow.endedWeek),
+          "schedule-status":
+            SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || "",
         };
-  
+
         const result = await updateTimetableStatus(
           schoolId,
           selectedSchoolYearId,
           statusData,
           sessionToken
         );
-  
+
         if (result) {
+          const termsData = await getTerms(sessionToken, selectedSchoolYearId);
+          const termsList = termsData.result.items;
+          const newTermName = termsList.find(
+            (t: ITerm) => t.id === termId
+          )?.name;
+
           const timetableRef = doc(firestore, "timetables", selectedRow.id);
           await updateDoc(timetableRef, {
-            status: statusData["schedule-status"]
+            status: statusData["schedule-status"],
+            "term-id": termId || selectedRow.termId,
+            "applied-week": startWeek?.toString() || selectedRow.appliedWeek,
+            "ended-week":  endWeek?.toString() || selectedRow.endedWeek,
+            "term-name": newTermName || selectedRow.termName,
           });
-  
+
           useNotify({
             message: "Cập nhật trạng thái thành công",
-            type: "success"
+            type: "success",
           });
-  
+
           handleConfirmClose();
           mutate();
         }
         return;
       }
-  
-      // For publish status (status === 3)
+
+      // For status 3 (Published)
+      if (selectedStatus === 3) {
+        const statusData: IUpdateTimetableStatus = {
+          "term-id": termId || selectedRow.termId,
+          "start-week": startWeek || Number(selectedRow.appliedWeek),
+          "end-week": endWeek || Number(selectedRow.endedWeek),
+          "schedule-status":
+            SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || "",
+        };
+
+        const result = await updateTimetableStatus(
+          schoolId,
+          selectedSchoolYearId,
+          statusData,
+          sessionToken
+        );
+
+        if (result) {
+          const scheduleRef = doc(
+            firestore,
+            "schedule-responses",
+            selectedRow.generatedScheduleId
+          );
+          const scheduleSnap = await getDoc(scheduleRef);
+
+          if (scheduleSnap.exists()) {
+            const scheduleData = scheduleSnap.data() as IScheduleResponse;
+            const updatedScheduleData = {
+              ...scheduleData,
+              "term-id": termId || scheduleData["term-id"],
+              "start-week": startWeek || scheduleData["start-week"],
+              "end-week": endWeek || scheduleData["end-week"],
+            };
+
+            await publishTimetable(
+              schoolId,
+              selectedSchoolYearId,
+              updatedScheduleData,
+              sessionToken
+            );
+          }
+
+          const termsData = await getTerms(sessionToken, selectedSchoolYearId);
+          const termsList = termsData.result.items;
+          const newTermName = termsList.find(
+            (t: ITerm) => t.id === termId
+          )?.name;
+
+          const timetableRef = doc(firestore, "timetables", selectedRow.id);
+          await updateDoc(timetableRef, {
+            status: statusData["schedule-status"],
+            "term-id": termId || selectedRow.termId,
+            "applied-week": startWeek?.toString() || selectedRow.appliedWeek,
+            "ended-week": endWeek?.toString() || selectedRow.endedWeek,
+            "term-name": newTermName || selectedRow.termName,
+          });
+
+          useNotify({
+            message: `Công bố thời khóa biểu ${selectedRow.timetableCode} thành công`,
+            type: "success",
+          });
+
+          handleConfirmClose();
+          mutate();
+        }
+        return;
+      }
+
+      // For other statuses - only update status
       const statusData: IUpdateTimetableStatus = {
-        "term-id": termId || selectedRow.termId,
-        "start-week": startWeek || Number(selectedRow.appliedWeek),
-        "end-week": endWeek || Number(selectedRow.endedWeek),
-        "schedule-status": SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || ""
+        "term-id": selectedRow.termId,
+        "start-week": Number(selectedRow.appliedWeek),
+        "end-week": Number(selectedRow.endedWeek),
+        "schedule-status":
+          SCHEDULE_STATUS.find((s) => s.value === selectedStatus)?.key || "",
       };
-  
+
       const result = await updateTimetableStatus(
         schoolId,
         selectedSchoolYearId,
         statusData,
         sessionToken
       );
-  
+
       if (result) {
-        const scheduleRef = doc(firestore, "schedule-responses", selectedRow.generatedScheduleId);
-        const scheduleSnap = await getDoc(scheduleRef);
-  
-        if (scheduleSnap.exists()) {
-          const scheduleData = scheduleSnap.data() as IScheduleResponse;
-          const updatedScheduleData = {
-            ...scheduleData,
-            "term-id": termId || scheduleData["term-id"],
-            "start-week": startWeek || scheduleData["start-week"],
-            "end-week": endWeek || scheduleData["end-week"]
-          };
-  
-          await publishTimetable(
-            schoolId,
-            selectedSchoolYearId,
-            updatedScheduleData,
-            sessionToken
-          );
-        }
-  
-        const termsData = await getTerms(sessionToken, selectedSchoolYearId);
-        const termsList = termsData.result.items;
-        const newTermName = termsList.find((t: ITerm) => t.id === termId)?.name;
-  
         const timetableRef = doc(firestore, "timetables", selectedRow.id);
-        const updateData = {
+        await updateDoc(timetableRef, {
           status: statusData["schedule-status"],
-          "term-id": termId || selectedRow.termId,
-          "applied-week": startWeek?.toString() || selectedRow.appliedWeek,
-          "ended-week": endWeek?.toString() || selectedRow.endedWeek,
-          "term-name": newTermName || selectedRow.termName
-        };
-  
-        await updateDoc(timetableRef, updateData);
-  
-        useNotify({
-          message: selectedStatus === 3
-            ? `Công bố thời khóa biểu ${selectedRow.timetableCode} thành công`
-            : "Cập nhật trạng thái thành công",
-          type: "success"
         });
-  
+
+        useNotify({
+          message: "Cập nhật trạng thái thành công",
+          type: "success",
+        });
+
         handleConfirmClose();
         mutate();
       }
     } catch (error) {
       console.error("Update failed:", error);
+      useNotify({
+        message: "Cập nhật trạng thái thất bại",
+        type: "error",
+      });
     }
   };
-  
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -453,9 +502,18 @@ const TimetableTable = (props: TimetableTableProps) => {
               rowCount={data.length}
             />
             <TableBody>
+            {visibleRows.length === 0 && (
+									<TableRow>
+										<TableCell colSpan={8} align='center'>
+											<h1 className='text-body-large-strong italic text-basic-gray'>
+												Bản thảo thời khóa biểu chưa có dữ liệu
+											</h1>
+										</TableCell>
+									</TableRow>
+								)}
+
               {visibleRows.map((row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                   <TableRow
                     hover
@@ -535,7 +593,9 @@ const TimetableTable = (props: TimetableTableProps) => {
                             }}
                             disabled={
                               (row.status === 3 &&
-                                (status.value === 1 || status.value === 2 || status.value === 5)) ||
+                                (status.value === 1 ||
+                                  status.value === 2 ||
+                                  status.value === 5)) ||
                               (row.status === 4 &&
                                 (status.value === 2 || status.value === 3)) ||
                               (row.status == 1 &&
@@ -543,14 +603,19 @@ const TimetableTable = (props: TimetableTableProps) => {
                                   status.value === 4 ||
                                   status.value === 5)) ||
                               (row.status == 2 &&
-                                (status.value === 1 || status.value === 4 )) ||
-                                (row.status == 5 && 
-                                  (status.value === 2 || status.value === 3 || status.value === 4))
-                                
+                                (status.value === 1 || status.value === 4)) ||
+                              (row.status == 5 &&
+                                (status.value === 2 ||
+                                  status.value === 3 ||
+                                  status.value === 4)) ||
+                              (hasPublishedTimetable &&
+                                status.value === 3 &&
+                                row.status !== 3)
                             }
                           >
                             <Chip
                               label={SCHEDULE_STATUS_TRANSLATOR[status.value]}
+                              style={{ width: 80}}
                               variant="outlined"
                               color={
                                 status.value === 1
@@ -574,7 +639,7 @@ const TimetableTable = (props: TimetableTableProps) => {
               })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={10} />
                 </TableRow>
               )}
             </TableBody>
@@ -601,8 +666,10 @@ const TimetableTable = (props: TimetableTableProps) => {
           timetableCode={selectedRow?.timetableCode || ""}
           timetableName={selectedRow?.timetableName || ""}
           termId={selectedRow?.termId || 0}
+          termName={selectedRow?.termName || ""}
           appliedWeek={selectedRow?.appliedWeek || null}
           endedWeek={selectedRow?.endedWeek || null}
+          generatedScheduleId={selectedRow?.generatedScheduleId || ""}
         />
       </Paper>
     </Box>

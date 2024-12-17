@@ -161,6 +161,10 @@ interface ICombineClassProps {
   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
   totalRows?: number;
   mutate: KeyedMutator<any>;
+  selectedCombineClassId: number;
+  setSelectedCombineClassId: React.Dispatch<React.SetStateAction<number>>;
+  isDetailsShown: boolean;
+  setIsDetailsShown: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const dropdownOptions: ICommonOption[] = [
@@ -177,6 +181,10 @@ const CombineClassTable = (props: ICombineClassProps) => {
     setRowsPerPage,
     totalRows,
     mutate,
+    selectedCombineClassId,
+    setSelectedCombineClassId,
+    isDetailsShown,
+    setIsDetailsShown,
   } = props;
   const [order, setOrder] = React.useState<Order>("asc");
   const [orderBy, setOrderBy] =
@@ -251,6 +259,11 @@ const CombineClassTable = (props: ICombineClassProps) => {
 
   const handleOpenAddForm = () => setOpenAddForm(true);
 
+  const handleSelectCombineClass = (row: ICombineClassData) => {
+    setSelectedCombineClassId(row.id);
+    setIsDetailsShown(true);
+  };
+
   return (
     <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
       <Box sx={{ width: "100%" }}>
@@ -270,11 +283,6 @@ const CombineClassTable = (props: ICombineClassProps) => {
             <Tooltip title="Thêm lớp ghép">
               <IconButton onClick={handleOpenAddForm}>
                 <AddIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Lọc danh sách">
-              <IconButton>
-                <FilterListIcon />
               </IconButton>
             </Tooltip>
           </Toolbar>
@@ -309,7 +317,14 @@ const CombineClassTable = (props: ICombineClassProps) => {
                       role="checkbox"
                       tabIndex={-1}
                       key={row.id}
-                      sx={{ cursor: "pointer" }}
+                      sx={[
+                        { cursor: "pointer" },
+                        selectedCombineClassId === row.id &&
+                          isDetailsShown && {
+                            backgroundColor: "#f5f5f5",
+                          },
+                      ]}
+                      onClick={() => handleSelectCombineClass(row)}
                     >
                       <TableCell
                         component="th"

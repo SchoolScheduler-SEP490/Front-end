@@ -16,7 +16,11 @@ import {
   TableRow,
   TableSortLabel,
   Toolbar,
-  Tooltip
+  Tooltip,
+  FormControl,
+  TextField,
+  InputAdornment,
+  Autocomplete,
 } from "@mui/material";
 import { visuallyHidden } from "@mui/utils";
 import Image from "next/image";
@@ -27,8 +31,9 @@ import { ITeacherTableData } from "../_libs/constants";
 import AddTeacherModal from "./add_teacher";
 import DeleteConfirmationModal from "./delete_teacher";
 import ImportTeacherSelectModal from "./import_teachers";
-import TeacherAccountModal from "./teacher_modal_accounts";
-import UpdateTeacherModal from "./update_teacher";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+
 //Teacher's data table
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T): number {
@@ -170,6 +175,8 @@ interface ITeacherTableProps {
   mutate: KeyedMutator<any>;
   isFilterable: boolean;
   setIsFilterable: React.Dispatch<React.SetStateAction<boolean>>;
+  searchName: string;
+  setSearchName: (name: string) => void;
 }
 
 const TeacherTable = (props: ITeacherTableProps) => {
@@ -183,6 +190,8 @@ const TeacherTable = (props: ITeacherTableProps) => {
     mutate,
     isFilterable,
     setIsFilterable,
+    searchName,
+    setSearchName,
   } = props;
 
   const [order, setOrder] = React.useState<Order>("asc");
@@ -193,6 +202,8 @@ const TeacherTable = (props: ITeacherTableProps) => {
   const [openImportForm, setOpenImportForm] = React.useState<boolean>(false);
   const [openDeleteModal, setOpenDeleteModal] = React.useState<boolean>(false);
   const [openUpdateModal, setOpenUpdateModal] = React.useState<boolean>(false);
+  const [showClearIcon, setShowClearIcon] = React.useState("none");
+  const [isFocused, setIsFocused] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<
     ITeacherTableData | undefined
   >();
@@ -204,14 +215,16 @@ const TeacherTable = (props: ITeacherTableProps) => {
     router.push(`/teacher-management/detail?id=${teacherId}`);
   };
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    row: ITeacherTableData
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setAnchorEl(event.currentTarget);
-    setSelectedRow(row);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setShowClearIcon(value === "" ? "none" : "flex");
+    setSearchName(value);
+  };
+
+  const handleClick = () => {
+    setSearchName("");
+    setShowClearIcon("none");
+    mutate();
   };
 
   const handleRequestSort = (
@@ -247,7 +260,10 @@ const TeacherTable = (props: ITeacherTableProps) => {
   };
 
   const visibleRows = React.useMemo(
-    () => [...teacherTableData].sort(getComparator(order, orderBy)),
+    () =>
+      [...teacherTableData]
+        .sort((a, b) => b.id - a.id)
+        .sort(getComparator(order, orderBy)),
     [order, orderBy, page, rowsPerPage, teacherTableData]
   );
 
@@ -299,6 +315,34 @@ const TeacherTable = (props: ITeacherTableProps) => {
           <h2 className="text-title-medium-strong font-semibold w-full text-left">
             Danh sách giáo viên
           </h2>
+          <FormControl sx={{ width: "400px", mr: 2 }}>
+            <Autocomplete
+              freeSolo
+              id="teacher-search"
+              options={teacherTableData.map((teacher) => teacher.teacherName)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  placeholder="Nhập tên giáo viên"
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              )}
+              value={searchName}
+              onChange={(event, newValue) => {
+                setSearchName(newValue || "");
+              }}
+            />
+          </FormControl>
           <Tooltip title="Trạng thái tài khoản">
             <IconButton onClick={() => setOpenAccountModal(true)}>
               <ManageAccountsIcon />
@@ -340,36 +384,56 @@ const TeacherTable = (props: ITeacherTableProps) => {
               onRequestSort={handleRequestSort}
               rowCount={teacherTableData.length}
             />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const labelId = `enhanced-table-checkbox-${index}`;
-                return (
-                  <TableRow
-                    hover
-                    onClick={() => handleRowClick(row.id)}
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.id}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      align="left"
-                    >
-                      {index + 1 + page * rowsPerPage}
+              <TableBody>
+                {visibleRows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={10} align="center">
+                      <h1 className="text-body-large-strong italic text-basic-gray">
+                        {searchName ? (
+                          <>
+                            Không tìm thấy tên giáo viên{" "}
+                            <strong>{searchName}</strong> trong bảng
+                          </>
+                        ) : (
+                          "Giáo viên chưa có dữ liệu"
+                        )}
+                      </h1>
                     </TableCell>
-                    <TableCell align="left">{row.teacherName}</TableCell>
-                    <TableCell align="left">{row.nameAbbreviation}</TableCell>
-                    <TableCell align="left">{row.subjectDepartment}</TableCell>
-                    <TableCell align="left">{row.teachableSubjects}</TableCell>
-                    <TableCell align="left">{row.email}</TableCell>
-                    <TableCell align="left">{row.phoneNumber}</TableCell>
-                    <TableCell align="left">
-                      <div className="w-full h-full flex justify-center items-center">
-                        <div
-                          className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
+                  </TableRow>
+                )}
+                {visibleRows.map((row, index) => {
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  return (
+                    <TableRow
+                      hover
+                      onClick={() => handleRowClick(row.id)}
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.id}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        align="left"
+                      >
+                        {index + 1 + page * rowsPerPage}
+                      </TableCell>
+                      <TableCell align="left">{row.teacherName}</TableCell>
+                      <TableCell align="left">{row.nameAbbreviation}</TableCell>
+                      <TableCell align="left">
+                        {row.subjectDepartment}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.teachableSubjects}
+                      </TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
+                      <TableCell align="left">{row.phoneNumber}</TableCell>
+                      <TableCell align="left">
+                        <div className="w-full h-full flex justify-center items-center">
+                          <div
+                            className={`w-fit h-fit px-[6%] py-[2%] rounded-[5px] font-semibold 
                           ${
                             row.status === 1
                               ? "bg-basic-positive-hover text-basic-positive"
@@ -377,39 +441,39 @@ const TeacherTable = (props: ITeacherTableProps) => {
                               ? "bg-basic-negative-hover text-basic-negative"
                               : "bg-basic-gray-hover text-basic-gray"
                           }`}
-                          style={{ whiteSpace: "nowrap" }}
-                        >
-                          {TEACHER_STATUS_TRANSLATOR[row.status]}
+                            style={{ whiteSpace: "nowrap" }}
+                          >
+                            {TEACHER_STATUS_TRANSLATOR[row.status]}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell width={80}>
-                      <IconButton
-                        color="error"
-                        sx={{ zIndex: 10 }}
-                        onClick={(event) => handleDeleteClick(event, row)}
-                      >
-                        <Image
-                          src="/images/icons/delete.png"
-                          alt="Xóa giáo viên"
-                          width={15}
-                          height={15}
-                        />
-                      </IconButton>
-                    </TableCell>
+                      </TableCell>
+                      <TableCell width={80}>
+                        <IconButton
+                          color="error"
+                          sx={{ zIndex: 10 }}
+                          onClick={(event) => handleDeleteClick(event, row)}
+                        >
+                          <Image
+                            src="/images/icons/delete.png"
+                            alt="Xóa giáo viên"
+                            width={15}
+                            height={15}
+                          />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: 50 * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={10} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: 50 * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={10} />
-                </TableRow>
-              )}
-            </TableBody>
+                )}
+              </TableBody>
           </Table>
         </TableContainer>
         <TablePagination

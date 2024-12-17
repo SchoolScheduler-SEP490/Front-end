@@ -22,7 +22,10 @@ import { useUpdateClassGroup } from "../_hooks/useUpdateClassGroup";
 import { updateClassGroupSchema } from "../_libs/class_group_schema";
 import React, { useEffect, useState } from "react";
 import { KeyedMutator } from "swr";
-import { getClassGroupById, getExistingClassGroup } from "../_libs/apiClassGroup";
+import {
+  getClassGroupById,
+  getExistingClassGroup,
+} from "../_libs/apiClassGroup";
 import { CLASSGROUP_STRING_TYPE } from "@/utils/constants";
 
 interface UpdateClassGroupFormProps {
@@ -51,7 +54,9 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [classGroupData, setClassGroupData] =
     useState<IClassGroupDetail | null>(null);
-  const [existClassGroup, setExistClassGroup] = React.useState<IExistingClassGroup[]>([]);
+  const [existClassGroup, setExistClassGroup] = React.useState<
+    IExistingClassGroup[]
+  >([]);
 
   const hasClasses =
     classGroupData?.classes && classGroupData.classes.length > 0;
@@ -67,12 +72,19 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
     validate: (values) => {
       const errors: { [key: string]: string } = {};
       if (
-        existClassGroup.some((c) => c["group-name"] === values["group-name"] && c.id !== classGroupId)
+        existClassGroup.some(
+          (c) =>
+            c["group-name"] === values["group-name"] && c.id !== classGroupId
+        )
       ) {
         errors["group-name"] = "Tên nhóm lớp đã tồn tại";
       }
       if (
-        existClassGroup.some((c) => c["student-class-group-code"] === values["student-class-group-code"] && c.id !== classGroupId)
+        existClassGroup.some(
+          (c) =>
+            c["student-class-group-code"] ===
+              values["student-class-group-code"] && c.id !== classGroupId
+        )
       ) {
         errors["student-class-group-code"] = "Mã nhóm lớp đã tồn tại";
       }
@@ -124,7 +136,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
 
     const loadExistClassGroup = async () => {
       try {
-        const response = await getExistingClassGroup (
+        const response = await getExistingClassGroup(
           schoolId,
           selectedSchoolYearId,
           sessionToken
@@ -135,7 +147,7 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
       } catch (error) {
         console.error("Failed to load existing class group:", error);
       }
-    }
+    };
 
     if (open) {
       loadClassGroup();
@@ -328,15 +340,15 @@ const UpdateClassGroupModal = (props: UpdateClassGroupFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
-            title="Cập nhật"
-            type="submit"
-            disabled={ !formik.isValid || isUpdating}
-            styles="bg-primary-300 text-white !py-1 px-4"
-          />
-          <ContainedButton
             title="Huỷ"
             onClick={() => onClose(false)}
             styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
+          />
+          <ContainedButton
+            title="Cập nhật"
+            type="submit"
+            disabled={!formik.isValid || isUpdating}
+            styles="bg-primary-300 text-white !py-1 px-4"
           />
         </div>
       </form>

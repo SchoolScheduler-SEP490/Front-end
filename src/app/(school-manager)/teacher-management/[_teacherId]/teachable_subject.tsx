@@ -99,14 +99,9 @@ export default function TeachableSubjectTable({
           <h2 className="text-title-medium-strong font-semibold w-full text-left">
             Danh sách môn học có thể dạy
           </h2>
-          <Tooltip title="Thêm môn học">
+          <Tooltip title="Thêm chuyên môn">
             <IconButton onClick={handleOpenAddForm}>
               <AddIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Lọc danh sách">
-            <IconButton>
-              <FilterListIcon />
             </IconButton>
           </Tooltip>
         </Toolbar>

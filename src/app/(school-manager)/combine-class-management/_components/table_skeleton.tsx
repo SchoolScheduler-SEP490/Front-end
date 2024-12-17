@@ -113,14 +113,9 @@ const CombineClassTableSkeleton = () => {
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
               Lớp ghép
             </h2>
-            <Tooltip title="Thêm nhóm lớp">
+            <Tooltip title="Thêm lớp ghép">
               <IconButton>
                 <AddIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Lọc danh sách">
-              <IconButton>
-                <FilterListIcon />
               </IconButton>
             </Tooltip>
           </Toolbar>

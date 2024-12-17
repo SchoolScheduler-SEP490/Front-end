@@ -21,6 +21,7 @@ import { TRANSLATOR } from "@/utils/dictionary";
 import SMHeader from "@/commons/school_manager/header";
 import CombineClassTableSkeleton from "./_components/table_skeleton";
 import CombineClassTable from "./_components/combine_class_table";
+import CombineClassDetails from "./_components/combine_class_details";
 
 export default function SMCombineClass() {
   const isMenuOpen: boolean = useSelector(
@@ -37,6 +38,8 @@ export default function SMCombineClass() {
   const [subjectName, setSubjectName] = useState<ISubject[]>([]);
   const [roomName, setRoomName] = useState<IRoom[]>([]);
   const [termName, setTermName] = useState<ITerm[]>([]);
+  const [isDetailsShown, setIsDetailsShown] = useState<boolean>(false);
+  const [selectedCombineClassId, setSelectedCombineClassId] = useState<number>(0);
 
   const { data, error, isValidating, mutate } = useCombineClassData({
     sessionToken,
@@ -120,15 +123,15 @@ export default function SMCombineClass() {
             ] || "-";
           const roomData =
             roomName.find((room) => room.id === item["room-id"])?.name || "-";
-            
+
           const termData =
             termName.find((term) => term.id === item["term-id"])?.name || "-";
-            
+
           const studentClassNames = Array.isArray(item["student-class"])
             ? item["student-class"]
-                .map(item => item["student-class-name"])
-                .join(", ")
-            || "-" : "-";
+                .map((item) => item["student-class-name"])
+                .join(", ") || "-"
+            : "-";
 
           return {
             id: item.id,
@@ -139,7 +142,8 @@ export default function SMCombineClass() {
             termId: termData,
             teacherAbbreviation: item["teacher-abbreviation"],
           };
-        }      );
+        }
+      );
       setCombineClassTableData(combineClassData);
     }
   }, [data, subjectName, roomName, termName]);
@@ -186,15 +190,30 @@ export default function SMCombineClass() {
           </h3>
         </div>
       </SMHeader>
-      <CombineClassTable
-        combineClassData={combineClassTableData}
-        page={page}
-        setPage={setPage}
-        rowsPerPage={rowsPerPage}
-        setRowsPerPage={setRowsPerPage}
-        totalRows={totalRows}
-        mutate={mutate}
-      />
+      <div
+        className={`w-full h-full flex justify-${
+          isDetailsShown ? "end" : "center"
+        } items-start`}
+      >
+        <CombineClassTable
+          combineClassData={combineClassTableData}
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          totalRows={totalRows}
+          selectedCombineClassId={selectedCombineClassId}
+          setSelectedCombineClassId={setSelectedCombineClassId}
+          mutate={mutate}
+          isDetailsShown={isDetailsShown}
+          setIsDetailsShown={setIsDetailsShown}
+        />
+        <CombineClassDetails
+          open={isDetailsShown}
+          setOpen={setIsDetailsShown}
+          combineClassId={selectedCombineClassId}
+        />
+      </div>
     </div>
   );
 }

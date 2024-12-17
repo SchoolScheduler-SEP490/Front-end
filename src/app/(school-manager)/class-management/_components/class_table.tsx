@@ -77,7 +77,7 @@ const headCells: readonly HeadCell[] = [
   {
     id: "room" as keyof IClassTableData,
     label: "Phòng học mặc định",
-    centered: false,
+    centered: true,
   },
   {
     id: "homeroomTeacherName" as keyof IClassTableData,

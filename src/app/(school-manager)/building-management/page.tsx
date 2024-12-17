@@ -76,15 +76,15 @@ export default function SMBuilding() {
     }
   }, [page, rowsPerPage]);
 
-  React.useEffect(() => {
-    if (error && !isErrorShown) {
-      setIsErrorShown(true);
-      useNotify({
-        message: TRANSLATOR[error?.message] ?? "Lớp học chưa có dữ liệu.",
-        type: "error",
-      });
-    }
-  }, [isValidating]);
+  // React.useEffect(() => {
+  //   if (error && !isErrorShown) {
+  //     setIsErrorShown(true);
+  //     useNotify({
+  //       message: TRANSLATOR[error?.message] ?? "Tòa nhà chưa có dữ liệu.",
+  //       type: "error",
+  //     });
+  //   }
+  // }, [isValidating]);
 
   if (isValidating) {
     return (
@@ -96,7 +96,7 @@ export default function SMBuilding() {
         <SMHeader>
           <div>
             <h3 className="text-title-small text-white font-semibold tracking-wider">
-              Lớp học
+              Tòa nhà
             </h3>
           </div>
         </SMHeader>

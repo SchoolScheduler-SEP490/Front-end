@@ -117,7 +117,7 @@ const TeacherTableSkeleton = () => {
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
               Danh sách giáo viên
             </h2>
-            <Tooltip title="Thêm Môn học">
+            <Tooltip title="Thêm Giáo viên">
               <IconButton>
                 <AddIcon />
               </IconButton>
