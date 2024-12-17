@@ -11,10 +11,10 @@ export const getSubjectName = async (
   sessionToken: string,
   selectedSchoolYearId: number
 ) => {
+  // Get total count first
   const initialResponse = await fetch(
     `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=20`,
     {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${sessionToken}`,
@@ -25,10 +25,10 @@ export const getSubjectName = async (
   const initialData = await initialResponse.json();
   const totalCount = initialData.result["total-item-count"];
 
+  // Fetch all items
   const response = await fetch(
     `${api}/api/subjects?schoolYearIdint=${selectedSchoolYearId}&includeDeleted=false&pageIndex=1&pageSize=${totalCount}`,
     {
-      method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${sessionToken}`,
@@ -253,19 +253,32 @@ export const updateCombineClass = async (
 export const getCombineClassDetail = async (
   schoolId: string,
   roomSubjectId: number,
-  pageIndex: number,
-  pageSize: number,
   sessionToken: string,
 ) => {
-  const url = `${api}/api/room-subjects?schoolId=${schoolId}&roomSubjectId=${roomSubjectId}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+  const initialResponse = await fetch(
+    `${api}/api/room-subjects?schoolId=${schoolId}&roomSubjectId=${roomSubjectId}&pageIndex=1&pageSize=20`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${sessionToken}`,
-    },
-  });
+  const initialData = await initialResponse.json();
+  const totalCount = initialData.result["total-item-count"];
+
+  const response = await fetch(
+    `${api}/api/room-subjects?schoolId=${schoolId}&roomSubjectId=${roomSubjectId}&pageIndex=1&pageSize=${totalCount}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    }
+  );
   const data = await response.json();
   return data;
 };

@@ -31,6 +31,8 @@ export default function SMRoom() {
 
 	const [totalRows, setTotalRows] = React.useState<number | undefined>(undefined);
 	const [roomTableData, setRoomTableData] = React.useState<IRoomTableData[]>([]);
+	const [isBuildingLoading, setIsBuildingLoading] = React.useState(true);
+  
 
 	const getMaxPage = () => {
 		if (totalRows === 0) return 1;
@@ -43,6 +45,7 @@ export default function SMRoom() {
 
 	// Fetch building data
 	React.useEffect(() => {
+		// setIsBuildingLoading(true);
 		const getBuildingData = async () => {
 			try {
 				const buildingData = await fetchBuildingName(sessionToken, schoolId);
@@ -58,6 +61,7 @@ export default function SMRoom() {
 			} catch (error) {
 				console.error('Error fetching building data:', error);
 			}
+			setIsBuildingLoading(false);
 		};
 		getBuildingData();
 	}, [sessionToken, schoolId]);
@@ -99,7 +103,7 @@ export default function SMRoom() {
 		}
 	}, [isValidating]);
 
-	if (isValidating || !buildingMap.size) {
+	if (isValidating || isBuildingLoading) {
 		return (
 			<div
 				className={`w-[${
@@ -118,12 +122,12 @@ export default function SMRoom() {
 		);
 	}
 
-	if (error) {
-		useNotify({
-			type: 'error',
-			message: error.message ?? 'Có lỗi xảy ra',
-		});
-	}
+	// if (error) {
+	// 	useNotify({
+	// 		type: 'error',
+	// 		message: error.message ?? 'Có lỗi xảy ra',
+	// 	});
+	// }
 
 	return (
 		<div

@@ -251,9 +251,9 @@ export default function ClassDetails() {
 												let currentTeacherRowSpan = 0;
 
 												return teacherAssignments.map((assignment, index) => {
-													const teacherName = assignment['teacher-last-name'] === null || assignment['teacher-first-name'] === null
+													const teacherName = assignment['teacher-first-name'] === null || assignment['teacher-last-name'] === null
 													? 'N/A'
-													: `${assignment['teacher-last-name']} ${assignment['teacher-first-name']}`;
+													: `${assignment['teacher-first-name']} ${assignment['teacher-last-name']}`;
 											
 												let teacherCell = null;
 												const rowId = `${subject['subject-id']}-${index}`;
@@ -262,9 +262,9 @@ export default function ClassDetails() {
 													currentTeacher = teacherName;
 													currentTeacherRowSpan = teacherAssignments.filter(
 														(a) => {
-															const name = a['teacher-last-name'] === null || a['teacher-first-name'] === null
+															const name = a['teacher-first-name'] === null || a['teacher-last-name'] === null
 																? 'N/A'
-																: `${a['teacher-last-name']} ${a['teacher-first-name']}`;
+																: `${a['teacher-first-name']} ${a['teacher-last-name']}`;
 															return name === teacherName;
 														}
 													).length;

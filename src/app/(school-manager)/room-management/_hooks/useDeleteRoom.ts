@@ -13,16 +13,15 @@ import { useAppContext } from "@/context/app_provider";
           type: "success",
         });
         return true;
-      } catch (error) {
+      } catch (error: any) {
         console.error(`Failed to delete room with ID: ${roomId}`, error);
         useNotify({
-          message: "Xóa phòng học thất bại. Vui lòng thử lại!",
+          message: error.message,
           type: "error",
         });
         return false;
       }
-    };
-  
+    };  
     return { deleteRoom };
   };
   

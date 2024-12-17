@@ -161,8 +161,8 @@ const AddClassModal = (props: AddClassFormProps) => {
     },
   });
 
-  console.log("Values: ", formik.values)
-  
+  console.log("Values: ", formik.values);
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
@@ -419,17 +419,17 @@ const AddClassModal = (props: AddClassFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
+            title="Huỷ"
+            onClick={handleClose}
+            disableRipple
+            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
+          />
+          <ContainedButton
             title="Thêm lớp học"
             disableRipple
             type="submit"
             disabled={!formik.isValid}
             styles="bg-primary-300 text-white !py-1 px-4"
-          />
-          <ContainedButton
-            title="Huỷ"
-            onClick={handleClose}
-            disableRipple
-            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
         </div>
       </form>

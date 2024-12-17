@@ -233,7 +233,7 @@ const UpdateBuildingModal = (props: UpdateBuildingFormProps) => {
                   sx={{ display: "flex", alignItems: "center" }}
                 >
                   <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    Tầng
+                    Số lượng tầng
                   </Typography>
                 </Grid>
                 <Grid item xs={9}>
@@ -241,7 +241,7 @@ const UpdateBuildingModal = (props: UpdateBuildingFormProps) => {
                     variant="standard"
                     fullWidth
                     name="floor"
-                    label="Nhập số tầng"
+                    label="Nhập số lượng tầng"
                     type="number"
                     value={formik.values.floor}
                     onChange={formik.handleChange}

@@ -60,9 +60,9 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   const [departments, setDepartments] = React.useState<IDepartment[]>([]);
   const [subjects, setSubjects] = React.useState<ISubject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [localFormData, setLocalFormData] = useState<IUpdateTeacherRequestBody | null>(null);
+  const [localFormData, setLocalFormData] =
+    useState<IUpdateTeacherRequestBody | null>(null);
   const [teacherData, setTeacherData] = useState<ITeacherDetail | null>(null);
-
 
   const formik = useFormik({
     initialValues: {
@@ -103,7 +103,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
     if (!open) {
       setIsLoading(true);
     }
-  }, [open])
+  }, [open]);
 
   useEffect(() => {
     const loadTeacherData = async () => {
@@ -187,12 +187,7 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
   console.log("isValid", formik.isValid);
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <div
         id="modal-header"
         className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3"
@@ -210,22 +205,22 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
       </div>
       <form onSubmit={formik.handleSubmit}>
         <DialogContent
-        sx={{ 
-          maxHeight: '70vh',
-          overflowY: 'auto',
-          '&::-webkit-scrollbar': {
-            width: '8px', 
-            display: "none",
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#888',
-            borderRadius: '4px'
-          },
-          "-ms-overflow-style": "none",
-        }}
+          sx={{
+            maxHeight: "70vh",
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "8px",
+              display: "none",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#888",
+              borderRadius: "4px",
+            },
+            "-ms-overflow-style": "none",
+          }}
         >
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -556,18 +551,17 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
         </DialogContent>
         <div className="w-full flex flex-row justify-end items-center gap-2 bg-basic-gray-hover p-3">
           <ContainedButton
+            title="Huỷ"
+            onClick={handleClose}
+            disableRipple
+            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
+          />
+          <ContainedButton
             title="Cập nhật"
             disableRipple
             type="submit"
             disabled={!formik.isValid}
             styles="bg-primary-300 text-white !py-1 px-4"
-          />
-
-          <ContainedButton
-            title="Huỷ"
-            onClick={handleClose}
-            disableRipple
-            styles="!bg-basic-gray-active !text-basic-gray !py-1 px-4"
           />
         </div>
       </form>
@@ -576,4 +570,3 @@ const UpdateTeacherModal = (props: UpdateTeacherFormProps) => {
 };
 
 export default UpdateTeacherModal;
-   
