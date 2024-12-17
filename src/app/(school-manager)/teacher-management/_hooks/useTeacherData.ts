@@ -1,3 +1,4 @@
+import { TEACHER_STATUS_REVERSED } from "@/utils/constants";
 import useSWR from "swr";
 
 interface ITeacherDataProps {
@@ -5,7 +6,9 @@ interface ITeacherDataProps {
   schoolId: string;
   pageSize: number;
   pageIndex: number;
+  teacherStatus?: number | null;
   departmentId?: number | null;
+  searchName?: string | null;
 }
 
 const useTeacherData = ({
@@ -13,7 +16,9 @@ const useTeacherData = ({
   schoolId,
   pageSize,
   pageIndex,
+  teacherStatus,
   departmentId,
+  searchName,
 }: ITeacherDataProps) => {
   const api = process.env.NEXT_PUBLIC_API_URL || "Unknown";
 
@@ -31,6 +36,10 @@ const useTeacherData = ({
   };
 
   const endpoint = `${api}/api/schools/${schoolId}/teachers?${
+    searchName ? `Name=${searchName}&` : ""
+  }${
+    teacherStatus ? `teacherStatus=${TEACHER_STATUS_REVERSED[teacherStatus]}&` : ""
+  }${
     departmentId ? `departmentId=${departmentId}&` : ""
   }includeDeleted=false&pageSize=${pageSize}&pageIndex=${pageIndex}`;
   

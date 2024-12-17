@@ -106,14 +106,9 @@ const RoomTableSkeleton = () => {
             <h2 className="text-title-medium-strong font-semibold w-full text-left">
               Phòng học
             </h2>
-            <Tooltip title="Thêm lớp học">
+            <Tooltip title="Thêm phòng học">
               <IconButton>
                 <AddIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Lọc danh sách">
-              <IconButton>
-                <FilterListIcon />
               </IconButton>
             </Tooltip>
           </Toolbar>

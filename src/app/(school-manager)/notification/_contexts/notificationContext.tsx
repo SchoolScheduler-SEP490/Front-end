@@ -10,7 +10,7 @@ interface NotificationContextType {
   unreadCount: number;
   sessionToken: string;
   fetchNotifications: () => Promise<void>;
-  markAsRead: (notificationUrl: string) => void;
+  markAsRead: (notificationId: number) => void;
   fetchUnreadCount: () => Promise<void>;
   markAllAsRead: () => Promise<void>;
 }
@@ -78,17 +78,20 @@ export const NotificationProvider = ({
     }
   }, [sessionToken]);
 
-  const markAsRead = async (notificationUrl: string) => {
-    await markNotificationAsRead(sessionToken, accountId);
-    setNotifications(prev =>
-        prev.map(notification =>
-            notification["notification-url"] === notificationUrl
-                ? { ...notification, "is-read": true }
-                : notification
-        )
-    );
-    fetchUnreadCount();
-  };
+  const markAsRead = async (notificationId: number) => {
+    const notification = notifications.find(n => n.id === notificationId);
+    if (notification) {
+        await markNotificationAsRead(sessionToken, notification.id);
+        setNotifications(prev =>
+            prev.map(n =>
+                n.id === notification.id
+                    ? { ...n, "is-read": true }
+                    : n
+            )
+        );
+        fetchUnreadCount();
+    }
+};
 
   const markAllAsRead = async () => {
     await markAllNotificationsAsRead(sessionToken, accountId);

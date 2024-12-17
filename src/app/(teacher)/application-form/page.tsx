@@ -17,13 +17,11 @@ import {
   MenuItem,
   Select,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useSendApplication } from "./_hooks/useSendApplication";
-import {
-  ISendApplication,
-} from "./_libs/constants";
+import { ISendApplication } from "./_libs/constants";
 import { REQUEST_TYPE, REQUEST_TYPE_TRANSLATOR } from "../_utils/constants";
 
 export default function ApplicationFormPage() {
@@ -33,6 +31,7 @@ export default function ApplicationFormPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string>("");
+  const [fileError, setFileError] = useState<string>("");
   const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
   const [formData, setFormData] = useState<ISendApplication>({
@@ -85,13 +84,19 @@ export default function ApplicationFormPage() {
   }, [teacherInfo]);
 
   const validateFile = (file: File): boolean => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    
     if (file.size > MAX_FILE_SIZE) {
-      useNotify({
-        type: "error",
-        message: "File không được vượt quá 1MB",
-      });
+      setFileError("File không được vượt quá 1MB");
       return false;
     }
+    
+    if (fileExtension !== 'docx') {
+      setFileError("Chỉ chấp nhận file định dạng .docx");
+      return false;
+    }
+    
+    setFileError("");
     return true;
   };
 
@@ -104,11 +109,21 @@ export default function ApplicationFormPage() {
     });
   };
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && validateFile(file)) {
+    if (file) {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      if (fileExtension !== 'docx') {
+        setFileError("Chỉ chấp nhận file định dạng .docx");
+        setFileName(file.name);
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setFileError("File không được vượt quá 1MB");
+        setFileName(file.name);
+        return;
+      }
+      setFileError("");
       const base64 = await convertFileToBase64(file);
       setFileName(file.name);
       setFormData({
@@ -134,9 +149,21 @@ export default function ApplicationFormPage() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-
+  
     const file = e.dataTransfer.files[0];
     if (file) {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      if (fileExtension !== 'docx') {
+        setFileError("Chỉ chấp nhận file định dạng .docx. Vui lòng thử lại!");
+        setFileName(file.name);
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setFileError("File không được vượt quá 1MB");
+        setFileName(file.name);
+        return;
+      }
+      setFileError("");
       const base64 = await convertFileToBase64(file);
       setFileName(file.name);
       setFormData({
@@ -148,6 +175,7 @@ export default function ApplicationFormPage() {
 
   const handleRemoveFile = () => {
     setFileName("");
+    setFileError("");
     setFormData({
       ...formData,
       "attached-file": "",
@@ -161,7 +189,7 @@ export default function ApplicationFormPage() {
     <div className="w-[84%] h-screen flex flex-col justify-start items-start overflow-y-scroll no-scrollbar">
       <TeacherHeader>
         <h3 className="text-title-small text-white font-semibold tracking-wider">
-          Gửi đơn cho Phòng đào tạo
+          Gửi đơn cho Quản lý trường
         </h3>
       </TeacherHeader>
 
@@ -191,7 +219,7 @@ export default function ApplicationFormPage() {
             fullWidth
             multiline
             rows={7}
-            label="Mô tả chi tiết"
+            label="Lý do"
             value={formData["request-description"]}
             onChange={(e) =>
               setFormData({
@@ -216,7 +244,7 @@ export default function ApplicationFormPage() {
                 cursor: "pointer",
                 bgcolor: isDragging ? "rgba(0, 0, 0, 0.04)" : "transparent",
                 "&:hover": {
-                  borderColor: "primary.main",
+                  borderColor: fileError ? "error.main" : "primary.main",
                   bgcolor: "rgba(0, 0, 0, 0.04)",
                 },
               }}
@@ -245,6 +273,9 @@ export default function ApplicationFormPage() {
                   ) : (
                     "Chọn file hoặc kéo thả vào đây"
                   )}
+                  {fileError && (
+                    <div className="text-red-500 text-sm mt-1">{fileError}</div>
+                  )}
                 </Typography>
               </div>
               <Input
@@ -257,9 +288,7 @@ export default function ApplicationFormPage() {
                 }}
               />
             </Box>
-            <FormHelperText>
-              Định dạng hỗ trợ: docx (Tối đa 1MB)
-            </FormHelperText>
+            <FormHelperText>Định dạng hỗ trợ: docx (Tối đa 1MB)</FormHelperText>
           </FormControl>
 
           <div className="flex justify-end mt-6">
@@ -267,6 +296,7 @@ export default function ApplicationFormPage() {
               title="Gửi đơn"
               disableRipple
               type="submit"
+              disabled={!!fileError}
               styles="bg-primary-300 text-white !py-1 px-4"
             />
           </div>

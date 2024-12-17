@@ -7,21 +7,21 @@ import {
 	setTimetableId,
 	setTimetableStored,
 } from '@/context/slice_timetable_generation';
-import { firestore } from '@/utils/firebaseConfig';
-import { IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
-import Image from 'next/image';
-import { notFound, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import TimetableTabs from '../_components/timetable-tabs';
-import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
 import useNotify from '@/hooks/useNotify';
 import {
 	IConfigurationStoreObject,
 	IScheduleResponse,
 	ITimetableStoreObject,
 } from '@/utils/constants';
+import { firestore } from '@/utils/firebaseConfig';
+import { IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from '@mui/material';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import TimetableTabs from '../_components/timetable-tabs';
+import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
 
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -90,8 +90,6 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 					dispatch(setGeneratedScheduleStored(generatedSchedule));
 				}
 				dispatch(setTimetableStored(timetableStore));
-			} else {
-				notFound();
 			}
 		};
 		fetchStoreTimetable();
@@ -121,7 +119,7 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 					type: 'error',
 					message: 'Không tìm thấy dữ liệu cấu hình của TKB',
 				});
-				notFound();
+				
 			}
 		};
 		fetchStoredData();

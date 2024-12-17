@@ -147,8 +147,6 @@ const UpdateCombineClassModal = (props: UpdateCombineClassFormProps) => {
         const response = await getCombineClassDetail(
           schoolId,
           combineClassId,
-          1,
-          20,
           sessionToken
         );
 

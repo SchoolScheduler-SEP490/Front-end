@@ -23,7 +23,7 @@ import {
 import Image from "next/image";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useRouter } from "next/navigation";
 
 const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -89,9 +89,9 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
   const dispatch = useDispatch();
   const notificationRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-	const handleProfileClick = () =>{
-		router.push("/school-manager-profile");
-	}
+  const handleProfileClick = () => {
+    router.push("/school-manager-profile");
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -169,6 +169,13 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  const getFilteredNotifications = () => {
+    if (activeTab === 1) { // "Chưa đọc" tab
+      return notifications.filter(notification => !notification["is-read"]);
+    }
+    return notifications; // "Tất cả" tab
+  };
+
   return (
     <div className="w-full min-h-[50px] bg-primary-400 flex flex-row justify-between items-center pl-[1.5vw] pr-2">
       <div className="w-fit h-full flex flex-row justify-start items-center gap-5">
@@ -208,7 +215,10 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
           </IconButton>
 
           {showNotifications && (
-            <div ref={notificationRef} className="absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar ">
+            <div
+              ref={notificationRef}
+              className="absolute right-0 top-12 min-w-96 bg-white rounded-lg shadow-lg z-[1000] max-h-96 overflow-y-auto no-scrollbar "
+            >
               <div className="p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h5 className="text-lg font-semibold">Thông báo</h5>
@@ -235,15 +245,15 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
                     Đánh dấu tất cả
                   </button>
                 </div>
-                {notifications.length > 0 ? (
-                  notifications.map((notification, index) => (
+                {getFilteredNotifications().length > 0 ? (
+                  getFilteredNotifications().map((notification, index) => (
                     <div
                       key={index}
                       className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
                         !notification["is-read"] ? "bg-blue-50" : ""
                       }`}
                       onClick={() => {
-                        markAsRead(notification["notification-url"]);
+                        markAsRead(notification.id);
                         if (notification.link) {
                           window.location.href = notification.link;
                         }
@@ -324,12 +334,9 @@ const SMHeader = ({ children }: { children: ReactNode }) => {
             ))}
           </Menu>
         </div>
-        <IconButton sx={{color: 'white'}} onClick={handleProfileClick}>
-						<AccountCircleIcon
-							width={20}
-							height={20}
-						/>
-					</IconButton>
+        <IconButton sx={{ color: "white" }} onClick={handleProfileClick}>
+          <AccountCircleIcon width={20} height={20} />
+        </IconButton>
       </div>
     </div>
   );

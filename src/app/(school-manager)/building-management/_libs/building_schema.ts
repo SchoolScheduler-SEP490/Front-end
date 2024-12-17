@@ -25,8 +25,8 @@ export const buildingSchema = (existingBuilding: IExistingBuilding[]) =>
 
     floor: yup
       .number()
-      .required("Vui lòng nhập số tầng")
-      .min(1, "Số tầng phải lớn hơn 0"),
+      .required("Vui lòng nhập số lượng số tầng")
+      .min(1, "Số lượng tầng phải lớn hơn 0"),
   });
 
 export const updateBuildingSchema = yup.object().shape({
@@ -38,6 +38,6 @@ export const updateBuildingSchema = yup.object().shape({
 
   floor: yup
     .number()
-    .required("Vui lòng nhập số tầng")
-    .min(1, "Số tầng phải lớn hơn 0"),
+    .required("Vui lòng nhập số lượng tầng")
+    .min(1, "Số lượng tầng phải lớn hơn 0"),
 });

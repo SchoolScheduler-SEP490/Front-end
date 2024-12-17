@@ -52,9 +52,11 @@ export const deleteRoomById = async (
       Authorization: `Bearer ${sessionToken}`,
     },
   });
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
+  const data = await response.json();
+  // if (!response.ok) {
+  //   throw new Error(data.message);
+  // }
+  return data;
 };
 
 export const addRoom = async (
@@ -84,9 +86,9 @@ export const addRoom = async (
     body: JSON.stringify(requestBody),
   });
   const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message);
-  }
+  // if (!response.ok) {
+  //   throw new Error(data.message);
+  // }
   return data;
 };
 

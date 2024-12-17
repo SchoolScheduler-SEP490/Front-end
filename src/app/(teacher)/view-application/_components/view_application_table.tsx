@@ -89,7 +89,7 @@ export default function ViewApplicationTable({
             <TableCell
               sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}
             >
-              Nội dung
+              Lý do
             </TableCell>
             <TableCell
               sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}

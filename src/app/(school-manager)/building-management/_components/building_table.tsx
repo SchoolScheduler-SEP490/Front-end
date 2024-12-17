@@ -261,11 +261,6 @@ const BuildingTable = (props: IBuildingTableProps) => {
                 <AddIcon />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Lọc danh sách">
-              <IconButton>
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
           </Toolbar>
 
           <TableContainer>

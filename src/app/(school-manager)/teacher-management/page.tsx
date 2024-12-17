@@ -8,7 +8,6 @@ import TeacherTableSkeleton from "./_components/table_skeleton";
 import { useAppContext } from "@/context/app_provider";
 import { IDepartment, ITeacher, ITeacherTableData } from "./_libs/constants";
 import useNotify from "@/hooks/useNotify";
-import { TEACHER_STATUS } from "@/utils/constants";
 import { TRANSLATOR } from "@/utils/dictionary";
 import { useSelector } from "react-redux";
 import { getDepartmentName } from "./_libs/apiTeacher";
@@ -26,14 +25,18 @@ export default function SMTeacher() {
   const [selectedDepartment, setSelectedDepartment] = React.useState<
     number | null
   >(null);
-  const [filteredRowsPerPage, setFilteredRowsPerPage] = React.useState(0);
+  const [selectedStatus, setSelectedStatus] = React.useState<number | null>(null);
+  const [searchName, setSearchName] = React.useState<string>("");
+  
 
   const { data, error, isValidating, mutate } = useTeacherData({
     sessionToken,
     schoolId,
     pageSize: rowsPerPage,
     pageIndex: page + 1,
-    departmentId: selectedDepartment
+    departmentId: selectedDepartment,
+    teacherStatus: selectedStatus,
+    searchName: searchName || null
   });
 
   const [totalRows, setTotalRows] = React.useState<number | undefined>(
@@ -151,6 +154,8 @@ export default function SMTeacher() {
               mutate={mutate}
               isFilterable={isFilterable}
               setIsFilterable={setIsFilterable}
+              searchName={searchName}
+              setSearchName={setSearchName}
             />
           </div>
           {isFilterable && (
@@ -162,6 +167,8 @@ export default function SMTeacher() {
               departments={departments}
               mutate={mutate}
               setPage={setPage}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
             />
           )}
         </div>

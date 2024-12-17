@@ -18,9 +18,9 @@ const useRoomData = (props: IFetcherProps) => {
       },
     });
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message);
-    }
+    // if (!response.ok) {
+    //   throw new Error(data.message);
+    // }
     return data;
   }
 

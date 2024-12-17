@@ -50,14 +50,14 @@ const DeleteCurriculumModal = (props: ISubjectDeleteModalProps) => {
 		const data: ICommonResponse<any> = await response.json();
 		if (data.status !== 200) {
 			useNotify({
-				message: TRANSLATOR[data.message ?? ''] ?? 'Có lỗi xảy ra',
+				message: data.message ?? 'Có lỗi xảy ra',
 				type: 'error',
-			});
+			});1
 			return;
 		} else {
 			await mutate();
 			useNotify({
-				message: TRANSLATOR[data.message ?? ''] ?? 'Xóa Khung chương trình thành công',
+				message: data.message ?? 'Xóa Khung chương trình thành công',
 				type: 'success',
 			});
 		}

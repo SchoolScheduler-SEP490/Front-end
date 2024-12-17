@@ -358,23 +358,17 @@ const CreateDepartment = (props: ICreateDepartmentProps) => {
 		const data = await response.json();
 		if (response.ok) {
 			useNotify({
-				message: TRANSLATOR[data?.message || ''] ?? 'Có lỗi xảy ra',
+				message: TRANSLATOR[data?.message || ''] ?? 'Tạo mới thành công',
 				type: 'success',
 			});
 			updateDepartment();
 			handleClose();
-		} else if (
-			data?.status === 400 &&
-			data?.message === 'Department name or code does existed.'
-		) {
-			const tmpErrorObjects: IErrorDepartmentResonse[] = data?.result?.map(
-				(item: IErrorDepartmentResonse) => ({
-					...item,
-				})
-			);
-			if (tmpErrorObjects.length > 0) {
-				setVulnerableObjects(tmpErrorObjects);
-			}
+		} else {
+			useNotify({
+				message: data?.message ?? 'Có lỗi xảy ra',
+				type: 'error',
+			});
+			setIsConfirmOpen(false);
 		}
 	};
 

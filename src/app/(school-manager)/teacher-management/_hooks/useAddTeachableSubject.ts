@@ -13,18 +13,18 @@ interface IAddTeachableSubjectProps {
 const useAddTeachableSubject = (props: IAddTeachableSubjectProps) => {
   const handleAddTeachableSubject = async () => {
     try {
-      const response = await addNewTeachableSubject(
+      const result = await addNewTeachableSubject(
         props.schoolId,
         props.teacherId,
         props.teachableData,
         props.sessionToken
       );
-
+      
       useNotify({
         message: "Thêm chuyên môn thành công",
         type: "success",
       });
-      return true;
+      return result;
     } catch (err: any) {
       useNotify({
         message: err.message || "Thêm chuyên môn thất bại",
@@ -33,10 +33,7 @@ const useAddTeachableSubject = (props: IAddTeachableSubjectProps) => {
       return false;
     }
   };
-
-  return {
-    handleAddTeachableSubject,
-  };
-};
+  return { handleAddTeachableSubject };
+}
 
 export default useAddTeachableSubject;

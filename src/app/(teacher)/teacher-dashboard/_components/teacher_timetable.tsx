@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from "@mui/material";
 import {
   collection,
@@ -64,6 +65,13 @@ export default function TeacherTimetable({
 }: TeacherTimetableProps) {
   const { teacherInfo } = useTeacherSelector((state) => state.teacher);
   const [publishedTimetable, setPublishedTimetable] = useState<any>(null);
+  const [timetableDetails, setTimetableDetails] = useState({
+    appliedWeek: "",
+    endedWeek: "",
+    timetableAbbreviation: "",
+    termName: "",
+    timetableName: "",
+  });
 
   useEffect(() => {
     const fetchPublishedTimetable = async () => {
@@ -78,10 +86,22 @@ export default function TeacherTimetable({
         const snapshot = await getDocs(q);
         if (!snapshot.empty) {
           const timetableDoc = snapshot.docs[0];
+          const timetableData = timetableDoc.data();
+
+          // Set timetable details
+          setTimetableDetails({
+            appliedWeek: timetableData["applied-week"] || "",
+            endedWeek: timetableData["ended-week"] || "",
+            timetableAbbreviation:
+              timetableData["timetable-abbreviation"] || "",
+            termName: timetableData["term-name"] || "",
+            timetableName: timetableData["timetable-name"] || "",
+          });
+
           const scheduleRef = doc(
             firestore,
             "schedule-responses",
-            timetableDoc.data()["generated-schedule-id"]
+            timetableData["generated-schedule-id"]
           );
           const scheduleSnap = await getDoc(scheduleRef);
 
@@ -101,6 +121,61 @@ export default function TeacherTimetable({
 
   return (
     <div className="w-full h-[90vh] flex flex-col justify-start items-center pb-[2vh]">
+      <div className="w-full mb-6 flex justify-between items-center gap-4">
+        <div className="flex gap-4">
+          <TextField
+            label="Tên thời khóa biểu"
+            variant="standard"
+            value={timetableDetails.timetableName}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <TextField
+            label="Mã thời khóa biểu"
+            variant="standard"
+            value={timetableDetails.timetableAbbreviation}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <TextField
+            label="Học kì"
+            variant="standard"
+            value={timetableDetails.termName}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <TextField
+            label="Tuần áp dụng"
+            variant="standard"
+            value={timetableDetails.appliedWeek}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <TextField
+            label="Tuần kết thúc"
+            variant="standard"
+            value={timetableDetails.endedWeek}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+        </div>
+      </div>
+
       <TableContainer
         sx={{ mb: 10, maxHeight: "100%" }}
         className="!no-scrollbar"
@@ -160,12 +235,12 @@ export default function TeacherTimetable({
                               {period["subject-abbreviation"]}
                             </strong>
                             <div className="flex justify-between w-full">
-                            <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
-                              {schedule["student-class-name"]}
-                            </p>
-                            <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
-                              {period["room-code"]}
-                            </p>
+                              <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                                {schedule["student-class-name"]}
+                              </p>
+                              <p className="text-ellipsis text-nowrap overflow-hidden text-gray-600 text-xs">
+                                {period["room-code"]}
+                              </p>
                             </div>
                           </div>
                         )}

@@ -105,15 +105,15 @@ export default function SMClass() {
     }
   }, [page, rowsPerPage]);
 
-  React.useEffect(() => {
-    if (error && !isErrorShown) {
-      setIsErrorShown(true);
-      useNotify({
-        message: TRANSLATOR[error?.message] ?? "Lớp học chưa có dữ liệu.",
-        type: "error",
-      });
-    }
-  }, [isValidating]);
+  // React.useEffect(() => {
+  //   if (error && !isErrorShown) {
+  //     setIsErrorShown(true);
+  //     useNotify({
+  //       message: TRANSLATOR[error?.message] ?? "Lớp học chưa có dữ liệu.",
+  //       type: "error",
+  //     });
+  //   }
+  // }, [isValidating]);
 
   if (isValidating) {
     return (

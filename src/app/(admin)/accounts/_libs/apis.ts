@@ -14,6 +14,18 @@ export const getFetchAccountApi = ({
 	}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
 };
 
-export const getActiveSchoolApi = () => {
+export const getActiveSchoolApi = ({
+	accountStatus,
+	schoolId,
+	schoolManagerId,
+}: {
+	schoolManagerId: number;
+	schoolId: number;
+	accountStatus: 'Active' | 'Pending' | 'Inactive';
+}) => {
+	return `${api}/api/users/confirm-school-manager-account?schoolManagerId=${schoolManagerId}&schoolId=${schoolId}&accountStatus=${accountStatus}`;
+};
+
+export const getUpdateStatusSchoolApi = () => {
 	return `${api}/api/users/status`;
 };

@@ -127,7 +127,7 @@ export default function TeacherDetails() {
                                   variant="body2"
                                   className="!text-gray-500"
                                 >
-                                  Ho Chi Minh City
+                                  {`Chủ nhiệm lớp: ${teacherData["home-room-teacher-of-class"] ? teacherData["home-room-teacher-of-class"] : 'N/A'}`}
                                 </Typography>
                               </div>
                             </div>
@@ -261,12 +261,12 @@ export default function TeacherDetails() {
             )}
             {activeTab === 1 && (
               <div className="w-full px-24 py-7">
-                  <TeachableSubjectTable
-                    teacherId={teacherId}
-                    schoolId={schoolId}
-                    sessionToken={sessionToken}
-                    mutate={mutate}
-                  />
+                <TeachableSubjectTable
+                  teacherId={teacherId}
+                  schoolId={schoolId}
+                  sessionToken={sessionToken}
+                  mutate={mutate}
+                />
               </div>
             )}
           </div>

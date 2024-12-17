@@ -10,6 +10,7 @@ import {
   MenuItem,
   keyframes,
   Menu,
+  TextField,
 } from "@mui/material";
 import ContainedButton from "@/commons/button-contained";
 import CloseIcon from "@mui/icons-material/Close";
@@ -17,6 +18,7 @@ import { ITerm, IWeekDate } from "../_libs/constants";
 import { getTerms, getWeekDate } from "../_libs/apiTimetable";
 import { useState, useEffect } from "react";
 import { useAppContext } from "@/context/app_provider";
+import { useRouter } from 'next/navigation';
 
 const style = {
   position: "absolute",
@@ -48,8 +50,10 @@ interface ConfirmStatusModalProps {
   timetableCode: string;
   timetableName: string;
   termId: number;
+  termName: string;
   appliedWeek: string | null;
   endedWeek: string | null;
+  generatedScheduleId: string
 }
 
 const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
@@ -61,8 +65,10 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
     timetableCode,
     timetableName,
     termId,
+    termName,
     appliedWeek,
     endedWeek,
+    generatedScheduleId
   } = props;
 
   const { schoolId, selectedSchoolYearId, sessionToken } = useAppContext();
@@ -75,10 +81,11 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
   const [selectedEndWeek, setSelectedEndWeek] = useState<number>(
     Number(endedWeek) || 0
   );
+	const router = useRouter();
 
   useEffect(() => {
     const loadInitialData = async () => {
-      if (open) {
+      if ((open && status === 2) || status == 3) {
         const termsData = await getTerms(sessionToken, selectedSchoolYearId);
         setTerms(termsData.result.items);
         setSelectedTermId(termId);
@@ -89,7 +96,7 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
 
   useEffect(() => {
     const loadWeeks = async () => {
-      if (selectedTermId && status === 3) {
+      if (selectedTermId && (status === 3 || status === 2)) {
         const data = await getWeekDate(
           schoolId,
           selectedSchoolYearId,
@@ -106,31 +113,40 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
 
   const getCurrentWeekNumber = () => {
     const currentDate = new Date();
-    return (
-      weeks.find((week) => {
-        const startDate = new Date(week["start-date"]);
-        const endDate = new Date(week["end-date"]);
-        return currentDate >= startDate && currentDate <= endDate;
-      })?.["week-number"] || 0
-    );
+    const currentDay = currentDate.getDay(); // 0 = Sunday, 6 = Saturday
+    
+    // Find current week
+    const currentWeek = weeks.find((week) => {
+      const startDate = new Date(week["start-date"]);
+      const endDate = new Date(week["end-date"]);
+      return currentDate >= startDate && currentDate <= endDate;
+    });
+  
+    // If it's Friday(5), Saturday(6) or Sunday(0), add 1 to the minimum allowed week
+    const isWeekend = currentDay === 5 || currentDay === 6 || currentDay === 0;
+    const weekOffset = isWeekend ? 2 : 1;
+  
+    return (currentWeek?.["week-number"] || 0) + weekOffset;
   };
 
+  const formatWeekDisplay = (weekNumber: string | null, weeks: IWeekDate[]) => {
+    if (!weekNumber) return "";
+    const week = weeks.find(w => w["week-number"].toString() === weekNumber);
+    if (week) {
+      return `Tuần ${week["week-number"]} (${week["start-date"]} - ${week["end-date"]})`;
+    }
+    return weekNumber;
+  };
+  
+  
   const getStatusMessage = () => {
     switch (status) {
       case 2:
         return (
-          <span>
-            Bạn có chắc chắn muốn công bố nội bộ thời khóa biểu{" "}
-            <strong>{timetableCode}</strong>?
-          </span>
-        );
-
-      case 3:
-        return (
           <div className="flex flex-col gap-4">
             <span>
-              Bạn có chắc chắn muốn công bố thời khóa biểu{" "}
-              <strong>"{timetableCode}"</strong>?
+              Bạn có chắc chắn muốn công bố nội bộ thời khóa biểu{" "}
+              <strong>{timetableCode}</strong>?
             </span>
             <div className="bg-gray-50 p-4 rounded">
               <div className="grid grid-cols-2 gap-4">
@@ -150,24 +166,17 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
 
                 <div className="col-span-2 grid grid-cols-2 gap-2">
                   <span className="text-gray-600 font-semibold">Học kỳ:</span>
-                  <FormControl
+                  <TextField
                     variant="standard"
                     fullWidth
+                    value={termName}
                     sx={{ maxWidth: 200 }}
-                  >
-                    <Select
-                      value={selectedTermId}
-                      onChange={(e) =>
-                        setSelectedTermId(Number(e.target.value))
-                      }
-                    >
-                      {terms.map((term) => (
-                        <MenuItem key={term.id} value={term.id}>
-                          {term.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                      },
+                    }}
+                  />
                 </div>
 
                 <div className="col-span-2 grid grid-cols-2 gap-2">
@@ -180,27 +189,23 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
                     sx={{ maxWidth: 200 }}
                   >
                     <Select
-                      value={selectedStartWeek}
+                      value={selectedStartWeek || ""}
                       onChange={(e) =>
                         setSelectedStartWeek(Number(e.target.value))
                       }
-                      disabled={!selectedTermId}
                     >
-                      {Array.isArray(weeks) &&
-                        weeks
-                          .filter(
-                            (week) =>
-                              week["week-number"] > getCurrentWeekNumber()
-                          )
-                          .map((week) => (
-                            <MenuItem
-                              key={week["week-number"]}
-                              value={week["week-number"]}
-                            >
-                              Tuần {week["week-number"]} ({week["start-date"]} -{" "}
-                              {week["end-date"]})
-                            </MenuItem>
-                          ))}
+                      {weeks.filter(week => {
+                        const currentDay = new Date().getDay();
+                        const adjustedDay = currentDay === 0 ? 7 : currentDay;
+                        const minWeek = getCurrentWeekNumber();
+                        return week["week-number"] >= minWeek;
+                      })
+                      .map((week) => (
+                        <MenuItem key={week["week-number"]} value={week["week-number"]}>
+                          Tuần {week["week-number"]} ({week["start-date"]} - {week["end-date"]})
+                        </MenuItem>
+                      ))
+                      }
                     </Select>
                   </FormControl>
                 </div>
@@ -238,6 +243,96 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
                           ))}
                     </Select>
                   </FormControl>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      case 3:
+        if (!generatedScheduleId) {
+          return (
+            <div className="flex flex-col gap-4">
+              <span className="italic tracking-wide">
+                Thời khóa biểu chưa có dữ liệu. Vui lòng tạo thời khóa biểu {" "}
+                <span 
+                  className="text-primary-300 underline italic cursor-pointer hover:underline"
+                  onClick={() => router.push(`/timetable-generation/${timetableCode}/information`)}
+                >
+                  tại đây
+                </span>
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div className="flex flex-col gap-4">
+            <span>
+              Bạn có chắc chắn muốn công bố thời khóa biểu{" "}
+              <strong>{timetableCode}</strong>?
+            </span>
+            <div className="bg-gray-50 p-4 rounded">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Mã thời khóa biểu:
+                  </span>
+                  <span>{timetableCode}</span>
+                </div>
+
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tên thời khóa biểu:
+                  </span>
+                  <span>{timetableName}</span>
+                </div>
+
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">Học kỳ:</span>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    value={termName}
+                    sx={{ maxWidth: 200 }}
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                      },
+                    }}
+                  />
+                </div>
+
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tuần áp dụng:
+                  </span>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    value={formatWeekDisplay(appliedWeek, weeks)}
+                    sx={{ maxWidth: 200 }}
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                      },
+                    }}
+                  />
+                </div>
+
+                <div className="col-span-2 grid grid-cols-2 gap-2">
+                  <span className="text-gray-600 font-semibold">
+                    Tuần kết thúc:
+                  </span>
+                  <TextField
+                    variant="standard"
+                    fullWidth
+                    value={formatWeekDisplay(endedWeek, weeks)}
+                    sx={{ maxWidth: 200 }}
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                      },
+                    }}
+                  />
                 </div>
               </div>
             </div>
@@ -317,7 +412,9 @@ const ConfirmStatusModal = (props: ConfirmStatusModalProps) => {
           <ContainedButton
             title="Xác nhận"
             disableRipple
-            onClick={() => onConfirm(selectedTermId, selectedStartWeek, selectedEndWeek)}
+            onClick={() =>
+              onConfirm(selectedTermId, selectedStartWeek, selectedEndWeek)
+            }
             styles="!bg-primary-300 text-white !py-1 px-4"
           />
         </div>
