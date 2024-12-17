@@ -253,7 +253,7 @@ const TeacherAccountModal = (props: IPublishTimetableConfirmModalProps) => {
 										Mã GV
 									</TableCell>
 									<TableCell align='center' sx={{ fontWeight: 'bold' }}>
-										Vị trí
+										Vai trò
 									</TableCell>
 									<TableCell align='center' sx={{ fontWeight: 'bold' }}>
 										Email
