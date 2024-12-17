@@ -205,6 +205,13 @@ const TeacherHeader = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
+  const getFilteredNotifications = () => {
+    if (activeTab === 1) { // "Chưa đọc" tab
+      return notifications.filter(notification => !notification["is-read"]);
+    }
+    return notifications; // "Tất cả" tab
+  };
+
   return (
     <div className="w-full min-h-[50px] bg-primary-500 flex flex-row justify-between items-center pl-[1.5vw] pr-2">
       <div className="w-fit h-full flex flex-row justify-start items-center gap-5">
@@ -280,15 +287,15 @@ const TeacherHeader = ({ children }: { children: ReactNode }) => {
                     Đánh dấu tất cả
                   </button>
                 </div>
-                {notifications.length > 0 ? (
-                  notifications.map((notification, index) => (
+                {getFilteredNotifications().length > 0 ? (
+                  getFilteredNotifications().map((notification, index) => (
                     <div
                       key={index}
                       className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
                         !notification["is-read"] ? "bg-blue-50" : ""
                       }`}
                       onClick={() => {
-                        markAsRead(notification["notification-url"]);
+                        markAsRead(notification.id);
                         if (notification.link) {
                           window.location.href = notification.link;
                         }
