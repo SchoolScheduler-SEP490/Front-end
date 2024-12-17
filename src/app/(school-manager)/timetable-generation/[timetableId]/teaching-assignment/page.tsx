@@ -38,7 +38,7 @@ interface ISortableDropdown<T> extends IDropdownOption<T> {
 
 export default function SMTeachingAssignment() {
 	const { sessionToken, schoolId, selectedSchoolYearId } = useAppContext();
-	const { dataStored }: ITimetableGenerationState = useSelector(
+	const { dataStored , timetableStored}: ITimetableGenerationState = useSelector(
 		(state: any) => state.timetableGeneration
 	);
 
@@ -97,60 +97,14 @@ export default function SMTeachingAssignment() {
 		pageSize: 1000,
 		pageIndex: 1,
 	});
-	const { data: termData, mutate: updateTerm } = useFetchTerm({
-		pageIndex: 1,
-		pageSize: 100,
-		schoolYearId: selectedSchoolYearId,
-	});
 
 	// Lấy data summary từ dataStored
 	useEffect(() => {
 		if (dataStored) {
 			setAssignmentSummary(dataStored['teacher-assignments-summary']);
+			setSelectedTermId(timetableStored['term-id'])
 		}
 	}, [dataStored]);
-
-	// Process data
-	useEffect(() => {
-		if (termData?.status === 200) {
-			const studyOptions: ISortableDropdown<number>[] = termData.result.items.map(
-				(item: ITermResponse) => ({
-					value: item.id,
-					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-					criteria: item.name,
-				})
-			);
-			setTermStudyOptions(
-				studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
-			);
-		}
-	}, [termData]);
-
-	useEffect(() => {
-		updateTerm({ schoolYearId: selectedSchoolYearId });
-		if (termData?.status === 200) {
-			const termInYear: ITermResponse[] = termData.result.items.filter(
-				(term: ITermResponse) => term['school-year-id'] === selectedSchoolYearId
-			);
-			if (termInYear.length > 0) {
-				const studyOptions: ISortableDropdown<number>[] = termInYear.map((item: ITermResponse) => ({
-					value: item.id,
-					label: `${item.name} | (${item['school-year-start']}-${item['school-year-end']}) `,
-					criteria: item.name,
-				}));
-				setTermStudyOptions(
-					studyOptions.sort((a, b) => (a.criteria as string).localeCompare(b.criteria as string))
-				);
-				if (!studyOptions.some((item) => item.value === selectedTermId))
-					setSelectedTermId(studyOptions[0].value);
-			} else {
-				useNotify({
-					type: 'error',
-					message: 'Không có học kỳ cho năm học này',
-				});
-			}
-		}
-	}, [selectedSchoolYearId]);
 
 	useEffect(() => {
 		updateClass();

@@ -13,7 +13,7 @@ import { firestore } from '@/utils/firebaseConfig';
 import { addDoc, collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import TimetableLoading from './_components/timetable_loading';
 import PreviewScheduleTable from './_components/timetable_table_preview';
-import useGenerateTimetable from './_hooks/useGenerateTimetable';
+import { getGenerateTimetableApi } from './_libs/apis';
 import { IGenerateTimetableRequest } from './_libs/constants';
 
 export default function Home() {
@@ -49,13 +49,22 @@ export default function Home() {
 				'days-in-week': dataStored['days-in-week'],
 				'max-execution-time-in-seconds': dataStored['max-execution-time-in-seconds'],
 			};
-			const data = await useGenerateTimetable({
-				formData: requestBody,
-				sessionToken,
+
+			const endpoint = getGenerateTimetableApi({
 				schoolId: Number(schoolId),
 				schoolYearId: selectedSchoolYearId,
 			});
-			if (data?.status === 200) {
+
+			const response = await fetch(endpoint, {
+				headers: {
+					Authorization: `Bearer ${sessionToken}`,
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
+				body: JSON.stringify(requestBody),
+			});
+			if (response.ok) {
+				const data = await response.json();
 				const result: IScheduleResponse = { ...data.result, 'timetable-id': timetableId };
 				if (result) {
 					const timetableQuery = query(
@@ -86,8 +95,8 @@ export default function Home() {
 								dispatch(setGeneratedScheduleStored({ ...result } as IScheduleResponse));
 								dispatch(setGeneratingStatus(false));
 								useNotify({
-									type: 'success',
 									message: data?.message,
+									type: 'success',
 								});
 							});
 						});
@@ -139,10 +148,11 @@ export default function Home() {
 					}
 				}
 			} else {
+				const data = await response.json();
 				dispatch(setGeneratingStatus(false));
 				useNotify({
 					type: 'error',
-					message: data?.Message,
+					message: data?.message,
 				});
 			}
 		}

@@ -28,6 +28,9 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { IDropdownOption } from '../_utils/contants';
 import { TIMETABLE_GENERATION_TABS } from './_libs/constants';
+import useFetchWeekDays from '../publish-timetable/_hooks/useFetchWeekdays';
+import { IWeekdayResponse } from '../publish-timetable/_libs/constants';
+import dayjs from 'dayjs';
 
 const ITEM_HEIGHT = 30;
 const ITEM_PADDING_TOP = 8;
@@ -60,6 +63,7 @@ export default function Home() {
 
 	const [schoolYearIdOptions, setSchoolYearIdOptions] = useState<IDropdownOption<number>[]>([]);
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
+	const [weekdayOptions, setWeekdayOptions] = useState<IDropdownOption<number>[]>([]);
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: false });
 	const { data: termData, mutate: updateTerm } = useFetchTerm({
@@ -67,6 +71,34 @@ export default function Home() {
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
 	});
+
+	const { data: weekdayData, mutate: updateWeekdayData } = useFetchWeekDays({
+		schoolId: Number(schoolId),
+		sessionToken,
+		termId: selectedTermId,
+		yearId: selectedSchoolYearId,
+	});
+
+	useEffect(() => {
+		updateWeekdayData();
+		if (weekdayData?.status === 200) {
+			setWeekdayOptions([]);
+			const tmpWeekdayOptions: IDropdownOption<number>[] = weekdayData.result.map(
+				(weekday: IWeekdayResponse) =>
+					({
+						label: `Tuần ${weekday['week-number']} (${dayjs(weekday['start-date']).format(
+							'DD/MM/YYYY'
+						)} - ${dayjs(weekday['end-date']).format('DD/MM/YYYY')})`,
+						value: weekday['week-number'],
+					} as IDropdownOption<number>)
+			);
+			if (tmpWeekdayOptions.length > 0) {
+				setWeekdayOptions(tmpWeekdayOptions.sort((a, b) => a.value - b.value));
+				setStartWeek(tmpWeekdayOptions[0].value);
+				setEndWeek(tmpWeekdayOptions[tmpWeekdayOptions.length - 1].value);
+			}
+		}
+	}, [weekdayData, selectedTermId, selectedSchoolYearId, open]);
 
 	// Process data
 	useEffect(() => {
@@ -324,18 +356,16 @@ export default function Home() {
 								onChange={(event) => setStartWeek(Number(event.target.value))}
 								MenuProps={MenuProps}
 								renderValue={(selected) => {
-									return selected;
+									return weekdayOptions.find((item) => item.value === selected)?.label ?? '';
 								}}
 								sx={{ width: '100%', fontSize: '1.000rem' }}
 							>
-								{Array.from({ length: endWeek - startWeek }, (_, i) => startWeek + i).map(
-									(item, index) => (
-										<MenuItem key={item + index} value={item}>
-											<Checkbox checked={startWeek === 0 ? false : startWeek === item} />
-											<ListItemText primary={item} />
-										</MenuItem>
-									)
-								)}
+								{weekdayOptions.map((option: IDropdownOption<number>, index: number) => (
+									<MenuItem key={index} value={option.value}>
+										<Checkbox checked={startWeek === 0 ? false : startWeek === option.value} />
+										<ListItemText primary={option.label} />
+									</MenuItem>
+								))}
 							</Select>
 						</FormControl>
 						<FormControl sx={{ width: '45%' }}>
@@ -350,18 +380,16 @@ export default function Home() {
 								onChange={(event) => setEndWeek(Number(event.target.value))}
 								MenuProps={MenuProps}
 								renderValue={(selected) => {
-									return selected;
+									return weekdayOptions.find((item) => item.value === selected)?.label ?? '';
 								}}
 								sx={{ width: '100%', fontSize: '1.000rem' }}
 							>
-								{Array.from({ length: endWeek - startWeek }, (_, i) => startWeek + i + 1).map(
-									(item, index) => (
-										<MenuItem key={item + index} value={item}>
-											<Checkbox checked={endWeek === 0 ? false : endWeek === item} />
-											<ListItemText primary={item} />
-										</MenuItem>
-									)
-								)}
+								{weekdayOptions.map((option: IDropdownOption<number>, index: number) => (
+									<MenuItem key={index} value={option.value}>
+										<Checkbox checked={startWeek === 0 ? false : startWeek === option.value} />
+										<ListItemText primary={option.label} />
+									</MenuItem>
+								))}
 							</Select>
 						</FormControl>
 					</div>

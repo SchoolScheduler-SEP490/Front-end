@@ -77,7 +77,7 @@ export const getFetchTeachingAssignmentApi = ({
 }) => {
 	const queryString = new URLSearchParams({
 		studentClassId: studentClassId.toString(),
-		termId: termId.toString(),
+		termId: termId?.toString(),
 	}).toString();
 	return `${api}/api/schools/${schoolId}/academic-years/${schoolYearId}/teacher-assignments?${queryString}`;
 };
