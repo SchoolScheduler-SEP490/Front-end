@@ -256,6 +256,7 @@ const TimetableEditModal = (props: ITimetableEditModalProps) => {
 					type: 'success',
 					message: 'Cập nhật tiết học thành công',
 				});
+				handleClose();
 			}
 		}
 	};

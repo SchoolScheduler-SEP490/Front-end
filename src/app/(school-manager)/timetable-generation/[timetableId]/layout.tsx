@@ -88,9 +88,11 @@ export default function SMConstraintLayout({ children }: { children: ReactNode }
 					const docSnap = await getDoc(docRef);
 					const generatedSchedule = docSnap.data() as IScheduleResponse;
 					dispatch(setGeneratedScheduleStored(generatedSchedule));
+				} else {
+					dispatch(setGeneratedScheduleStored({} as IScheduleResponse));
 				}
 				dispatch(setTimetableStored(timetableStore));
-			}
+			} 
 		};
 		fetchStoreTimetable();
 	}, []);
