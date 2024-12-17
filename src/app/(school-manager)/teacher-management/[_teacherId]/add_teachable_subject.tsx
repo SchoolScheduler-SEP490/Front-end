@@ -311,7 +311,7 @@ const AddTeachableSubjectModal = (props: AddTeachableSubjectProps) => {
         },
       }}
     >
-      <div className="w-full h-fit flex flex-row justify-between items-center bg-primary-50 p-3">
+      <div className="!w-full h-fit flex flex-row justify-between items-center bg-primary-50 !p-3">
         <Typography
           variant="h6"
           className="text-title-medium-strong font-normal opacity-60"
