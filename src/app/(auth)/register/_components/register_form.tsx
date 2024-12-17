@@ -105,14 +105,20 @@ export const RegisterForm = () => {
           type: "success",
         });
         router.push("/login");
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
+      } else if (response.status === 400 && response.message === "Account already exists.") {
+        useNotify({
+          message: "Tài khoản đã tồn tại trong hệ thống.",
+          type: "error",
+        });
+      } 
+    } catch (error: any) {
       console.error("Registration failed:", error);
-      setError("Registration failed. Please try again.");
+      useNotify({
+        message: error.message || "Đăng ký thất bại. Vui lòng thử lại.",
+        type: "error",
+      });
     }
-  };
+  };  
 
   useEffect(() => {
     const fetchProvince = async () => {

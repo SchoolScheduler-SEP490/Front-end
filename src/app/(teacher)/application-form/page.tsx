@@ -83,22 +83,6 @@ export default function ApplicationFormPage() {
     }
   }, [teacherInfo]);
 
-  const validateFile = (file: File): boolean => {
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    
-    if (file.size > MAX_FILE_SIZE) {
-      setFileError("File không được vượt quá 1MB");
-      return false;
-    }
-    
-    if (fileExtension !== 'docx') {
-      setFileError("Chỉ chấp nhận file định dạng .docx");
-      return false;
-    }
-    
-    setFileError("");
-    return true;
-  };
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {

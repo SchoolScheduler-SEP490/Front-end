@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
   Chip,
+  TablePagination,
 } from "@mui/material";
 import { IViewApplication } from "../_libs/constants";
 import {
@@ -24,13 +25,26 @@ interface ViewApplicationTableProps {
   teacherId: number;
   schoolYearId: number;
   sessionToken: string;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  rowsPerPage: number;
+  setRowsPerPage: React.Dispatch<React.SetStateAction<number>>;
+  totalRows?: number;
+  setTotalRows: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function ViewApplicationTable({
-  teacherId,
-  schoolYearId,
-  sessionToken,
-}: ViewApplicationTableProps) {
+export default function ViewApplicationTable(props: ViewApplicationTableProps) {
+  const {
+    teacherId,
+    schoolYearId,
+    sessionToken,
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    totalRows,
+    setTotalRows,
+  } = props;
   const [applications, setApplications] = useState<IViewApplication[]>([]);
 
   useEffect(() => {
@@ -43,6 +57,7 @@ export default function ViewApplicationTable({
         );
         if (response?.result?.items) {
           setApplications(response.result.items);
+          setTotalRows(response.result["total-item-count"]);
         }
       }
     };
@@ -68,6 +83,26 @@ export default function ViewApplicationTable({
     }
   };
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value));
+  };
+
+  const emptyRows =
+    applications.length < rowsPerPage && rowsPerPage < 10
+      ? rowsPerPage - applications.length + 1
+      : 0;
+
+  const visibleApplications = applications.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   return (
     <TableContainer
       component={Paper}
@@ -81,6 +116,12 @@ export default function ViewApplicationTable({
       <Table aria-label="application table">
         <TableHead>
           <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+            <TableCell
+              id="labelId"
+              sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}
+            >
+              STT
+            </TableCell>
             <TableCell
               sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}
             >
@@ -106,15 +147,35 @@ export default function ViewApplicationTable({
             >
               Trạng thái
             </TableCell>
+            <TableCell
+              sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}
+            >
+              Phản hồi
+            </TableCell>
+            <TableCell
+              sx={{ fontWeight: "bold", fontSize: "1rem", textAlign: "center" }}
+            >
+              Ngày duyệt
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {Array.isArray(applications) &&
-            applications.map((application) => (
+            visibleApplications.map((application, index) => (
               <TableRow
                 key={application.id}
                 sx={{ "&:hover": { backgroundColor: "#f8f9fa" } }}
               >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  align="center"
+                  style={{
+                    borderRight: "1px solid #e0e0e0",
+                  }}
+                >
+                  {index + 1 + page * rowsPerPage}
+                </TableCell>
                 <TableCell
                   style={{
                     borderRight: "1px solid #e0e0e0",
@@ -222,10 +283,63 @@ export default function ViewApplicationTable({
                     />
                   </div>
                 </TableCell>
+                <TableCell
+                  style={{
+                    maxWidth: "200px",
+                    borderRight: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Typography variant="body1">
+                    {application["process-note"]}
+                  </Typography>
+                </TableCell>
+                <TableCell
+                  style={{
+                    borderRight: "1px solid #e0e0e0",
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#666",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {new Date(application["request-time"]).toLocaleString(
+                      "vi-VN",
+                      {
+                        year: "numeric",
+                        month: "numeric",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
+                  </Typography>
+                </TableCell>
               </TableRow>
             ))}
+          {emptyRows > 0 && (
+            <TableRow style={{ height: 53 * emptyRows }}>
+              <TableCell colSpan={8} />
+            </TableRow>
+          )}
         </TableBody>
       </Table>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        labelRowsPerPage="Số hàng"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from} - ${to} của ${count !== -1 ? count : `hơn ${to}`}`
+        }
+        count={applications.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </TableContainer>
   );
 }
