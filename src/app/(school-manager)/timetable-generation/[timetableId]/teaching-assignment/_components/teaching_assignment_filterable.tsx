@@ -84,11 +84,11 @@ const TeachingAssignmentFilterable = (props: ITeachingAssignmentFilterableProps)
 				setMinPeriodPerWeek(Number(value));
 				break;
 			case 'max':
-				if (Number(value) <= 17) {
+				if (Number(value) <= 25) {
 					setMaxPeriodPerWeek(Number(value));
 				} else {
 					setErrors((prev) => ({ ...prev, [name]: true }));
-					setMaxPeriodPerWeek(17);
+					setMaxPeriodPerWeek(25);
 				}
 				break;
 		}

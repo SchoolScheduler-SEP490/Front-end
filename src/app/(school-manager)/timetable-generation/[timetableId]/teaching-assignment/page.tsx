@@ -48,7 +48,7 @@ export default function SMTeachingAssignment() {
 	const [selectedGrade, setSelectedGrade] = useState<string>('');
 	const [selectedTermId, setSelectedTermId] = useState<number>(1);
 	const [maxPeriodPerWeek, setMaxPeriodPerWeek] = useState<number>(17);
-	const [minPeriodPerWeek, setMinPeriodPerWeek] = useState<number>(10);
+	const [minPeriodPerWeek, setMinPeriodPerWeek] = useState<number>(5);
 
 	// Data
 	const [tableData, setTableData] = useState<ITeachingAssignmentTableData[]>([]);

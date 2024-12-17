@@ -26,6 +26,8 @@ import useFetchData from '@/app/(admin)/subjects/_hooks/useFetchData';
 import { useAppContext } from '@/context/app_provider';
 import { ISubjectResponse } from '@/app/(school-manager)/department-management/_libs/constants';
 import { ITeacherResponse } from '../_libs/constants';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import TimetableDuplicationModal from './details_configurations/details_modal_duplicate';
 
 interface IDetailsSolutionProps {
 	selectedTeacher: string;
@@ -46,6 +48,8 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 	const { selectedSchoolYearId, sessionToken } = useAppContext();
 	const [subjectLoadedData, setsubjectLoadedData] = useState<ISubjectResponse[]>([]);
 	const [teacherLoadedData, setteacherLoadedData] = useState<ITeacherResponse[]>([]);
+	const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState<boolean>(false);
+	
 	const { data: subjectData } = useFetchData({
 		sessionToken: sessionToken,
 		schoolYearId: selectedSchoolYearId,
@@ -97,7 +101,15 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						))}
 					</Select>
 				</FormControl>
-				<div className='flex items-center gap-3'>
+				<div className='flex items-center gap-3 pr-[2vw]'>
+					<Tooltip title='Tạo bản sao TKB'>
+						<IconButton
+							onClick={() => setIsDuplicateModalOpen(true)}
+							disabled={subjectLoadedData.length == 0 || teacherLoadedData.length == 0}
+						>
+							<FileCopyIcon />
+						</IconButton>
+					</Tooltip>
 					<Tooltip title='Xuất TKB'>
 						<IconButton
 							onClick={() => setOpenExportModel(true)}
@@ -107,7 +119,7 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 						</IconButton>
 					</Tooltip>
 					{timetableStored &&
-						['Published', 'PublishedInternal'].includes(timetableStored.status) && (
+						!['Published', 'PublishedInternal'].includes(timetableStored.status) && (
 							<Tooltip title='Cấu hình'>
 								<IconButton
 									onClick={() => router.push(`/timetable-generation/${timetableId}/information`)}
@@ -262,6 +274,11 @@ const DetailsSolution: React.FC<IDetailsSolutionProps> = (props) => {
 					scheduleData={scheduleData}
 					subjectData={subjectLoadedData}
 					teacherData={teacherLoadedData}
+				/>
+
+				<TimetableDuplicationModal
+					open={isDuplicateModalOpen}
+					setOpen={setIsDuplicateModalOpen}
 				/>
 			</div>
 		</div>

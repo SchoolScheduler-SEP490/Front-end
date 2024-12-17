@@ -62,10 +62,7 @@ export default function Home() {
 	const [termIdOptions, setTermIdOptions] = useState<ISortableDropdown<number>[]>([]);
 
 	const { data: schoolYearData, mutate } = useFetchSchoolYear({ includePrivate: false });
-	const {
-		data: termData,
-		mutate: updateTerm,
-	} = useFetchTerm({
+	const { data: termData, mutate: updateTerm } = useFetchTerm({
 		pageIndex: 1,
 		pageSize: 100,
 		schoolYearId: selectedSchoolYearId,
@@ -150,7 +147,7 @@ export default function Home() {
 			'fixed-periods-para': [],
 			'no-assign-periods-para': [],
 			'free-timetable-periods-para': [],
-			"teacher-assignments-summary": [],
+			'teacher-assignments-summary': [],
 			'applied-curriculum-id': 0,
 			'days-in-week': 6,
 			'minimum-days-off': 0,
@@ -372,6 +369,7 @@ export default function Home() {
 						variant='contained'
 						fullWidth
 						onClick={handleCreateTimetable}
+						disabled={timetableName.length === 0 || timetableAbbreviation.length === 0}
 						color='inherit'
 						sx={{
 							bgcolor: '#175b8e',

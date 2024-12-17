@@ -1,7 +1,7 @@
 'use client';
 import { ITimetableGenerationState } from '@/context/slice_timetable_generation';
 import { Button, Divider, Tab, Tabs, Typography } from '@mui/material';
-import { usePathname, useRouter } from 'next/navigation';
+import { notFound, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { TIMETABLE_GENERATION_TABS } from '../_libs/constants';
@@ -55,6 +55,8 @@ const TimetableTabs = () => {
 		setValue(value - 1);
 	};
 
+	if (!dataStored) router.replace('/timetable-generation')
+
 	return (
 		<div className='w-full h-fit border-b-1 border-basic-gray flex flex-row justify-between items-center px-2 gap-1'>
 			<Button
@@ -88,12 +90,12 @@ const TimetableTabs = () => {
 				<Tab label='2. Phân công giáo viên' {...a11yProps(1)} disabled={isTimetableGenerating} />
 				<Tab
 					label='3. Xếp tiết cố định'
-					disabled={dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
+					disabled={!dataStored || dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
 					{...a11yProps(3)}
 				/>
 				<Tab
 					label='4. Tạo thời khóa biểu'
-					disabled={dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
+					disabled={!dataStored || dataStored['teacher-assignments']?.length === 0 || isTimetableGenerating}
 					{...a11yProps(3)}
 				/>
 			</Tabs>

@@ -96,9 +96,9 @@ export default function SMLesson() {
 		setCurriculumSidenavData([]);
 		setApplicableCurriculums([]);
 		updateCurriculum();
-		if (subjectGroupData?.status === 200) {
+		if (subjectGroupData?.status === 200 && subjectGroupData.result !== null) {
 			const tmpData: ICurriculumSidenavData[] = useSidenavDataConverter(
-				subjectGroupData.result.items as ICurriculumObjectResponse[]
+				subjectGroupData.result?.items as ICurriculumObjectResponse[]
 			);
 			if (tmpData.length > 0) {
 				setCurriculumSidenavData(tmpData);
