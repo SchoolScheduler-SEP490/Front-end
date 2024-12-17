@@ -453,7 +453,7 @@ export const SCHEDULE_STATUS_TRANSLATOR: { [key: number]: string } = {
 
 export const REQUEST_TYPE_TRANSLATOR: { [key: string]: string } = {
 	All: 'Tất cả',
-	Other: 'Đơn Khác',
-	RequestAbsenntSchedule: 'Xin nghỉ phép',
-	RequestChangeSlot: 'Xin đổi tiết',
+	Other: 'Các loại đơn khác',
+	RequestAbsenntSchedule: 'Đơn xin nghỉ',
+	RequestChangeSlot: 'Đơn xin thay đổi lịch dạy',
 };
