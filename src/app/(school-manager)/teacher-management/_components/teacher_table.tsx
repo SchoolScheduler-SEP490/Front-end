@@ -33,6 +33,8 @@ import DeleteConfirmationModal from "./delete_teacher";
 import ImportTeacherSelectModal from "./import_teachers";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import UpdateTeacherModal from "./update_teacher";
+import TeacherAccountModal from "./teacher_modal_accounts";
 
 //Teacher's data table
 
