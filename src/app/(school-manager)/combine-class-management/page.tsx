@@ -193,7 +193,7 @@ export default function SMCombineClass() {
       <div
         className={`w-full h-full flex justify-${
           isDetailsShown ? "end" : "center"
-        } items-start`}
+        } pl-[1.5vw] gap-[1.5vw] items-start`}
       >
         <CombineClassTable
           combineClassData={combineClassTableData}

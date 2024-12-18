@@ -265,7 +265,7 @@ const CombineClassTable = (props: ICombineClassProps) => {
   };
 
   return (
-    <div className="w-full h-fit flex flex-col justify-center items-center px-[10vw] pt-[5vh]">
+    <div className="w-[79%] h-fit flex flex-row justify-center items-center gap-6 pt-[5vh]">
       <Box sx={{ width: "100%" }}>
         <Paper sx={{ width: "100%", mb: 2 }}>
           <Toolbar
